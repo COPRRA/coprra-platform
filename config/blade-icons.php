@@ -5,9 +5,7 @@ declare(strict_types=1);
 return [
     'class' => 'icon',
     'sets' => [
-        'heroicons' => [
-            'path' => 'resources/svg/heroicons',
-            'prefix' => 'hero',
-        ],
+        // heroicons are managed by blade-heroicons package
+        // see config/blade-heroicons.php for heroicons configuration
     ],
 ];

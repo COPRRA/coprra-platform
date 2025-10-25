@@ -103,6 +103,28 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       array (
       ),
     ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Console\\Commands\\GenerateMigrationsFromFixSql.php' => 
+    array (
+      0 => '47219632509916781359d58591c1bc98c60db81a',
+      1 => 
+      array (
+        0 => 'app\\console\\commands\\generatemigrationsfromfixsql',
+      ),
+      2 => 
+      array (
+        0 => 'app\\console\\commands\\handle',
+        1 => 'app\\console\\commands\\parseaddindexstatements',
+        2 => 'app\\console\\commands\\parsemodifycolumnstatements',
+        3 => 'app\\console\\commands\\buildoriginaltypesmap',
+        4 => 'app\\console\\commands\\generatemigration',
+        5 => 'app\\console\\commands\\renderindexmigration',
+        6 => 'app\\console\\commands\\rendermodifymigration',
+        7 => 'app\\console\\commands\\parsecolumndefinition',
+      ),
+      3 => 
+      array (
+      ),
+    ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Console\\Commands\\GenerateSitemap.php' => 
     array (
       0 => '4397e55bb17c6fc6b49e5d20d75393d75344c703',
@@ -3261,7 +3283,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Models\\Product.php' => 
     array (
-      0 => 'f27161a969b69c4d705492a35a69cc4d7c83b344',
+      0 => 'ae1b6a075c4b4c20f0be5d7376209a6dffe6cb68',
       1 => 
       array (
         0 => 'app\\models\\product',
@@ -6051,6 +6073,21 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       array (
       ),
     ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Services\\Order\\OrderTotalsCalculator.php' => 
+    array (
+      0 => '35c60aa1a04b4636be02f2d4992c5534ed4eb397',
+      1 => 
+      array (
+        0 => 'app\\services\\order\\ordertotalscalculator',
+      ),
+      2 => 
+      array (
+        0 => 'app\\services\\order\\calculatesubtotal',
+      ),
+      3 => 
+      array (
+      ),
+    ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Services\\OrderService.php' => 
     array (
       0 => '91da2a2109e9254145254525b7498242e5e6181e',
@@ -7487,43 +7524,6 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       ),
       2 => 
       array (
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Services\\Order\\OrderTotalsCalculator.php' => 
-    array (
-      0 => '35c60aa1a04b4636be02f2d4992c5534ed4eb397',
-      1 => 
-      array (
-        0 => 'app\\services\\order\\ordertotalscalculator',
-      ),
-      2 => 
-      array (
-        0 => 'app\\services\\order\\calculatesubtotal',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Console\\Commands\\GenerateMigrationsFromFixSql.php' => 
-    array (
-      0 => '47219632509916781359d58591c1bc98c60db81a',
-      1 => 
-      array (
-        0 => 'app\\console\\commands\\generatemigrationsfromfixsql',
-      ),
-      2 => 
-      array (
-        0 => 'app\\console\\commands\\handle',
-        1 => 'app\\console\\commands\\parseaddindexstatements',
-        2 => 'app\\console\\commands\\parsemodifycolumnstatements',
-        3 => 'app\\console\\commands\\buildoriginaltypesmap',
-        4 => 'app\\console\\commands\\generatemigration',
-        5 => 'app\\console\\commands\\renderindexmigration',
-        6 => 'app\\console\\commands\\rendermodifymigration',
-        7 => 'app\\console\\commands\\parsecolumndefinition',
       ),
       3 => 
       array (

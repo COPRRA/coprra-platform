@@ -12,8 +12,8 @@
          beStrictAboutTestsThatDoNotTestAnything="true"
          beStrictAboutOutputDuringTests="true"
          failOnRisky="true"
-         failOnWarning="false"
-         failOnDeprecation="false"
+         failOnWarning="true"
+         failOnDeprecation="true"
          displayDetailsOnTestsThatTriggerDeprecations="true"
          displayDetailsOnTestsThatTriggerErrors="true"
          displayDetailsOnTestsThatTriggerNotices="true"
@@ -101,9 +101,3 @@
   </php>
   <!-- Simplified configuration to reduce XML parsing and memory usage -->
 </phpunit>
-
-
-
-
-
-

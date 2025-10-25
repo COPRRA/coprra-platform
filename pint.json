@@ -1,4 +1,17 @@
 {
     "preset": "laravel",
-    "exclude": ["vendor", "storage", "bootstrap/cache", "public", "tmp"]
+    "exclude": [
+        "vendor",
+        "storage",
+        "bootstrap/cache",
+        "public",
+        "tmp",
+        "tmp/**",
+        "tmp/phpstan/**",
+        "tmp/phpstan/cache/**",
+        ".phpunit.cache",
+        ".phpunit.cache/**",
+        "*.cache",
+        "cache/**"
+    ]
 }

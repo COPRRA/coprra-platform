@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 
 return [
-	'lastFullAnalysisTime' => 1761331711,
+	'lastFullAnalysisTime' => 1761426277,
 	'meta' => array (
   'cacheVersion' => 'v12-linesToIgnore',
   'phpstanVersion' => '2.1.31',
@@ -19,7 +19,7 @@ return [
   ),
   'composerLocks' => 
   array (
-    'C:/Users/Gaser/Desktop/COPRRA/composer.lock' => '3ccddec8868461f3cd58a26390c0a2265e21db48',
+    'C:/Users/Gaser/Desktop/COPRRA/composer.lock' => '4c809bd2b66d7f385e348178b12e1a86a11470da',
   ),
   'composerInstalled' => 
   array (
@@ -7743,12 +7743,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to function method_exists() with App\\Models\\Product and \'priceHistory\' will always evaluate to true.',
        'file' => 'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Models\\Product.php',
-       'line' => 430,
+       'line' => 426,
        'canBeIgnored' => true,
        'filePath' => 'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Models\\Product.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 430,
+       'nodeLine' => 426,
        'nodeType' => 'PhpParser\\Node\\Expr\\FuncCall',
        'identifier' => 'function.alreadyNarrowedType',
        'metadata' => 
@@ -7760,12 +7760,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to function method_exists() with App\\Models\\Product and \'priceHistory\' will always evaluate to true.',
        'file' => 'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Models\\Product.php',
-       'line' => 440,
+       'line' => 436,
        'canBeIgnored' => true,
        'filePath' => 'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Models\\Product.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 440,
+       'nodeLine' => 436,
        'nodeType' => 'PhpParser\\Node\\Expr\\FuncCall',
        'identifier' => 'function.alreadyNarrowedType',
        'metadata' => 
@@ -18981,43 +18981,43 @@ return [
       array (
         0 => 'Illuminate\\Support\\Facades\\Cache',
         1 => 'forget',
-        2 => 463,
+        2 => 459,
       ),
       1 => 
       array (
         0 => 'Illuminate\\Support\\Facades\\Cache',
         1 => 'forget',
-        2 => 464,
+        2 => 460,
       ),
       2 => 
       array (
         0 => 'Illuminate\\Support\\Facades\\Cache',
         1 => 'forget',
-        2 => 465,
+        2 => 461,
       ),
       3 => 
       array (
         0 => 'Illuminate\\Support\\Facades\\Cache',
         1 => 'forget',
-        2 => 470,
+        2 => 466,
       ),
       4 => 
       array (
         0 => 'Illuminate\\Support\\Facades\\Cache',
         1 => 'forget',
-        2 => 490,
+        2 => 486,
       ),
       5 => 
       array (
         0 => 'Illuminate\\Support\\Facades\\Cache',
         1 => 'forget',
-        2 => 491,
+        2 => 487,
       ),
       6 => 
       array (
         0 => 'Illuminate\\Support\\Facades\\Cache',
         1 => 'forget',
-        2 => 492,
+        2 => 488,
       ),
     ),
     'PHPStan\\Rules\\Traits\\TraitUseCollector' => 
@@ -23229,7 +23229,7 @@ return [
   ),
   'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Models\\Product.php' => 
   array (
-    'fileHash' => 'f27161a969b69c4d705492a35a69cc4d7c83b344',
+    'fileHash' => 'ae1b6a075c4b4c20f0be5d7376209a6dffe6cb68',
     'dependentFiles' => 
     array (
       0 => 'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Console\\Commands\\GenerateSitemap.php',

@@ -415,13 +415,9 @@ class Product extends Model
 
         // Ensure no stray attributes like 'quantity' are persisted on save
         static::saving(static function (self $product): void {
-            try {
-                // Remove accidental 'quantity' attribute that may be set by factories or external code
-                if (isset($product->attributes['quantity'])) {
-                    unset($product->attributes['quantity']);
-                }
-            } catch (\Throwable $e) {
-                // Silently ignore to avoid breaking save lifecycle in tests
+            // Remove accidental 'quantity' attribute that may be set by factories or external code
+            if (isset($product->attributes['quantity'])) {
+                unset($product->attributes['quantity']);
             }
         });
 

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.0/phpunit.xsd"
+         bootstrap="bootstrap.php"
+         colors="true"
+         processIsolation="false"
+         stopOnFailure="false"
+         stopOnError="false"
+         stopOnIncomplete="false"
+         stopOnSkipped="false"
+         stopOnRisky="false"
+         beStrictAboutChangesToGlobalState="true"
+         beStrictAboutOutputDuringTests="true"
+         failOnRisky="true"
+         failOnWarning="true"
+         failOnDeprecation="true"
+         displayDetailsOnTestsThatTriggerDeprecations="true"
+         displayDetailsOnTestsThatTriggerErrors="true"
+         displayDetailsOnTestsThatTriggerWarnings="true"
+         displayDetailsOnTestsThatTriggerNotices="true"
+         cacheDirectory=".phpunit.cache"
+         backupGlobals="false"
+         backupStaticProperties="false">
+
+    <testsuites>
+        <testsuite name="Coverage Analysis">
+            <directory>Unit</directory>
+            <directory>Feature</directory>
+            <directory>Integration</directory>
+            <directory>AI</directory>
+            <directory>Security</directory>
+            <directory>Performance</directory>
+            <directory>Architecture</directory>
+        </testsuite>
+    </testsuites>
+
+    <source>
+        <include>
+            <directory suffix=".php">../app</directory>
+        </include>
+        <exclude>
+            <directory>../app/Console/Kernel.php</directory>
+            <directory>../app/Exceptions/Handler.php</directory>
+            <directory>../app/Http/Middleware</directory>
+            <file>../app/Providers/RouteServiceProvider.php</file>
+        </exclude>
+    </source>
+
+    <coverage includeUncoveredFiles="true"
+              processUncoveredFiles="true"
+              ignoreDeprecatedCodeUnits="true"
+              disableCodeCoverageIgnore="false">
+        <report>
+            <clover outputFile="../reports/coverage.xml"/>
+            <html outputDirectory="../reports/coverage" lowUpperBound="50" highLowerBound="80"/>
+            <text outputFile="php://stdout" showUncoveredFiles="true" showOnlySummary="false"/>
+            <xml outputDirectory="../reports/coverage-xml"/>
+        </report>
+    </coverage>
+
+    <logging>
+        <junit outputFile="../reports/junit.xml"/>
+        <teamcity outputFile="../reports/teamcity.txt"/>
+        <testdoxHtml outputFile="../reports/testdox.html"/>
+        <testdoxText outputFile="../reports/testdox.txt"/>
+    </logging>
+
+    <php>
+        <env name="APP_ENV" value="testing"/>
+        <env name="APP_KEY" value="base64:2fl+Ktvkdg+Fuz4Qp/A75G2RTiWVA/ZoKX87PNcQgUE="/>
+        <env name="APP_DEBUG" value="true"/>
+        <env name="BCRYPT_ROUNDS" value="4"/>
+        <env name="CACHE_DRIVER" value="array"/>
+        <env name="DB_CONNECTION" value="sqlite"/>
+        <env name="DB_DATABASE" value=":memory:"/>
+        <env name="MAIL_MAILER" value="array"/>
+        <env name="QUEUE_CONNECTION" value="sync"/>
+        <env name="SESSION_DRIVER" value="array"/>
+        <env name="TELESCOPE_ENABLED" value="false"/>
+        <env name="REDIS_HOST" value="127.0.0.1"/>
+        <env name="REDIS_PASSWORD" value="null"/>
+        <env name="REDIS_PORT" value="6379"/>
+    </php>
+</phpunit>

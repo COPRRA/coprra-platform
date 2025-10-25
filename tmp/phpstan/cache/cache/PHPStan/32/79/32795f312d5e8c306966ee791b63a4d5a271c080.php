@@ -514,6 +514,21 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       array (
       ),
     ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Browser\\LoginTest.php' => 
+    array (
+      0 => '908acc44f40a0402c77ee1a5733dc234d6274191',
+      1 => 
+      array (
+        0 => 'tests\\browser\\logintest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\browser\\login_page_loads_and_has_form',
+      ),
+      3 => 
+      array (
+      ),
+    ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Browser\\Pages\\HomePage.php' => 
     array (
       0 => '434d6ca2fd03ee04ed85a3b982b39037a59b32fa',
@@ -1136,6 +1151,25 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
         2 => 'tests\\feature\\test_validation',
         3 => 'tests\\feature\\setup',
         4 => 'tests\\feature\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Feature\\FinancialTransactionServiceCoverageTest.php' => 
+    array (
+      0 => '77385f4e7bad94f3173f0b7c330bdd238b33a1f9',
+      1 => 
+      array (
+        0 => 'tests\\feature\\financialtransactionservicecoveragetest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\feature\\test_create_price_offer_updates_product_price_from_new_offer',
+        1 => 'tests\\feature\\test_update_product_price_rejects_negative_value',
+        2 => 'tests\\feature\\test_update_price_offer_changes_price_and_updates_product_to_lowest_available',
+        3 => 'tests\\feature\\test_update_price_offer_unavailable_recalculates_to_next_lowest_available_offer',
+        4 => 'tests\\feature\\test_delete_price_offer_returns_true',
       ),
       3 => 
       array (
@@ -2740,7 +2774,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Feature\\Models\\OrderTest.php' => 
     array (
-      0 => 'bebead2dbc432af2b3b8147f694e46001a766d9e',
+      0 => '8b7edeab308a6d8f9d05e888d9e7ba112d06ceba',
       1 => 
       array (
         0 => 'tests\\feature\\models\\ordertest',
@@ -3079,6 +3113,26 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       2 => 
       array (
         0 => 'tests\\feature\\it_handles_mysql_connection_based_on_environment',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Feature\\OrderServiceCoverageTest.php' => 
+    array (
+      0 => '6902ccc4e16dd42418536b61e60c569ce04c8587',
+      1 => 
+      array (
+        0 => 'tests\\feature\\orderservicecoveragetest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\feature\\test_create_order_computes_totals_and_persists_items',
+        1 => 'tests\\feature\\test_update_order_status_allows_transition_and_fires_event',
+        2 => 'tests\\feature\\test_cancel_order_restores_stock_and_returns_true_for_pending',
+        3 => 'tests\\feature\\test_update_order_status_rejects_invalid_transition',
+        4 => 'tests\\feature\\test_create_order_respects_shipping_threshold_boundary_and_tax_config',
+        5 => 'tests\\feature\\test_update_order_status_accepts_completed_alias_as_delivered_and_fires_event',
       ),
       3 => 
       array (
@@ -4562,2960 +4616,6 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       array (
       ),
     ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Controllers\\AnalyticsControllerTest.php' => 
-    array (
-      0 => 'fcd37b5216d8ba07bbdb9fdf7b014b522158026f',
-      1 => 
-      array (
-        0 => 'tests\\unit\\controllers\\analyticscontrollertest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\controllers\\setup',
-        1 => 'tests\\unit\\controllers\\teardown',
-        2 => 'tests\\unit\\controllers\\test_user_analytics_returns_analytics_for_authenticated_user',
-        3 => 'tests\\unit\\controllers\\test_user_analytics_returns_unauthorized_for_unauthenticated_user',
-        4 => 'tests\\unit\\controllers\\test_site_analytics_returns_site_analytics',
-        5 => 'tests\\unit\\controllers\\test_track_behavior_returns_success_for_valid_authenticated_request',
-        6 => 'tests\\unit\\controllers\\test_track_behavior_returns_unauthorized_for_unauthenticated_user',
-        7 => 'tests\\unit\\controllers\\test_track_behavior_fails_validation_for_invalid_action',
-        8 => 'tests\\unit\\controllers\\test_user_analytics_throws_exception_when_service_fails',
-        9 => 'tests\\unit\\controllers\\test_site_analytics_throws_exception_when_service_fails',
-        10 => 'tests\\unit\\controllers\\test_track_behavior_throws_exception_when_service_fails',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Controllers\\BaseApiControllerTest.php' => 
-    array (
-      0 => 'f344e767aac59d761f5aeca2d53cbfcf7e1c5383',
-      1 => 
-      array (
-        0 => 'tests\\unit\\controllers\\concretebaseapicontroller',
-        1 => 'tests\\unit\\controllers\\baseapicontrollertest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\controllers\\testmethod',
-        1 => 'tests\\unit\\controllers\\successresponsepublic',
-        2 => 'tests\\unit\\controllers\\errorresponsepublic',
-        3 => 'tests\\unit\\controllers\\paginatedresponsepublic',
-        4 => 'tests\\unit\\controllers\\getratelimitinfopublic',
-        5 => 'tests\\unit\\controllers\\setup',
-        6 => 'tests\\unit\\controllers\\test_success_response',
-        7 => 'tests\\unit\\controllers\\test_error_response',
-        8 => 'tests\\unit\\controllers\\test_paginated_response',
-        9 => 'tests\\unit\\controllers\\test_get_rate_limit_info',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Controllers\\OrderControllerTest.php' => 
-    array (
-      0 => '41977a40abf96a3dc66ef01395bad3183574997b',
-      1 => 
-      array (
-        0 => 'tests\\unit\\controllers\\ordercontrollertest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\controllers\\setup',
-        1 => 'tests\\unit\\controllers\\teardown',
-        2 => 'tests\\unit\\controllers\\test_index_returns_orders_for_authenticated_user',
-        3 => 'tests\\unit\\controllers\\test_index_returns_unauthorized_for_unauthenticated_user',
-        4 => 'tests\\unit\\controllers\\test_show_returns_order_with_loaded_relationships',
-        5 => 'tests\\unit\\controllers\\test_create_creates_order_and_awards_points_for_valid_request',
-        6 => 'tests\\unit\\controllers\\test_create_returns_unauthorized_for_unauthenticated_user',
-        7 => 'tests\\unit\\controllers\\test_update_status_updates_status_and_sends_notification',
-        8 => 'tests\\unit\\controllers\\test_update_status_returns_error_when_update_fails',
-        9 => 'tests\\unit\\controllers\\test_cancel_cancels_order_successfully',
-        10 => 'tests\\unit\\controllers\\test_cancel_returns_error_when_cancel_fails',
-        11 => 'tests\\unit\\controllers\\test_show_throws_authorization_exception_when_not_authorized',
-        12 => 'tests\\unit\\controllers\\test_update_status_returns_error_for_invalid_transition',
-        13 => 'tests\\unit\\controllers\\test_cancel_returns_error_for_invalid_status',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\COPRRA\\AnalyticsServiceTest.php' => 
-    array (
-      0 => 'c6af4d4f527eb0c6ff288b315a52a3ffd8cc5619',
-      1 => 
-      array (
-        0 => 'tests\\unit\\coprra\\analyticsservicetest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\coprra\\test_it_tracks_price_comparison_event',
-        1 => 'tests\\unit\\coprra\\test_it_tracks_product_view_event',
-        2 => 'tests\\unit\\coprra\\test_it_tracks_search_event',
-        3 => 'tests\\unit\\coprra\\test_it_tracks_store_click_event',
-        4 => 'tests\\unit\\coprra\\test_it_gets_most_viewed_products',
-        5 => 'tests\\unit\\coprra\\test_it_gets_most_searched_queries',
-        6 => 'tests\\unit\\coprra\\test_it_gets_most_popular_stores',
-        7 => 'tests\\unit\\coprra\\test_it_gets_price_comparison_statistics',
-        8 => 'tests\\unit\\coprra\\test_it_gets_dashboard_data',
-        9 => 'tests\\unit\\coprra\\test_it_cleans_old_analytics_data',
-        10 => 'tests\\unit\\coprra\\test_it_does_not_track_when_disabled',
-        11 => 'tests\\unit\\coprra\\test_it_handles_null_user_id',
-        12 => 'tests\\unit\\coprra\\test_it_handles_empty_metadata',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\COPRRA\\CacheServiceTest.php' => 
-    array (
-      0 => '5fec99c5d2a33ddf564892a4ddddfe5cc5e60ac1',
-      1 => 
-      array (
-        0 => 'tests\\unit\\coprra\\cacheservicetest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\coprra\\setup',
-        1 => 'tests\\unit\\coprra\\teardown',
-        2 => 'tests\\unit\\coprra\\test_it_generates_correct_product_cache_key',
-        3 => 'tests\\unit\\coprra\\test_it_generates_correct_category_cache_key',
-        4 => 'tests\\unit\\coprra\\test_it_generates_correct_store_cache_key',
-        5 => 'tests\\unit\\coprra\\test_it_generates_correct_price_comparison_cache_key',
-        6 => 'tests\\unit\\coprra\\test_it_generates_correct_exchange_rate_cache_key',
-        7 => 'tests\\unit\\coprra\\test_it_generates_correct_search_cache_key',
-        8 => 'tests\\unit\\coprra\\test_it_generates_search_cache_key_with_filters',
-        9 => 'tests\\unit\\coprra\\test_it_caches_product_data',
-        10 => 'tests\\unit\\coprra\\test_it_caches_price_comparison_data',
-        11 => 'tests\\unit\\coprra\\test_it_caches_search_results',
-        12 => 'tests\\unit\\coprra\\test_it_invalidates_product_cache',
-        13 => 'tests\\unit\\coprra\\test_it_invalidates_category_cache',
-        14 => 'tests\\unit\\coprra\\test_it_invalidates_store_cache',
-        15 => 'tests\\unit\\coprra\\test_it_returns_null_for_non_existent_cache',
-        16 => 'tests\\unit\\coprra\\test_it_returns_cache_statistics',
-        17 => 'tests\\unit\\coprra\\test_it_uses_remember_method_correctly',
-        18 => 'tests\\unit\\coprra\\test_it_clears_all_cache',
-        19 => 'tests\\unit\\coprra\\test_it_respects_custom_cache_duration',
-        20 => 'tests\\unit\\coprra\\test_it_handles_search_with_different_filters',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\COPRRA\\CoprraServiceProviderTest.php' => 
-    array (
-      0 => 'f12b4830aa35cd090c9108adb7e1996dd57d7e7e',
-      1 => 
-      array (
-        0 => 'tests\\unit\\coprra\\coprraserviceprovidertest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\coprra\\setup',
-        1 => 'tests\\unit\\coprra\\test_it_registers_coprra_configuration',
-        2 => 'tests\\unit\\coprra\\test_it_has_coprra_name_configuration',
-        3 => 'tests\\unit\\coprra\\test_it_has_coprra_version_configuration',
-        4 => 'tests\\unit\\coprra\\test_it_has_default_currency_configuration',
-        5 => 'tests\\unit\\coprra\\test_it_has_default_language_configuration',
-        6 => 'tests\\unit\\coprra\\test_it_has_price_comparison_settings',
-        7 => 'tests\\unit\\coprra\\test_it_has_search_settings',
-        8 => 'tests\\unit\\coprra\\test_it_has_exchange_rates_configuration',
-        9 => 'tests\\unit\\coprra\\test_it_has_pagination_settings',
-        10 => 'tests\\unit\\coprra\\test_it_has_api_configuration',
-        11 => 'tests\\unit\\coprra\\test_it_has_media_settings',
-        12 => 'tests\\unit\\coprra\\test_it_has_analytics_settings',
-        13 => 'tests\\unit\\coprra\\test_it_has_security_settings',
-        14 => 'tests\\unit\\coprra\\test_it_has_performance_settings',
-        15 => 'tests\\unit\\coprra\\test_it_shares_coprra_name_with_views',
-        16 => 'tests\\unit\\coprra\\test_it_shares_coprra_version_with_views',
-        17 => 'tests\\unit\\coprra\\test_it_shares_default_currency_with_views',
-        18 => 'tests\\unit\\coprra\\test_it_shares_default_language_with_views',
-        19 => 'tests\\unit\\coprra\\test_it_registers_currency_blade_directive',
-        20 => 'tests\\unit\\coprra\\test_it_registers_pricecompare_blade_directive',
-        21 => 'tests\\unit\\coprra\\test_it_registers_rtl_blade_directive',
-        22 => 'tests\\unit\\coprra\\currency_directive_generates_correct_php_code',
-        23 => 'tests\\unit\\coprra\\pricecompare_directive_generates_correct_php_code',
-        24 => 'tests\\unit\\coprra\\rtl_directive_generates_correct_php_code',
-        25 => 'tests\\unit\\coprra\\test_it_validates_price_cache_duration_is_numeric',
-        26 => 'tests\\unit\\coprra\\test_it_validates_max_stores_per_product_is_numeric',
-        27 => 'tests\\unit\\coprra\\test_it_validates_search_max_results_is_numeric',
-        28 => 'tests\\unit\\coprra\\test_it_validates_api_rate_limit_is_numeric',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\COPRRA\\ExchangeRateServiceTest.php' => 
-    array (
-      0 => '7b98e452ab19dcd5bfc5b7531176a4f2f80aee14',
-      1 => 
-      array (
-        0 => 'tests\\unit\\coprra\\exchangerateservicetest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\coprra\\setup',
-        1 => 'tests\\unit\\coprra\\test_it_returns_one_for_same_currency',
-        2 => 'tests\\unit\\coprra\\test_it_seeds_exchange_rates_from_config',
-        3 => 'tests\\unit\\coprra\\test_it_gets_rate_from_database',
-        4 => 'tests\\unit\\coprra\\test_it_caches_exchange_rates',
-        5 => 'tests\\unit\\coprra\\test_it_converts_currency_correctly',
-        6 => 'tests\\unit\\coprra\\test_it_identifies_stale_rates',
-        7 => 'tests\\unit\\coprra\\test_it_gets_fresh_rates_only',
-        8 => 'tests\\unit\\coprra\\test_it_gets_stale_rates_only',
-        9 => 'tests\\unit\\coprra\\test_it_returns_supported_currencies',
-        10 => 'tests\\unit\\coprra\\test_it_uses_fallback_rate_when_not_in_database',
-        11 => 'tests\\unit\\coprra\\test_it_handles_reverse_conversion',
-        12 => 'tests\\unit\\coprra\\test_it_updates_existing_rates',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\COPRRA\\PriceHelperTest.php' => 
-    array (
-      0 => '987a68cf94dd70f600d89a380210b240513b2c76',
-      1 => 
-      array (
-        0 => 'tests\\unit\\coprra\\pricehelpertest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\coprra\\setup',
-        1 => 'tests\\unit\\coprra\\test_it_formats_price_with_default_currency',
-        2 => 'tests\\unit\\coprra\\test_it_formats_price_with_specific_currency',
-        3 => 'tests\\unit\\coprra\\test_it_formats_price_with_sar_currency',
-        4 => 'tests\\unit\\coprra\\test_it_handles_non_existent_currency',
-        5 => 'tests\\unit\\coprra\\test_it_calculates_price_difference_percentage',
-        6 => 'tests\\unit\\coprra\\test_it_calculates_negative_price_difference',
-        7 => 'tests\\unit\\coprra\\test_it_returns_zero_for_same_prices',
-        8 => 'tests\\unit\\coprra\\test_it_handles_zero_original_price',
-        9 => 'tests\\unit\\coprra\\test_it_handles_negative_original_price',
-        10 => 'tests\\unit\\coprra\\test_it_formats_positive_price_difference_string',
-        11 => 'tests\\unit\\coprra\\test_it_formats_negative_price_difference_string',
-        12 => 'tests\\unit\\coprra\\test_it_formats_zero_price_difference_string',
-        13 => 'tests\\unit\\coprra\\test_it_identifies_good_deal',
-        14 => 'tests\\unit\\coprra\\test_it_identifies_not_good_deal',
-        15 => 'tests\\unit\\coprra\\test_it_handles_empty_prices_array_for_good_deal',
-        16 => 'tests\\unit\\coprra\\test_it_gets_best_price_from_array',
-        17 => 'tests\\unit\\coprra\\test_it_returns_null_for_empty_prices_array',
-        18 => 'tests\\unit\\coprra\\test_it_converts_currency',
-        19 => 'tests\\unit\\coprra\\test_it_converts_currency_to_sar',
-        20 => 'tests\\unit\\coprra\\test_it_formats_price_range_with_same_prices',
-        21 => 'tests\\unit\\coprra\\test_it_formats_price_range_with_different_prices',
-        22 => 'tests\\unit\\coprra\\test_it_formats_price_range_with_default_currency',
-        23 => 'tests\\unit\\coprra\\test_it_formats_price_range_with_non_existent_currency',
-        24 => 'tests\\unit\\coprra\\test_it_handles_decimal_prices_correctly',
-        25 => 'tests\\unit\\coprra\\test_it_handles_large_prices',
-        26 => 'tests\\unit\\coprra\\test_it_calculates_accurate_percentage_for_small_differences',
-        27 => 'tests\\unit\\coprra\\test_it_calculates_accurate_percentage_for_large_differences',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\COPRRA\\StoreAdapterManagerTest.php' => 
-    array (
-      0 => '2e6d8476e57256f292c326740e53bbe822d08bc9',
-      1 => 
-      array (
-        0 => 'tests\\unit\\coprra\\storeadaptermanagertest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\coprra\\setup',
-        1 => 'tests\\unit\\coprra\\test_it_registers_default_adapters',
-        2 => 'tests\\unit\\coprra\\test_it_gets_adapter_by_identifier',
-        3 => 'tests\\unit\\coprra\\test_it_returns_null_for_unknown_adapter',
-        4 => 'tests\\unit\\coprra\\test_it_checks_if_store_is_supported',
-        5 => 'tests\\unit\\coprra\\test_it_gets_supported_stores',
-        6 => 'tests\\unit\\coprra\\test_it_validates_amazon_identifier',
-        7 => 'tests\\unit\\coprra\\test_it_validates_ebay_identifier',
-        8 => 'tests\\unit\\coprra\\test_it_validates_noon_identifier',
-        9 => 'tests\\unit\\coprra\\test_it_gets_product_url_for_amazon',
-        10 => 'tests\\unit\\coprra\\test_it_gets_product_url_for_ebay',
-        11 => 'tests\\unit\\coprra\\test_it_gets_product_url_for_noon',
-        12 => 'tests\\unit\\coprra\\test_it_returns_null_for_unknown_store_url',
-        13 => 'tests\\unit\\coprra\\test_it_gets_statistics',
-        14 => 'tests\\unit\\coprra\\test_it_gets_adapter_rate_limits',
-        15 => 'tests\\unit\\coprra\\amazon_adapter_has_correct_properties',
-        16 => 'tests\\unit\\coprra\\ebay_adapter_has_correct_properties',
-        17 => 'tests\\unit\\coprra\\noon_adapter_has_correct_properties',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\COPRRA\\WebhookServiceTest.php' => 
-    array (
-      0 => 'b51d1a963f57486a6af21ea63c8b4544c94cd8ed',
-      1 => 
-      array (
-        0 => 'tests\\unit\\coprra\\webhookservicetest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\coprra\\setup',
-        1 => 'tests\\unit\\coprra\\test_it_creates_webhook_record',
-        2 => 'tests\\unit\\coprra\\test_it_processes_price_update_webhook',
-        3 => 'tests\\unit\\coprra\\test_it_marks_webhook_as_failed_on_error',
-        4 => 'tests\\unit\\coprra\\test_it_adds_logs_to_webhook',
-        5 => 'tests\\unit\\coprra\\test_it_gets_webhook_statistics',
-        6 => 'tests\\unit\\coprra\\webhook_can_be_marked_as_processing',
-        7 => 'tests\\unit\\coprra\\webhook_can_be_marked_as_completed',
-        8 => 'tests\\unit\\coprra\\webhook_can_be_marked_as_failed',
-        9 => 'tests\\unit\\coprra\\test_it_filters_webhooks_by_status',
-        10 => 'tests\\unit\\coprra\\test_it_filters_webhooks_by_store',
-        11 => 'tests\\unit\\coprra\\test_it_filters_webhooks_by_event_type',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\CreatesApplicationTest.php' => 
-    array (
-      0 => 'a44387f8196b69e2c437f0793813ff18633003ec',
-      1 => 
-      array (
-        0 => 'tests\\unit\\createsapplicationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\test_application_can_be_created',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataAccuracy\\CurrencyConversionTest.php' => 
-    array (
-      0 => '9a6c212c1d1eedbedd24c0b89c9b1a5c5510e51c',
-      1 => 
-      array (
-        0 => 'tests\\unit\\dataaccuracy\\currencyconversiontest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\dataaccuracy\\test_basic_conversion',
-        1 => 'tests\\unit\\dataaccuracy\\test_inverse_conversion',
-        2 => 'tests\\unit\\dataaccuracy\\test_zero_value_handling',
-        3 => 'tests\\unit\\dataaccuracy\\test_basic_functionality',
-        4 => 'tests\\unit\\dataaccuracy\\test_expected_behavior',
-        5 => 'tests\\unit\\dataaccuracy\\test_validation',
-        6 => 'tests\\unit\\dataaccuracy\\setup',
-        7 => 'tests\\unit\\dataaccuracy\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataAccuracy\\DataConsistencyTest.php' => 
-    array (
-      0 => 'fb65ecf07915a5e6035a92a0ec4ac4e4d83769bc',
-      1 => 
-      array (
-        0 => 'tests\\unit\\dataaccuracy\\dataconsistencytest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\dataaccuracy\\test_order_total_matches_items_sum',
-        1 => 'tests\\unit\\dataaccuracy\\test_order_items_product_reference',
-        2 => 'tests\\unit\\dataaccuracy\\test_order_status_consistency',
-        3 => 'tests\\unit\\dataaccuracy\\setup',
-        4 => 'tests\\unit\\dataaccuracy\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataAccuracy\\DataIntegrityTest.php' => 
-    array (
-      0 => '3be648988d40d8efba16591e91fa82619a1b5bd3',
-      1 => 
-      array (
-        0 => 'tests\\unit\\dataaccuracy\\dataintegritytest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\dataaccuracy\\test_basic_functionality',
-        1 => 'tests\\unit\\dataaccuracy\\test_expected_behavior',
-        2 => 'tests\\unit\\dataaccuracy\\test_validation',
-        3 => 'tests\\unit\\dataaccuracy\\setup',
-        4 => 'tests\\unit\\dataaccuracy\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataAccuracy\\DataValidationTest.php' => 
-    array (
-      0 => 'f0ac02e6e6351f833ea9773c7a83b0cf35e8f724',
-      1 => 
-      array (
-        0 => 'tests\\unit\\dataaccuracy\\datavalidationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\dataaccuracy\\test_integer_validation',
-        1 => 'tests\\unit\\dataaccuracy\\test_date_validation',
-        2 => 'tests\\unit\\dataaccuracy\\test_url_validation',
-        3 => 'tests\\unit\\dataaccuracy\\setup',
-        4 => 'tests\\unit\\dataaccuracy\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataAccuracy\\DiscountCalculationTest.php' => 
-    array (
-      0 => 'fda5a1e81c5775943de513acae83b56f380553be',
-      1 => 
-      array (
-        0 => 'tests\\unit\\dataaccuracy\\discountcalculationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\dataaccuracy\\test_percentage_discount',
-        1 => 'tests\\unit\\dataaccuracy\\test_fixed_amount_discount',
-        2 => 'tests\\unit\\dataaccuracy\\test_discount_expiration',
-        3 => 'tests\\unit\\dataaccuracy\\setup',
-        4 => 'tests\\unit\\dataaccuracy\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataAccuracy\\InventoryAccuracyTest.php' => 
-    array (
-      0 => '97bea4f2c94362a70ba801d6016ddcb3e5768a73',
-      1 => 
-      array (
-        0 => 'tests\\unit\\dataaccuracy\\inventoryaccuracytest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\dataaccuracy\\test_basic_functionality',
-        1 => 'tests\\unit\\dataaccuracy\\test_expected_behavior',
-        2 => 'tests\\unit\\dataaccuracy\\test_validation',
-        3 => 'tests\\unit\\dataaccuracy\\setup',
-        4 => 'tests\\unit\\dataaccuracy\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataAccuracy\\OrderAccuracyTest.php' => 
-    array (
-      0 => '738e4edeb03b45c3a64b9a8ed33f11f942c42bcb',
-      1 => 
-      array (
-        0 => 'tests\\unit\\dataaccuracy\\orderaccuracytest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\dataaccuracy\\test_basic_functionality',
-        1 => 'tests\\unit\\dataaccuracy\\test_expected_behavior',
-        2 => 'tests\\unit\\dataaccuracy\\test_validation',
-        3 => 'tests\\unit\\dataaccuracy\\setup',
-        4 => 'tests\\unit\\dataaccuracy\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataAccuracy\\PaymentAccuracyTest.php' => 
-    array (
-      0 => '09bae7ae92f91f81915fde79a0a5fd5d804e53c0',
-      1 => 
-      array (
-        0 => 'tests\\unit\\dataaccuracy\\paymentaccuracytest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\dataaccuracy\\test_basic_functionality',
-        1 => 'tests\\unit\\dataaccuracy\\test_expected_behavior',
-        2 => 'tests\\unit\\dataaccuracy\\test_validation',
-        3 => 'tests\\unit\\dataaccuracy\\setup',
-        4 => 'tests\\unit\\dataaccuracy\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataAccuracy\\PriceAccuracyTest.php' => 
-    array (
-      0 => 'dc5b9fdf578082b7b8d280e7980a675a12e80e81',
-      1 => 
-      array (
-        0 => 'tests\\unit\\dataaccuracy\\priceaccuracytest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\dataaccuracy\\test_base_price_calculation',
-        1 => 'tests\\unit\\dataaccuracy\\test_tax_inclusive_pricing',
-        2 => 'tests\\unit\\dataaccuracy\\test_discount_application_accuracy',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataAccuracy\\PriceHistoryAccuracyTest.php' => 
-    array (
-      0 => '2e3ede2eb5ba1ff98f661c0ede76d54328154512',
-      1 => 
-      array (
-        0 => 'tests\\unit\\dataaccuracy\\pricehistoryaccuracytest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\dataaccuracy\\test_price_history_records_changes',
-        1 => 'tests\\unit\\dataaccuracy\\test_historical_prices_accuracy',
-        2 => 'tests\\unit\\dataaccuracy\\test_price_fluctuation_detection',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataAccuracy\\ProductMatchingTest.php' => 
-    array (
-      0 => '44d51860f100afefeed47142e56abc3673ab4c33',
-      1 => 
-      array (
-        0 => 'tests\\unit\\dataaccuracy\\productmatchingtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\dataaccuracy\\test_basic_functionality',
-        1 => 'tests\\unit\\dataaccuracy\\test_expected_behavior',
-        2 => 'tests\\unit\\dataaccuracy\\test_validation',
-        3 => 'tests\\unit\\dataaccuracy\\setup',
-        4 => 'tests\\unit\\dataaccuracy\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataAccuracy\\ShippingAccuracyTest.php' => 
-    array (
-      0 => '0ce47f9acea4b8cd1b4aa2085772afe61115d76c',
-      1 => 
-      array (
-        0 => 'tests\\unit\\dataaccuracy\\shippingaccuracytest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\dataaccuracy\\test_basic_functionality',
-        1 => 'tests\\unit\\dataaccuracy\\test_expected_behavior',
-        2 => 'tests\\unit\\dataaccuracy\\test_validation',
-        3 => 'tests\\unit\\dataaccuracy\\setup',
-        4 => 'tests\\unit\\dataaccuracy\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataAccuracy\\StoreDataValidationTest.php' => 
-    array (
-      0 => '492e0afdd4d65c4e79cb56fc625f756a424211e7',
-      1 => 
-      array (
-        0 => 'tests\\unit\\dataaccuracy\\storedatavalidationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\dataaccuracy\\test_basic_functionality',
-        1 => 'tests\\unit\\dataaccuracy\\test_expected_behavior',
-        2 => 'tests\\unit\\dataaccuracy\\test_validation',
-        3 => 'tests\\unit\\dataaccuracy\\setup',
-        4 => 'tests\\unit\\dataaccuracy\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataAccuracy\\TaxCalculationTest.php' => 
-    array (
-      0 => 'ad9f6dc5d1a9afe23b9d9f7a84948bba448bc109',
-      1 => 
-      array (
-        0 => 'tests\\unit\\dataaccuracy\\taxcalculationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\dataaccuracy\\test_basic_functionality',
-        1 => 'tests\\unit\\dataaccuracy\\test_expected_behavior',
-        2 => 'tests\\unit\\dataaccuracy\\test_validation',
-        3 => 'tests\\unit\\dataaccuracy\\setup',
-        4 => 'tests\\unit\\dataaccuracy\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataQuality\\DataAccuracyTest.php' => 
-    array (
-      0 => '82b845098012d006e526fd34dc062151477ad07a',
-      1 => 
-      array (
-        0 => 'tests\\unit\\dataquality\\dataaccuracytest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\dataquality\\test_price_calculation_accuracy',
-        1 => 'tests\\unit\\dataquality\\test_currency_conversion_edge_cases',
-        2 => 'tests\\unit\\dataquality\\test_complex_order_scenarios',
-        3 => 'tests\\unit\\dataquality\\test_negative_values_handling',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataQuality\\DataCompletenessTest.php' => 
-    array (
-      0 => '91ef5ddd6c96a8614cecd3db05926812755b137a',
-      1 => 
-      array (
-        0 => 'tests\\unit\\dataquality\\datacompletenesstest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\dataquality\\test_basic_functionality',
-        1 => 'tests\\unit\\dataquality\\test_expected_behavior',
-        2 => 'tests\\unit\\dataquality\\test_validation',
-        3 => 'tests\\unit\\dataquality\\setup',
-        4 => 'tests\\unit\\dataquality\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataQuality\\DataDuplicationTest.php' => 
-    array (
-      0 => '45a7d5fad28dabd12f6d445af6bc7bdc63a2d0e2',
-      1 => 
-      array (
-        0 => 'tests\\unit\\dataquality\\dataduplicationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\dataquality\\test_basic_functionality',
-        1 => 'tests\\unit\\dataquality\\test_expected_behavior',
-        2 => 'tests\\unit\\dataquality\\test_validation',
-        3 => 'tests\\unit\\dataquality\\setup',
-        4 => 'tests\\unit\\dataquality\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataQuality\\DataFreshnessTest.php' => 
-    array (
-      0 => 'a203cd27658516ad9aea43850f459d75f43393c0',
-      1 => 
-      array (
-        0 => 'tests\\unit\\dataquality\\datafreshnesstest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\dataquality\\test_basic_functionality',
-        1 => 'tests\\unit\\dataquality\\test_expected_behavior',
-        2 => 'tests\\unit\\dataquality\\test_validation',
-        3 => 'tests\\unit\\dataquality\\setup',
-        4 => 'tests\\unit\\dataquality\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataQuality\\DataQualityMetricsTest.php' => 
-    array (
-      0 => '0400827e9cc82f815f0572e0e174b5241054a35c',
-      1 => 
-      array (
-        0 => 'tests\\unit\\dataquality\\dataqualitymetricstest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\dataquality\\test_basic_functionality',
-        1 => 'tests\\unit\\dataquality\\test_expected_behavior',
-        2 => 'tests\\unit\\dataquality\\test_validation',
-        3 => 'tests\\unit\\dataquality\\setup',
-        4 => 'tests\\unit\\dataquality\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataQuality\\DataRelevanceTest.php' => 
-    array (
-      0 => '6cc47bdf104739c8f20c2000f7f7ad27efffcea1',
-      1 => 
-      array (
-        0 => 'tests\\unit\\dataquality\\datarelevancetest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\dataquality\\test_basic_functionality',
-        1 => 'tests\\unit\\dataquality\\test_expected_behavior',
-        2 => 'tests\\unit\\dataquality\\test_validation',
-        3 => 'tests\\unit\\dataquality\\setup',
-        4 => 'tests\\unit\\dataquality\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataQuality\\DataReliabilityTest.php' => 
-    array (
-      0 => 'e7189d46d06dc642cb4ef7ee457ccfddad21bf36',
-      1 => 
-      array (
-        0 => 'tests\\unit\\dataquality\\datareliabilitytest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\dataquality\\test_basic_functionality',
-        1 => 'tests\\unit\\dataquality\\test_expected_behavior',
-        2 => 'tests\\unit\\dataquality\\test_validation',
-        3 => 'tests\\unit\\dataquality\\setup',
-        4 => 'tests\\unit\\dataquality\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataQuality\\DataTimelinessTest.php' => 
-    array (
-      0 => '3e37933bb45bedb27f1674977500454507cd48f6',
-      1 => 
-      array (
-        0 => 'tests\\unit\\dataquality\\datatimelinesstest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\dataquality\\test_basic_functionality',
-        1 => 'tests\\unit\\dataquality\\test_expected_behavior',
-        2 => 'tests\\unit\\dataquality\\test_validation',
-        3 => 'tests\\unit\\dataquality\\setup',
-        4 => 'tests\\unit\\dataquality\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataQuality\\DataUniquenessTest.php' => 
-    array (
-      0 => '452fb2878b245cee8bd548c2994f311138cf464b',
-      1 => 
-      array (
-        0 => 'tests\\unit\\dataquality\\datauniquenesstest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\dataquality\\test_basic_functionality',
-        1 => 'tests\\unit\\dataquality\\test_expected_behavior',
-        2 => 'tests\\unit\\dataquality\\test_validation',
-        3 => 'tests\\unit\\dataquality\\setup',
-        4 => 'tests\\unit\\dataquality\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataQuality\\DataValidityTest.php' => 
-    array (
-      0 => '758dd1f1d090562a9329c29a9dc04da369455353',
-      1 => 
-      array (
-        0 => 'tests\\unit\\dataquality\\datavaliditytest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\dataquality\\test_email_format_validity',
-        1 => 'tests\\unit\\dataquality\\test_phone_number_format',
-        2 => 'tests\\unit\\dataquality\\test_order_date_format',
-        3 => 'tests\\unit\\dataquality\\setup',
-        4 => 'tests\\unit\\dataquality\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataQuality\\DuplicateDetectionTest.php' => 
-    array (
-      0 => 'e94ea85854579e904a25465c422b3f6b54555cb6',
-      1 => 
-      array (
-        0 => 'tests\\unit\\dataquality\\duplicatedetectiontest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\dataquality\\test_basic_functionality',
-        1 => 'tests\\unit\\dataquality\\test_expected_behavior',
-        2 => 'tests\\unit\\dataquality\\test_validation',
-        3 => 'tests\\unit\\dataquality\\setup',
-        4 => 'tests\\unit\\dataquality\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Deployment\\BlueGreenDeploymentTest.php' => 
-    array (
-      0 => '356c3d3fdf18163596f63085f0b13006f998568c',
-      1 => 
-      array (
-        0 => 'tests\\unit\\deployment\\bluegreendeploymenttest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\deployment\\test_basic_functionality',
-        1 => 'tests\\unit\\deployment\\test_expected_behavior',
-        2 => 'tests\\unit\\deployment\\test_validation',
-        3 => 'tests\\unit\\deployment\\setup',
-        4 => 'tests\\unit\\deployment\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Deployment\\CanaryDeploymentTest.php' => 
-    array (
-      0 => '31181fca96b8306eb251747d0d5a8725df2c7908',
-      1 => 
-      array (
-        0 => 'tests\\unit\\deployment\\canarydeploymenttest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\deployment\\test_basic_functionality',
-        1 => 'tests\\unit\\deployment\\test_expected_behavior',
-        2 => 'tests\\unit\\deployment\\test_validation',
-        3 => 'tests\\unit\\deployment\\setup',
-        4 => 'tests\\unit\\deployment\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Deployment\\CloudDeploymentTest.php' => 
-    array (
-      0 => '4dcbee783568e460511036ddf1afe6595a6a1286',
-      1 => 
-      array (
-        0 => 'tests\\unit\\deployment\\clouddeploymenttest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\deployment\\test_basic_functionality',
-        1 => 'tests\\unit\\deployment\\test_expected_behavior',
-        2 => 'tests\\unit\\deployment\\test_validation',
-        3 => 'tests\\unit\\deployment\\setup',
-        4 => 'tests\\unit\\deployment\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Deployment\\ConfigurationTest.php' => 
-    array (
-      0 => '7eb73602f390884a875e7749eeacc48bdcfc8401',
-      1 => 
-      array (
-        0 => 'tests\\unit\\deployment\\configurationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\deployment\\test_basic_functionality',
-        1 => 'tests\\unit\\deployment\\test_expected_behavior',
-        2 => 'tests\\unit\\deployment\\test_validation',
-        3 => 'tests\\unit\\deployment\\setup',
-        4 => 'tests\\unit\\deployment\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Deployment\\DevelopmentDeploymentTest.php' => 
-    array (
-      0 => '5a274a0aac0fab10f3a205c8c99e4bfedf06763e',
-      1 => 
-      array (
-        0 => 'tests\\unit\\deployment\\developmentdeploymenttest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\deployment\\test_basic_functionality',
-        1 => 'tests\\unit\\deployment\\test_expected_behavior',
-        2 => 'tests\\unit\\deployment\\test_validation',
-        3 => 'tests\\unit\\deployment\\setup',
-        4 => 'tests\\unit\\deployment\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Deployment\\DockerDeploymentTest.php' => 
-    array (
-      0 => 'b72e18428ecc6b4aa51d784567487d0469db594c',
-      1 => 
-      array (
-        0 => 'tests\\unit\\deployment\\dockerdeploymenttest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\deployment\\test_basic_functionality',
-        1 => 'tests\\unit\\deployment\\test_expected_behavior',
-        2 => 'tests\\unit\\deployment\\test_validation',
-        3 => 'tests\\unit\\deployment\\setup',
-        4 => 'tests\\unit\\deployment\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Deployment\\EnvironmentConfigurationTest.php' => 
-    array (
-      0 => '3375446a8ede5b2d7a826585f5308490798913b4',
-      1 => 
-      array (
-        0 => 'tests\\unit\\deployment\\environmentconfigurationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\deployment\\test_basic_functionality',
-        1 => 'tests\\unit\\deployment\\test_expected_behavior',
-        2 => 'tests\\unit\\deployment\\test_validation',
-        3 => 'tests\\unit\\deployment\\setup',
-        4 => 'tests\\unit\\deployment\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Deployment\\InfrastructureTest.php' => 
-    array (
-      0 => 'cabc7e0045c679d03a2edef38d9ae568c88a86d1',
-      1 => 
-      array (
-        0 => 'tests\\unit\\deployment\\infrastructuretest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\deployment\\test_basic_functionality',
-        1 => 'tests\\unit\\deployment\\test_expected_behavior',
-        2 => 'tests\\unit\\deployment\\test_validation',
-        3 => 'tests\\unit\\deployment\\setup',
-        4 => 'tests\\unit\\deployment\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Deployment\\KubernetesDeploymentTest.php' => 
-    array (
-      0 => '5274068b1055d6a5ca1261f2643cc4be73be69e5',
-      1 => 
-      array (
-        0 => 'tests\\unit\\deployment\\kubernetesdeploymenttest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\deployment\\test_basic_functionality',
-        1 => 'tests\\unit\\deployment\\test_expected_behavior',
-        2 => 'tests\\unit\\deployment\\test_validation',
-        3 => 'tests\\unit\\deployment\\setup',
-        4 => 'tests\\unit\\deployment\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Deployment\\ProductionDeploymentTest.php' => 
-    array (
-      0 => '20adcefafb07ad324581f5aa0a825ad5155121ac',
-      1 => 
-      array (
-        0 => 'tests\\unit\\deployment\\productiondeploymenttest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\deployment\\test_basic_functionality',
-        1 => 'tests\\unit\\deployment\\test_expected_behavior',
-        2 => 'tests\\unit\\deployment\\test_validation',
-        3 => 'tests\\unit\\deployment\\setup',
-        4 => 'tests\\unit\\deployment\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Deployment\\RollbackTest.php' => 
-    array (
-      0 => '0d770a848e0daa6a1c1166930323f6393b379675',
-      1 => 
-      array (
-        0 => 'tests\\unit\\deployment\\rollbacktest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\deployment\\test_basic_functionality',
-        1 => 'tests\\unit\\deployment\\test_expected_behavior',
-        2 => 'tests\\unit\\deployment\\test_validation',
-        3 => 'tests\\unit\\deployment\\setup',
-        4 => 'tests\\unit\\deployment\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Deployment\\RollingDeploymentTest.php' => 
-    array (
-      0 => 'd43ef7bc404c2ca79a6a729e5f812a84614bdaaa',
-      1 => 
-      array (
-        0 => 'tests\\unit\\deployment\\rollingdeploymenttest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\deployment\\test_basic_functionality',
-        1 => 'tests\\unit\\deployment\\test_expected_behavior',
-        2 => 'tests\\unit\\deployment\\test_validation',
-        3 => 'tests\\unit\\deployment\\setup',
-        4 => 'tests\\unit\\deployment\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Deployment\\StagingDeploymentTest.php' => 
-    array (
-      0 => '83c982e6ef1a62268b4f4913c1786d89b71d3c84',
-      1 => 
-      array (
-        0 => 'tests\\unit\\deployment\\stagingdeploymenttest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\deployment\\test_basic_functionality',
-        1 => 'tests\\unit\\deployment\\test_expected_behavior',
-        2 => 'tests\\unit\\deployment\\test_validation',
-        3 => 'tests\\unit\\deployment\\setup',
-        4 => 'tests\\unit\\deployment\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Deployment\\TestingDeploymentTest.php' => 
-    array (
-      0 => '589c21cb9f52e522c90871fa28714e9aebdfcab8',
-      1 => 
-      array (
-        0 => 'tests\\unit\\deployment\\testingdeploymenttest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\deployment\\test_basic_functionality',
-        1 => 'tests\\unit\\deployment\\test_expected_behavior',
-        2 => 'tests\\unit\\deployment\\test_validation',
-        3 => 'tests\\unit\\deployment\\setup',
-        4 => 'tests\\unit\\deployment\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Enums\\OrderStatusTest.php' => 
-    array (
-      0 => '522d6c8f4265591568c8f39415d43aed60511458',
-      1 => 
-      array (
-        0 => 'tests\\unit\\enums\\orderstatustest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\enums\\test_enum_has_all_expected_cases',
-        1 => 'tests\\unit\\enums\\test_enum_values_are_correct',
-        2 => 'tests\\unit\\enums\\test_label_returns_correct_arabic_text',
-        3 => 'tests\\unit\\enums\\test_color_returns_correct_values',
-        4 => 'tests\\unit\\enums\\test_allowed_transitions_from_pending',
-        5 => 'tests\\unit\\enums\\test_allowed_transitions_from_processing',
-        6 => 'tests\\unit\\enums\\test_allowed_transitions_from_shipped',
-        7 => 'tests\\unit\\enums\\test_no_transitions_from_final_statuses',
-        8 => 'tests\\unit\\enums\\test_can_transition_to_allowed_status',
-        9 => 'tests\\unit\\enums\\test_cannot_transition_to_disallowed_status',
-        10 => 'tests\\unit\\enums\\test_to_array_returns_correct_format',
-        11 => 'tests\\unit\\enums\\test_options_returns_value_label_pairs',
-        12 => 'tests\\unit\\enums\\test_can_create_from_string',
-        13 => 'tests\\unit\\enums\\test_try_from_returns_null_for_invalid_value',
-        14 => 'tests\\unit\\enums\\test_from_throws_exception_for_invalid_value',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Enums\\UserRoleTest.php' => 
-    array (
-      0 => '283617f1047296a430fe89683a86021d788b4425',
-      1 => 
-      array (
-        0 => 'tests\\unit\\enums\\userroletest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\enums\\test_enum_has_all_expected_cases',
-        1 => 'tests\\unit\\enums\\test_enum_values_are_correct',
-        2 => 'tests\\unit\\enums\\test_label_returns_correct_arabic_text',
-        3 => 'tests\\unit\\enums\\test_admin_has_all_permissions',
-        4 => 'tests\\unit\\enums\\test_moderator_has_limited_permissions',
-        5 => 'tests\\unit\\enums\\test_user_has_basic_permissions',
-        6 => 'tests\\unit\\enums\\test_guest_has_minimal_permissions',
-        7 => 'tests\\unit\\enums\\test_has_permission_returns_true_for_valid_permission',
-        8 => 'tests\\unit\\enums\\test_has_permission_returns_false_for_invalid_permission',
-        9 => 'tests\\unit\\enums\\test_is_admin_returns_true_only_for_admin',
-        10 => 'tests\\unit\\enums\\test_is_moderator_returns_true_for_admin_and_moderator',
-        11 => 'tests\\unit\\enums\\test_to_array_returns_correct_format',
-        12 => 'tests\\unit\\enums\\test_options_returns_value_label_pairs',
-        13 => 'tests\\unit\\enums\\test_can_create_from_string',
-        14 => 'tests\\unit\\enums\\test_try_from_returns_null_for_invalid_value',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Factories\\FactoriesTest.php' => 
-    array (
-      0 => '0f17fd3959f9bd0761fcfd7a451ea889f1fbd953',
-      1 => 
-      array (
-        0 => 'tests\\unit\\factories\\factoriestest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\factories\\test_basic_functionality',
-        1 => 'tests\\unit\\factories\\test_expected_behavior',
-        2 => 'tests\\unit\\factories\\test_validation',
-        3 => 'tests\\unit\\factories\\setup',
-        4 => 'tests\\unit\\factories\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Helpers\\OrderHelperTest.php' => 
-    array (
-      0 => '78a12b80418ace39be4a13822fbe34f885814ce8',
-      1 => 
-      array (
-        0 => 'tests\\unit\\helpers\\orderhelpertest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\helpers\\test_get_status_badge_returns_correct_html',
-        1 => 'tests\\unit\\helpers\\test_calculate_total_with_all_values',
-        2 => 'tests\\unit\\helpers\\test_calculate_total_with_missing_values',
-        3 => 'tests\\unit\\helpers\\test_calculate_total_returns_zero_for_negative_result',
-        4 => 'tests\\unit\\helpers\\test_calculate_tax_with_default_rate',
-        5 => 'tests\\unit\\helpers\\test_calculate_tax_with_custom_rate',
-        6 => 'tests\\unit\\helpers\\test_generate_order_number_is_unique',
-        7 => 'tests\\unit\\helpers\\test_can_be_cancelled_returns_true_for_pending',
-        8 => 'tests\\unit\\helpers\\test_can_be_cancelled_returns_true_for_processing',
-        9 => 'tests\\unit\\helpers\\test_can_be_cancelled_returns_false_for_shipped',
-        10 => 'tests\\unit\\helpers\\test_can_be_refunded_returns_true_for_delivered',
-        11 => 'tests\\unit\\helpers\\test_can_be_refunded_returns_false_for_pending',
-        12 => 'tests\\unit\\helpers\\test_get_progress_percentage_for_all_statuses',
-        13 => 'tests\\unit\\helpers\\test_format_total_with_default_currency',
-        14 => 'tests\\unit\\helpers\\test_format_total_with_sar_currency',
-        15 => 'tests\\unit\\helpers\\test_get_estimated_delivery_date_for_shipped_order',
-        16 => 'tests\\unit\\helpers\\test_get_estimated_delivery_date_for_processing_order',
-        17 => 'tests\\unit\\helpers\\test_get_estimated_delivery_date_returns_null_for_pending',
-        18 => 'tests\\unit\\helpers\\test_is_overdue_returns_false_for_non_shipped_order',
-        19 => 'tests\\unit\\helpers\\test_is_overdue_returns_false_for_recent_shipment',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Helpers\\PriceHelperTest.php' => 
-    array (
-      0 => 'f0afa7724281eca86d5e85124719ba17ed858c5c',
-      1 => 
-      array (
-        0 => 'tests\\unit\\helpers\\pricehelpertest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\helpers\\test_basic_functionality',
-        1 => 'tests\\unit\\helpers\\test_expected_behavior',
-        2 => 'tests\\unit\\helpers\\test_validation',
-        3 => 'tests\\unit\\helpers\\setup',
-        4 => 'tests\\unit\\helpers\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\AnalyticsIntegrationTest.php' => 
-    array (
-      0 => 'fa8076cb691dc022bdb192e83d193faf5a7bb2ce',
-      1 => 
-      array (
-        0 => 'tests\\unit\\integration\\analyticsintegrationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\integration\\test_basic_functionality',
-        1 => 'tests\\unit\\integration\\test_expected_behavior',
-        2 => 'tests\\unit\\integration\\test_validation',
-        3 => 'tests\\unit\\integration\\setup',
-        4 => 'tests\\unit\\integration\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\APIIntegrationTest.php' => 
-    array (
-      0 => '302c78b76b1f90e7704c1fac5e529c3f171dd13a',
-      1 => 
-      array (
-        0 => 'tests\\unit\\integration\\apiintegrationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\integration\\test_basic_functionality',
-        1 => 'tests\\unit\\integration\\test_expected_behavior',
-        2 => 'tests\\unit\\integration\\test_validation',
-        3 => 'tests\\unit\\integration\\setup',
-        4 => 'tests\\unit\\integration\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\CurrencyIntegrationTest.php' => 
-    array (
-      0 => '2cb4e7c0c08fa16009eddcdf82511fd17c8e4419',
-      1 => 
-      array (
-        0 => 'tests\\unit\\integration\\currencyintegrationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\integration\\test_basic_functionality',
-        1 => 'tests\\unit\\integration\\test_expected_behavior',
-        2 => 'tests\\unit\\integration\\test_validation',
-        3 => 'tests\\unit\\integration\\setup',
-        4 => 'tests\\unit\\integration\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\EmailIntegrationTest.php' => 
-    array (
-      0 => '01b25cec586da0ced53b175a6bcfdc6bf9784595',
-      1 => 
-      array (
-        0 => 'tests\\unit\\integration\\emailintegrationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\integration\\test_basic_functionality',
-        1 => 'tests\\unit\\integration\\test_expected_behavior',
-        2 => 'tests\\unit\\integration\\test_validation',
-        3 => 'tests\\unit\\integration\\setup',
-        4 => 'tests\\unit\\integration\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\EndToEndIntegrationTest.php' => 
-    array (
-      0 => '2bde006ca25af75ef1b564105b3f147c9e216e42',
-      1 => 
-      array (
-        0 => 'tests\\unit\\integration\\endtoendintegrationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\integration\\test_basic_functionality',
-        1 => 'tests\\unit\\integration\\test_expected_behavior',
-        2 => 'tests\\unit\\integration\\test_validation',
-        3 => 'tests\\unit\\integration\\setup',
-        4 => 'tests\\unit\\integration\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\InventoryIntegrationTest.php' => 
-    array (
-      0 => '707494204b8641cb1f12305f2f114978954dd9ae',
-      1 => 
-      array (
-        0 => 'tests\\unit\\integration\\inventoryintegrationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\integration\\test_basic_functionality',
-        1 => 'tests\\unit\\integration\\test_expected_behavior',
-        2 => 'tests\\unit\\integration\\test_validation',
-        3 => 'tests\\unit\\integration\\setup',
-        4 => 'tests\\unit\\integration\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\NotificationIntegrationTest.php' => 
-    array (
-      0 => '62c9e71a3d259d5050285a58471ef79018775e69',
-      1 => 
-      array (
-        0 => 'tests\\unit\\integration\\notificationintegrationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\integration\\test_basic_functionality',
-        1 => 'tests\\unit\\integration\\test_expected_behavior',
-        2 => 'tests\\unit\\integration\\test_validation',
-        3 => 'tests\\unit\\integration\\setup',
-        4 => 'tests\\unit\\integration\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\PaymentIntegrationTest.php' => 
-    array (
-      0 => '953b3c24659ee36e7e3fff81d97ac00b657476e5',
-      1 => 
-      array (
-        0 => 'tests\\unit\\integration\\paymentintegrationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\integration\\test_basic_functionality',
-        1 => 'tests\\unit\\integration\\test_expected_behavior',
-        2 => 'tests\\unit\\integration\\test_validation',
-        3 => 'tests\\unit\\integration\\setup',
-        4 => 'tests\\unit\\integration\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\PushNotificationTest.php' => 
-    array (
-      0 => 'b46a514c1470c9a80373c891314e93d4c1025350',
-      1 => 
-      array (
-        0 => 'tests\\unit\\integration\\pushnotificationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\integration\\test_basic_functionality',
-        1 => 'tests\\unit\\integration\\test_expected_behavior',
-        2 => 'tests\\unit\\integration\\test_validation',
-        3 => 'tests\\unit\\integration\\setup',
-        4 => 'tests\\unit\\integration\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\SearchIntegrationTest.php' => 
-    array (
-      0 => 'fea2e8704140047c37160c8dd2686bcde3c5b1e1',
-      1 => 
-      array (
-        0 => 'tests\\unit\\integration\\searchintegrationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\integration\\test_basic_functionality',
-        1 => 'tests\\unit\\integration\\test_expected_behavior',
-        2 => 'tests\\unit\\integration\\test_validation',
-        3 => 'tests\\unit\\integration\\setup',
-        4 => 'tests\\unit\\integration\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\ShippingIntegrationTest.php' => 
-    array (
-      0 => '9a34aa9fef8cf3114f44a6c372ffafdcfd4c78b5',
-      1 => 
-      array (
-        0 => 'tests\\unit\\integration\\shippingintegrationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\integration\\test_basic_functionality',
-        1 => 'tests\\unit\\integration\\test_expected_behavior',
-        2 => 'tests\\unit\\integration\\test_validation',
-        3 => 'tests\\unit\\integration\\setup',
-        4 => 'tests\\unit\\integration\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\SMSIntegrationTest.php' => 
-    array (
-      0 => 'ee65ac45fcecf9d929aff45a1a590d3ce309eeaa',
-      1 => 
-      array (
-        0 => 'tests\\unit\\integration\\smsintegrationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\integration\\test_basic_functionality',
-        1 => 'tests\\unit\\integration\\test_expected_behavior',
-        2 => 'tests\\unit\\integration\\test_validation',
-        3 => 'tests\\unit\\integration\\setup',
-        4 => 'tests\\unit\\integration\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\StoreAPIIntegrationTest.php' => 
-    array (
-      0 => '8cd7bb8353e0601605a425a3cfa315cc126c7a71',
-      1 => 
-      array (
-        0 => 'tests\\unit\\integration\\storeapiintegrationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\integration\\test_basic_functionality',
-        1 => 'tests\\unit\\integration\\test_expected_behavior',
-        2 => 'tests\\unit\\integration\\test_validation',
-        3 => 'tests\\unit\\integration\\setup',
-        4 => 'tests\\unit\\integration\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\ThirdPartyAPIIntegrationTest.php' => 
-    array (
-      0 => 'f21229597893cd6093c606394ec4f17184f9ce73',
-      1 => 
-      array (
-        0 => 'tests\\unit\\integration\\thirdpartyapiintegrationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\integration\\test_basic_functionality',
-        1 => 'tests\\unit\\integration\\test_expected_behavior',
-        2 => 'tests\\unit\\integration\\test_validation',
-        3 => 'tests\\unit\\integration\\setup',
-        4 => 'tests\\unit\\integration\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\WebhookTest.php' => 
-    array (
-      0 => 'aeee77e4f85b0cb120728733f0daf4df0fb15ec8',
-      1 => 
-      array (
-        0 => 'tests\\unit\\integration\\webhooktest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\integration\\test_basic_functionality',
-        1 => 'tests\\unit\\integration\\test_expected_behavior',
-        2 => 'tests\\unit\\integration\\test_validation',
-        3 => 'tests\\unit\\integration\\setup',
-        4 => 'tests\\unit\\integration\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\IsolatedStrictTest.php' => 
-    array (
-      0 => 'b22aea658de6e0dc06ad8294fd11a4a01d6425ea',
-      1 => 
-      array (
-        0 => 'tests\\unit\\isolatedstricttest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\test_basic_functionality',
-        1 => 'tests\\unit\\test_expected_behavior',
-        2 => 'tests\\unit\\test_validation',
-        3 => 'tests\\unit\\setup',
-        4 => 'tests\\unit\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Jobs\\ProcessHeavyOperationTest.php' => 
-    array (
-      0 => '15c64313ff5946a5eedf85ea6aef9767086d0a82',
-      1 => 
-      array (
-        0 => 'tests\\unit\\jobs\\processheavyoperationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\jobs\\setup',
-        1 => 'tests\\unit\\jobs\\test_job_constructor_sets_properties_correctly',
-        2 => 'tests\\unit\\jobs\\test_can_be_instantiated',
-        3 => 'tests\\unit\\jobs\\test_job_has_correct_timeout_and_retry_settings',
-        4 => 'tests\\unit\\jobs\\test_job_get_job_status_returns_null_for_unknown_job',
-        5 => 'tests\\unit\\jobs\\test_job_get_user_job_statuses_returns_empty_array',
-        6 => 'tests\\unit\\jobs\\test_job_throws_exception_for_unknown_operation',
-        7 => 'tests\\unit\\jobs\\test_job_handles_generate_report_operation_without_job_instance',
-        8 => 'tests\\unit\\jobs\\test_job_handles_process_images_operation_without_job_instance',
-        9 => 'tests\\unit\\jobs\\test_job_handles_sync_data_operation_without_job_instance',
-        10 => 'tests\\unit\\jobs\\test_job_handles_send_bulk_notifications_operation_without_job_instance',
-        11 => 'tests\\unit\\jobs\\test_job_handles_update_statistics_operation_without_job_instance',
-        12 => 'tests\\unit\\jobs\\test_job_handles_cleanup_old_data_operation_without_job_instance',
-        13 => 'tests\\unit\\jobs\\test_job_handles_export_data_operation_without_job_instance',
-        14 => 'tests\\unit\\jobs\\test_job_handles_import_data_operation_without_job_instance',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Middleware\\AdminMiddlewareTest.php' => 
-    array (
-      0 => '17ab67406d163a89765f920c80acf6eef3980d66',
-      1 => 
-      array (
-        0 => 'tests\\unit\\middleware\\adminmiddlewaretest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\middleware\\test_basic_functionality',
-        1 => 'tests\\unit\\middleware\\test_expected_behavior',
-        2 => 'tests\\unit\\middleware\\test_validation',
-        3 => 'tests\\unit\\middleware\\setup',
-        4 => 'tests\\unit\\middleware\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\MockeryDebugTest.php' => 
-    array (
-      0 => '447d732388d74e0fd63d02f45a7f2647dcb8df65',
-      1 => 
-      array (
-        0 => 'tests\\unit\\mockerydebugtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\test_basic_functionality',
-        1 => 'tests\\unit\\test_expected_behavior',
-        2 => 'tests\\unit\\test_validation',
-        3 => 'tests\\unit\\setup',
-        4 => 'tests\\unit\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\ModelRelationsTest.php' => 
-    array (
-      0 => '7add8f61d2d7cf04b8b21faed6e053a75dd3006e',
-      1 => 
-      array (
-        0 => 'tests\\unit\\modelrelationstest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\test_basic_functionality',
-        1 => 'tests\\unit\\test_expected_behavior',
-        2 => 'tests\\unit\\test_validation',
-        3 => 'tests\\unit\\setup',
-        4 => 'tests\\unit\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\AuditLogTest.php' => 
-    array (
-      0 => 'ade23a37d86f2bb46d502a2057f174168e0a6fb2',
-      1 => 
-      array (
-        0 => 'tests\\unit\\models\\auditlogtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\models\\test_fillable_attributes',
-        1 => 'tests\\unit\\models\\test_casts',
-        2 => 'tests\\unit\\models\\test_user_relation',
-        3 => 'tests\\unit\\models\\test_auditable_relation',
-        4 => 'tests\\unit\\models\\test_scope_event',
-        5 => 'tests\\unit\\models\\test_scope_for_user',
-        6 => 'tests\\unit\\models\\test_scope_for_model',
-        7 => 'tests\\unit\\models\\test_scope_date_range',
-        8 => 'tests\\unit\\models\\test_get_formatted_event_attribute',
-        9 => 'tests\\unit\\models\\test_get_changes_summary_attribute_no_changes',
-        10 => 'tests\\unit\\models\\test_get_changes_summary_attribute_only_old_values',
-        11 => 'tests\\unit\\models\\test_get_changes_summary_attribute_only_new_values',
-        12 => 'tests\\unit\\models\\test_get_changes_summary_attribute_with_changes',
-        13 => 'tests\\unit\\models\\test_get_changes_summary_attribute_boolean_values',
-        14 => 'tests\\unit\\models\\test_get_changes_summary_attribute_null_values',
-        15 => 'tests\\unit\\models\\test_get_changes_summary_attribute_no_actual_changes',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\BrandTest.php' => 
-    array (
-      0 => '05d527a00b7de0b9d214da851417bfb8ab221611',
-      1 => 
-      array (
-        0 => 'tests\\unit\\models\\brandtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\models\\setup',
-        1 => 'tests\\unit\\models\\test_products_relation',
-        2 => 'tests\\unit\\models\\test_scope_active',
-        3 => 'tests\\unit\\models\\test_scope_search',
-        4 => 'tests\\unit\\models\\test_slug_auto_generated_on_creating',
-        5 => 'tests\\unit\\models\\test_slug_auto_generated_on_updating',
-        6 => 'tests\\unit\\models\\test_get_rules',
-        7 => 'tests\\unit\\models\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\CategoryTest.php' => 
-    array (
-      0 => '07d3f234bdabaffb9d109bf678aba203cc7ba477',
-      1 => 
-      array (
-        0 => 'tests\\unit\\models\\categorytest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\models\\setup',
-        1 => 'tests\\unit\\models\\test_parent_relation',
-        2 => 'tests\\unit\\models\\test_children_relation',
-        3 => 'tests\\unit\\models\\test_products_relation',
-        4 => 'tests\\unit\\models\\test_scope_active',
-        5 => 'tests\\unit\\models\\test_scope_search',
-        6 => 'tests\\unit\\models\\test_slug_and_level_auto_generated_on_creating',
-        7 => 'tests\\unit\\models\\test_level_based_on_parent_on_creating',
-        8 => 'tests\\unit\\models\\test_slug_updated_on_name_change',
-        9 => 'tests\\unit\\models\\test_level_updated_on_parent_change',
-        10 => 'tests\\unit\\models\\test_get_rules',
-        11 => 'tests\\unit\\models\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\CurrencyTest.php' => 
-    array (
-      0 => '929a5e0c4aa51bcbda26e91ed6cf50d61eb5dfd4',
-      1 => 
-      array (
-        0 => 'tests\\unit\\models\\currencytest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\models\\test_guarded_attributes',
-        1 => 'tests\\unit\\models\\test_stores_relation',
-        2 => 'tests\\unit\\models\\test_languages_relation',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\LanguageTest.php' => 
-    array (
-      0 => '7bec72853188c05e5cb08a158bfa4100f400c84e',
-      1 => 
-      array (
-        0 => 'tests\\unit\\models\\languagetest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\models\\test_fillable_attributes',
-        1 => 'tests\\unit\\models\\test_casts',
-        2 => 'tests\\unit\\models\\test_currencies_relation',
-        3 => 'tests\\unit\\models\\test_user_locale_settings_relation',
-        4 => 'tests\\unit\\models\\test_scope_active',
-        5 => 'tests\\unit\\models\\test_scope_ordered',
-        6 => 'tests\\unit\\models\\test_is_rtl_returns_true_when_direction_rtl',
-        7 => 'tests\\unit\\models\\test_is_rtl_returns_false_when_direction_ltr',
-        8 => 'tests\\unit\\models\\test_find_by_code',
-        9 => 'tests\\unit\\models\\test_default_currency_method_exists',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\NotificationTest.php' => 
-    array (
-      0 => '6a575e17fe804fe41135922f0dccca24b00f64c4',
-      1 => 
-      array (
-        0 => 'tests\\unit\\models\\notificationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\models\\test_table_name',
-        1 => 'tests\\unit\\models\\test_fillable_attributes',
-        2 => 'tests\\unit\\models\\test_casts',
-        3 => 'tests\\unit\\models\\test_hidden_attributes',
-        4 => 'tests\\unit\\models\\test_user_relation',
-        5 => 'tests\\unit\\models\\test_scope_unread',
-        6 => 'tests\\unit\\models\\test_scope_read',
-        7 => 'tests\\unit\\models\\test_scope_of_type',
-        8 => 'tests\\unit\\models\\test_scope_of_priority',
-        9 => 'tests\\unit\\models\\test_scope_of_status',
-        10 => 'tests\\unit\\models\\test_scope_sent',
-        11 => 'tests\\unit\\models\\test_scope_pending',
-        12 => 'tests\\unit\\models\\test_scope_failed',
-        13 => 'tests\\unit\\models\\test_scope_for_user',
-        14 => 'tests\\unit\\models\\test_scope_after',
-        15 => 'tests\\unit\\models\\test_scope_before',
-        16 => 'tests\\unit\\models\\test_scope_between',
-        17 => 'tests\\unit\\models\\test_is_read_returns_true_when_read_at_set',
-        18 => 'tests\\unit\\models\\test_is_read_returns_false_when_read_at_null',
-        19 => 'tests\\unit\\models\\test_is_unread_returns_true_when_read_at_null',
-        20 => 'tests\\unit\\models\\test_is_unread_returns_false_when_read_at_set',
-        21 => 'tests\\unit\\models\\test_is_sent_returns_true_when_sent_at_set',
-        22 => 'tests\\unit\\models\\test_is_sent_returns_false_when_sent_at_null',
-        23 => 'tests\\unit\\models\\test_is_pending_returns_true',
-        24 => 'tests\\unit\\models\\test_is_pending_returns_false_when_sent_at_set',
-        25 => 'tests\\unit\\models\\test_is_failed_returns_true',
-        26 => 'tests\\unit\\models\\test_is_failed_returns_false',
-        27 => 'tests\\unit\\models\\test_get_priority_level',
-        28 => 'tests\\unit\\models\\test_get_type_display_name',
-        29 => 'tests\\unit\\models\\test_get_channel_display_name',
-        30 => 'tests\\unit\\models\\test_get_status_display_name',
-        31 => 'tests\\unit\\models\\test_get_icon',
-        32 => 'tests\\unit\\models\\test_get_color',
-        33 => 'tests\\unit\\models\\test_get_badge_text',
-        34 => 'tests\\unit\\models\\test_get_summary',
-        35 => 'tests\\unit\\models\\test_has_action',
-        36 => 'tests\\unit\\models\\test_is_expired',
-        37 => 'tests\\unit\\models\\test_can_retry',
-        38 => 'tests\\unit\\models\\test_has_tag',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\OrderItemTest.php' => 
-    array (
-      0 => 'c48432b4d56422719e469a83694a8ea041001fab',
-      1 => 
-      array (
-        0 => 'tests\\unit\\models\\orderitemtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\models\\test_fillable_attributes',
-        1 => 'tests\\unit\\models\\test_casts',
-        2 => 'tests\\unit\\models\\test_order_relation',
-        3 => 'tests\\unit\\models\\test_product_relation',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\OrderTest.php' => 
-    array (
-      0 => '26ebb60cb8f637c2e9a83700bb0dd8b256e501dc',
-      1 => 
-      array (
-        0 => 'tests\\unit\\models\\ordertest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\models\\test_user_relation',
-        1 => 'tests\\unit\\models\\test_items_relation',
-        2 => 'tests\\unit\\models\\test_payments_relation',
-        3 => 'tests\\unit\\models\\test_scope_by_status',
-        4 => 'tests\\unit\\models\\test_scope_for_user',
-        5 => 'tests\\unit\\models\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\PaymentMethodTest.php' => 
-    array (
-      0 => 'f8cad9c680a6dd49bf21fd2d0b0d6e001ad62cfe',
-      1 => 
-      array (
-        0 => 'tests\\unit\\models\\paymentmethodtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\models\\test_fillable_attributes',
-        1 => 'tests\\unit\\models\\test_casts',
-        2 => 'tests\\unit\\models\\test_payments_relation',
-        3 => 'tests\\unit\\models\\test_scope_active',
-        4 => 'tests\\unit\\models\\test_scope_default',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\PaymentTest.php' => 
-    array (
-      0 => 'cf8c3f3597df74169338b6968770b1baf6d15e1d',
-      1 => 
-      array (
-        0 => 'tests\\unit\\models\\paymenttest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\models\\test_order_relation',
-        1 => 'tests\\unit\\models\\test_payment_method_relation',
-        2 => 'tests\\unit\\models\\test_scope_by_status',
-        3 => 'tests\\unit\\models\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\PriceAlertTest.php' => 
-    array (
-      0 => 'c8ca764acfbcc556a6d603462ace413deb193088',
-      1 => 
-      array (
-        0 => 'tests\\unit\\models\\pricealerttest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\models\\test_fillable_attributes',
-        1 => 'tests\\unit\\models\\test_casts',
-        2 => 'tests\\unit\\models\\test_uses_soft_deletes',
-        3 => 'tests\\unit\\models\\test_user_relation',
-        4 => 'tests\\unit\\models\\test_product_relation',
-        5 => 'tests\\unit\\models\\test_scope_active',
-        6 => 'tests\\unit\\models\\test_scope_for_user',
-        7 => 'tests\\unit\\models\\test_scope_for_product',
-        8 => 'tests\\unit\\models\\test_get_rules',
-        9 => 'tests\\unit\\models\\test_is_price_target_reached_true',
-        10 => 'tests\\unit\\models\\test_is_price_target_reached_false',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\ProductTest.php' => 
-    array (
-      0 => '8713049864e2e9bdddb5858a98674600797420bc',
-      1 => 
-      array (
-        0 => 'tests\\unit\\models\\producttest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\models\\setup',
-        1 => 'tests\\unit\\models\\test_brand_relation',
-        2 => 'tests\\unit\\models\\test_category_relation',
-        3 => 'tests\\unit\\models\\test_store_relation',
-        4 => 'tests\\unit\\models\\test_price_alerts_relation',
-        5 => 'tests\\unit\\models\\test_reviews_relation',
-        6 => 'tests\\unit\\models\\test_wishlists_relation',
-        7 => 'tests\\unit\\models\\test_price_offers_relation',
-        8 => 'tests\\unit\\models\\test_scope_active',
-        9 => 'tests\\unit\\models\\test_scope_search',
-        10 => 'tests\\unit\\models\\test_scope_with_reviews_count',
-        11 => 'tests\\unit\\models\\test_get_average_rating',
-        12 => 'tests\\unit\\models\\test_get_total_reviews',
-        13 => 'tests\\unit\\models\\test_is_in_wishlist',
-        14 => 'tests\\unit\\models\\test_get_current_price',
-        15 => 'tests\\unit\\models\\test_get_price_history',
-        16 => 'tests\\unit\\models\\test_validate',
-        17 => 'tests\\unit\\models\\test_validate_fails',
-        18 => 'tests\\unit\\models\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\ReviewTest.php' => 
-    array (
-      0 => '546c53780ebcae341e1d4349f72a0479fb91d6e1',
-      1 => 
-      array (
-        0 => 'tests\\unit\\models\\reviewtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\models\\test_user_relation',
-        1 => 'tests\\unit\\models\\test_product_relation',
-        2 => 'tests\\unit\\models\\test_get_review_text_attribute',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\StoreTest.php' => 
-    array (
-      0 => '73714bbecbfc7650d9066f171015045040455cd8',
-      1 => 
-      array (
-        0 => 'tests\\unit\\models\\storetest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\models\\setup',
-        1 => 'tests\\unit\\models\\test_price_offers_relation',
-        2 => 'tests\\unit\\models\\test_products_relation',
-        3 => 'tests\\unit\\models\\test_currency_relation',
-        4 => 'tests\\unit\\models\\test_scope_active',
-        5 => 'tests\\unit\\models\\test_scope_search',
-        6 => 'tests\\unit\\models\\test_slug_auto_generated_on_creating',
-        7 => 'tests\\unit\\models\\test_slug_updated_on_name_change',
-        8 => 'tests\\unit\\models\\test_generate_affiliate_url_no_affiliate_data',
-        9 => 'tests\\unit\\models\\test_generate_affiliate_url',
-        10 => 'tests\\unit\\models\\test_get_rules',
-        11 => 'tests\\unit\\models\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\UserTest.php' => 
-    array (
-      0 => 'a297aa7d5aa72cb93520edf366d21708d71c19bb',
-      1 => 
-      array (
-        0 => 'tests\\unit\\models\\usertest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\models\\test_is_admin_returns_true_when_is_admin_is_true',
-        1 => 'tests\\unit\\models\\test_is_admin_returns_false_when_is_admin_is_false',
-        2 => 'tests\\unit\\models\\test_is_admin_returns_false_when_is_admin_is_null',
-        3 => 'tests\\unit\\models\\test_is_banned_returns_true_when_is_blocked_is_true',
-        4 => 'tests\\unit\\models\\test_is_banned_returns_false_when_is_blocked_is_false',
-        5 => 'tests\\unit\\models\\test_is_banned_returns_false_when_is_blocked_is_null',
-        6 => 'tests\\unit\\models\\test_is_ban_expired_returns_false_when_not_blocked',
-        7 => 'tests\\unit\\models\\test_is_ban_expired_returns_false_when_ban_not_expired',
-        8 => 'tests\\unit\\models\\test_is_ban_expired_returns_true_when_ban_expired',
-        9 => 'tests\\unit\\models\\test_is_ban_expired_returns_false_when_ban_expires_at_is_null',
-        10 => 'tests\\unit\\models\\test_reviews_relation',
-        11 => 'tests\\unit\\models\\test_wishlists_relation',
-        12 => 'tests\\unit\\models\\test_price_alerts_relation',
-        13 => 'tests\\unit\\models\\test_locale_setting_relation',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Performance\\AvailabilityTestingTest.php' => 
-    array (
-      0 => '60556a62a843888ee02231d26407d150ad02cb96',
-      1 => 
-      array (
-        0 => 'tests\\unit\\performance\\availabilitytestingtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\performance\\test_performance_basic_functionality',
-        1 => 'tests\\unit\\performance\\test_performance_metrics',
-        2 => 'tests\\unit\\performance\\test_performance_optimization',
-        3 => 'tests\\unit\\performance\\setup',
-        4 => 'tests\\unit\\performance\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Performance\\CacheHitRateTest.php' => 
-    array (
-      0 => 'c8fa8d2f237f15b3e3e5b6046fe121054ec0824a',
-      1 => 
-      array (
-        0 => 'tests\\unit\\performance\\cachehitratetest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\performance\\test_performance_basic_functionality',
-        1 => 'tests\\unit\\performance\\test_performance_metrics',
-        2 => 'tests\\unit\\performance\\test_performance_optimization',
-        3 => 'tests\\unit\\performance\\setup',
-        4 => 'tests\\unit\\performance\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Performance\\ConcurrentUserTest.php' => 
-    array (
-      0 => '97c7e5fdf82eb5ed2d118ff085906bc81ab7bfa1',
-      1 => 
-      array (
-        0 => 'tests\\unit\\performance\\concurrentusertest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\performance\\test_performance_basic_functionality',
-        1 => 'tests\\unit\\performance\\test_performance_metrics',
-        2 => 'tests\\unit\\performance\\test_performance_optimization',
-        3 => 'tests\\unit\\performance\\setup',
-        4 => 'tests\\unit\\performance\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Performance\\CPUUsageTest.php' => 
-    array (
-      0 => 'a898277b515f85ef84d3e671e8f0bcc064313564',
-      1 => 
-      array (
-        0 => 'tests\\unit\\performance\\cpuusagetest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\performance\\test_performance_basic_functionality',
-        1 => 'tests\\unit\\performance\\test_performance_metrics',
-        2 => 'tests\\unit\\performance\\test_performance_optimization',
-        3 => 'tests\\unit\\performance\\setup',
-        4 => 'tests\\unit\\performance\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Performance\\DatabaseQueryTimeTest.php' => 
-    array (
-      0 => 'f3bca3b74bf18b0f719cd456cc3fd05606d663b8',
-      1 => 
-      array (
-        0 => 'tests\\unit\\performance\\databasequerytimetest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\performance\\test_performance_basic_functionality',
-        1 => 'tests\\unit\\performance\\test_performance_metrics',
-        2 => 'tests\\unit\\performance\\test_performance_optimization',
-        3 => 'tests\\unit\\performance\\setup',
-        4 => 'tests\\unit\\performance\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Performance\\FilteringPerformanceTest.php' => 
-    array (
-      0 => '339a69bf854d68e29523eafbe736686620faf650',
-      1 => 
-      array (
-        0 => 'tests\\unit\\performance\\filteringperformancetest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\performance\\test_performance_basic_functionality',
-        1 => 'tests\\unit\\performance\\test_performance_metrics',
-        2 => 'tests\\unit\\performance\\test_performance_optimization',
-        3 => 'tests\\unit\\performance\\setup',
-        4 => 'tests\\unit\\performance\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Performance\\ImageLoadTimeTest.php' => 
-    array (
-      0 => '4d8fe14d7b0d418cba0a19db7b5c70b6fd142a8e',
-      1 => 
-      array (
-        0 => 'tests\\unit\\performance\\imageloadtimetest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\performance\\test_performance_basic_functionality',
-        1 => 'tests\\unit\\performance\\test_performance_metrics',
-        2 => 'tests\\unit\\performance\\test_performance_optimization',
-        3 => 'tests\\unit\\performance\\setup',
-        4 => 'tests\\unit\\performance\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Performance\\PageLoadTimeTest.php' => 
-    array (
-      0 => 'c8adbd44b579e8146ab417fc3da5546c2b97481f',
-      1 => 
-      array (
-        0 => 'tests\\unit\\performance\\pageloadtimetest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\performance\\test_basic_functionality',
-        1 => 'tests\\unit\\performance\\test_expected_behavior',
-        2 => 'tests\\unit\\performance\\test_validation',
-        3 => 'tests\\unit\\performance\\setup',
-        4 => 'tests\\unit\\performance\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\ProcessIsolationTest.php' => 
-    array (
-      0 => '4d82ec5d59cab4195b3402550460a06955d922c6',
-      1 => 
-      array (
-        0 => 'tests\\unit\\processisolationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\test_basic_functionality',
-        1 => 'tests\\unit\\test_expected_behavior',
-        2 => 'tests\\unit\\test_validation',
-        3 => 'tests\\unit\\setup',
-        4 => 'tests\\unit\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\PureUnitTest.php' => 
-    array (
-      0 => 'bcaf6a1e762e4a1974f8c291d1b0554498875a4d',
-      1 => 
-      array (
-        0 => 'tests\\unit\\pureunittest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\test_basic_functionality',
-        1 => 'tests\\unit\\test_expected_behavior',
-        2 => 'tests\\unit\\test_validation',
-        3 => 'tests\\unit\\setup',
-        4 => 'tests\\unit\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Recommendations\\BestDealRecommendationTest.php' => 
-    array (
-      0 => '9b033a5d09cd336f4050c419ba17cb72fcf0f691',
-      1 => 
-      array (
-        0 => 'tests\\unit\\recommendations\\bestdealrecommendationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\recommendations\\it_identifies_best_deals',
-        1 => 'tests\\unit\\recommendations\\it_calculates_deal_score',
-        2 => 'tests\\unit\\recommendations\\it_identifies_percentage_discounts',
-        3 => 'tests\\unit\\recommendations\\it_identifies_absolute_discounts',
-        4 => 'tests\\unit\\recommendations\\it_identifies_value_for_money_deals',
-        5 => 'tests\\unit\\recommendations\\it_identifies_limited_time_deals',
-        6 => 'tests\\unit\\recommendations\\it_identifies_bulk_deals',
-        7 => 'tests\\unit\\recommendations\\it_identifies_bundle_deals',
-        8 => 'tests\\unit\\recommendations\\it_identifies_cashback_deals',
-        9 => 'tests\\unit\\recommendations\\it_identifies_free_shipping_deals',
-        10 => 'tests\\unit\\recommendations\\it_identifies_clearance_deals',
-        11 => 'tests\\unit\\recommendations\\it_identifies_seasonal_deals',
-        12 => 'tests\\unit\\recommendations\\it_identifies_best_overall_deals',
-        13 => 'tests\\unit\\recommendations\\getbestdeals',
-        14 => 'tests\\unit\\recommendations\\calculatedealscore',
-        15 => 'tests\\unit\\recommendations\\getpercentagediscounts',
-        16 => 'tests\\unit\\recommendations\\getabsolutediscounts',
-        17 => 'tests\\unit\\recommendations\\getvalueformoneydeals',
-        18 => 'tests\\unit\\recommendations\\getlimitedtimedeals',
-        19 => 'tests\\unit\\recommendations\\getbulkdeals',
-        20 => 'tests\\unit\\recommendations\\getbundledeals',
-        21 => 'tests\\unit\\recommendations\\getcashbackdeals',
-        22 => 'tests\\unit\\recommendations\\getfreeshippingdeals',
-        23 => 'tests\\unit\\recommendations\\getclearancedeals',
-        24 => 'tests\\unit\\recommendations\\getseasonaldeals',
-        25 => 'tests\\unit\\recommendations\\getbestoveralldeals',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Recommendations\\BrandRecommendationTest.php' => 
-    array (
-      0 => 'ddd998f95172bd3b56df70d6794f743d49f611ff',
-      1 => 
-      array (
-        0 => 'tests\\unit\\recommendations\\brandrecommendationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\recommendations\\it_recommends_brands_based_on_user_preferences',
-        1 => 'tests\\unit\\recommendations\\it_recommends_popular_brands_in_category',
-        2 => 'tests\\unit\\recommendations\\it_recommends_similar_brands',
-        3 => 'tests\\unit\\recommendations\\it_recommends_brands_based_on_price_range',
-        4 => 'tests\\unit\\recommendations\\it_recommends_brands_based_on_quality_rating',
-        5 => 'tests\\unit\\recommendations\\it_handles_brand_availability_by_region',
-        6 => 'tests\\unit\\recommendations\\it_recommends_brands_based_on_user_purchase_history',
-        7 => 'tests\\unit\\recommendations\\it_calculates_brand_loyalty_score',
-        8 => 'tests\\unit\\recommendations\\it_recommends_trending_brands',
-        9 => 'tests\\unit\\recommendations\\it_handles_brand_recommendation_weights',
-        10 => 'tests\\unit\\recommendations\\getbrandrecommendations',
-        11 => 'tests\\unit\\recommendations\\getpopularbrandsincategory',
-        12 => 'tests\\unit\\recommendations\\getsimilarbrandrecommendations',
-        13 => 'tests\\unit\\recommendations\\getbrandsinpricerange',
-        14 => 'tests\\unit\\recommendations\\gethighratedbrands',
-        15 => 'tests\\unit\\recommendations\\getavailablebrandsinregion',
-        16 => 'tests\\unit\\recommendations\\getbrandsfrompurchasehistory',
-        17 => 'tests\\unit\\recommendations\\calculatebrandloyaltyscore',
-        18 => 'tests\\unit\\recommendations\\gettrendingbrands',
-        19 => 'tests\\unit\\recommendations\\rankbrandsbyweightedscore',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Recommendations\\CategoryRecommendationTest.php' => 
-    array (
-      0 => 'dcbf988540ade0ec418f201acb59362733c0160f',
-      1 => 
-      array (
-        0 => 'tests\\unit\\recommendations\\categoryrecommendationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\recommendations\\it_recommends_categories_based_on_user_history',
-        1 => 'tests\\unit\\recommendations\\it_recommends_popular_categories',
-        2 => 'tests\\unit\\recommendations\\it_recommends_related_categories',
-        3 => 'tests\\unit\\recommendations\\it_handles_seasonal_category_recommendations',
-        4 => 'tests\\unit\\recommendations\\it_recommends_categories_based_on_demographics',
-        5 => 'tests\\unit\\recommendations\\it_filters_categories_by_availability',
-        6 => 'tests\\unit\\recommendations\\it_ranks_categories_by_relevance_score',
-        7 => 'tests\\unit\\recommendations\\it_handles_empty_category_data',
-        8 => 'tests\\unit\\recommendations\\it_calculates_category_affinity_score',
-        9 => 'tests\\unit\\recommendations\\it_recommends_trending_categories',
-        10 => 'tests\\unit\\recommendations\\getcategoryrecommendations',
-        11 => 'tests\\unit\\recommendations\\getpopularcategoryrecommendations',
-        12 => 'tests\\unit\\recommendations\\getrelatedcategoryrecommendations',
-        13 => 'tests\\unit\\recommendations\\getseasonalcategoryrecommendations',
-        14 => 'tests\\unit\\recommendations\\getdemographiccategoryrecommendations',
-        15 => 'tests\\unit\\recommendations\\filtercategoriesbyavailability',
-        16 => 'tests\\unit\\recommendations\\rankcategoriesbyscore',
-        17 => 'tests\\unit\\recommendations\\calculatecategoryaffinityscore',
-        18 => 'tests\\unit\\recommendations\\gettrendingcategoryrecommendations',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Recommendations\\CollaborativeFilteringTest.php' => 
-    array (
-      0 => '9e8b84875e42055bee28795631348b0a202cae1a',
-      1 => 
-      array (
-        0 => 'tests\\unit\\recommendations\\collaborativefilteringtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\recommendations\\it_finds_similar_users',
-        1 => 'tests\\unit\\recommendations\\it_calculates_cosine_similarity',
-        2 => 'tests\\unit\\recommendations\\it_predicts_ratings_for_items',
-        3 => 'tests\\unit\\recommendations\\it_handles_cold_start_problem',
-        4 => 'tests\\unit\\recommendations\\it_calculates_pearson_correlation',
-        5 => 'tests\\unit\\recommendations\\it_filters_items_by_user_preferences',
-        6 => 'tests\\unit\\recommendations\\it_calculates_item_based_similarity',
-        7 => 'tests\\unit\\recommendations\\it_handles_sparse_data',
-        8 => 'tests\\unit\\recommendations\\it_calculates_confidence_scores',
-        9 => 'tests\\unit\\recommendations\\it_handles_matrix_factorization',
-        10 => 'tests\\unit\\recommendations\\findsimilarusers',
-        11 => 'tests\\unit\\recommendations\\calculatecosinesimilarity',
-        12 => 'tests\\unit\\recommendations\\predictrating',
-        13 => 'tests\\unit\\recommendations\\handlecoldstart',
-        14 => 'tests\\unit\\recommendations\\calculatepearsoncorrelation',
-        15 => 'tests\\unit\\recommendations\\filteritemsbypreferences',
-        16 => 'tests\\unit\\recommendations\\calculateitembasedsimilarity',
-        17 => 'tests\\unit\\recommendations\\findsimilaruserswithmincommonitems',
-        18 => 'tests\\unit\\recommendations\\calculatepredictionconfidence',
-        19 => 'tests\\unit\\recommendations\\performmatrixfactorization',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Recommendations\\ContentBasedFilteringTest.php' => 
-    array (
-      0 => '46285e121c71caa34b06175e26e7f1ed959645de',
-      1 => 
-      array (
-        0 => 'tests\\unit\\recommendations\\contentbasedfilteringtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\recommendations\\it_analyzes_item_features',
-        1 => 'tests\\unit\\recommendations\\it_calculates_item_similarity',
-        2 => 'tests\\unit\\recommendations\\it_builds_user_profile',
-        3 => 'tests\\unit\\recommendations\\it_recommends_items_based_on_content',
-        4 => 'tests\\unit\\recommendations\\it_handles_text_similarity',
-        5 => 'tests\\unit\\recommendations\\it_extracts_keywords_from_text',
-        6 => 'tests\\unit\\recommendations\\it_calculates_tf_idf_scores',
-        7 => 'tests\\unit\\recommendations\\it_handles_categorical_features',
-        8 => 'tests\\unit\\recommendations\\it_handles_numerical_features',
-        9 => 'tests\\unit\\recommendations\\it_combines_multiple_similarity_measures',
-        10 => 'tests\\unit\\recommendations\\extractitemfeatures',
-        11 => 'tests\\unit\\recommendations\\categorizeprice',
-        12 => 'tests\\unit\\recommendations\\calculateitemsimilarity',
-        13 => 'tests\\unit\\recommendations\\builduserprofile',
-        14 => 'tests\\unit\\recommendations\\getcontentbasedrecommendations',
-        15 => 'tests\\unit\\recommendations\\calculateuseritemsimilarity',
-        16 => 'tests\\unit\\recommendations\\calculatetextsimilarity',
-        17 => 'tests\\unit\\recommendations\\extractkeywords',
-        18 => 'tests\\unit\\recommendations\\calculatetfidf',
-        19 => 'tests\\unit\\recommendations\\calculatecategoricalsimilarity',
-        20 => 'tests\\unit\\recommendations\\calculatenumericalsimilarity',
-        21 => 'tests\\unit\\recommendations\\calculatecombinedsimilarity',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Recommendations\\CrossSellRecommendationTest.php' => 
-    array (
-      0 => 'd0b2495755f5fabe528ad70048f979ba1072d463',
-      1 => 
-      array (
-        0 => 'tests\\unit\\recommendations\\crosssellrecommendationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\recommendations\\it_recommends_cross_sell_products',
-        1 => 'tests\\unit\\recommendations\\it_recommends_complementary_products',
-        2 => 'tests\\unit\\recommendations\\it_recommends_related_accessories',
-        3 => 'tests\\unit\\recommendations\\it_recommends_bundled_products',
-        4 => 'tests\\unit\\recommendations\\it_recommends_products_based_on_purchase_history',
-        5 => 'tests\\unit\\recommendations\\it_recommends_products_based_on_user_behavior',
-        6 => 'tests\\unit\\recommendations\\it_recommends_products_based_on_season',
-        7 => 'tests\\unit\\recommendations\\it_recommends_products_based_on_price_range',
-        8 => 'tests\\unit\\recommendations\\it_recommends_products_based_on_brand_preference',
-        9 => 'tests\\unit\\recommendations\\it_recommends_products_based_on_ratings',
-        10 => 'tests\\unit\\recommendations\\it_recommends_products_based_on_availability',
-        11 => 'tests\\unit\\recommendations\\it_recommends_products_based_on_popularity',
-        12 => 'tests\\unit\\recommendations\\it_recommends_products_based_on_customer_segments',
-        13 => 'tests\\unit\\recommendations\\it_recommends_products_based_on_geographic_location',
-        14 => 'tests\\unit\\recommendations\\it_recommends_products_based_on_time_of_day',
-        15 => 'tests\\unit\\recommendations\\it_recommends_products_based_on_weather',
-        16 => 'tests\\unit\\recommendations\\it_recommends_products_based_on_events',
-        17 => 'tests\\unit\\recommendations\\it_calculates_recommendation_confidence',
-        18 => 'tests\\unit\\recommendations\\it_generates_cross_sell_report',
-        19 => 'tests\\unit\\recommendations\\getcrosssellrecommendations',
-        20 => 'tests\\unit\\recommendations\\getcomplementaryproducts',
-        21 => 'tests\\unit\\recommendations\\getrelatedaccessories',
-        22 => 'tests\\unit\\recommendations\\getbundledproducts',
-        23 => 'tests\\unit\\recommendations\\getrecommendationsbasedonhistory',
-        24 => 'tests\\unit\\recommendations\\getrecommendationsbasedonbehavior',
-        25 => 'tests\\unit\\recommendations\\getseasonalrecommendations',
-        26 => 'tests\\unit\\recommendations\\getrecommendationsbypricerange',
-        27 => 'tests\\unit\\recommendations\\getrecommendationsbybrand',
-        28 => 'tests\\unit\\recommendations\\getrecommendationsbyratings',
-        29 => 'tests\\unit\\recommendations\\getrecommendationsbyavailability',
-        30 => 'tests\\unit\\recommendations\\getrecommendationsbypopularity',
-        31 => 'tests\\unit\\recommendations\\getrecommendationsbysegment',
-        32 => 'tests\\unit\\recommendations\\getrecommendationsbylocation',
-        33 => 'tests\\unit\\recommendations\\getrecommendationsbytimeofday',
-        34 => 'tests\\unit\\recommendations\\getrecommendationsbyweather',
-        35 => 'tests\\unit\\recommendations\\getrecommendationsbyevent',
-        36 => 'tests\\unit\\recommendations\\calculaterecommendationconfidence',
-        37 => 'tests\\unit\\recommendations\\generatecrosssellreport',
-        38 => 'tests\\unit\\recommendations\\isaccessory',
-        39 => 'tests\\unit\\recommendations\\canbebundled',
-        40 => 'tests\\unit\\recommendations\\isseasonalproduct',
-        41 => 'tests\\unit\\recommendations\\isinsimilarpricerange',
-        42 => 'tests\\unit\\recommendations\\matchescustomersegment',
-        43 => 'tests\\unit\\recommendations\\isrelevanttotimeofday',
-        44 => 'tests\\unit\\recommendations\\isrelevanttoweather',
-        45 => 'tests\\unit\\recommendations\\isrelevanttoevent',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Recommendations\\HybridRecommendationTest.php' => 
-    array (
-      0 => 'd03f2f9b16278d5ecc3173d31c2bd38dd9f30739',
-      1 => 
-      array (
-        0 => 'tests\\unit\\recommendations\\hybridrecommendationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\recommendations\\it_combines_collaborative_and_content_based_filtering',
-        1 => 'tests\\unit\\recommendations\\it_handles_weighted_ensemble_method',
-        2 => 'tests\\unit\\recommendations\\it_handles_switching_hybrid_approach',
-        3 => 'tests\\unit\\recommendations\\it_handles_mixed_hybrid_approach',
-        4 => 'tests\\unit\\recommendations\\it_handles_cascade_hybrid_approach',
-        5 => 'tests\\unit\\recommendations\\it_handles_feature_combination_hybrid',
-        6 => 'tests\\unit\\recommendations\\it_handles_meta_learning_hybrid',
-        7 => 'tests\\unit\\recommendations\\it_handles_dynamic_weight_adjustment',
-        8 => 'tests\\unit\\recommendations\\it_handles_confidence_weighted_hybrid',
-        9 => 'tests\\unit\\recommendations\\it_handles_temporal_hybrid_approach',
-        10 => 'tests\\unit\\recommendations\\it_evaluates_hybrid_recommendation_quality',
-        11 => 'tests\\unit\\recommendations\\calculatehybridscore',
-        12 => 'tests\\unit\\recommendations\\createweightedensemble',
-        13 => 'tests\\unit\\recommendations\\selectrecommendationmethod',
-        14 => 'tests\\unit\\recommendations\\createmixedhybrid',
-        15 => 'tests\\unit\\recommendations\\createcascadehybrid',
-        16 => 'tests\\unit\\recommendations\\combinefeaturevectors',
-        17 => 'tests\\unit\\recommendations\\selectbestmethodbymetalearning',
-        18 => 'tests\\unit\\recommendations\\adjustweightsdynamically',
-        19 => 'tests\\unit\\recommendations\\createconfidenceweightedhybrid',
-        20 => 'tests\\unit\\recommendations\\createtemporalhybrid',
-        21 => 'tests\\unit\\recommendations\\evaluatehybridquality',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Recommendations\\PersonalizedRecommendationTest.php' => 
-    array (
-      0 => 'b79b6dd462ed62671f203413590cd643d2d0b5ce',
-      1 => 
-      array (
-        0 => 'tests\\unit\\recommendations\\personalizedrecommendationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\recommendations\\it_generates_recommendations_based_on_user_history',
-        1 => 'tests\\unit\\recommendations\\it_prioritizes_same_brand_recommendations',
-        2 => 'tests\\unit\\recommendations\\it_considers_user_preferences',
-        3 => 'tests\\unit\\recommendations\\it_avoids_previously_purchased_products',
-        4 => 'tests\\unit\\recommendations\\it_considers_user_rating_patterns',
-        5 => 'tests\\unit\\recommendations\\it_considers_seasonal_trends',
-        6 => 'tests\\unit\\recommendations\\it_considers_user_demographics',
-        7 => 'tests\\unit\\recommendations\\it_limits_recommendation_count',
-        8 => 'tests\\unit\\recommendations\\it_considers_product_availability',
-        9 => 'tests\\unit\\recommendations\\it_considers_price_sensitivity',
-        10 => 'tests\\unit\\recommendations\\it_considers_collaborative_filtering',
-        11 => 'tests\\unit\\recommendations\\it_considers_content_based_filtering',
-        12 => 'tests\\unit\\recommendations\\it_handles_empty_user_history',
-        13 => 'tests\\unit\\recommendations\\it_considers_recommendation_diversity',
-        14 => 'tests\\unit\\recommendations\\generaterecommendations',
-        15 => 'tests\\unit\\recommendations\\setup',
-        16 => 'tests\\unit\\recommendations\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Recommendations\\SimilarProductTest.php' => 
-    array (
-      0 => '685377c53634e5a2cdb7dacb17905c3aeab06a42',
-      1 => 
-      array (
-        0 => 'tests\\unit\\recommendations\\similarproducttest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\recommendations\\it_finds_similar_products_by_category',
-        1 => 'tests\\unit\\recommendations\\it_finds_similar_products_by_brand',
-        2 => 'tests\\unit\\recommendations\\it_finds_similar_products_by_price_range',
-        3 => 'tests\\unit\\recommendations\\it_finds_similar_products_by_specifications',
-        4 => 'tests\\unit\\recommendations\\it_calculates_similarity_score',
-        5 => 'tests\\unit\\recommendations\\it_handles_empty_product_list',
-        6 => 'tests\\unit\\recommendations\\it_ranks_similar_products_by_relevance',
-        7 => 'tests\\unit\\recommendations\\it_considers_user_preferences',
-        8 => 'tests\\unit\\recommendations\\it_handles_case_insensitive_matching',
-        9 => 'tests\\unit\\recommendations\\it_limits_number_of_similar_products',
-        10 => 'tests\\unit\\recommendations\\it_handles_products_with_missing_attributes',
-        11 => 'tests\\unit\\recommendations\\findsimilarproducts',
-        12 => 'tests\\unit\\recommendations\\findsimilarproductsbyspecs',
-        13 => 'tests\\unit\\recommendations\\calculatesimilarityscore',
-        14 => 'tests\\unit\\recommendations\\calculatespecsimilarity',
-        15 => 'tests\\unit\\recommendations\\calculatestringsimilarity',
-        16 => 'tests\\unit\\recommendations\\applyuserpreferences',
-        17 => 'tests\\unit\\recommendations\\generatetestproducts',
-        18 => 'tests\\unit\\recommendations\\setup',
-        19 => 'tests\\unit\\recommendations\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Recommendations\\TrendingProductTest.php' => 
-    array (
-      0 => 'c9c29e948128f39e24f5cf406febd69b3ab3199d',
-      1 => 
-      array (
-        0 => 'tests\\unit\\recommendations\\trendingproducttest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\recommendations\\it_identifies_trending_products',
-        1 => 'tests\\unit\\recommendations\\it_calculates_trending_score',
-        2 => 'tests\\unit\\recommendations\\it_identifies_rising_trends',
-        3 => 'tests\\unit\\recommendations\\it_identifies_falling_trends',
-        4 => 'tests\\unit\\recommendations\\it_identifies_seasonal_trends',
-        5 => 'tests\\unit\\recommendations\\it_identifies_category_trends',
-        6 => 'tests\\unit\\recommendations\\it_identifies_brand_trends',
-        7 => 'tests\\unit\\recommendations\\it_identifies_price_range_trends',
-        8 => 'tests\\unit\\recommendations\\it_identifies_time_based_trends',
-        9 => 'tests\\unit\\recommendations\\it_identifies_geographic_trends',
-        10 => 'tests\\unit\\recommendations\\it_identifies_demographic_trends',
-        11 => 'tests\\unit\\recommendations\\gettrendingproducts',
-        12 => 'tests\\unit\\recommendations\\calculatetrendingscore',
-        13 => 'tests\\unit\\recommendations\\getrisingtrends',
-        14 => 'tests\\unit\\recommendations\\getfallingtrends',
-        15 => 'tests\\unit\\recommendations\\getseasonaltrends',
-        16 => 'tests\\unit\\recommendations\\getcategorytrends',
-        17 => 'tests\\unit\\recommendations\\getbrandtrends',
-        18 => 'tests\\unit\\recommendations\\getpricerangetrends',
-        19 => 'tests\\unit\\recommendations\\gettimebasedtrends',
-        20 => 'tests\\unit\\recommendations\\getgeographictrends',
-        21 => 'tests\\unit\\recommendations\\getdemographictrends',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Recommendations\\UpsellRecommendationTest.php' => 
-    array (
-      0 => '4ca870a0ecefa6bf90ac586cb202ef8d9f2ae876',
-      1 => 
-      array (
-        0 => 'tests\\unit\\recommendations\\upsellrecommendationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\recommendations\\it_recommends_higher_tier_products',
-        1 => 'tests\\unit\\recommendations\\it_recommends_premium_versions',
-        2 => 'tests\\unit\\recommendations\\it_recommends_products_with_more_features',
-        3 => 'tests\\unit\\recommendations\\it_recommends_products_with_better_specifications',
-        4 => 'tests\\unit\\recommendations\\it_recommends_products_with_extended_warranty',
-        5 => 'tests\\unit\\recommendations\\it_recommends_products_with_premium_materials',
-        6 => 'tests\\unit\\recommendations\\it_recommends_products_with_better_brand',
-        7 => 'tests\\unit\\recommendations\\it_recommends_products_with_higher_capacity',
-        8 => 'tests\\unit\\recommendations\\it_recommends_products_with_better_performance',
-        9 => 'tests\\unit\\recommendations\\it_recommends_products_with_more_storage',
-        10 => 'tests\\unit\\recommendations\\it_recommends_products_with_better_display',
-        11 => 'tests\\unit\\recommendations\\it_recommends_products_with_better_connectivity',
-        12 => 'tests\\unit\\recommendations\\it_recommends_products_with_better_battery_life',
-        13 => 'tests\\unit\\recommendations\\it_recommends_products_with_better_camera',
-        14 => 'tests\\unit\\recommendations\\it_recommends_products_with_better_audio',
-        15 => 'tests\\unit\\recommendations\\it_recommends_products_with_better_security',
-        16 => 'tests\\unit\\recommendations\\it_recommends_products_with_better_support',
-        17 => 'tests\\unit\\recommendations\\it_calculates_upsell_potential',
-        18 => 'tests\\unit\\recommendations\\it_generates_upsell_report',
-        19 => 'tests\\unit\\recommendations\\getupsellrecommendations',
-        20 => 'tests\\unit\\recommendations\\getpremiumversions',
-        21 => 'tests\\unit\\recommendations\\getfeaturerichproducts',
-        22 => 'tests\\unit\\recommendations\\getbetterspecproducts',
-        23 => 'tests\\unit\\recommendations\\getextendedwarrantyproducts',
-        24 => 'tests\\unit\\recommendations\\getpremiummaterialproducts',
-        25 => 'tests\\unit\\recommendations\\getbetterbrandproducts',
-        26 => 'tests\\unit\\recommendations\\gethighercapacityproducts',
-        27 => 'tests\\unit\\recommendations\\getbetterperformanceproducts',
-        28 => 'tests\\unit\\recommendations\\getmorestorageproducts',
-        29 => 'tests\\unit\\recommendations\\getbetterdisplayproducts',
-        30 => 'tests\\unit\\recommendations\\getbetterconnectivityproducts',
-        31 => 'tests\\unit\\recommendations\\getbetterbatteryproducts',
-        32 => 'tests\\unit\\recommendations\\getbettercameraproducts',
-        33 => 'tests\\unit\\recommendations\\getbetteraudioproducts',
-        34 => 'tests\\unit\\recommendations\\getbettersecurityproducts',
-        35 => 'tests\\unit\\recommendations\\getbettersupportproducts',
-        36 => 'tests\\unit\\recommendations\\calculateupsellpotential',
-        37 => 'tests\\unit\\recommendations\\generateupsellreport',
-        38 => 'tests\\unit\\recommendations\\ispremiumversion',
-        39 => 'tests\\unit\\recommendations\\hasmorefeatures',
-        40 => 'tests\\unit\\recommendations\\hasbetterspecs',
-        41 => 'tests\\unit\\recommendations\\hasextendedwarranty',
-        42 => 'tests\\unit\\recommendations\\haspremiummaterial',
-        43 => 'tests\\unit\\recommendations\\hasbetterbrand',
-        44 => 'tests\\unit\\recommendations\\hashighercapacity',
-        45 => 'tests\\unit\\recommendations\\hasbetterperformance',
-        46 => 'tests\\unit\\recommendations\\hasmorestorage',
-        47 => 'tests\\unit\\recommendations\\hasbetterdisplay',
-        48 => 'tests\\unit\\recommendations\\hasbetterconnectivity',
-        49 => 'tests\\unit\\recommendations\\hasbetterbatterylife',
-        50 => 'tests\\unit\\recommendations\\hasbettercamera',
-        51 => 'tests\\unit\\recommendations\\hasbetteraudio',
-        52 => 'tests\\unit\\recommendations\\hasbettersecurity',
-        53 => 'tests\\unit\\recommendations\\hasbettersupport',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Recommendations\\UserBehaviorRecommendationTest.php' => 
-    array (
-      0 => '03bd370dfb4bcf4377140c156b228cf887dae1d1',
-      1 => 
-      array (
-        0 => 'tests\\unit\\recommendations\\userbehaviorrecommendationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\recommendations\\it_analyzes_user_browsing_patterns',
-        1 => 'tests\\unit\\recommendations\\it_tracks_user_purchase_frequency',
-        2 => 'tests\\unit\\recommendations\\it_identifies_user_preferences_from_behavior',
-        3 => 'tests\\unit\\recommendations\\it_predicts_user_intent',
-        4 => 'tests\\unit\\recommendations\\it_analyzes_user_engagement_level',
-        5 => 'tests\\unit\\recommendations\\it_tracks_user_price_sensitivity',
-        6 => 'tests\\unit\\recommendations\\it_analyzes_user_device_preferences',
-        7 => 'tests\\unit\\recommendations\\it_tracks_user_seasonal_patterns',
-        8 => 'tests\\unit\\recommendations\\it_predicts_user_churn_risk',
-        9 => 'tests\\unit\\recommendations\\it_generates_personalized_recommendations',
-        10 => 'tests\\unit\\recommendations\\analyzebrowsingpatterns',
-        11 => 'tests\\unit\\recommendations\\calculatepurchasefrequency',
-        12 => 'tests\\unit\\recommendations\\identifyuserpreferences',
-        13 => 'tests\\unit\\recommendations\\predictuserintent',
-        14 => 'tests\\unit\\recommendations\\calculateengagementlevel',
-        15 => 'tests\\unit\\recommendations\\calculatepricesensitivity',
-        16 => 'tests\\unit\\recommendations\\analyzedevicepreferences',
-        17 => 'tests\\unit\\recommendations\\analyzeseasonalpatterns',
-        18 => 'tests\\unit\\recommendations\\predictchurnrisk',
-        19 => 'tests\\unit\\recommendations\\generatepersonalizedrecommendations',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Rules\\ValidOrderStatusTest.php' => 
-    array (
-      0 => 'fab62aa9e35f5a3dddc9959ea93478e18838a8f2',
-      1 => 
-      array (
-        0 => 'tests\\unit\\rules\\validorderstatustest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\rules\\setup',
-        1 => 'tests\\unit\\rules\\test_passes_with_valid_status',
-        2 => 'tests\\unit\\rules\\test_fails_with_invalid_status',
-        3 => 'tests\\unit\\rules\\test_fails_with_non_string_value',
-        4 => 'tests\\unit\\rules\\test_passes_with_all_valid_statuses',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Security\\DataBackupTest.php' => 
-    array (
-      0 => '2d24c8b15f2acb01d18ee2a39216346a09fcc814',
-      1 => 
-      array (
-        0 => 'tests\\unit\\security\\databackuptest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\security\\test_basic_functionality',
-        1 => 'tests\\unit\\security\\test_expected_behavior',
-        2 => 'tests\\unit\\security\\test_validation',
-        3 => 'tests\\unit\\security\\setup',
-        4 => 'tests\\unit\\security\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Services\\APIServiceTest.php' => 
-    array (
-      0 => '6c2bd377d28d3d3656aaab1e8f576f73399bc352',
-      1 => 
-      array (
-        0 => 'tests\\unit\\services\\apiservicetest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\services\\test_api_info_service_version_and_urls',
-        1 => 'tests\\unit\\services\\test_response_builder_success_and_error',
-        2 => 'tests\\unit\\services\\test_paginated_response_structure_with_collection',
-        3 => 'tests\\unit\\services\\test_request_parameter_service_parsing',
-        4 => 'tests\\unit\\services\\test_pagination_service_defaults_for_non_paginator',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Services\\BehaviorAnalysisServiceTest.php' => 
-    array (
-      0 => '38cffab8ea2d100a106e613bd6479595b5cdee2b',
-      1 => 
-      array (
-        0 => 'tests\\unit\\services\\behavioranalysisservicetest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\services\\setup',
-        1 => 'tests\\unit\\services\\test_track_user_behavior_inserts_into_database',
-        2 => 'tests\\unit\\services\\test_get_user_analytics_returns_cached_data',
-        3 => 'tests\\unit\\services\\test_get_site_analytics_returns_cached_data',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Services\\ExternalStoreServiceTest.php' => 
-    array (
-      0 => '574a3e6b5fb0b3275ad08cdf4da103c8ae6d12f3',
-      1 => 
-      array (
-        0 => 'tests\\unit\\services\\externalstoreservicetest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\services\\setup',
-        1 => 'tests\\unit\\services\\teardown',
-        2 => 'tests\\unit\\services\\test_it_searches_products_across_all_stores',
-        3 => 'tests\\unit\\services\\test_it_handles_api_failure_gracefully',
-        4 => 'tests\\unit\\services\\test_it_gets_product_details_with_cache',
-        5 => 'tests\\unit\\services\\test_it_returns_null_for_invalid_store',
-        6 => 'tests\\unit\\services\\test_it_syncs_store_products',
-        7 => 'tests\\unit\\services\\test_it_gets_store_status',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Services\\OrderServiceTest.php' => 
-    array (
-      0 => '1a837f591a9b845f5251c34bc968a5f045873b03',
-      1 => 
-      array (
-        0 => 'tests\\unit\\services\\orderservicetest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\services\\setup',
-        1 => 'tests\\unit\\services\\test_create_order_creates_order_with_items',
-        2 => 'tests\\unit\\services\\test_update_order_status_updates_valid_transition',
-        3 => 'tests\\unit\\services\\test_update_order_status_fails_invalid_transition',
-        4 => 'tests\\unit\\services\\test_cancel_order_cancels_pending_order',
-        5 => 'tests\\unit\\services\\test_cancel_order_fails_for_shipped_order',
-        6 => 'tests\\unit\\services\\test_get_order_history_returns_user_orders',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Services\\PointsServiceTest.php' => 
-    array (
-      0 => '39548ac613d98bfc531a6c63aecf11d40842325e',
-      1 => 
-      array (
-        0 => 'tests\\unit\\services\\pointsservicetest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\services\\setup',
-        1 => 'tests\\unit\\services\\test_add_points_creates_user_point',
-        2 => 'tests\\unit\\services\\test_get_available_points_returns_sum',
-        3 => 'tests\\unit\\services\\test_redeem_points_succeeds_with_sufficient_points',
-        4 => 'tests\\unit\\services\\test_redeem_points_fails_with_insufficient_points',
-        5 => 'tests\\unit\\services\\test_award_purchase_points_adds_points',
-        6 => 'tests\\unit\\services\\test_get_points_history_returns_paginated',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\SimpleMockeryTest.php' => 
-    array (
-      0 => '691a2d55c82a6b06faf155435d9919bff3eee361',
-      1 => 
-      array (
-        0 => 'tests\\unit\\simplemockerytest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\teardown',
-        1 => 'tests\\unit\\test_mock_basic_functionality',
-        2 => 'tests\\unit\\test_mock_expected_behavior_with_parameters',
-        3 => 'tests\\unit\\test_mock_validation_throws_exception',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\StoreModelTest.php' => 
-    array (
-      0 => '2395c1a8f767e59cb2242abf3d61dc70ac4b9f89',
-      1 => 
-      array (
-        0 => 'tests\\unit\\storemodeltest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\test_store_has_fillable_attributes',
-        1 => 'tests\\unit\\test_store_casts_attributes_correctly',
-        2 => 'tests\\unit\\test_store_relationships',
-        3 => 'tests\\unit\\test_active_scope',
-        4 => 'tests\\unit\\test_search_scope',
-        5 => 'tests\\unit\\test_generate_affiliate_url',
-        6 => 'tests\\unit\\test_generate_affiliate_url_without_config',
-        7 => 'tests\\unit\\test_slug_generation_on_create',
-        8 => 'tests\\unit\\test_validation_rules',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\StrictMockeryTest.php' => 
-    array (
-      0 => '14df5e6b41a47686652c4142282fd317a0d053b3',
-      1 => 
-      array (
-        0 => 'tests\\unit\\strictmockerytest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\test_basic_functionality',
-        1 => 'tests\\unit\\test_expected_behavior',
-        2 => 'tests\\unit\\test_validation',
-        3 => 'tests\\unit\\setup',
-        4 => 'tests\\unit\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\TestErrorHandler.php' => 
-    array (
-      0 => 'b09b5fd48e92306f60ac18ba6e3b56fcf343417f',
-      1 => 
-      array (
-        0 => 'tests\\unit\\testerrorhandler',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\test_simple_assertion',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\URLServiceTest.php' => 
-    array (
-      0 => '1c12efa36027a09c1d3b6f46733723d0d2e90a9a',
-      1 => 
-      array (
-        0 => 'tests\\unit\\urlservicetest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\test_generate_affiliate_url_encodes_url_and_injects_affiliate_code',
-        1 => 'tests\\unit\\test_generate_affiliate_url_returns_original_when_missing_config',
-        2 => 'tests\\unit\\test_generate_affiliate_url_keeps_path_slashes_unencoded',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Validation\\BasicValidationTest.php' => 
-    array (
-      0 => '779306cb47dcf4bb50e83fc333ec15e854fdeda3',
-      1 => 
-      array (
-        0 => 'tests\\unit\\validation\\basicvalidationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\validation\\test_basic_functionality',
-        1 => 'tests\\unit\\validation\\test_expected_behavior',
-        2 => 'tests\\unit\\validation\\test_validation',
-        3 => 'tests\\unit\\validation\\setup',
-        4 => 'tests\\unit\\validation\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Validation\\ComprehensiveValidationTest.php' => 
-    array (
-      0 => 'c7d2b3a4066496fa25cdb7d777dd8e5432d1e6b2',
-      1 => 
-      array (
-        0 => 'tests\\unit\\validation\\comprehensivevalidationtest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\validation\\test_basic_functionality',
-        1 => 'tests\\unit\\validation\\test_expected_behavior',
-        2 => 'tests\\unit\\validation\\test_validation',
-        3 => 'tests\\unit\\validation\\setup',
-        4 => 'tests\\unit\\validation\\teardown',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Validation\\ValidationTestCase.php' => 
-    array (
-      0 => 'ceaa33eb4a301554f96cc6736e76783dfed29cb0',
-      1 => 
-      array (
-        0 => 'tests\\unit\\validation\\validationtestcase',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\unit\\validation\\setup',
-        1 => 'tests\\unit\\validation\\teardown',
-        2 => 'tests\\unit\\validation\\createvalidator',
-        3 => 'tests\\unit\\validation\\validatedata',
-        4 => 'tests\\unit\\validation\\getvalidationerrors',
-        5 => 'tests\\unit\\validation\\test_can_be_instantiated',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Feature\\FinancialTransactionServiceCoverageTest.php' => 
-    array (
-      0 => '77385f4e7bad94f3173f0b7c330bdd238b33a1f9',
-      1 => 
-      array (
-        0 => 'tests\\feature\\financialtransactionservicecoveragetest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\feature\\test_create_price_offer_updates_product_price_from_new_offer',
-        1 => 'tests\\feature\\test_update_product_price_rejects_negative_value',
-        2 => 'tests\\feature\\test_update_price_offer_changes_price_and_updates_product_to_lowest_available',
-        3 => 'tests\\feature\\test_update_price_offer_unavailable_recalculates_to_next_lowest_available_offer',
-        4 => 'tests\\feature\\test_delete_price_offer_returns_true',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Feature\\OrderServiceCoverageTest.php' => 
-    array (
-      0 => '6902ccc4e16dd42418536b61e60c569ce04c8587',
-      1 => 
-      array (
-        0 => 'tests\\feature\\orderservicecoveragetest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\feature\\test_create_order_computes_totals_and_persists_items',
-        1 => 'tests\\feature\\test_update_order_status_allows_transition_and_fires_event',
-        2 => 'tests\\feature\\test_cancel_order_restores_stock_and_returns_true_for_pending',
-        3 => 'tests\\feature\\test_update_order_status_rejects_invalid_transition',
-        4 => 'tests\\feature\\test_create_order_respects_shipping_threshold_boundary_and_tax_config',
-        5 => 'tests\\feature\\test_update_order_status_accepts_completed_alias_as_delivered_and_fires_event',
-      ),
-      3 => 
-      array (
-      ),
-    ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\AccessControlListTest.php' => 
     array (
       0 => '74e479ce647beaad5c01db093e485ace1391f06e',
@@ -8536,6 +5636,84 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       array (
       ),
     ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Controllers\\AnalyticsControllerTest.php' => 
+    array (
+      0 => 'fcd37b5216d8ba07bbdb9fdf7b014b522158026f',
+      1 => 
+      array (
+        0 => 'tests\\unit\\controllers\\analyticscontrollertest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\controllers\\setup',
+        1 => 'tests\\unit\\controllers\\teardown',
+        2 => 'tests\\unit\\controllers\\test_user_analytics_returns_analytics_for_authenticated_user',
+        3 => 'tests\\unit\\controllers\\test_user_analytics_returns_unauthorized_for_unauthenticated_user',
+        4 => 'tests\\unit\\controllers\\test_site_analytics_returns_site_analytics',
+        5 => 'tests\\unit\\controllers\\test_track_behavior_returns_success_for_valid_authenticated_request',
+        6 => 'tests\\unit\\controllers\\test_track_behavior_returns_unauthorized_for_unauthenticated_user',
+        7 => 'tests\\unit\\controllers\\test_track_behavior_fails_validation_for_invalid_action',
+        8 => 'tests\\unit\\controllers\\test_user_analytics_throws_exception_when_service_fails',
+        9 => 'tests\\unit\\controllers\\test_site_analytics_throws_exception_when_service_fails',
+        10 => 'tests\\unit\\controllers\\test_track_behavior_throws_exception_when_service_fails',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Controllers\\BaseApiControllerTest.php' => 
+    array (
+      0 => 'f344e767aac59d761f5aeca2d53cbfcf7e1c5383',
+      1 => 
+      array (
+        0 => 'tests\\unit\\controllers\\concretebaseapicontroller',
+        1 => 'tests\\unit\\controllers\\baseapicontrollertest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\controllers\\testmethod',
+        1 => 'tests\\unit\\controllers\\successresponsepublic',
+        2 => 'tests\\unit\\controllers\\errorresponsepublic',
+        3 => 'tests\\unit\\controllers\\paginatedresponsepublic',
+        4 => 'tests\\unit\\controllers\\getratelimitinfopublic',
+        5 => 'tests\\unit\\controllers\\setup',
+        6 => 'tests\\unit\\controllers\\test_success_response',
+        7 => 'tests\\unit\\controllers\\test_error_response',
+        8 => 'tests\\unit\\controllers\\test_paginated_response',
+        9 => 'tests\\unit\\controllers\\test_get_rate_limit_info',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Controllers\\OrderControllerTest.php' => 
+    array (
+      0 => '41977a40abf96a3dc66ef01395bad3183574997b',
+      1 => 
+      array (
+        0 => 'tests\\unit\\controllers\\ordercontrollertest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\controllers\\setup',
+        1 => 'tests\\unit\\controllers\\teardown',
+        2 => 'tests\\unit\\controllers\\test_index_returns_orders_for_authenticated_user',
+        3 => 'tests\\unit\\controllers\\test_index_returns_unauthorized_for_unauthenticated_user',
+        4 => 'tests\\unit\\controllers\\test_show_returns_order_with_loaded_relationships',
+        5 => 'tests\\unit\\controllers\\test_create_creates_order_and_awards_points_for_valid_request',
+        6 => 'tests\\unit\\controllers\\test_create_returns_unauthorized_for_unauthenticated_user',
+        7 => 'tests\\unit\\controllers\\test_update_status_updates_status_and_sends_notification',
+        8 => 'tests\\unit\\controllers\\test_update_status_returns_error_when_update_fails',
+        9 => 'tests\\unit\\controllers\\test_cancel_cancels_order_successfully',
+        10 => 'tests\\unit\\controllers\\test_cancel_returns_error_when_cancel_fails',
+        11 => 'tests\\unit\\controllers\\test_show_throws_authorization_exception_when_not_authorized',
+        12 => 'tests\\unit\\controllers\\test_update_status_returns_error_for_invalid_transition',
+        13 => 'tests\\unit\\controllers\\test_cancel_returns_error_for_invalid_status',
+      ),
+      3 => 
+      array (
+      ),
+    ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\ControllerServiceTest.php' => 
     array (
       0 => 'cbccecfbdfba57ee1c10cae31c7f13f14224f3d2',
@@ -8606,6 +5784,253 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       2 => 
       array (
         0 => 'tests\\unit\\test_basic_truth',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\COPRRA\\AnalyticsServiceTest.php' => 
+    array (
+      0 => 'c6af4d4f527eb0c6ff288b315a52a3ffd8cc5619',
+      1 => 
+      array (
+        0 => 'tests\\unit\\coprra\\analyticsservicetest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\coprra\\test_it_tracks_price_comparison_event',
+        1 => 'tests\\unit\\coprra\\test_it_tracks_product_view_event',
+        2 => 'tests\\unit\\coprra\\test_it_tracks_search_event',
+        3 => 'tests\\unit\\coprra\\test_it_tracks_store_click_event',
+        4 => 'tests\\unit\\coprra\\test_it_gets_most_viewed_products',
+        5 => 'tests\\unit\\coprra\\test_it_gets_most_searched_queries',
+        6 => 'tests\\unit\\coprra\\test_it_gets_most_popular_stores',
+        7 => 'tests\\unit\\coprra\\test_it_gets_price_comparison_statistics',
+        8 => 'tests\\unit\\coprra\\test_it_gets_dashboard_data',
+        9 => 'tests\\unit\\coprra\\test_it_cleans_old_analytics_data',
+        10 => 'tests\\unit\\coprra\\test_it_does_not_track_when_disabled',
+        11 => 'tests\\unit\\coprra\\test_it_handles_null_user_id',
+        12 => 'tests\\unit\\coprra\\test_it_handles_empty_metadata',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\COPRRA\\CacheServiceTest.php' => 
+    array (
+      0 => '5fec99c5d2a33ddf564892a4ddddfe5cc5e60ac1',
+      1 => 
+      array (
+        0 => 'tests\\unit\\coprra\\cacheservicetest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\coprra\\setup',
+        1 => 'tests\\unit\\coprra\\teardown',
+        2 => 'tests\\unit\\coprra\\test_it_generates_correct_product_cache_key',
+        3 => 'tests\\unit\\coprra\\test_it_generates_correct_category_cache_key',
+        4 => 'tests\\unit\\coprra\\test_it_generates_correct_store_cache_key',
+        5 => 'tests\\unit\\coprra\\test_it_generates_correct_price_comparison_cache_key',
+        6 => 'tests\\unit\\coprra\\test_it_generates_correct_exchange_rate_cache_key',
+        7 => 'tests\\unit\\coprra\\test_it_generates_correct_search_cache_key',
+        8 => 'tests\\unit\\coprra\\test_it_generates_search_cache_key_with_filters',
+        9 => 'tests\\unit\\coprra\\test_it_caches_product_data',
+        10 => 'tests\\unit\\coprra\\test_it_caches_price_comparison_data',
+        11 => 'tests\\unit\\coprra\\test_it_caches_search_results',
+        12 => 'tests\\unit\\coprra\\test_it_invalidates_product_cache',
+        13 => 'tests\\unit\\coprra\\test_it_invalidates_category_cache',
+        14 => 'tests\\unit\\coprra\\test_it_invalidates_store_cache',
+        15 => 'tests\\unit\\coprra\\test_it_returns_null_for_non_existent_cache',
+        16 => 'tests\\unit\\coprra\\test_it_returns_cache_statistics',
+        17 => 'tests\\unit\\coprra\\test_it_uses_remember_method_correctly',
+        18 => 'tests\\unit\\coprra\\test_it_clears_all_cache',
+        19 => 'tests\\unit\\coprra\\test_it_respects_custom_cache_duration',
+        20 => 'tests\\unit\\coprra\\test_it_handles_search_with_different_filters',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\COPRRA\\CoprraServiceProviderTest.php' => 
+    array (
+      0 => 'f12b4830aa35cd090c9108adb7e1996dd57d7e7e',
+      1 => 
+      array (
+        0 => 'tests\\unit\\coprra\\coprraserviceprovidertest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\coprra\\setup',
+        1 => 'tests\\unit\\coprra\\test_it_registers_coprra_configuration',
+        2 => 'tests\\unit\\coprra\\test_it_has_coprra_name_configuration',
+        3 => 'tests\\unit\\coprra\\test_it_has_coprra_version_configuration',
+        4 => 'tests\\unit\\coprra\\test_it_has_default_currency_configuration',
+        5 => 'tests\\unit\\coprra\\test_it_has_default_language_configuration',
+        6 => 'tests\\unit\\coprra\\test_it_has_price_comparison_settings',
+        7 => 'tests\\unit\\coprra\\test_it_has_search_settings',
+        8 => 'tests\\unit\\coprra\\test_it_has_exchange_rates_configuration',
+        9 => 'tests\\unit\\coprra\\test_it_has_pagination_settings',
+        10 => 'tests\\unit\\coprra\\test_it_has_api_configuration',
+        11 => 'tests\\unit\\coprra\\test_it_has_media_settings',
+        12 => 'tests\\unit\\coprra\\test_it_has_analytics_settings',
+        13 => 'tests\\unit\\coprra\\test_it_has_security_settings',
+        14 => 'tests\\unit\\coprra\\test_it_has_performance_settings',
+        15 => 'tests\\unit\\coprra\\test_it_shares_coprra_name_with_views',
+        16 => 'tests\\unit\\coprra\\test_it_shares_coprra_version_with_views',
+        17 => 'tests\\unit\\coprra\\test_it_shares_default_currency_with_views',
+        18 => 'tests\\unit\\coprra\\test_it_shares_default_language_with_views',
+        19 => 'tests\\unit\\coprra\\test_it_registers_currency_blade_directive',
+        20 => 'tests\\unit\\coprra\\test_it_registers_pricecompare_blade_directive',
+        21 => 'tests\\unit\\coprra\\test_it_registers_rtl_blade_directive',
+        22 => 'tests\\unit\\coprra\\currency_directive_generates_correct_php_code',
+        23 => 'tests\\unit\\coprra\\pricecompare_directive_generates_correct_php_code',
+        24 => 'tests\\unit\\coprra\\rtl_directive_generates_correct_php_code',
+        25 => 'tests\\unit\\coprra\\test_it_validates_price_cache_duration_is_numeric',
+        26 => 'tests\\unit\\coprra\\test_it_validates_max_stores_per_product_is_numeric',
+        27 => 'tests\\unit\\coprra\\test_it_validates_search_max_results_is_numeric',
+        28 => 'tests\\unit\\coprra\\test_it_validates_api_rate_limit_is_numeric',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\COPRRA\\ExchangeRateServiceTest.php' => 
+    array (
+      0 => '7b98e452ab19dcd5bfc5b7531176a4f2f80aee14',
+      1 => 
+      array (
+        0 => 'tests\\unit\\coprra\\exchangerateservicetest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\coprra\\setup',
+        1 => 'tests\\unit\\coprra\\test_it_returns_one_for_same_currency',
+        2 => 'tests\\unit\\coprra\\test_it_seeds_exchange_rates_from_config',
+        3 => 'tests\\unit\\coprra\\test_it_gets_rate_from_database',
+        4 => 'tests\\unit\\coprra\\test_it_caches_exchange_rates',
+        5 => 'tests\\unit\\coprra\\test_it_converts_currency_correctly',
+        6 => 'tests\\unit\\coprra\\test_it_identifies_stale_rates',
+        7 => 'tests\\unit\\coprra\\test_it_gets_fresh_rates_only',
+        8 => 'tests\\unit\\coprra\\test_it_gets_stale_rates_only',
+        9 => 'tests\\unit\\coprra\\test_it_returns_supported_currencies',
+        10 => 'tests\\unit\\coprra\\test_it_uses_fallback_rate_when_not_in_database',
+        11 => 'tests\\unit\\coprra\\test_it_handles_reverse_conversion',
+        12 => 'tests\\unit\\coprra\\test_it_updates_existing_rates',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\COPRRA\\PriceHelperTest.php' => 
+    array (
+      0 => '987a68cf94dd70f600d89a380210b240513b2c76',
+      1 => 
+      array (
+        0 => 'tests\\unit\\coprra\\pricehelpertest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\coprra\\setup',
+        1 => 'tests\\unit\\coprra\\test_it_formats_price_with_default_currency',
+        2 => 'tests\\unit\\coprra\\test_it_formats_price_with_specific_currency',
+        3 => 'tests\\unit\\coprra\\test_it_formats_price_with_sar_currency',
+        4 => 'tests\\unit\\coprra\\test_it_handles_non_existent_currency',
+        5 => 'tests\\unit\\coprra\\test_it_calculates_price_difference_percentage',
+        6 => 'tests\\unit\\coprra\\test_it_calculates_negative_price_difference',
+        7 => 'tests\\unit\\coprra\\test_it_returns_zero_for_same_prices',
+        8 => 'tests\\unit\\coprra\\test_it_handles_zero_original_price',
+        9 => 'tests\\unit\\coprra\\test_it_handles_negative_original_price',
+        10 => 'tests\\unit\\coprra\\test_it_formats_positive_price_difference_string',
+        11 => 'tests\\unit\\coprra\\test_it_formats_negative_price_difference_string',
+        12 => 'tests\\unit\\coprra\\test_it_formats_zero_price_difference_string',
+        13 => 'tests\\unit\\coprra\\test_it_identifies_good_deal',
+        14 => 'tests\\unit\\coprra\\test_it_identifies_not_good_deal',
+        15 => 'tests\\unit\\coprra\\test_it_handles_empty_prices_array_for_good_deal',
+        16 => 'tests\\unit\\coprra\\test_it_gets_best_price_from_array',
+        17 => 'tests\\unit\\coprra\\test_it_returns_null_for_empty_prices_array',
+        18 => 'tests\\unit\\coprra\\test_it_converts_currency',
+        19 => 'tests\\unit\\coprra\\test_it_converts_currency_to_sar',
+        20 => 'tests\\unit\\coprra\\test_it_formats_price_range_with_same_prices',
+        21 => 'tests\\unit\\coprra\\test_it_formats_price_range_with_different_prices',
+        22 => 'tests\\unit\\coprra\\test_it_formats_price_range_with_default_currency',
+        23 => 'tests\\unit\\coprra\\test_it_formats_price_range_with_non_existent_currency',
+        24 => 'tests\\unit\\coprra\\test_it_handles_decimal_prices_correctly',
+        25 => 'tests\\unit\\coprra\\test_it_handles_large_prices',
+        26 => 'tests\\unit\\coprra\\test_it_calculates_accurate_percentage_for_small_differences',
+        27 => 'tests\\unit\\coprra\\test_it_calculates_accurate_percentage_for_large_differences',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\COPRRA\\StoreAdapterManagerTest.php' => 
+    array (
+      0 => '2e6d8476e57256f292c326740e53bbe822d08bc9',
+      1 => 
+      array (
+        0 => 'tests\\unit\\coprra\\storeadaptermanagertest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\coprra\\setup',
+        1 => 'tests\\unit\\coprra\\test_it_registers_default_adapters',
+        2 => 'tests\\unit\\coprra\\test_it_gets_adapter_by_identifier',
+        3 => 'tests\\unit\\coprra\\test_it_returns_null_for_unknown_adapter',
+        4 => 'tests\\unit\\coprra\\test_it_checks_if_store_is_supported',
+        5 => 'tests\\unit\\coprra\\test_it_gets_supported_stores',
+        6 => 'tests\\unit\\coprra\\test_it_validates_amazon_identifier',
+        7 => 'tests\\unit\\coprra\\test_it_validates_ebay_identifier',
+        8 => 'tests\\unit\\coprra\\test_it_validates_noon_identifier',
+        9 => 'tests\\unit\\coprra\\test_it_gets_product_url_for_amazon',
+        10 => 'tests\\unit\\coprra\\test_it_gets_product_url_for_ebay',
+        11 => 'tests\\unit\\coprra\\test_it_gets_product_url_for_noon',
+        12 => 'tests\\unit\\coprra\\test_it_returns_null_for_unknown_store_url',
+        13 => 'tests\\unit\\coprra\\test_it_gets_statistics',
+        14 => 'tests\\unit\\coprra\\test_it_gets_adapter_rate_limits',
+        15 => 'tests\\unit\\coprra\\amazon_adapter_has_correct_properties',
+        16 => 'tests\\unit\\coprra\\ebay_adapter_has_correct_properties',
+        17 => 'tests\\unit\\coprra\\noon_adapter_has_correct_properties',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\COPRRA\\WebhookServiceTest.php' => 
+    array (
+      0 => 'b51d1a963f57486a6af21ea63c8b4544c94cd8ed',
+      1 => 
+      array (
+        0 => 'tests\\unit\\coprra\\webhookservicetest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\coprra\\setup',
+        1 => 'tests\\unit\\coprra\\test_it_creates_webhook_record',
+        2 => 'tests\\unit\\coprra\\test_it_processes_price_update_webhook',
+        3 => 'tests\\unit\\coprra\\test_it_marks_webhook_as_failed_on_error',
+        4 => 'tests\\unit\\coprra\\test_it_adds_logs_to_webhook',
+        5 => 'tests\\unit\\coprra\\test_it_gets_webhook_statistics',
+        6 => 'tests\\unit\\coprra\\webhook_can_be_marked_as_processing',
+        7 => 'tests\\unit\\coprra\\webhook_can_be_marked_as_completed',
+        8 => 'tests\\unit\\coprra\\webhook_can_be_marked_as_failed',
+        9 => 'tests\\unit\\coprra\\test_it_filters_webhooks_by_status',
+        10 => 'tests\\unit\\coprra\\test_it_filters_webhooks_by_store',
+        11 => 'tests\\unit\\coprra\\test_it_filters_webhooks_by_event_type',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\CreatesApplicationTest.php' => 
+    array (
+      0 => 'a44387f8196b69e2c437f0793813ff18633003ec',
+      1 => 
+      array (
+        0 => 'tests\\unit\\createsapplicationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\test_application_can_be_created',
       ),
       3 => 
       array (
@@ -8726,6 +6151,271 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       2 => 
       array (
         0 => 'tests\\unit\\test_basic_truth',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataAccuracy\\CurrencyConversionTest.php' => 
+    array (
+      0 => '9a6c212c1d1eedbedd24c0b89c9b1a5c5510e51c',
+      1 => 
+      array (
+        0 => 'tests\\unit\\dataaccuracy\\currencyconversiontest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\dataaccuracy\\test_basic_conversion',
+        1 => 'tests\\unit\\dataaccuracy\\test_inverse_conversion',
+        2 => 'tests\\unit\\dataaccuracy\\test_zero_value_handling',
+        3 => 'tests\\unit\\dataaccuracy\\test_basic_functionality',
+        4 => 'tests\\unit\\dataaccuracy\\test_expected_behavior',
+        5 => 'tests\\unit\\dataaccuracy\\test_validation',
+        6 => 'tests\\unit\\dataaccuracy\\setup',
+        7 => 'tests\\unit\\dataaccuracy\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataAccuracy\\DataConsistencyTest.php' => 
+    array (
+      0 => 'fb65ecf07915a5e6035a92a0ec4ac4e4d83769bc',
+      1 => 
+      array (
+        0 => 'tests\\unit\\dataaccuracy\\dataconsistencytest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\dataaccuracy\\test_order_total_matches_items_sum',
+        1 => 'tests\\unit\\dataaccuracy\\test_order_items_product_reference',
+        2 => 'tests\\unit\\dataaccuracy\\test_order_status_consistency',
+        3 => 'tests\\unit\\dataaccuracy\\setup',
+        4 => 'tests\\unit\\dataaccuracy\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataAccuracy\\DataIntegrityTest.php' => 
+    array (
+      0 => '3be648988d40d8efba16591e91fa82619a1b5bd3',
+      1 => 
+      array (
+        0 => 'tests\\unit\\dataaccuracy\\dataintegritytest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\dataaccuracy\\test_basic_functionality',
+        1 => 'tests\\unit\\dataaccuracy\\test_expected_behavior',
+        2 => 'tests\\unit\\dataaccuracy\\test_validation',
+        3 => 'tests\\unit\\dataaccuracy\\setup',
+        4 => 'tests\\unit\\dataaccuracy\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataAccuracy\\DataValidationTest.php' => 
+    array (
+      0 => 'f0ac02e6e6351f833ea9773c7a83b0cf35e8f724',
+      1 => 
+      array (
+        0 => 'tests\\unit\\dataaccuracy\\datavalidationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\dataaccuracy\\test_integer_validation',
+        1 => 'tests\\unit\\dataaccuracy\\test_date_validation',
+        2 => 'tests\\unit\\dataaccuracy\\test_url_validation',
+        3 => 'tests\\unit\\dataaccuracy\\setup',
+        4 => 'tests\\unit\\dataaccuracy\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataAccuracy\\DiscountCalculationTest.php' => 
+    array (
+      0 => 'fda5a1e81c5775943de513acae83b56f380553be',
+      1 => 
+      array (
+        0 => 'tests\\unit\\dataaccuracy\\discountcalculationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\dataaccuracy\\test_percentage_discount',
+        1 => 'tests\\unit\\dataaccuracy\\test_fixed_amount_discount',
+        2 => 'tests\\unit\\dataaccuracy\\test_discount_expiration',
+        3 => 'tests\\unit\\dataaccuracy\\setup',
+        4 => 'tests\\unit\\dataaccuracy\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataAccuracy\\InventoryAccuracyTest.php' => 
+    array (
+      0 => '97bea4f2c94362a70ba801d6016ddcb3e5768a73',
+      1 => 
+      array (
+        0 => 'tests\\unit\\dataaccuracy\\inventoryaccuracytest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\dataaccuracy\\test_basic_functionality',
+        1 => 'tests\\unit\\dataaccuracy\\test_expected_behavior',
+        2 => 'tests\\unit\\dataaccuracy\\test_validation',
+        3 => 'tests\\unit\\dataaccuracy\\setup',
+        4 => 'tests\\unit\\dataaccuracy\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataAccuracy\\OrderAccuracyTest.php' => 
+    array (
+      0 => '738e4edeb03b45c3a64b9a8ed33f11f942c42bcb',
+      1 => 
+      array (
+        0 => 'tests\\unit\\dataaccuracy\\orderaccuracytest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\dataaccuracy\\test_basic_functionality',
+        1 => 'tests\\unit\\dataaccuracy\\test_expected_behavior',
+        2 => 'tests\\unit\\dataaccuracy\\test_validation',
+        3 => 'tests\\unit\\dataaccuracy\\setup',
+        4 => 'tests\\unit\\dataaccuracy\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataAccuracy\\PaymentAccuracyTest.php' => 
+    array (
+      0 => '09bae7ae92f91f81915fde79a0a5fd5d804e53c0',
+      1 => 
+      array (
+        0 => 'tests\\unit\\dataaccuracy\\paymentaccuracytest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\dataaccuracy\\test_basic_functionality',
+        1 => 'tests\\unit\\dataaccuracy\\test_expected_behavior',
+        2 => 'tests\\unit\\dataaccuracy\\test_validation',
+        3 => 'tests\\unit\\dataaccuracy\\setup',
+        4 => 'tests\\unit\\dataaccuracy\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataAccuracy\\PriceAccuracyTest.php' => 
+    array (
+      0 => 'dc5b9fdf578082b7b8d280e7980a675a12e80e81',
+      1 => 
+      array (
+        0 => 'tests\\unit\\dataaccuracy\\priceaccuracytest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\dataaccuracy\\test_base_price_calculation',
+        1 => 'tests\\unit\\dataaccuracy\\test_tax_inclusive_pricing',
+        2 => 'tests\\unit\\dataaccuracy\\test_discount_application_accuracy',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataAccuracy\\PriceHistoryAccuracyTest.php' => 
+    array (
+      0 => '2e3ede2eb5ba1ff98f661c0ede76d54328154512',
+      1 => 
+      array (
+        0 => 'tests\\unit\\dataaccuracy\\pricehistoryaccuracytest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\dataaccuracy\\test_price_history_records_changes',
+        1 => 'tests\\unit\\dataaccuracy\\test_historical_prices_accuracy',
+        2 => 'tests\\unit\\dataaccuracy\\test_price_fluctuation_detection',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataAccuracy\\ProductMatchingTest.php' => 
+    array (
+      0 => '44d51860f100afefeed47142e56abc3673ab4c33',
+      1 => 
+      array (
+        0 => 'tests\\unit\\dataaccuracy\\productmatchingtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\dataaccuracy\\test_basic_functionality',
+        1 => 'tests\\unit\\dataaccuracy\\test_expected_behavior',
+        2 => 'tests\\unit\\dataaccuracy\\test_validation',
+        3 => 'tests\\unit\\dataaccuracy\\setup',
+        4 => 'tests\\unit\\dataaccuracy\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataAccuracy\\ShippingAccuracyTest.php' => 
+    array (
+      0 => '0ce47f9acea4b8cd1b4aa2085772afe61115d76c',
+      1 => 
+      array (
+        0 => 'tests\\unit\\dataaccuracy\\shippingaccuracytest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\dataaccuracy\\test_basic_functionality',
+        1 => 'tests\\unit\\dataaccuracy\\test_expected_behavior',
+        2 => 'tests\\unit\\dataaccuracy\\test_validation',
+        3 => 'tests\\unit\\dataaccuracy\\setup',
+        4 => 'tests\\unit\\dataaccuracy\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataAccuracy\\StoreDataValidationTest.php' => 
+    array (
+      0 => '492e0afdd4d65c4e79cb56fc625f756a424211e7',
+      1 => 
+      array (
+        0 => 'tests\\unit\\dataaccuracy\\storedatavalidationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\dataaccuracy\\test_basic_functionality',
+        1 => 'tests\\unit\\dataaccuracy\\test_expected_behavior',
+        2 => 'tests\\unit\\dataaccuracy\\test_validation',
+        3 => 'tests\\unit\\dataaccuracy\\setup',
+        4 => 'tests\\unit\\dataaccuracy\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataAccuracy\\TaxCalculationTest.php' => 
+    array (
+      0 => 'ad9f6dc5d1a9afe23b9d9f7a84948bba448bc109',
+      1 => 
+      array (
+        0 => 'tests\\unit\\dataaccuracy\\taxcalculationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\dataaccuracy\\test_basic_functionality',
+        1 => 'tests\\unit\\dataaccuracy\\test_expected_behavior',
+        2 => 'tests\\unit\\dataaccuracy\\test_validation',
+        3 => 'tests\\unit\\dataaccuracy\\setup',
+        4 => 'tests\\unit\\dataaccuracy\\teardown',
       ),
       3 => 
       array (
@@ -8941,6 +6631,214 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       array (
       ),
     ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataQuality\\DataAccuracyTest.php' => 
+    array (
+      0 => '82b845098012d006e526fd34dc062151477ad07a',
+      1 => 
+      array (
+        0 => 'tests\\unit\\dataquality\\dataaccuracytest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\dataquality\\test_price_calculation_accuracy',
+        1 => 'tests\\unit\\dataquality\\test_currency_conversion_edge_cases',
+        2 => 'tests\\unit\\dataquality\\test_complex_order_scenarios',
+        3 => 'tests\\unit\\dataquality\\test_negative_values_handling',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataQuality\\DataCompletenessTest.php' => 
+    array (
+      0 => '91ef5ddd6c96a8614cecd3db05926812755b137a',
+      1 => 
+      array (
+        0 => 'tests\\unit\\dataquality\\datacompletenesstest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\dataquality\\test_basic_functionality',
+        1 => 'tests\\unit\\dataquality\\test_expected_behavior',
+        2 => 'tests\\unit\\dataquality\\test_validation',
+        3 => 'tests\\unit\\dataquality\\setup',
+        4 => 'tests\\unit\\dataquality\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataQuality\\DataDuplicationTest.php' => 
+    array (
+      0 => '45a7d5fad28dabd12f6d445af6bc7bdc63a2d0e2',
+      1 => 
+      array (
+        0 => 'tests\\unit\\dataquality\\dataduplicationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\dataquality\\test_basic_functionality',
+        1 => 'tests\\unit\\dataquality\\test_expected_behavior',
+        2 => 'tests\\unit\\dataquality\\test_validation',
+        3 => 'tests\\unit\\dataquality\\setup',
+        4 => 'tests\\unit\\dataquality\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataQuality\\DataFreshnessTest.php' => 
+    array (
+      0 => 'a203cd27658516ad9aea43850f459d75f43393c0',
+      1 => 
+      array (
+        0 => 'tests\\unit\\dataquality\\datafreshnesstest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\dataquality\\test_basic_functionality',
+        1 => 'tests\\unit\\dataquality\\test_expected_behavior',
+        2 => 'tests\\unit\\dataquality\\test_validation',
+        3 => 'tests\\unit\\dataquality\\setup',
+        4 => 'tests\\unit\\dataquality\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataQuality\\DataQualityMetricsTest.php' => 
+    array (
+      0 => '0400827e9cc82f815f0572e0e174b5241054a35c',
+      1 => 
+      array (
+        0 => 'tests\\unit\\dataquality\\dataqualitymetricstest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\dataquality\\test_basic_functionality',
+        1 => 'tests\\unit\\dataquality\\test_expected_behavior',
+        2 => 'tests\\unit\\dataquality\\test_validation',
+        3 => 'tests\\unit\\dataquality\\setup',
+        4 => 'tests\\unit\\dataquality\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataQuality\\DataRelevanceTest.php' => 
+    array (
+      0 => '6cc47bdf104739c8f20c2000f7f7ad27efffcea1',
+      1 => 
+      array (
+        0 => 'tests\\unit\\dataquality\\datarelevancetest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\dataquality\\test_basic_functionality',
+        1 => 'tests\\unit\\dataquality\\test_expected_behavior',
+        2 => 'tests\\unit\\dataquality\\test_validation',
+        3 => 'tests\\unit\\dataquality\\setup',
+        4 => 'tests\\unit\\dataquality\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataQuality\\DataReliabilityTest.php' => 
+    array (
+      0 => 'e7189d46d06dc642cb4ef7ee457ccfddad21bf36',
+      1 => 
+      array (
+        0 => 'tests\\unit\\dataquality\\datareliabilitytest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\dataquality\\test_basic_functionality',
+        1 => 'tests\\unit\\dataquality\\test_expected_behavior',
+        2 => 'tests\\unit\\dataquality\\test_validation',
+        3 => 'tests\\unit\\dataquality\\setup',
+        4 => 'tests\\unit\\dataquality\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataQuality\\DataTimelinessTest.php' => 
+    array (
+      0 => '3e37933bb45bedb27f1674977500454507cd48f6',
+      1 => 
+      array (
+        0 => 'tests\\unit\\dataquality\\datatimelinesstest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\dataquality\\test_basic_functionality',
+        1 => 'tests\\unit\\dataquality\\test_expected_behavior',
+        2 => 'tests\\unit\\dataquality\\test_validation',
+        3 => 'tests\\unit\\dataquality\\setup',
+        4 => 'tests\\unit\\dataquality\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataQuality\\DataUniquenessTest.php' => 
+    array (
+      0 => '452fb2878b245cee8bd548c2994f311138cf464b',
+      1 => 
+      array (
+        0 => 'tests\\unit\\dataquality\\datauniquenesstest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\dataquality\\test_basic_functionality',
+        1 => 'tests\\unit\\dataquality\\test_expected_behavior',
+        2 => 'tests\\unit\\dataquality\\test_validation',
+        3 => 'tests\\unit\\dataquality\\setup',
+        4 => 'tests\\unit\\dataquality\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataQuality\\DataValidityTest.php' => 
+    array (
+      0 => '758dd1f1d090562a9329c29a9dc04da369455353',
+      1 => 
+      array (
+        0 => 'tests\\unit\\dataquality\\datavaliditytest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\dataquality\\test_email_format_validity',
+        1 => 'tests\\unit\\dataquality\\test_phone_number_format',
+        2 => 'tests\\unit\\dataquality\\test_order_date_format',
+        3 => 'tests\\unit\\dataquality\\setup',
+        4 => 'tests\\unit\\dataquality\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataQuality\\DuplicateDetectionTest.php' => 
+    array (
+      0 => 'e94ea85854579e904a25465c422b3f6b54555cb6',
+      1 => 
+      array (
+        0 => 'tests\\unit\\dataquality\\duplicatedetectiontest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\dataquality\\test_basic_functionality',
+        1 => 'tests\\unit\\dataquality\\test_expected_behavior',
+        2 => 'tests\\unit\\dataquality\\test_validation',
+        3 => 'tests\\unit\\dataquality\\setup',
+        4 => 'tests\\unit\\dataquality\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\DataSelectionTest.php' => 
     array (
       0 => '43d01ec730ba95e0fce5d0766a3ca5564cf15a54',
@@ -9086,6 +6984,272 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       2 => 
       array (
         0 => 'tests\\unit\\test_basic_truth',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Deployment\\BlueGreenDeploymentTest.php' => 
+    array (
+      0 => '356c3d3fdf18163596f63085f0b13006f998568c',
+      1 => 
+      array (
+        0 => 'tests\\unit\\deployment\\bluegreendeploymenttest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\deployment\\test_basic_functionality',
+        1 => 'tests\\unit\\deployment\\test_expected_behavior',
+        2 => 'tests\\unit\\deployment\\test_validation',
+        3 => 'tests\\unit\\deployment\\setup',
+        4 => 'tests\\unit\\deployment\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Deployment\\CanaryDeploymentTest.php' => 
+    array (
+      0 => '31181fca96b8306eb251747d0d5a8725df2c7908',
+      1 => 
+      array (
+        0 => 'tests\\unit\\deployment\\canarydeploymenttest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\deployment\\test_basic_functionality',
+        1 => 'tests\\unit\\deployment\\test_expected_behavior',
+        2 => 'tests\\unit\\deployment\\test_validation',
+        3 => 'tests\\unit\\deployment\\setup',
+        4 => 'tests\\unit\\deployment\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Deployment\\CloudDeploymentTest.php' => 
+    array (
+      0 => '4dcbee783568e460511036ddf1afe6595a6a1286',
+      1 => 
+      array (
+        0 => 'tests\\unit\\deployment\\clouddeploymenttest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\deployment\\test_basic_functionality',
+        1 => 'tests\\unit\\deployment\\test_expected_behavior',
+        2 => 'tests\\unit\\deployment\\test_validation',
+        3 => 'tests\\unit\\deployment\\setup',
+        4 => 'tests\\unit\\deployment\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Deployment\\ConfigurationTest.php' => 
+    array (
+      0 => '7eb73602f390884a875e7749eeacc48bdcfc8401',
+      1 => 
+      array (
+        0 => 'tests\\unit\\deployment\\configurationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\deployment\\test_basic_functionality',
+        1 => 'tests\\unit\\deployment\\test_expected_behavior',
+        2 => 'tests\\unit\\deployment\\test_validation',
+        3 => 'tests\\unit\\deployment\\setup',
+        4 => 'tests\\unit\\deployment\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Deployment\\DevelopmentDeploymentTest.php' => 
+    array (
+      0 => '5a274a0aac0fab10f3a205c8c99e4bfedf06763e',
+      1 => 
+      array (
+        0 => 'tests\\unit\\deployment\\developmentdeploymenttest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\deployment\\test_basic_functionality',
+        1 => 'tests\\unit\\deployment\\test_expected_behavior',
+        2 => 'tests\\unit\\deployment\\test_validation',
+        3 => 'tests\\unit\\deployment\\setup',
+        4 => 'tests\\unit\\deployment\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Deployment\\DockerDeploymentTest.php' => 
+    array (
+      0 => 'b72e18428ecc6b4aa51d784567487d0469db594c',
+      1 => 
+      array (
+        0 => 'tests\\unit\\deployment\\dockerdeploymenttest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\deployment\\test_basic_functionality',
+        1 => 'tests\\unit\\deployment\\test_expected_behavior',
+        2 => 'tests\\unit\\deployment\\test_validation',
+        3 => 'tests\\unit\\deployment\\setup',
+        4 => 'tests\\unit\\deployment\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Deployment\\EnvironmentConfigurationTest.php' => 
+    array (
+      0 => '3375446a8ede5b2d7a826585f5308490798913b4',
+      1 => 
+      array (
+        0 => 'tests\\unit\\deployment\\environmentconfigurationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\deployment\\test_basic_functionality',
+        1 => 'tests\\unit\\deployment\\test_expected_behavior',
+        2 => 'tests\\unit\\deployment\\test_validation',
+        3 => 'tests\\unit\\deployment\\setup',
+        4 => 'tests\\unit\\deployment\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Deployment\\InfrastructureTest.php' => 
+    array (
+      0 => 'cabc7e0045c679d03a2edef38d9ae568c88a86d1',
+      1 => 
+      array (
+        0 => 'tests\\unit\\deployment\\infrastructuretest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\deployment\\test_basic_functionality',
+        1 => 'tests\\unit\\deployment\\test_expected_behavior',
+        2 => 'tests\\unit\\deployment\\test_validation',
+        3 => 'tests\\unit\\deployment\\setup',
+        4 => 'tests\\unit\\deployment\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Deployment\\KubernetesDeploymentTest.php' => 
+    array (
+      0 => '5274068b1055d6a5ca1261f2643cc4be73be69e5',
+      1 => 
+      array (
+        0 => 'tests\\unit\\deployment\\kubernetesdeploymenttest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\deployment\\test_basic_functionality',
+        1 => 'tests\\unit\\deployment\\test_expected_behavior',
+        2 => 'tests\\unit\\deployment\\test_validation',
+        3 => 'tests\\unit\\deployment\\setup',
+        4 => 'tests\\unit\\deployment\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Deployment\\ProductionDeploymentTest.php' => 
+    array (
+      0 => '20adcefafb07ad324581f5aa0a825ad5155121ac',
+      1 => 
+      array (
+        0 => 'tests\\unit\\deployment\\productiondeploymenttest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\deployment\\test_basic_functionality',
+        1 => 'tests\\unit\\deployment\\test_expected_behavior',
+        2 => 'tests\\unit\\deployment\\test_validation',
+        3 => 'tests\\unit\\deployment\\setup',
+        4 => 'tests\\unit\\deployment\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Deployment\\RollbackTest.php' => 
+    array (
+      0 => '0d770a848e0daa6a1c1166930323f6393b379675',
+      1 => 
+      array (
+        0 => 'tests\\unit\\deployment\\rollbacktest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\deployment\\test_basic_functionality',
+        1 => 'tests\\unit\\deployment\\test_expected_behavior',
+        2 => 'tests\\unit\\deployment\\test_validation',
+        3 => 'tests\\unit\\deployment\\setup',
+        4 => 'tests\\unit\\deployment\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Deployment\\RollingDeploymentTest.php' => 
+    array (
+      0 => 'd43ef7bc404c2ca79a6a729e5f812a84614bdaaa',
+      1 => 
+      array (
+        0 => 'tests\\unit\\deployment\\rollingdeploymenttest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\deployment\\test_basic_functionality',
+        1 => 'tests\\unit\\deployment\\test_expected_behavior',
+        2 => 'tests\\unit\\deployment\\test_validation',
+        3 => 'tests\\unit\\deployment\\setup',
+        4 => 'tests\\unit\\deployment\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Deployment\\StagingDeploymentTest.php' => 
+    array (
+      0 => '83c982e6ef1a62268b4f4913c1786d89b71d3c84',
+      1 => 
+      array (
+        0 => 'tests\\unit\\deployment\\stagingdeploymenttest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\deployment\\test_basic_functionality',
+        1 => 'tests\\unit\\deployment\\test_expected_behavior',
+        2 => 'tests\\unit\\deployment\\test_validation',
+        3 => 'tests\\unit\\deployment\\setup',
+        4 => 'tests\\unit\\deployment\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Deployment\\TestingDeploymentTest.php' => 
+    array (
+      0 => '589c21cb9f52e522c90871fa28714e9aebdfcab8',
+      1 => 
+      array (
+        0 => 'tests\\unit\\deployment\\testingdeploymenttest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\deployment\\test_basic_functionality',
+        1 => 'tests\\unit\\deployment\\test_expected_behavior',
+        2 => 'tests\\unit\\deployment\\test_validation',
+        3 => 'tests\\unit\\deployment\\setup',
+        4 => 'tests\\unit\\deployment\\teardown',
       ),
       3 => 
       array (
@@ -9376,6 +7540,64 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       array (
       ),
     ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Enums\\OrderStatusTest.php' => 
+    array (
+      0 => '522d6c8f4265591568c8f39415d43aed60511458',
+      1 => 
+      array (
+        0 => 'tests\\unit\\enums\\orderstatustest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\enums\\test_enum_has_all_expected_cases',
+        1 => 'tests\\unit\\enums\\test_enum_values_are_correct',
+        2 => 'tests\\unit\\enums\\test_label_returns_correct_arabic_text',
+        3 => 'tests\\unit\\enums\\test_color_returns_correct_values',
+        4 => 'tests\\unit\\enums\\test_allowed_transitions_from_pending',
+        5 => 'tests\\unit\\enums\\test_allowed_transitions_from_processing',
+        6 => 'tests\\unit\\enums\\test_allowed_transitions_from_shipped',
+        7 => 'tests\\unit\\enums\\test_no_transitions_from_final_statuses',
+        8 => 'tests\\unit\\enums\\test_can_transition_to_allowed_status',
+        9 => 'tests\\unit\\enums\\test_cannot_transition_to_disallowed_status',
+        10 => 'tests\\unit\\enums\\test_to_array_returns_correct_format',
+        11 => 'tests\\unit\\enums\\test_options_returns_value_label_pairs',
+        12 => 'tests\\unit\\enums\\test_can_create_from_string',
+        13 => 'tests\\unit\\enums\\test_try_from_returns_null_for_invalid_value',
+        14 => 'tests\\unit\\enums\\test_from_throws_exception_for_invalid_value',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Enums\\UserRoleTest.php' => 
+    array (
+      0 => '283617f1047296a430fe89683a86021d788b4425',
+      1 => 
+      array (
+        0 => 'tests\\unit\\enums\\userroletest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\enums\\test_enum_has_all_expected_cases',
+        1 => 'tests\\unit\\enums\\test_enum_values_are_correct',
+        2 => 'tests\\unit\\enums\\test_label_returns_correct_arabic_text',
+        3 => 'tests\\unit\\enums\\test_admin_has_all_permissions',
+        4 => 'tests\\unit\\enums\\test_moderator_has_limited_permissions',
+        5 => 'tests\\unit\\enums\\test_user_has_basic_permissions',
+        6 => 'tests\\unit\\enums\\test_guest_has_minimal_permissions',
+        7 => 'tests\\unit\\enums\\test_has_permission_returns_true_for_valid_permission',
+        8 => 'tests\\unit\\enums\\test_has_permission_returns_false_for_invalid_permission',
+        9 => 'tests\\unit\\enums\\test_is_admin_returns_true_only_for_admin',
+        10 => 'tests\\unit\\enums\\test_is_moderator_returns_true_for_admin_and_moderator',
+        11 => 'tests\\unit\\enums\\test_to_array_returns_correct_format',
+        12 => 'tests\\unit\\enums\\test_options_returns_value_label_pairs',
+        13 => 'tests\\unit\\enums\\test_can_create_from_string',
+        14 => 'tests\\unit\\enums\\test_try_from_returns_null_for_invalid_value',
+      ),
+      3 => 
+      array (
+      ),
+    ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\EnvironmentDocumentationTest.php' => 
     array (
       0 => '4db132d75028e234e8b8ecde896a7200865af8ea',
@@ -9491,6 +7713,25 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       2 => 
       array (
         0 => 'tests\\unit\\test_basic_truth',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Factories\\FactoriesTest.php' => 
+    array (
+      0 => '0f17fd3959f9bd0761fcfd7a451ea889f1fbd953',
+      1 => 
+      array (
+        0 => 'tests\\unit\\factories\\factoriestest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\factories\\test_basic_functionality',
+        1 => 'tests\\unit\\factories\\test_expected_behavior',
+        2 => 'tests\\unit\\factories\\test_validation',
+        3 => 'tests\\unit\\factories\\setup',
+        4 => 'tests\\unit\\factories\\teardown',
       ),
       3 => 
       array (
@@ -9856,6 +8097,59 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       array (
       ),
     ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Helpers\\OrderHelperTest.php' => 
+    array (
+      0 => '78a12b80418ace39be4a13822fbe34f885814ce8',
+      1 => 
+      array (
+        0 => 'tests\\unit\\helpers\\orderhelpertest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\helpers\\test_get_status_badge_returns_correct_html',
+        1 => 'tests\\unit\\helpers\\test_calculate_total_with_all_values',
+        2 => 'tests\\unit\\helpers\\test_calculate_total_with_missing_values',
+        3 => 'tests\\unit\\helpers\\test_calculate_total_returns_zero_for_negative_result',
+        4 => 'tests\\unit\\helpers\\test_calculate_tax_with_default_rate',
+        5 => 'tests\\unit\\helpers\\test_calculate_tax_with_custom_rate',
+        6 => 'tests\\unit\\helpers\\test_generate_order_number_is_unique',
+        7 => 'tests\\unit\\helpers\\test_can_be_cancelled_returns_true_for_pending',
+        8 => 'tests\\unit\\helpers\\test_can_be_cancelled_returns_true_for_processing',
+        9 => 'tests\\unit\\helpers\\test_can_be_cancelled_returns_false_for_shipped',
+        10 => 'tests\\unit\\helpers\\test_can_be_refunded_returns_true_for_delivered',
+        11 => 'tests\\unit\\helpers\\test_can_be_refunded_returns_false_for_pending',
+        12 => 'tests\\unit\\helpers\\test_get_progress_percentage_for_all_statuses',
+        13 => 'tests\\unit\\helpers\\test_format_total_with_default_currency',
+        14 => 'tests\\unit\\helpers\\test_format_total_with_sar_currency',
+        15 => 'tests\\unit\\helpers\\test_get_estimated_delivery_date_for_shipped_order',
+        16 => 'tests\\unit\\helpers\\test_get_estimated_delivery_date_for_processing_order',
+        17 => 'tests\\unit\\helpers\\test_get_estimated_delivery_date_returns_null_for_pending',
+        18 => 'tests\\unit\\helpers\\test_is_overdue_returns_false_for_non_shipped_order',
+        19 => 'tests\\unit\\helpers\\test_is_overdue_returns_false_for_recent_shipment',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Helpers\\PriceHelperTest.php' => 
+    array (
+      0 => 'f0afa7724281eca86d5e85124719ba17ed858c5c',
+      1 => 
+      array (
+        0 => 'tests\\unit\\helpers\\pricehelpertest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\helpers\\test_basic_functionality',
+        1 => 'tests\\unit\\helpers\\test_expected_behavior',
+        2 => 'tests\\unit\\helpers\\test_validation',
+        3 => 'tests\\unit\\helpers\\setup',
+        4 => 'tests\\unit\\helpers\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\HelperServiceTest.php' => 
     array (
       0 => 'ffab0e5f3e3a8f0098936e368248e8200eaecd36',
@@ -10096,6 +8390,291 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       array (
       ),
     ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\AnalyticsIntegrationTest.php' => 
+    array (
+      0 => 'fa8076cb691dc022bdb192e83d193faf5a7bb2ce',
+      1 => 
+      array (
+        0 => 'tests\\unit\\integration\\analyticsintegrationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\integration\\test_basic_functionality',
+        1 => 'tests\\unit\\integration\\test_expected_behavior',
+        2 => 'tests\\unit\\integration\\test_validation',
+        3 => 'tests\\unit\\integration\\setup',
+        4 => 'tests\\unit\\integration\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\APIIntegrationTest.php' => 
+    array (
+      0 => '302c78b76b1f90e7704c1fac5e529c3f171dd13a',
+      1 => 
+      array (
+        0 => 'tests\\unit\\integration\\apiintegrationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\integration\\test_basic_functionality',
+        1 => 'tests\\unit\\integration\\test_expected_behavior',
+        2 => 'tests\\unit\\integration\\test_validation',
+        3 => 'tests\\unit\\integration\\setup',
+        4 => 'tests\\unit\\integration\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\CurrencyIntegrationTest.php' => 
+    array (
+      0 => '2cb4e7c0c08fa16009eddcdf82511fd17c8e4419',
+      1 => 
+      array (
+        0 => 'tests\\unit\\integration\\currencyintegrationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\integration\\test_basic_functionality',
+        1 => 'tests\\unit\\integration\\test_expected_behavior',
+        2 => 'tests\\unit\\integration\\test_validation',
+        3 => 'tests\\unit\\integration\\setup',
+        4 => 'tests\\unit\\integration\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\EmailIntegrationTest.php' => 
+    array (
+      0 => '01b25cec586da0ced53b175a6bcfdc6bf9784595',
+      1 => 
+      array (
+        0 => 'tests\\unit\\integration\\emailintegrationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\integration\\test_basic_functionality',
+        1 => 'tests\\unit\\integration\\test_expected_behavior',
+        2 => 'tests\\unit\\integration\\test_validation',
+        3 => 'tests\\unit\\integration\\setup',
+        4 => 'tests\\unit\\integration\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\EndToEndIntegrationTest.php' => 
+    array (
+      0 => '2bde006ca25af75ef1b564105b3f147c9e216e42',
+      1 => 
+      array (
+        0 => 'tests\\unit\\integration\\endtoendintegrationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\integration\\test_basic_functionality',
+        1 => 'tests\\unit\\integration\\test_expected_behavior',
+        2 => 'tests\\unit\\integration\\test_validation',
+        3 => 'tests\\unit\\integration\\setup',
+        4 => 'tests\\unit\\integration\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\InventoryIntegrationTest.php' => 
+    array (
+      0 => '707494204b8641cb1f12305f2f114978954dd9ae',
+      1 => 
+      array (
+        0 => 'tests\\unit\\integration\\inventoryintegrationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\integration\\test_basic_functionality',
+        1 => 'tests\\unit\\integration\\test_expected_behavior',
+        2 => 'tests\\unit\\integration\\test_validation',
+        3 => 'tests\\unit\\integration\\setup',
+        4 => 'tests\\unit\\integration\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\NotificationIntegrationTest.php' => 
+    array (
+      0 => '62c9e71a3d259d5050285a58471ef79018775e69',
+      1 => 
+      array (
+        0 => 'tests\\unit\\integration\\notificationintegrationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\integration\\test_basic_functionality',
+        1 => 'tests\\unit\\integration\\test_expected_behavior',
+        2 => 'tests\\unit\\integration\\test_validation',
+        3 => 'tests\\unit\\integration\\setup',
+        4 => 'tests\\unit\\integration\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\PaymentIntegrationTest.php' => 
+    array (
+      0 => '953b3c24659ee36e7e3fff81d97ac00b657476e5',
+      1 => 
+      array (
+        0 => 'tests\\unit\\integration\\paymentintegrationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\integration\\test_basic_functionality',
+        1 => 'tests\\unit\\integration\\test_expected_behavior',
+        2 => 'tests\\unit\\integration\\test_validation',
+        3 => 'tests\\unit\\integration\\setup',
+        4 => 'tests\\unit\\integration\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\PushNotificationTest.php' => 
+    array (
+      0 => 'b46a514c1470c9a80373c891314e93d4c1025350',
+      1 => 
+      array (
+        0 => 'tests\\unit\\integration\\pushnotificationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\integration\\test_basic_functionality',
+        1 => 'tests\\unit\\integration\\test_expected_behavior',
+        2 => 'tests\\unit\\integration\\test_validation',
+        3 => 'tests\\unit\\integration\\setup',
+        4 => 'tests\\unit\\integration\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\SearchIntegrationTest.php' => 
+    array (
+      0 => 'fea2e8704140047c37160c8dd2686bcde3c5b1e1',
+      1 => 
+      array (
+        0 => 'tests\\unit\\integration\\searchintegrationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\integration\\test_basic_functionality',
+        1 => 'tests\\unit\\integration\\test_expected_behavior',
+        2 => 'tests\\unit\\integration\\test_validation',
+        3 => 'tests\\unit\\integration\\setup',
+        4 => 'tests\\unit\\integration\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\ShippingIntegrationTest.php' => 
+    array (
+      0 => '9a34aa9fef8cf3114f44a6c372ffafdcfd4c78b5',
+      1 => 
+      array (
+        0 => 'tests\\unit\\integration\\shippingintegrationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\integration\\test_basic_functionality',
+        1 => 'tests\\unit\\integration\\test_expected_behavior',
+        2 => 'tests\\unit\\integration\\test_validation',
+        3 => 'tests\\unit\\integration\\setup',
+        4 => 'tests\\unit\\integration\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\SMSIntegrationTest.php' => 
+    array (
+      0 => 'ee65ac45fcecf9d929aff45a1a590d3ce309eeaa',
+      1 => 
+      array (
+        0 => 'tests\\unit\\integration\\smsintegrationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\integration\\test_basic_functionality',
+        1 => 'tests\\unit\\integration\\test_expected_behavior',
+        2 => 'tests\\unit\\integration\\test_validation',
+        3 => 'tests\\unit\\integration\\setup',
+        4 => 'tests\\unit\\integration\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\StoreAPIIntegrationTest.php' => 
+    array (
+      0 => '8cd7bb8353e0601605a425a3cfa315cc126c7a71',
+      1 => 
+      array (
+        0 => 'tests\\unit\\integration\\storeapiintegrationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\integration\\test_basic_functionality',
+        1 => 'tests\\unit\\integration\\test_expected_behavior',
+        2 => 'tests\\unit\\integration\\test_validation',
+        3 => 'tests\\unit\\integration\\setup',
+        4 => 'tests\\unit\\integration\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\ThirdPartyAPIIntegrationTest.php' => 
+    array (
+      0 => 'f21229597893cd6093c606394ec4f17184f9ce73',
+      1 => 
+      array (
+        0 => 'tests\\unit\\integration\\thirdpartyapiintegrationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\integration\\test_basic_functionality',
+        1 => 'tests\\unit\\integration\\test_expected_behavior',
+        2 => 'tests\\unit\\integration\\test_validation',
+        3 => 'tests\\unit\\integration\\setup',
+        4 => 'tests\\unit\\integration\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Integration\\WebhookTest.php' => 
+    array (
+      0 => 'aeee77e4f85b0cb120728733f0daf4df0fb15ec8',
+      1 => 
+      array (
+        0 => 'tests\\unit\\integration\\webhooktest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\integration\\test_basic_functionality',
+        1 => 'tests\\unit\\integration\\test_expected_behavior',
+        2 => 'tests\\unit\\integration\\test_validation',
+        3 => 'tests\\unit\\integration\\setup',
+        4 => 'tests\\unit\\integration\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\IntrusionDetectionTest.php' => 
     array (
       0 => '41ac24754ec1c9bb1fd3a93e1409a7006888a379',
@@ -10171,6 +8750,25 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       array (
       ),
     ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\IsolatedStrictTest.php' => 
+    array (
+      0 => 'b22aea658de6e0dc06ad8294fd11a4a01d6425ea',
+      1 => 
+      array (
+        0 => 'tests\\unit\\isolatedstricttest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\test_basic_functionality',
+        1 => 'tests\\unit\\test_expected_behavior',
+        2 => 'tests\\unit\\test_validation',
+        3 => 'tests\\unit\\setup',
+        4 => 'tests\\unit\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\ItalianLanguageTest.php' => 
     array (
       0 => 'bd15a388d0889e4be74a8dd3bce2a5695a663ac0',
@@ -10226,6 +8824,35 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       2 => 
       array (
         0 => 'tests\\unit\\test_basic_truth',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Jobs\\ProcessHeavyOperationTest.php' => 
+    array (
+      0 => '15c64313ff5946a5eedf85ea6aef9767086d0a82',
+      1 => 
+      array (
+        0 => 'tests\\unit\\jobs\\processheavyoperationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\jobs\\setup',
+        1 => 'tests\\unit\\jobs\\test_job_constructor_sets_properties_correctly',
+        2 => 'tests\\unit\\jobs\\test_can_be_instantiated',
+        3 => 'tests\\unit\\jobs\\test_job_has_correct_timeout_and_retry_settings',
+        4 => 'tests\\unit\\jobs\\test_job_get_job_status_returns_null_for_unknown_job',
+        5 => 'tests\\unit\\jobs\\test_job_get_user_job_statuses_returns_empty_array',
+        6 => 'tests\\unit\\jobs\\test_job_throws_exception_for_unknown_operation',
+        7 => 'tests\\unit\\jobs\\test_job_handles_generate_report_operation_without_job_instance',
+        8 => 'tests\\unit\\jobs\\test_job_handles_process_images_operation_without_job_instance',
+        9 => 'tests\\unit\\jobs\\test_job_handles_sync_data_operation_without_job_instance',
+        10 => 'tests\\unit\\jobs\\test_job_handles_send_bulk_notifications_operation_without_job_instance',
+        11 => 'tests\\unit\\jobs\\test_job_handles_update_statistics_operation_without_job_instance',
+        12 => 'tests\\unit\\jobs\\test_job_handles_cleanup_old_data_operation_without_job_instance',
+        13 => 'tests\\unit\\jobs\\test_job_handles_export_data_operation_without_job_instance',
+        14 => 'tests\\unit\\jobs\\test_job_handles_import_data_operation_without_job_instance',
       ),
       3 => 
       array (
@@ -10771,6 +9398,25 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       array (
       ),
     ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Middleware\\AdminMiddlewareTest.php' => 
+    array (
+      0 => '17ab67406d163a89765f920c80acf6eef3980d66',
+      1 => 
+      array (
+        0 => 'tests\\unit\\middleware\\adminmiddlewaretest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\middleware\\test_basic_functionality',
+        1 => 'tests\\unit\\middleware\\test_expected_behavior',
+        2 => 'tests\\unit\\middleware\\test_validation',
+        3 => 'tests\\unit\\middleware\\setup',
+        4 => 'tests\\unit\\middleware\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\MiddlewareServiceTest.php' => 
     array (
       0 => 'e7d8afcbdb2c4f5f907d3866ba353e7306ca970b',
@@ -10826,6 +9472,25 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       2 => 
       array (
         0 => 'tests\\unit\\test_basic_truth',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\MockeryDebugTest.php' => 
+    array (
+      0 => '447d732388d74e0fd63d02f45a7f2647dcb8df65',
+      1 => 
+      array (
+        0 => 'tests\\unit\\mockerydebugtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\test_basic_functionality',
+        1 => 'tests\\unit\\test_expected_behavior',
+        2 => 'tests\\unit\\test_validation',
+        3 => 'tests\\unit\\setup',
+        4 => 'tests\\unit\\teardown',
       ),
       3 => 
       array (
@@ -10931,6 +9596,401 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       2 => 
       array (
         0 => 'tests\\unit\\test_basic_truth',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\ModelRelationsTest.php' => 
+    array (
+      0 => '7add8f61d2d7cf04b8b21faed6e053a75dd3006e',
+      1 => 
+      array (
+        0 => 'tests\\unit\\modelrelationstest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\test_basic_functionality',
+        1 => 'tests\\unit\\test_expected_behavior',
+        2 => 'tests\\unit\\test_validation',
+        3 => 'tests\\unit\\setup',
+        4 => 'tests\\unit\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\AuditLogTest.php' => 
+    array (
+      0 => 'ade23a37d86f2bb46d502a2057f174168e0a6fb2',
+      1 => 
+      array (
+        0 => 'tests\\unit\\models\\auditlogtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\models\\test_fillable_attributes',
+        1 => 'tests\\unit\\models\\test_casts',
+        2 => 'tests\\unit\\models\\test_user_relation',
+        3 => 'tests\\unit\\models\\test_auditable_relation',
+        4 => 'tests\\unit\\models\\test_scope_event',
+        5 => 'tests\\unit\\models\\test_scope_for_user',
+        6 => 'tests\\unit\\models\\test_scope_for_model',
+        7 => 'tests\\unit\\models\\test_scope_date_range',
+        8 => 'tests\\unit\\models\\test_get_formatted_event_attribute',
+        9 => 'tests\\unit\\models\\test_get_changes_summary_attribute_no_changes',
+        10 => 'tests\\unit\\models\\test_get_changes_summary_attribute_only_old_values',
+        11 => 'tests\\unit\\models\\test_get_changes_summary_attribute_only_new_values',
+        12 => 'tests\\unit\\models\\test_get_changes_summary_attribute_with_changes',
+        13 => 'tests\\unit\\models\\test_get_changes_summary_attribute_boolean_values',
+        14 => 'tests\\unit\\models\\test_get_changes_summary_attribute_null_values',
+        15 => 'tests\\unit\\models\\test_get_changes_summary_attribute_no_actual_changes',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\BrandTest.php' => 
+    array (
+      0 => '05d527a00b7de0b9d214da851417bfb8ab221611',
+      1 => 
+      array (
+        0 => 'tests\\unit\\models\\brandtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\models\\setup',
+        1 => 'tests\\unit\\models\\test_products_relation',
+        2 => 'tests\\unit\\models\\test_scope_active',
+        3 => 'tests\\unit\\models\\test_scope_search',
+        4 => 'tests\\unit\\models\\test_slug_auto_generated_on_creating',
+        5 => 'tests\\unit\\models\\test_slug_auto_generated_on_updating',
+        6 => 'tests\\unit\\models\\test_get_rules',
+        7 => 'tests\\unit\\models\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\CategoryTest.php' => 
+    array (
+      0 => '07d3f234bdabaffb9d109bf678aba203cc7ba477',
+      1 => 
+      array (
+        0 => 'tests\\unit\\models\\categorytest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\models\\setup',
+        1 => 'tests\\unit\\models\\test_parent_relation',
+        2 => 'tests\\unit\\models\\test_children_relation',
+        3 => 'tests\\unit\\models\\test_products_relation',
+        4 => 'tests\\unit\\models\\test_scope_active',
+        5 => 'tests\\unit\\models\\test_scope_search',
+        6 => 'tests\\unit\\models\\test_slug_and_level_auto_generated_on_creating',
+        7 => 'tests\\unit\\models\\test_level_based_on_parent_on_creating',
+        8 => 'tests\\unit\\models\\test_slug_updated_on_name_change',
+        9 => 'tests\\unit\\models\\test_level_updated_on_parent_change',
+        10 => 'tests\\unit\\models\\test_get_rules',
+        11 => 'tests\\unit\\models\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\CurrencyTest.php' => 
+    array (
+      0 => '929a5e0c4aa51bcbda26e91ed6cf50d61eb5dfd4',
+      1 => 
+      array (
+        0 => 'tests\\unit\\models\\currencytest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\models\\test_guarded_attributes',
+        1 => 'tests\\unit\\models\\test_stores_relation',
+        2 => 'tests\\unit\\models\\test_languages_relation',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\LanguageTest.php' => 
+    array (
+      0 => '7bec72853188c05e5cb08a158bfa4100f400c84e',
+      1 => 
+      array (
+        0 => 'tests\\unit\\models\\languagetest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\models\\test_fillable_attributes',
+        1 => 'tests\\unit\\models\\test_casts',
+        2 => 'tests\\unit\\models\\test_currencies_relation',
+        3 => 'tests\\unit\\models\\test_user_locale_settings_relation',
+        4 => 'tests\\unit\\models\\test_scope_active',
+        5 => 'tests\\unit\\models\\test_scope_ordered',
+        6 => 'tests\\unit\\models\\test_is_rtl_returns_true_when_direction_rtl',
+        7 => 'tests\\unit\\models\\test_is_rtl_returns_false_when_direction_ltr',
+        8 => 'tests\\unit\\models\\test_find_by_code',
+        9 => 'tests\\unit\\models\\test_default_currency_method_exists',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\NotificationTest.php' => 
+    array (
+      0 => '6a575e17fe804fe41135922f0dccca24b00f64c4',
+      1 => 
+      array (
+        0 => 'tests\\unit\\models\\notificationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\models\\test_table_name',
+        1 => 'tests\\unit\\models\\test_fillable_attributes',
+        2 => 'tests\\unit\\models\\test_casts',
+        3 => 'tests\\unit\\models\\test_hidden_attributes',
+        4 => 'tests\\unit\\models\\test_user_relation',
+        5 => 'tests\\unit\\models\\test_scope_unread',
+        6 => 'tests\\unit\\models\\test_scope_read',
+        7 => 'tests\\unit\\models\\test_scope_of_type',
+        8 => 'tests\\unit\\models\\test_scope_of_priority',
+        9 => 'tests\\unit\\models\\test_scope_of_status',
+        10 => 'tests\\unit\\models\\test_scope_sent',
+        11 => 'tests\\unit\\models\\test_scope_pending',
+        12 => 'tests\\unit\\models\\test_scope_failed',
+        13 => 'tests\\unit\\models\\test_scope_for_user',
+        14 => 'tests\\unit\\models\\test_scope_after',
+        15 => 'tests\\unit\\models\\test_scope_before',
+        16 => 'tests\\unit\\models\\test_scope_between',
+        17 => 'tests\\unit\\models\\test_is_read_returns_true_when_read_at_set',
+        18 => 'tests\\unit\\models\\test_is_read_returns_false_when_read_at_null',
+        19 => 'tests\\unit\\models\\test_is_unread_returns_true_when_read_at_null',
+        20 => 'tests\\unit\\models\\test_is_unread_returns_false_when_read_at_set',
+        21 => 'tests\\unit\\models\\test_is_sent_returns_true_when_sent_at_set',
+        22 => 'tests\\unit\\models\\test_is_sent_returns_false_when_sent_at_null',
+        23 => 'tests\\unit\\models\\test_is_pending_returns_true',
+        24 => 'tests\\unit\\models\\test_is_pending_returns_false_when_sent_at_set',
+        25 => 'tests\\unit\\models\\test_is_failed_returns_true',
+        26 => 'tests\\unit\\models\\test_is_failed_returns_false',
+        27 => 'tests\\unit\\models\\test_get_priority_level',
+        28 => 'tests\\unit\\models\\test_get_type_display_name',
+        29 => 'tests\\unit\\models\\test_get_channel_display_name',
+        30 => 'tests\\unit\\models\\test_get_status_display_name',
+        31 => 'tests\\unit\\models\\test_get_icon',
+        32 => 'tests\\unit\\models\\test_get_color',
+        33 => 'tests\\unit\\models\\test_get_badge_text',
+        34 => 'tests\\unit\\models\\test_get_summary',
+        35 => 'tests\\unit\\models\\test_has_action',
+        36 => 'tests\\unit\\models\\test_is_expired',
+        37 => 'tests\\unit\\models\\test_can_retry',
+        38 => 'tests\\unit\\models\\test_has_tag',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\OrderItemTest.php' => 
+    array (
+      0 => 'c48432b4d56422719e469a83694a8ea041001fab',
+      1 => 
+      array (
+        0 => 'tests\\unit\\models\\orderitemtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\models\\test_fillable_attributes',
+        1 => 'tests\\unit\\models\\test_casts',
+        2 => 'tests\\unit\\models\\test_order_relation',
+        3 => 'tests\\unit\\models\\test_product_relation',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\OrderTest.php' => 
+    array (
+      0 => '26ebb60cb8f637c2e9a83700bb0dd8b256e501dc',
+      1 => 
+      array (
+        0 => 'tests\\unit\\models\\ordertest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\models\\test_user_relation',
+        1 => 'tests\\unit\\models\\test_items_relation',
+        2 => 'tests\\unit\\models\\test_payments_relation',
+        3 => 'tests\\unit\\models\\test_scope_by_status',
+        4 => 'tests\\unit\\models\\test_scope_for_user',
+        5 => 'tests\\unit\\models\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\PaymentMethodTest.php' => 
+    array (
+      0 => 'f8cad9c680a6dd49bf21fd2d0b0d6e001ad62cfe',
+      1 => 
+      array (
+        0 => 'tests\\unit\\models\\paymentmethodtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\models\\test_fillable_attributes',
+        1 => 'tests\\unit\\models\\test_casts',
+        2 => 'tests\\unit\\models\\test_payments_relation',
+        3 => 'tests\\unit\\models\\test_scope_active',
+        4 => 'tests\\unit\\models\\test_scope_default',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\PaymentTest.php' => 
+    array (
+      0 => 'cf8c3f3597df74169338b6968770b1baf6d15e1d',
+      1 => 
+      array (
+        0 => 'tests\\unit\\models\\paymenttest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\models\\test_order_relation',
+        1 => 'tests\\unit\\models\\test_payment_method_relation',
+        2 => 'tests\\unit\\models\\test_scope_by_status',
+        3 => 'tests\\unit\\models\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\PriceAlertTest.php' => 
+    array (
+      0 => 'c8ca764acfbcc556a6d603462ace413deb193088',
+      1 => 
+      array (
+        0 => 'tests\\unit\\models\\pricealerttest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\models\\test_fillable_attributes',
+        1 => 'tests\\unit\\models\\test_casts',
+        2 => 'tests\\unit\\models\\test_uses_soft_deletes',
+        3 => 'tests\\unit\\models\\test_user_relation',
+        4 => 'tests\\unit\\models\\test_product_relation',
+        5 => 'tests\\unit\\models\\test_scope_active',
+        6 => 'tests\\unit\\models\\test_scope_for_user',
+        7 => 'tests\\unit\\models\\test_scope_for_product',
+        8 => 'tests\\unit\\models\\test_get_rules',
+        9 => 'tests\\unit\\models\\test_is_price_target_reached_true',
+        10 => 'tests\\unit\\models\\test_is_price_target_reached_false',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\ProductTest.php' => 
+    array (
+      0 => '8713049864e2e9bdddb5858a98674600797420bc',
+      1 => 
+      array (
+        0 => 'tests\\unit\\models\\producttest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\models\\setup',
+        1 => 'tests\\unit\\models\\test_brand_relation',
+        2 => 'tests\\unit\\models\\test_category_relation',
+        3 => 'tests\\unit\\models\\test_store_relation',
+        4 => 'tests\\unit\\models\\test_price_alerts_relation',
+        5 => 'tests\\unit\\models\\test_reviews_relation',
+        6 => 'tests\\unit\\models\\test_wishlists_relation',
+        7 => 'tests\\unit\\models\\test_price_offers_relation',
+        8 => 'tests\\unit\\models\\test_scope_active',
+        9 => 'tests\\unit\\models\\test_scope_search',
+        10 => 'tests\\unit\\models\\test_scope_with_reviews_count',
+        11 => 'tests\\unit\\models\\test_get_average_rating',
+        12 => 'tests\\unit\\models\\test_get_total_reviews',
+        13 => 'tests\\unit\\models\\test_is_in_wishlist',
+        14 => 'tests\\unit\\models\\test_get_current_price',
+        15 => 'tests\\unit\\models\\test_get_price_history',
+        16 => 'tests\\unit\\models\\test_validate',
+        17 => 'tests\\unit\\models\\test_validate_fails',
+        18 => 'tests\\unit\\models\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\ReviewTest.php' => 
+    array (
+      0 => '546c53780ebcae341e1d4349f72a0479fb91d6e1',
+      1 => 
+      array (
+        0 => 'tests\\unit\\models\\reviewtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\models\\test_user_relation',
+        1 => 'tests\\unit\\models\\test_product_relation',
+        2 => 'tests\\unit\\models\\test_get_review_text_attribute',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\StoreTest.php' => 
+    array (
+      0 => '73714bbecbfc7650d9066f171015045040455cd8',
+      1 => 
+      array (
+        0 => 'tests\\unit\\models\\storetest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\models\\setup',
+        1 => 'tests\\unit\\models\\test_price_offers_relation',
+        2 => 'tests\\unit\\models\\test_products_relation',
+        3 => 'tests\\unit\\models\\test_currency_relation',
+        4 => 'tests\\unit\\models\\test_scope_active',
+        5 => 'tests\\unit\\models\\test_scope_search',
+        6 => 'tests\\unit\\models\\test_slug_auto_generated_on_creating',
+        7 => 'tests\\unit\\models\\test_slug_updated_on_name_change',
+        8 => 'tests\\unit\\models\\test_generate_affiliate_url_no_affiliate_data',
+        9 => 'tests\\unit\\models\\test_generate_affiliate_url',
+        10 => 'tests\\unit\\models\\test_get_rules',
+        11 => 'tests\\unit\\models\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Models\\UserTest.php' => 
+    array (
+      0 => 'a297aa7d5aa72cb93520edf366d21708d71c19bb',
+      1 => 
+      array (
+        0 => 'tests\\unit\\models\\usertest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\models\\test_is_admin_returns_true_when_is_admin_is_true',
+        1 => 'tests\\unit\\models\\test_is_admin_returns_false_when_is_admin_is_false',
+        2 => 'tests\\unit\\models\\test_is_admin_returns_false_when_is_admin_is_null',
+        3 => 'tests\\unit\\models\\test_is_banned_returns_true_when_is_blocked_is_true',
+        4 => 'tests\\unit\\models\\test_is_banned_returns_false_when_is_blocked_is_false',
+        5 => 'tests\\unit\\models\\test_is_banned_returns_false_when_is_blocked_is_null',
+        6 => 'tests\\unit\\models\\test_is_ban_expired_returns_false_when_not_blocked',
+        7 => 'tests\\unit\\models\\test_is_ban_expired_returns_false_when_ban_not_expired',
+        8 => 'tests\\unit\\models\\test_is_ban_expired_returns_true_when_ban_expired',
+        9 => 'tests\\unit\\models\\test_is_ban_expired_returns_false_when_ban_expires_at_is_null',
+        10 => 'tests\\unit\\models\\test_reviews_relation',
+        11 => 'tests\\unit\\models\\test_wishlists_relation',
+        12 => 'tests\\unit\\models\\test_price_alerts_relation',
+        13 => 'tests\\unit\\models\\test_locale_setting_relation',
       ),
       3 => 
       array (
@@ -11416,6 +10476,158 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       array (
       ),
     ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Performance\\AvailabilityTestingTest.php' => 
+    array (
+      0 => '60556a62a843888ee02231d26407d150ad02cb96',
+      1 => 
+      array (
+        0 => 'tests\\unit\\performance\\availabilitytestingtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\performance\\test_performance_basic_functionality',
+        1 => 'tests\\unit\\performance\\test_performance_metrics',
+        2 => 'tests\\unit\\performance\\test_performance_optimization',
+        3 => 'tests\\unit\\performance\\setup',
+        4 => 'tests\\unit\\performance\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Performance\\CacheHitRateTest.php' => 
+    array (
+      0 => 'c8fa8d2f237f15b3e3e5b6046fe121054ec0824a',
+      1 => 
+      array (
+        0 => 'tests\\unit\\performance\\cachehitratetest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\performance\\test_performance_basic_functionality',
+        1 => 'tests\\unit\\performance\\test_performance_metrics',
+        2 => 'tests\\unit\\performance\\test_performance_optimization',
+        3 => 'tests\\unit\\performance\\setup',
+        4 => 'tests\\unit\\performance\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Performance\\ConcurrentUserTest.php' => 
+    array (
+      0 => '97c7e5fdf82eb5ed2d118ff085906bc81ab7bfa1',
+      1 => 
+      array (
+        0 => 'tests\\unit\\performance\\concurrentusertest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\performance\\test_performance_basic_functionality',
+        1 => 'tests\\unit\\performance\\test_performance_metrics',
+        2 => 'tests\\unit\\performance\\test_performance_optimization',
+        3 => 'tests\\unit\\performance\\setup',
+        4 => 'tests\\unit\\performance\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Performance\\CPUUsageTest.php' => 
+    array (
+      0 => 'a898277b515f85ef84d3e671e8f0bcc064313564',
+      1 => 
+      array (
+        0 => 'tests\\unit\\performance\\cpuusagetest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\performance\\test_performance_basic_functionality',
+        1 => 'tests\\unit\\performance\\test_performance_metrics',
+        2 => 'tests\\unit\\performance\\test_performance_optimization',
+        3 => 'tests\\unit\\performance\\setup',
+        4 => 'tests\\unit\\performance\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Performance\\DatabaseQueryTimeTest.php' => 
+    array (
+      0 => 'f3bca3b74bf18b0f719cd456cc3fd05606d663b8',
+      1 => 
+      array (
+        0 => 'tests\\unit\\performance\\databasequerytimetest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\performance\\test_performance_basic_functionality',
+        1 => 'tests\\unit\\performance\\test_performance_metrics',
+        2 => 'tests\\unit\\performance\\test_performance_optimization',
+        3 => 'tests\\unit\\performance\\setup',
+        4 => 'tests\\unit\\performance\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Performance\\FilteringPerformanceTest.php' => 
+    array (
+      0 => '339a69bf854d68e29523eafbe736686620faf650',
+      1 => 
+      array (
+        0 => 'tests\\unit\\performance\\filteringperformancetest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\performance\\test_performance_basic_functionality',
+        1 => 'tests\\unit\\performance\\test_performance_metrics',
+        2 => 'tests\\unit\\performance\\test_performance_optimization',
+        3 => 'tests\\unit\\performance\\setup',
+        4 => 'tests\\unit\\performance\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Performance\\ImageLoadTimeTest.php' => 
+    array (
+      0 => '4d8fe14d7b0d418cba0a19db7b5c70b6fd142a8e',
+      1 => 
+      array (
+        0 => 'tests\\unit\\performance\\imageloadtimetest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\performance\\test_performance_basic_functionality',
+        1 => 'tests\\unit\\performance\\test_performance_metrics',
+        2 => 'tests\\unit\\performance\\test_performance_optimization',
+        3 => 'tests\\unit\\performance\\setup',
+        4 => 'tests\\unit\\performance\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Performance\\PageLoadTimeTest.php' => 
+    array (
+      0 => 'c8adbd44b579e8146ab417fc3da5546c2b97481f',
+      1 => 
+      array (
+        0 => 'tests\\unit\\performance\\pageloadtimetest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\performance\\test_basic_functionality',
+        1 => 'tests\\unit\\performance\\test_expected_behavior',
+        2 => 'tests\\unit\\performance\\test_validation',
+        3 => 'tests\\unit\\performance\\setup',
+        4 => 'tests\\unit\\performance\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\PerformanceDocumentationTest.php' => 
     array (
       0 => '5b1b0f864415994316a2365be8255604bca82639',
@@ -11536,6 +10748,25 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       array (
       ),
     ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\ProcessIsolationTest.php' => 
+    array (
+      0 => '4d82ec5d59cab4195b3402550460a06955d922c6',
+      1 => 
+      array (
+        0 => 'tests\\unit\\processisolationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\test_basic_functionality',
+        1 => 'tests\\unit\\test_expected_behavior',
+        2 => 'tests\\unit\\test_validation',
+        3 => 'tests\\unit\\setup',
+        4 => 'tests\\unit\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\ProfileEndpointTest.php' => 
     array (
       0 => '79638fa361a8077fddaa99a332e34c7ed693e177',
@@ -11606,6 +10837,25 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       2 => 
       array (
         0 => 'tests\\unit\\test_basic_truth',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\PureUnitTest.php' => 
+    array (
+      0 => 'bcaf6a1e762e4a1974f8c291d1b0554498875a4d',
+      1 => 
+      array (
+        0 => 'tests\\unit\\pureunittest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\test_basic_functionality',
+        1 => 'tests\\unit\\test_expected_behavior',
+        2 => 'tests\\unit\\test_validation',
+        3 => 'tests\\unit\\setup',
+        4 => 'tests\\unit\\teardown',
       ),
       3 => 
       array (
@@ -11771,6 +11021,482 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       2 => 
       array (
         0 => 'tests\\unit\\test_basic_truth',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Recommendations\\BestDealRecommendationTest.php' => 
+    array (
+      0 => '9b033a5d09cd336f4050c419ba17cb72fcf0f691',
+      1 => 
+      array (
+        0 => 'tests\\unit\\recommendations\\bestdealrecommendationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\recommendations\\it_identifies_best_deals',
+        1 => 'tests\\unit\\recommendations\\it_calculates_deal_score',
+        2 => 'tests\\unit\\recommendations\\it_identifies_percentage_discounts',
+        3 => 'tests\\unit\\recommendations\\it_identifies_absolute_discounts',
+        4 => 'tests\\unit\\recommendations\\it_identifies_value_for_money_deals',
+        5 => 'tests\\unit\\recommendations\\it_identifies_limited_time_deals',
+        6 => 'tests\\unit\\recommendations\\it_identifies_bulk_deals',
+        7 => 'tests\\unit\\recommendations\\it_identifies_bundle_deals',
+        8 => 'tests\\unit\\recommendations\\it_identifies_cashback_deals',
+        9 => 'tests\\unit\\recommendations\\it_identifies_free_shipping_deals',
+        10 => 'tests\\unit\\recommendations\\it_identifies_clearance_deals',
+        11 => 'tests\\unit\\recommendations\\it_identifies_seasonal_deals',
+        12 => 'tests\\unit\\recommendations\\it_identifies_best_overall_deals',
+        13 => 'tests\\unit\\recommendations\\getbestdeals',
+        14 => 'tests\\unit\\recommendations\\calculatedealscore',
+        15 => 'tests\\unit\\recommendations\\getpercentagediscounts',
+        16 => 'tests\\unit\\recommendations\\getabsolutediscounts',
+        17 => 'tests\\unit\\recommendations\\getvalueformoneydeals',
+        18 => 'tests\\unit\\recommendations\\getlimitedtimedeals',
+        19 => 'tests\\unit\\recommendations\\getbulkdeals',
+        20 => 'tests\\unit\\recommendations\\getbundledeals',
+        21 => 'tests\\unit\\recommendations\\getcashbackdeals',
+        22 => 'tests\\unit\\recommendations\\getfreeshippingdeals',
+        23 => 'tests\\unit\\recommendations\\getclearancedeals',
+        24 => 'tests\\unit\\recommendations\\getseasonaldeals',
+        25 => 'tests\\unit\\recommendations\\getbestoveralldeals',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Recommendations\\BrandRecommendationTest.php' => 
+    array (
+      0 => 'ddd998f95172bd3b56df70d6794f743d49f611ff',
+      1 => 
+      array (
+        0 => 'tests\\unit\\recommendations\\brandrecommendationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\recommendations\\it_recommends_brands_based_on_user_preferences',
+        1 => 'tests\\unit\\recommendations\\it_recommends_popular_brands_in_category',
+        2 => 'tests\\unit\\recommendations\\it_recommends_similar_brands',
+        3 => 'tests\\unit\\recommendations\\it_recommends_brands_based_on_price_range',
+        4 => 'tests\\unit\\recommendations\\it_recommends_brands_based_on_quality_rating',
+        5 => 'tests\\unit\\recommendations\\it_handles_brand_availability_by_region',
+        6 => 'tests\\unit\\recommendations\\it_recommends_brands_based_on_user_purchase_history',
+        7 => 'tests\\unit\\recommendations\\it_calculates_brand_loyalty_score',
+        8 => 'tests\\unit\\recommendations\\it_recommends_trending_brands',
+        9 => 'tests\\unit\\recommendations\\it_handles_brand_recommendation_weights',
+        10 => 'tests\\unit\\recommendations\\getbrandrecommendations',
+        11 => 'tests\\unit\\recommendations\\getpopularbrandsincategory',
+        12 => 'tests\\unit\\recommendations\\getsimilarbrandrecommendations',
+        13 => 'tests\\unit\\recommendations\\getbrandsinpricerange',
+        14 => 'tests\\unit\\recommendations\\gethighratedbrands',
+        15 => 'tests\\unit\\recommendations\\getavailablebrandsinregion',
+        16 => 'tests\\unit\\recommendations\\getbrandsfrompurchasehistory',
+        17 => 'tests\\unit\\recommendations\\calculatebrandloyaltyscore',
+        18 => 'tests\\unit\\recommendations\\gettrendingbrands',
+        19 => 'tests\\unit\\recommendations\\rankbrandsbyweightedscore',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Recommendations\\CategoryRecommendationTest.php' => 
+    array (
+      0 => 'dcbf988540ade0ec418f201acb59362733c0160f',
+      1 => 
+      array (
+        0 => 'tests\\unit\\recommendations\\categoryrecommendationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\recommendations\\it_recommends_categories_based_on_user_history',
+        1 => 'tests\\unit\\recommendations\\it_recommends_popular_categories',
+        2 => 'tests\\unit\\recommendations\\it_recommends_related_categories',
+        3 => 'tests\\unit\\recommendations\\it_handles_seasonal_category_recommendations',
+        4 => 'tests\\unit\\recommendations\\it_recommends_categories_based_on_demographics',
+        5 => 'tests\\unit\\recommendations\\it_filters_categories_by_availability',
+        6 => 'tests\\unit\\recommendations\\it_ranks_categories_by_relevance_score',
+        7 => 'tests\\unit\\recommendations\\it_handles_empty_category_data',
+        8 => 'tests\\unit\\recommendations\\it_calculates_category_affinity_score',
+        9 => 'tests\\unit\\recommendations\\it_recommends_trending_categories',
+        10 => 'tests\\unit\\recommendations\\getcategoryrecommendations',
+        11 => 'tests\\unit\\recommendations\\getpopularcategoryrecommendations',
+        12 => 'tests\\unit\\recommendations\\getrelatedcategoryrecommendations',
+        13 => 'tests\\unit\\recommendations\\getseasonalcategoryrecommendations',
+        14 => 'tests\\unit\\recommendations\\getdemographiccategoryrecommendations',
+        15 => 'tests\\unit\\recommendations\\filtercategoriesbyavailability',
+        16 => 'tests\\unit\\recommendations\\rankcategoriesbyscore',
+        17 => 'tests\\unit\\recommendations\\calculatecategoryaffinityscore',
+        18 => 'tests\\unit\\recommendations\\gettrendingcategoryrecommendations',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Recommendations\\CollaborativeFilteringTest.php' => 
+    array (
+      0 => '9e8b84875e42055bee28795631348b0a202cae1a',
+      1 => 
+      array (
+        0 => 'tests\\unit\\recommendations\\collaborativefilteringtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\recommendations\\it_finds_similar_users',
+        1 => 'tests\\unit\\recommendations\\it_calculates_cosine_similarity',
+        2 => 'tests\\unit\\recommendations\\it_predicts_ratings_for_items',
+        3 => 'tests\\unit\\recommendations\\it_handles_cold_start_problem',
+        4 => 'tests\\unit\\recommendations\\it_calculates_pearson_correlation',
+        5 => 'tests\\unit\\recommendations\\it_filters_items_by_user_preferences',
+        6 => 'tests\\unit\\recommendations\\it_calculates_item_based_similarity',
+        7 => 'tests\\unit\\recommendations\\it_handles_sparse_data',
+        8 => 'tests\\unit\\recommendations\\it_calculates_confidence_scores',
+        9 => 'tests\\unit\\recommendations\\it_handles_matrix_factorization',
+        10 => 'tests\\unit\\recommendations\\findsimilarusers',
+        11 => 'tests\\unit\\recommendations\\calculatecosinesimilarity',
+        12 => 'tests\\unit\\recommendations\\predictrating',
+        13 => 'tests\\unit\\recommendations\\handlecoldstart',
+        14 => 'tests\\unit\\recommendations\\calculatepearsoncorrelation',
+        15 => 'tests\\unit\\recommendations\\filteritemsbypreferences',
+        16 => 'tests\\unit\\recommendations\\calculateitembasedsimilarity',
+        17 => 'tests\\unit\\recommendations\\findsimilaruserswithmincommonitems',
+        18 => 'tests\\unit\\recommendations\\calculatepredictionconfidence',
+        19 => 'tests\\unit\\recommendations\\performmatrixfactorization',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Recommendations\\ContentBasedFilteringTest.php' => 
+    array (
+      0 => '46285e121c71caa34b06175e26e7f1ed959645de',
+      1 => 
+      array (
+        0 => 'tests\\unit\\recommendations\\contentbasedfilteringtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\recommendations\\it_analyzes_item_features',
+        1 => 'tests\\unit\\recommendations\\it_calculates_item_similarity',
+        2 => 'tests\\unit\\recommendations\\it_builds_user_profile',
+        3 => 'tests\\unit\\recommendations\\it_recommends_items_based_on_content',
+        4 => 'tests\\unit\\recommendations\\it_handles_text_similarity',
+        5 => 'tests\\unit\\recommendations\\it_extracts_keywords_from_text',
+        6 => 'tests\\unit\\recommendations\\it_calculates_tf_idf_scores',
+        7 => 'tests\\unit\\recommendations\\it_handles_categorical_features',
+        8 => 'tests\\unit\\recommendations\\it_handles_numerical_features',
+        9 => 'tests\\unit\\recommendations\\it_combines_multiple_similarity_measures',
+        10 => 'tests\\unit\\recommendations\\extractitemfeatures',
+        11 => 'tests\\unit\\recommendations\\categorizeprice',
+        12 => 'tests\\unit\\recommendations\\calculateitemsimilarity',
+        13 => 'tests\\unit\\recommendations\\builduserprofile',
+        14 => 'tests\\unit\\recommendations\\getcontentbasedrecommendations',
+        15 => 'tests\\unit\\recommendations\\calculateuseritemsimilarity',
+        16 => 'tests\\unit\\recommendations\\calculatetextsimilarity',
+        17 => 'tests\\unit\\recommendations\\extractkeywords',
+        18 => 'tests\\unit\\recommendations\\calculatetfidf',
+        19 => 'tests\\unit\\recommendations\\calculatecategoricalsimilarity',
+        20 => 'tests\\unit\\recommendations\\calculatenumericalsimilarity',
+        21 => 'tests\\unit\\recommendations\\calculatecombinedsimilarity',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Recommendations\\CrossSellRecommendationTest.php' => 
+    array (
+      0 => 'd0b2495755f5fabe528ad70048f979ba1072d463',
+      1 => 
+      array (
+        0 => 'tests\\unit\\recommendations\\crosssellrecommendationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\recommendations\\it_recommends_cross_sell_products',
+        1 => 'tests\\unit\\recommendations\\it_recommends_complementary_products',
+        2 => 'tests\\unit\\recommendations\\it_recommends_related_accessories',
+        3 => 'tests\\unit\\recommendations\\it_recommends_bundled_products',
+        4 => 'tests\\unit\\recommendations\\it_recommends_products_based_on_purchase_history',
+        5 => 'tests\\unit\\recommendations\\it_recommends_products_based_on_user_behavior',
+        6 => 'tests\\unit\\recommendations\\it_recommends_products_based_on_season',
+        7 => 'tests\\unit\\recommendations\\it_recommends_products_based_on_price_range',
+        8 => 'tests\\unit\\recommendations\\it_recommends_products_based_on_brand_preference',
+        9 => 'tests\\unit\\recommendations\\it_recommends_products_based_on_ratings',
+        10 => 'tests\\unit\\recommendations\\it_recommends_products_based_on_availability',
+        11 => 'tests\\unit\\recommendations\\it_recommends_products_based_on_popularity',
+        12 => 'tests\\unit\\recommendations\\it_recommends_products_based_on_customer_segments',
+        13 => 'tests\\unit\\recommendations\\it_recommends_products_based_on_geographic_location',
+        14 => 'tests\\unit\\recommendations\\it_recommends_products_based_on_time_of_day',
+        15 => 'tests\\unit\\recommendations\\it_recommends_products_based_on_weather',
+        16 => 'tests\\unit\\recommendations\\it_recommends_products_based_on_events',
+        17 => 'tests\\unit\\recommendations\\it_calculates_recommendation_confidence',
+        18 => 'tests\\unit\\recommendations\\it_generates_cross_sell_report',
+        19 => 'tests\\unit\\recommendations\\getcrosssellrecommendations',
+        20 => 'tests\\unit\\recommendations\\getcomplementaryproducts',
+        21 => 'tests\\unit\\recommendations\\getrelatedaccessories',
+        22 => 'tests\\unit\\recommendations\\getbundledproducts',
+        23 => 'tests\\unit\\recommendations\\getrecommendationsbasedonhistory',
+        24 => 'tests\\unit\\recommendations\\getrecommendationsbasedonbehavior',
+        25 => 'tests\\unit\\recommendations\\getseasonalrecommendations',
+        26 => 'tests\\unit\\recommendations\\getrecommendationsbypricerange',
+        27 => 'tests\\unit\\recommendations\\getrecommendationsbybrand',
+        28 => 'tests\\unit\\recommendations\\getrecommendationsbyratings',
+        29 => 'tests\\unit\\recommendations\\getrecommendationsbyavailability',
+        30 => 'tests\\unit\\recommendations\\getrecommendationsbypopularity',
+        31 => 'tests\\unit\\recommendations\\getrecommendationsbysegment',
+        32 => 'tests\\unit\\recommendations\\getrecommendationsbylocation',
+        33 => 'tests\\unit\\recommendations\\getrecommendationsbytimeofday',
+        34 => 'tests\\unit\\recommendations\\getrecommendationsbyweather',
+        35 => 'tests\\unit\\recommendations\\getrecommendationsbyevent',
+        36 => 'tests\\unit\\recommendations\\calculaterecommendationconfidence',
+        37 => 'tests\\unit\\recommendations\\generatecrosssellreport',
+        38 => 'tests\\unit\\recommendations\\isaccessory',
+        39 => 'tests\\unit\\recommendations\\canbebundled',
+        40 => 'tests\\unit\\recommendations\\isseasonalproduct',
+        41 => 'tests\\unit\\recommendations\\isinsimilarpricerange',
+        42 => 'tests\\unit\\recommendations\\matchescustomersegment',
+        43 => 'tests\\unit\\recommendations\\isrelevanttotimeofday',
+        44 => 'tests\\unit\\recommendations\\isrelevanttoweather',
+        45 => 'tests\\unit\\recommendations\\isrelevanttoevent',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Recommendations\\HybridRecommendationTest.php' => 
+    array (
+      0 => 'd03f2f9b16278d5ecc3173d31c2bd38dd9f30739',
+      1 => 
+      array (
+        0 => 'tests\\unit\\recommendations\\hybridrecommendationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\recommendations\\it_combines_collaborative_and_content_based_filtering',
+        1 => 'tests\\unit\\recommendations\\it_handles_weighted_ensemble_method',
+        2 => 'tests\\unit\\recommendations\\it_handles_switching_hybrid_approach',
+        3 => 'tests\\unit\\recommendations\\it_handles_mixed_hybrid_approach',
+        4 => 'tests\\unit\\recommendations\\it_handles_cascade_hybrid_approach',
+        5 => 'tests\\unit\\recommendations\\it_handles_feature_combination_hybrid',
+        6 => 'tests\\unit\\recommendations\\it_handles_meta_learning_hybrid',
+        7 => 'tests\\unit\\recommendations\\it_handles_dynamic_weight_adjustment',
+        8 => 'tests\\unit\\recommendations\\it_handles_confidence_weighted_hybrid',
+        9 => 'tests\\unit\\recommendations\\it_handles_temporal_hybrid_approach',
+        10 => 'tests\\unit\\recommendations\\it_evaluates_hybrid_recommendation_quality',
+        11 => 'tests\\unit\\recommendations\\calculatehybridscore',
+        12 => 'tests\\unit\\recommendations\\createweightedensemble',
+        13 => 'tests\\unit\\recommendations\\selectrecommendationmethod',
+        14 => 'tests\\unit\\recommendations\\createmixedhybrid',
+        15 => 'tests\\unit\\recommendations\\createcascadehybrid',
+        16 => 'tests\\unit\\recommendations\\combinefeaturevectors',
+        17 => 'tests\\unit\\recommendations\\selectbestmethodbymetalearning',
+        18 => 'tests\\unit\\recommendations\\adjustweightsdynamically',
+        19 => 'tests\\unit\\recommendations\\createconfidenceweightedhybrid',
+        20 => 'tests\\unit\\recommendations\\createtemporalhybrid',
+        21 => 'tests\\unit\\recommendations\\evaluatehybridquality',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Recommendations\\PersonalizedRecommendationTest.php' => 
+    array (
+      0 => 'b79b6dd462ed62671f203413590cd643d2d0b5ce',
+      1 => 
+      array (
+        0 => 'tests\\unit\\recommendations\\personalizedrecommendationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\recommendations\\it_generates_recommendations_based_on_user_history',
+        1 => 'tests\\unit\\recommendations\\it_prioritizes_same_brand_recommendations',
+        2 => 'tests\\unit\\recommendations\\it_considers_user_preferences',
+        3 => 'tests\\unit\\recommendations\\it_avoids_previously_purchased_products',
+        4 => 'tests\\unit\\recommendations\\it_considers_user_rating_patterns',
+        5 => 'tests\\unit\\recommendations\\it_considers_seasonal_trends',
+        6 => 'tests\\unit\\recommendations\\it_considers_user_demographics',
+        7 => 'tests\\unit\\recommendations\\it_limits_recommendation_count',
+        8 => 'tests\\unit\\recommendations\\it_considers_product_availability',
+        9 => 'tests\\unit\\recommendations\\it_considers_price_sensitivity',
+        10 => 'tests\\unit\\recommendations\\it_considers_collaborative_filtering',
+        11 => 'tests\\unit\\recommendations\\it_considers_content_based_filtering',
+        12 => 'tests\\unit\\recommendations\\it_handles_empty_user_history',
+        13 => 'tests\\unit\\recommendations\\it_considers_recommendation_diversity',
+        14 => 'tests\\unit\\recommendations\\generaterecommendations',
+        15 => 'tests\\unit\\recommendations\\setup',
+        16 => 'tests\\unit\\recommendations\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Recommendations\\SimilarProductTest.php' => 
+    array (
+      0 => '685377c53634e5a2cdb7dacb17905c3aeab06a42',
+      1 => 
+      array (
+        0 => 'tests\\unit\\recommendations\\similarproducttest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\recommendations\\it_finds_similar_products_by_category',
+        1 => 'tests\\unit\\recommendations\\it_finds_similar_products_by_brand',
+        2 => 'tests\\unit\\recommendations\\it_finds_similar_products_by_price_range',
+        3 => 'tests\\unit\\recommendations\\it_finds_similar_products_by_specifications',
+        4 => 'tests\\unit\\recommendations\\it_calculates_similarity_score',
+        5 => 'tests\\unit\\recommendations\\it_handles_empty_product_list',
+        6 => 'tests\\unit\\recommendations\\it_ranks_similar_products_by_relevance',
+        7 => 'tests\\unit\\recommendations\\it_considers_user_preferences',
+        8 => 'tests\\unit\\recommendations\\it_handles_case_insensitive_matching',
+        9 => 'tests\\unit\\recommendations\\it_limits_number_of_similar_products',
+        10 => 'tests\\unit\\recommendations\\it_handles_products_with_missing_attributes',
+        11 => 'tests\\unit\\recommendations\\findsimilarproducts',
+        12 => 'tests\\unit\\recommendations\\findsimilarproductsbyspecs',
+        13 => 'tests\\unit\\recommendations\\calculatesimilarityscore',
+        14 => 'tests\\unit\\recommendations\\calculatespecsimilarity',
+        15 => 'tests\\unit\\recommendations\\calculatestringsimilarity',
+        16 => 'tests\\unit\\recommendations\\applyuserpreferences',
+        17 => 'tests\\unit\\recommendations\\generatetestproducts',
+        18 => 'tests\\unit\\recommendations\\setup',
+        19 => 'tests\\unit\\recommendations\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Recommendations\\TrendingProductTest.php' => 
+    array (
+      0 => 'c9c29e948128f39e24f5cf406febd69b3ab3199d',
+      1 => 
+      array (
+        0 => 'tests\\unit\\recommendations\\trendingproducttest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\recommendations\\it_identifies_trending_products',
+        1 => 'tests\\unit\\recommendations\\it_calculates_trending_score',
+        2 => 'tests\\unit\\recommendations\\it_identifies_rising_trends',
+        3 => 'tests\\unit\\recommendations\\it_identifies_falling_trends',
+        4 => 'tests\\unit\\recommendations\\it_identifies_seasonal_trends',
+        5 => 'tests\\unit\\recommendations\\it_identifies_category_trends',
+        6 => 'tests\\unit\\recommendations\\it_identifies_brand_trends',
+        7 => 'tests\\unit\\recommendations\\it_identifies_price_range_trends',
+        8 => 'tests\\unit\\recommendations\\it_identifies_time_based_trends',
+        9 => 'tests\\unit\\recommendations\\it_identifies_geographic_trends',
+        10 => 'tests\\unit\\recommendations\\it_identifies_demographic_trends',
+        11 => 'tests\\unit\\recommendations\\gettrendingproducts',
+        12 => 'tests\\unit\\recommendations\\calculatetrendingscore',
+        13 => 'tests\\unit\\recommendations\\getrisingtrends',
+        14 => 'tests\\unit\\recommendations\\getfallingtrends',
+        15 => 'tests\\unit\\recommendations\\getseasonaltrends',
+        16 => 'tests\\unit\\recommendations\\getcategorytrends',
+        17 => 'tests\\unit\\recommendations\\getbrandtrends',
+        18 => 'tests\\unit\\recommendations\\getpricerangetrends',
+        19 => 'tests\\unit\\recommendations\\gettimebasedtrends',
+        20 => 'tests\\unit\\recommendations\\getgeographictrends',
+        21 => 'tests\\unit\\recommendations\\getdemographictrends',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Recommendations\\UpsellRecommendationTest.php' => 
+    array (
+      0 => '4ca870a0ecefa6bf90ac586cb202ef8d9f2ae876',
+      1 => 
+      array (
+        0 => 'tests\\unit\\recommendations\\upsellrecommendationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\recommendations\\it_recommends_higher_tier_products',
+        1 => 'tests\\unit\\recommendations\\it_recommends_premium_versions',
+        2 => 'tests\\unit\\recommendations\\it_recommends_products_with_more_features',
+        3 => 'tests\\unit\\recommendations\\it_recommends_products_with_better_specifications',
+        4 => 'tests\\unit\\recommendations\\it_recommends_products_with_extended_warranty',
+        5 => 'tests\\unit\\recommendations\\it_recommends_products_with_premium_materials',
+        6 => 'tests\\unit\\recommendations\\it_recommends_products_with_better_brand',
+        7 => 'tests\\unit\\recommendations\\it_recommends_products_with_higher_capacity',
+        8 => 'tests\\unit\\recommendations\\it_recommends_products_with_better_performance',
+        9 => 'tests\\unit\\recommendations\\it_recommends_products_with_more_storage',
+        10 => 'tests\\unit\\recommendations\\it_recommends_products_with_better_display',
+        11 => 'tests\\unit\\recommendations\\it_recommends_products_with_better_connectivity',
+        12 => 'tests\\unit\\recommendations\\it_recommends_products_with_better_battery_life',
+        13 => 'tests\\unit\\recommendations\\it_recommends_products_with_better_camera',
+        14 => 'tests\\unit\\recommendations\\it_recommends_products_with_better_audio',
+        15 => 'tests\\unit\\recommendations\\it_recommends_products_with_better_security',
+        16 => 'tests\\unit\\recommendations\\it_recommends_products_with_better_support',
+        17 => 'tests\\unit\\recommendations\\it_calculates_upsell_potential',
+        18 => 'tests\\unit\\recommendations\\it_generates_upsell_report',
+        19 => 'tests\\unit\\recommendations\\getupsellrecommendations',
+        20 => 'tests\\unit\\recommendations\\getpremiumversions',
+        21 => 'tests\\unit\\recommendations\\getfeaturerichproducts',
+        22 => 'tests\\unit\\recommendations\\getbetterspecproducts',
+        23 => 'tests\\unit\\recommendations\\getextendedwarrantyproducts',
+        24 => 'tests\\unit\\recommendations\\getpremiummaterialproducts',
+        25 => 'tests\\unit\\recommendations\\getbetterbrandproducts',
+        26 => 'tests\\unit\\recommendations\\gethighercapacityproducts',
+        27 => 'tests\\unit\\recommendations\\getbetterperformanceproducts',
+        28 => 'tests\\unit\\recommendations\\getmorestorageproducts',
+        29 => 'tests\\unit\\recommendations\\getbetterdisplayproducts',
+        30 => 'tests\\unit\\recommendations\\getbetterconnectivityproducts',
+        31 => 'tests\\unit\\recommendations\\getbetterbatteryproducts',
+        32 => 'tests\\unit\\recommendations\\getbettercameraproducts',
+        33 => 'tests\\unit\\recommendations\\getbetteraudioproducts',
+        34 => 'tests\\unit\\recommendations\\getbettersecurityproducts',
+        35 => 'tests\\unit\\recommendations\\getbettersupportproducts',
+        36 => 'tests\\unit\\recommendations\\calculateupsellpotential',
+        37 => 'tests\\unit\\recommendations\\generateupsellreport',
+        38 => 'tests\\unit\\recommendations\\ispremiumversion',
+        39 => 'tests\\unit\\recommendations\\hasmorefeatures',
+        40 => 'tests\\unit\\recommendations\\hasbetterspecs',
+        41 => 'tests\\unit\\recommendations\\hasextendedwarranty',
+        42 => 'tests\\unit\\recommendations\\haspremiummaterial',
+        43 => 'tests\\unit\\recommendations\\hasbetterbrand',
+        44 => 'tests\\unit\\recommendations\\hashighercapacity',
+        45 => 'tests\\unit\\recommendations\\hasbetterperformance',
+        46 => 'tests\\unit\\recommendations\\hasmorestorage',
+        47 => 'tests\\unit\\recommendations\\hasbetterdisplay',
+        48 => 'tests\\unit\\recommendations\\hasbetterconnectivity',
+        49 => 'tests\\unit\\recommendations\\hasbetterbatterylife',
+        50 => 'tests\\unit\\recommendations\\hasbettercamera',
+        51 => 'tests\\unit\\recommendations\\hasbetteraudio',
+        52 => 'tests\\unit\\recommendations\\hasbettersecurity',
+        53 => 'tests\\unit\\recommendations\\hasbettersupport',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Recommendations\\UserBehaviorRecommendationTest.php' => 
+    array (
+      0 => '03bd370dfb4bcf4377140c156b228cf887dae1d1',
+      1 => 
+      array (
+        0 => 'tests\\unit\\recommendations\\userbehaviorrecommendationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\recommendations\\it_analyzes_user_browsing_patterns',
+        1 => 'tests\\unit\\recommendations\\it_tracks_user_purchase_frequency',
+        2 => 'tests\\unit\\recommendations\\it_identifies_user_preferences_from_behavior',
+        3 => 'tests\\unit\\recommendations\\it_predicts_user_intent',
+        4 => 'tests\\unit\\recommendations\\it_analyzes_user_engagement_level',
+        5 => 'tests\\unit\\recommendations\\it_tracks_user_price_sensitivity',
+        6 => 'tests\\unit\\recommendations\\it_analyzes_user_device_preferences',
+        7 => 'tests\\unit\\recommendations\\it_tracks_user_seasonal_patterns',
+        8 => 'tests\\unit\\recommendations\\it_predicts_user_churn_risk',
+        9 => 'tests\\unit\\recommendations\\it_generates_personalized_recommendations',
+        10 => 'tests\\unit\\recommendations\\analyzebrowsingpatterns',
+        11 => 'tests\\unit\\recommendations\\calculatepurchasefrequency',
+        12 => 'tests\\unit\\recommendations\\identifyuserpreferences',
+        13 => 'tests\\unit\\recommendations\\predictuserintent',
+        14 => 'tests\\unit\\recommendations\\calculateengagementlevel',
+        15 => 'tests\\unit\\recommendations\\calculatepricesensitivity',
+        16 => 'tests\\unit\\recommendations\\analyzedevicepreferences',
+        17 => 'tests\\unit\\recommendations\\analyzeseasonalpatterns',
+        18 => 'tests\\unit\\recommendations\\predictchurnrisk',
+        19 => 'tests\\unit\\recommendations\\generatepersonalizedrecommendations',
       ),
       3 => 
       array (
@@ -12211,6 +11937,25 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       array (
       ),
     ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Rules\\ValidOrderStatusTest.php' => 
+    array (
+      0 => 'fab62aa9e35f5a3dddc9959ea93478e18838a8f2',
+      1 => 
+      array (
+        0 => 'tests\\unit\\rules\\validorderstatustest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\rules\\setup',
+        1 => 'tests\\unit\\rules\\test_passes_with_valid_status',
+        2 => 'tests\\unit\\rules\\test_fails_with_invalid_status',
+        3 => 'tests\\unit\\rules\\test_fails_with_non_string_value',
+        4 => 'tests\\unit\\rules\\test_passes_with_all_valid_statuses',
+      ),
+      3 => 
+      array (
+      ),
+    ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\RussianLanguageTest.php' => 
     array (
       0 => 'f59de5ab8dfb81be7b1b85b9cec44ee6af50d2f4',
@@ -12316,6 +12061,25 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       array (
       ),
     ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Security\\DataBackupTest.php' => 
+    array (
+      0 => '2d24c8b15f2acb01d18ee2a39216346a09fcc814',
+      1 => 
+      array (
+        0 => 'tests\\unit\\security\\databackuptest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\security\\test_basic_functionality',
+        1 => 'tests\\unit\\security\\test_expected_behavior',
+        2 => 'tests\\unit\\security\\test_validation',
+        3 => 'tests\\unit\\security\\setup',
+        4 => 'tests\\unit\\security\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\SecurityDocumentationTest.php' => 
     array (
       0 => 'd4b756023d39c6d8888b87b2b05e51b2d2e4a9f6',
@@ -12356,6 +12120,107 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       2 => 
       array (
         0 => 'tests\\unit\\test_basic_truth',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Services\\APIServiceTest.php' => 
+    array (
+      0 => '6c2bd377d28d3d3656aaab1e8f576f73399bc352',
+      1 => 
+      array (
+        0 => 'tests\\unit\\services\\apiservicetest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\services\\test_api_info_service_version_and_urls',
+        1 => 'tests\\unit\\services\\test_response_builder_success_and_error',
+        2 => 'tests\\unit\\services\\test_paginated_response_structure_with_collection',
+        3 => 'tests\\unit\\services\\test_request_parameter_service_parsing',
+        4 => 'tests\\unit\\services\\test_pagination_service_defaults_for_non_paginator',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Services\\BehaviorAnalysisServiceTest.php' => 
+    array (
+      0 => '38cffab8ea2d100a106e613bd6479595b5cdee2b',
+      1 => 
+      array (
+        0 => 'tests\\unit\\services\\behavioranalysisservicetest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\services\\setup',
+        1 => 'tests\\unit\\services\\test_track_user_behavior_inserts_into_database',
+        2 => 'tests\\unit\\services\\test_get_user_analytics_returns_cached_data',
+        3 => 'tests\\unit\\services\\test_get_site_analytics_returns_cached_data',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Services\\ExternalStoreServiceTest.php' => 
+    array (
+      0 => '574a3e6b5fb0b3275ad08cdf4da103c8ae6d12f3',
+      1 => 
+      array (
+        0 => 'tests\\unit\\services\\externalstoreservicetest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\services\\setup',
+        1 => 'tests\\unit\\services\\teardown',
+        2 => 'tests\\unit\\services\\test_it_searches_products_across_all_stores',
+        3 => 'tests\\unit\\services\\test_it_handles_api_failure_gracefully',
+        4 => 'tests\\unit\\services\\test_it_gets_product_details_with_cache',
+        5 => 'tests\\unit\\services\\test_it_returns_null_for_invalid_store',
+        6 => 'tests\\unit\\services\\test_it_syncs_store_products',
+        7 => 'tests\\unit\\services\\test_it_gets_store_status',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Services\\OrderServiceTest.php' => 
+    array (
+      0 => '1a837f591a9b845f5251c34bc968a5f045873b03',
+      1 => 
+      array (
+        0 => 'tests\\unit\\services\\orderservicetest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\services\\setup',
+        1 => 'tests\\unit\\services\\test_create_order_creates_order_with_items',
+        2 => 'tests\\unit\\services\\test_update_order_status_updates_valid_transition',
+        3 => 'tests\\unit\\services\\test_update_order_status_fails_invalid_transition',
+        4 => 'tests\\unit\\services\\test_cancel_order_cancels_pending_order',
+        5 => 'tests\\unit\\services\\test_cancel_order_fails_for_shipped_order',
+        6 => 'tests\\unit\\services\\test_get_order_history_returns_user_orders',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Services\\PointsServiceTest.php' => 
+    array (
+      0 => '39548ac613d98bfc531a6c63aecf11d40842325e',
+      1 => 
+      array (
+        0 => 'tests\\unit\\services\\pointsservicetest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\services\\setup',
+        1 => 'tests\\unit\\services\\test_add_points_creates_user_point',
+        2 => 'tests\\unit\\services\\test_get_available_points_returns_sum',
+        3 => 'tests\\unit\\services\\test_redeem_points_succeeds_with_sufficient_points',
+        4 => 'tests\\unit\\services\\test_redeem_points_fails_with_insufficient_points',
+        5 => 'tests\\unit\\services\\test_award_purchase_points_adds_points',
+        6 => 'tests\\unit\\services\\test_get_points_history_returns_paginated',
       ),
       3 => 
       array (
@@ -12506,6 +12371,24 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       2 => 
       array (
         0 => 'tests\\unit\\test_basic_truth',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\SimpleMockeryTest.php' => 
+    array (
+      0 => '691a2d55c82a6b06faf155435d9919bff3eee361',
+      1 => 
+      array (
+        0 => 'tests\\unit\\simplemockerytest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\teardown',
+        1 => 'tests\\unit\\test_mock_basic_functionality',
+        2 => 'tests\\unit\\test_mock_expected_behavior_with_parameters',
+        3 => 'tests\\unit\\test_mock_validation_throws_exception',
       ),
       3 => 
       array (
@@ -12826,6 +12709,29 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       array (
       ),
     ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\StoreModelTest.php' => 
+    array (
+      0 => '2395c1a8f767e59cb2242abf3d61dc70ac4b9f89',
+      1 => 
+      array (
+        0 => 'tests\\unit\\storemodeltest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\test_store_has_fillable_attributes',
+        1 => 'tests\\unit\\test_store_casts_attributes_correctly',
+        2 => 'tests\\unit\\test_store_relationships',
+        3 => 'tests\\unit\\test_active_scope',
+        4 => 'tests\\unit\\test_search_scope',
+        5 => 'tests\\unit\\test_generate_affiliate_url',
+        6 => 'tests\\unit\\test_generate_affiliate_url_without_config',
+        7 => 'tests\\unit\\test_slug_generation_on_create',
+        8 => 'tests\\unit\\test_validation_rules',
+      ),
+      3 => 
+      array (
+      ),
+    ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\StressTestingTest.php' => 
     array (
       0 => 'd4f3db44a41c0fb958f6d2b3fc03f25ddcd8c810',
@@ -12836,6 +12742,25 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       2 => 
       array (
         0 => 'tests\\unit\\test_basic_truth',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\StrictMockeryTest.php' => 
+    array (
+      0 => '14df5e6b41a47686652c4142282fd317a0d053b3',
+      1 => 
+      array (
+        0 => 'tests\\unit\\strictmockerytest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\test_basic_functionality',
+        1 => 'tests\\unit\\test_expected_behavior',
+        2 => 'tests\\unit\\test_validation',
+        3 => 'tests\\unit\\setup',
+        4 => 'tests\\unit\\teardown',
       ),
       3 => 
       array (
@@ -12896,6 +12821,21 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       2 => 
       array (
         0 => 'tests\\unit\\test_basic_truth',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\TestErrorHandler.php' => 
+    array (
+      0 => 'b09b5fd48e92306f60ac18ba6e3b56fcf343417f',
+      1 => 
+      array (
+        0 => 'tests\\unit\\testerrorhandler',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\test_simple_assertion',
       ),
       3 => 
       array (
@@ -13186,6 +13126,23 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       array (
       ),
     ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\URLServiceTest.php' => 
+    array (
+      0 => '1c12efa36027a09c1d3b6f46733723d0d2e90a9a',
+      1 => 
+      array (
+        0 => 'tests\\unit\\urlservicetest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\test_generate_affiliate_url_encodes_url_and_injects_affiliate_code',
+        1 => 'tests\\unit\\test_generate_affiliate_url_returns_original_when_missing_config',
+        2 => 'tests\\unit\\test_generate_affiliate_url_keeps_path_slashes_unencoded',
+      ),
+      3 => 
+      array (
+      ),
+    ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\URLValidationTest.php' => 
     array (
       0 => '553a89b56d9f1d09abb7c732e210e6d7c39f22ef',
@@ -13316,6 +13273,64 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       2 => 
       array (
         0 => 'tests\\unit\\test_basic_truth',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Validation\\BasicValidationTest.php' => 
+    array (
+      0 => '779306cb47dcf4bb50e83fc333ec15e854fdeda3',
+      1 => 
+      array (
+        0 => 'tests\\unit\\validation\\basicvalidationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\validation\\test_basic_functionality',
+        1 => 'tests\\unit\\validation\\test_expected_behavior',
+        2 => 'tests\\unit\\validation\\test_validation',
+        3 => 'tests\\unit\\validation\\setup',
+        4 => 'tests\\unit\\validation\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Validation\\ComprehensiveValidationTest.php' => 
+    array (
+      0 => 'c7d2b3a4066496fa25cdb7d777dd8e5432d1e6b2',
+      1 => 
+      array (
+        0 => 'tests\\unit\\validation\\comprehensivevalidationtest',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\validation\\test_basic_functionality',
+        1 => 'tests\\unit\\validation\\test_expected_behavior',
+        2 => 'tests\\unit\\validation\\test_validation',
+        3 => 'tests\\unit\\validation\\setup',
+        4 => 'tests\\unit\\validation\\teardown',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Unit\\Validation\\ValidationTestCase.php' => 
+    array (
+      0 => 'ceaa33eb4a301554f96cc6736e76783dfed29cb0',
+      1 => 
+      array (
+        0 => 'tests\\unit\\validation\\validationtestcase',
+      ),
+      2 => 
+      array (
+        0 => 'tests\\unit\\validation\\setup',
+        1 => 'tests\\unit\\validation\\teardown',
+        2 => 'tests\\unit\\validation\\createvalidator',
+        3 => 'tests\\unit\\validation\\validatedata',
+        4 => 'tests\\unit\\validation\\getvalidationerrors',
+        5 => 'tests\\unit\\validation\\test_can_be_instantiated',
       ),
       3 => 
       array (
@@ -13511,21 +13526,6 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       2 => 
       array (
         0 => 'tests\\unit\\test_basic_truth',
-      ),
-      3 => 
-      array (
-      ),
-    ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\tests\\Browser\\LoginTest.php' => 
-    array (
-      0 => '908acc44f40a0402c77ee1a5733dc234d6274191',
-      1 => 
-      array (
-        0 => 'tests\\browser\\logintest',
-      ),
-      2 => 
-      array (
-        0 => 'tests\\browser\\login_page_loads_and_has_form',
       ),
       3 => 
       array (
