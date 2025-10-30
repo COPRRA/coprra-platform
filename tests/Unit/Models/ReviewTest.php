@@ -13,44 +13,46 @@ use Tests\TestCase;
 
 /**
  * Unit tests for the Review model.
+ *
+ * @internal
  */
 #[CoversClass(Review::class)]
-class ReviewTest extends TestCase
+final class ReviewTest extends TestCase
 {
     /**
      * Test that user relation is a BelongsTo instance.
      */
-    public function test_user_relation(): void
+    public function testUserRelation(): void
     {
-        $review = new Review;
+        $review = new Review();
 
         $relation = $review->user();
 
-        $this->assertInstanceOf(BelongsTo::class, $relation);
-        $this->assertEquals(User::class, $relation->getRelated()::class);
+        self::assertInstanceOf(BelongsTo::class, $relation);
+        self::assertSame(User::class, $relation->getRelated()::class);
     }
 
     /**
      * Test that product relation is a BelongsTo instance.
      */
-    public function test_product_relation(): void
+    public function testProductRelation(): void
     {
-        $review = new Review;
+        $review = new Review();
 
         $relation = $review->product();
 
-        $this->assertInstanceOf(BelongsTo::class, $relation);
-        $this->assertEquals(Product::class, $relation->getRelated()::class);
+        self::assertInstanceOf(BelongsTo::class, $relation);
+        self::assertSame(Product::class, $relation->getRelated()::class);
     }
 
     /**
      * Test getReviewTextAttribute returns content.
      */
-    public function test_get_review_text_attribute(): void
+    public function testGetReviewTextAttribute(): void
     {
         $content = 'This is a review';
         $review = new Review(['content' => $content]);
 
-        $this->assertEquals($content, $review->getReviewTextAttribute());
+        self::assertSame($content, $review->getReviewTextAttribute());
     }
 }

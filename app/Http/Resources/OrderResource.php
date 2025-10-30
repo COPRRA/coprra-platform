@@ -6,6 +6,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\MissingValue;
 
 /**
  * @mixin \App\Models\Order
@@ -15,9 +16,9 @@ class OrderResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @return array<\Illuminate\Http\Resources\MissingValue|array|mixed|null>
+     * @return array<\Illuminate\Http\Resources\MissingValue|array|mixed|* @method static \App\Models\Brand create(array<string, string|bool|null>
      *
-     * @psalm-return array{id: mixed, order_number: mixed, user_id: mixed, status: array{value: mixed, label: mixed, color: mixed}, total_amount: mixed, subtotal: mixed, tax_amount: mixed, shipping_amount: mixed, discount_amount: mixed, currency: mixed, shipping_address: mixed, billing_address: mixed, notes: mixed, created_at: mixed|null, updated_at: mixed|null, shipped_at: \Illuminate\Http\Resources\MissingValue|mixed, delivered_at: \Illuminate\Http\Resources\MissingValue|mixed}
+     * @psalm-return array{id: mixed, order_number: mixed, user_id: mixed, status: array{value: mixed, label: mixed, color: mixed}, total_amount: mixed, subtotal: mixed, tax_amount: mixed, shipping_amount: mixed, discount_amount: mixed, currency: mixed, shipping_address: mixed, billing_address: mixed, notes: mixed, created_at: mixed|null, updated_at: mixed|null, shipped_at: MissingValue|mixed, delivered_at: MissingValue|mixed}
      *
      * @SuppressWarnings("UnusedFormalParameter")
      */

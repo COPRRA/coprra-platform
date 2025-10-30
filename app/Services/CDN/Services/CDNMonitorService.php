@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace App\Services\CDN\Services;
 
 use App\Services\CDN\Contracts\CDNProviderInterface;
-use Exception;
 use Illuminate\Support\Facades\Log;
 
 /**
- * Service for handling CDN monitoring and statistics
+ * Service for handling CDN monitoring and statistics.
  */
 final readonly class CDNMonitorService
 {
@@ -21,7 +20,7 @@ final readonly class CDNMonitorService
     }
 
     /**
-     * Get CDN statistics
+     * Get CDN statistics.
      *
      * @return array<string, mixed>
      */
@@ -29,7 +28,7 @@ final readonly class CDNMonitorService
     {
         try {
             return $this->provider->getStatistics();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Failed to get CDN statistics', [
                 'provider' => $this->provider->getName(),
                 'error' => $e->getMessage(),
@@ -40,7 +39,7 @@ final readonly class CDNMonitorService
     }
 
     /**
-     * Test connection to CDN
+     * Test connection to CDN.
      */
     public function testConnection(): bool
     {
@@ -53,7 +52,7 @@ final readonly class CDNMonitorService
             ]);
 
             return $result;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('CDN connection test failed', [
                 'provider' => $this->provider->getName(),
                 'error' => $e->getMessage(),

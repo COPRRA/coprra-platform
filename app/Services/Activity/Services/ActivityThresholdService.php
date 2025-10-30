@@ -7,7 +7,7 @@ namespace App\Services\Activity\Services;
 use Illuminate\Contracts\Cache\Manager as CacheManager;
 
 /**
- * Service for checking activity thresholds
+ * Service for checking activity thresholds.
  */
 class ActivityThresholdService
 {
@@ -19,14 +19,14 @@ class ActivityThresholdService
     }
 
     /**
-     * Check if threshold is exceeded
+     * Check if threshold is exceeded.
      */
     public function checkThreshold(string $key, int $timeWindow, int $threshold): ?int
     {
         $cacheStore = $this->cache->store();
         $count = $cacheStore->increment($key);
 
-        if ($count === 1) {
+        if (1 === $count) {
             $cacheStore->put($key, 1, $timeWindow * 60);
         }
 
@@ -38,9 +38,9 @@ class ActivityThresholdService
     }
 
     /**
-     * Check multiple failed logins
+     * Check multiple failed logins.
      *
-     * @param  array{enabled: bool, time_window: int, threshold: int}  $rule
+     * @param array{enabled: bool, time_window: int, threshold: int} $rule
      */
     public function checkFailedLogins(int $userId, string $ipAddress, array $rule): ?int
     {
@@ -54,9 +54,9 @@ class ActivityThresholdService
     }
 
     /**
-     * Check rapid API requests
+     * Check rapid API requests.
      *
-     * @param  array{enabled: bool, time_window: int, threshold: int}  $rule
+     * @param array{enabled: bool, time_window: int, threshold: int} $rule
      */
     public function checkRapidApiRequests(int $userId, string $ipAddress, array $rule): ?int
     {
@@ -70,9 +70,9 @@ class ActivityThresholdService
     }
 
     /**
-     * Check unusual data access
+     * Check unusual data access.
      *
-     * @param  array{enabled: bool, time_window: int, threshold: int}  $rule
+     * @param array{enabled: bool, time_window: int, threshold: int} $rule
      */
     public function checkUnusualDataAccess(int $userId, array $rule): ?int
     {
@@ -86,7 +86,7 @@ class ActivityThresholdService
     }
 
     /**
-     * Clear threshold counter
+     * Clear threshold counter.
      */
     public function clearThreshold(string $key): void
     {
@@ -94,7 +94,7 @@ class ActivityThresholdService
     }
 
     /**
-     * Get current count for key
+     * Get current count for key.
      */
     public function getCurrentCount(string $key): int
     {

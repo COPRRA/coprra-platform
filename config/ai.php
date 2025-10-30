@@ -20,7 +20,7 @@ return [
     'temperature' => env('AI_TEMPERATURE', 0.5),
 
     // Disable external AI calls in testing to avoid real network requests
-    'disable_external_calls' => env('AI_DISABLE_EXTERNAL_CALLS', env('APP_ENV') === 'testing'),
+    'disable_external_calls' => true, // Temporarily forced to true for testing
 
     /*
     |--------------------------------------------------------------------------

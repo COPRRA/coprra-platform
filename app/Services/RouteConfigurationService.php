@@ -43,5 +43,10 @@ final readonly class RouteConfigurationService
         $this->router->group(['middleware' => 'web'], static function (): void {
             require base_path('routes/web.php');
         });
+
+        // Test routes for development
+        if (app()->environment('local', 'testing')) {
+            require base_path('routes/test.php');
+        }
     }
 }

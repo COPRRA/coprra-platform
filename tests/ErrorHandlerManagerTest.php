@@ -6,41 +6,46 @@ namespace Tests;
 
 use PHPUnit\Framework\Attributes\Test;
 
-class ErrorHandlerManagerTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class ErrorHandlerManagerTest extends TestCase
 {
     #[Test]
-    public function test_can_initialize(): void
+    public function testCanInitialize(): void
     {
         ErrorHandlerManager::initialize();
-        $this->assertTrue(true, 'ErrorHandlerManager should initialize without errors');
+        self::assertTrue(true, 'ErrorHandlerManager should initialize without errors');
     }
 
     #[Test]
-    public function test_can_restore(): void
+    public function testCanRestore(): void
     {
         ErrorHandlerManager::initialize();
         ErrorHandlerManager::restore();
-        $this->assertTrue(true, 'ErrorHandlerManager should restore without errors');
+        self::assertTrue(true, 'ErrorHandlerManager should restore without errors');
     }
 
     #[Test]
-    public function test_can_set_error_handlers(): void
+    public function testCanSetErrorHandlers(): void
     {
-        ErrorHandlerManager::setErrorHandler(function () {
+        ErrorHandlerManager::setErrorHandler(static function () {
             return true;
         });
-        ErrorHandlerManager::setExceptionHandler(function () {
+        ErrorHandlerManager::setExceptionHandler(static function () {
             return true;
         });
-        $this->assertTrue(true, 'Error handlers should be set without errors');
+        self::assertTrue(true, 'Error handlers should be set without errors');
     }
 
     #[Test]
-    public function test_can_get_original_handlers(): void
+    public function testCanGetOriginalHandlers(): void
     {
         $errorHandler = ErrorHandlerManager::getOriginalErrorHandler();
         $exceptionHandler = ErrorHandlerManager::getOriginalExceptionHandler();
 
-        $this->assertTrue(true, 'Original handlers should be retrievable');
+        self::assertTrue(true, 'Original handlers should be retrievable');
     }
 }

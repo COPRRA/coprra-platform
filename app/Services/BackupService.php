@@ -5,16 +5,15 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Services\Backup\BackupManagerService;
-use App\Services\Backup\Services\BackupValidatorService;
+use App\Services\Backup\Strategies\BackupStrategyInterface;
 use App\Services\Backup\Strategies\ConfigurationBackupStrategy;
 use App\Services\Backup\Strategies\DatabaseBackupStrategy;
 use App\Services\Backup\Strategies\FilesBackupStrategy;
 use Carbon\Carbon;
-use Exception;
 use Illuminate\Support\Facades\Log;
 
 /**
- * Backup Service - Refactored to use service composition
+ * Backup Service - Refactored to use service composition.
  *
  * This service now acts as a facade that delegates to specialized services,
  * reducing cyclomatic complexity from 76 to ~8.
@@ -24,7 +23,7 @@ class BackupService
     private readonly BackupManagerService $backupManager;
 
     /**
-     * @var array<string, \App\Services\Backup\Strategies\BackupStrategyInterface>
+     * @var array<string, BackupStrategyInterface>
      *
      * @psalm-suppress UnusedProperty - Used in constructor to register strategies with manager
      */
@@ -35,7 +34,6 @@ class BackupService
      */
     public function __construct(
         BackupManagerService $backupManager,
-        BackupValidatorService $validator,
         DatabaseBackupStrategy $databaseStrategy,
         FilesBackupStrategy $filesStrategy,
         ConfigurationBackupStrategy $configStrategy
@@ -56,11 +54,11 @@ class BackupService
     /**
      * Create full backup.
      *
-     * @return array<array<array<int|string|array<string>>|string>|Carbon|int|string>
+     * @return array<array<array<array<string>|int|string>|string>|Carbon|int|string>
      *
      * @psalm-return array{backup_name: string, started_at: Carbon, components: array<string, array<string, int|list<string>|string>|string>, completed_at: Carbon, status: string, size: int}
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function createFullBackup(): array
     {
@@ -85,7 +83,7 @@ class BackupService
             ]);
 
             return $results;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Full backup failed', [
                 'backup_name' => $backupName,
                 'error' => $e->getMessage(),
@@ -103,7 +101,7 @@ class BackupService
      *
      * @psalm-return array{filename: string, size: int, backup_name: string, completed_at: Carbon, status: 'completed'}
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function createDatabaseBackup(): array
     {
@@ -133,7 +131,7 @@ class BackupService
                 'completed_at' => $results['completed_at'],
                 'status' => 'completed',
             ];
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Database backup failed', [
                 'backup_name' => $backupName,
                 'error' => $e->getMessage(),
@@ -150,7 +148,7 @@ class BackupService
      *
      * @psalm-return array{filename: string, size: int, files_count: int<0, max>, backup_name: string, completed_at: Carbon, status: 'completed'}
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function createFilesBackup(): array
     {
@@ -176,12 +174,12 @@ class BackupService
             return [
                 'filename' => $result['path'],
                 'size' => $results['size'],
-                'files_count' => count($results['components']['files']['directories'] ?? []),
+                'files_count' => \count($results['components']['files']['directories'] ?? []),
                 'backup_name' => $backupName,
                 'completed_at' => $results['completed_at'],
                 'status' => 'completed',
             ];
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Files backup failed', [
                 'backup_name' => $backupName,
                 'error' => $e->getMessage(),
@@ -195,13 +193,13 @@ class BackupService
     /**
      * Restore from backup.
      *
-     * @return array<array<array<array<int|string|array<string>>|int|string>|string>|Carbon|string>
+     * @return array<array<array<array<array<string>|int|string>|int|string>|string>|Carbon|string>
      *
      * @psalm-return array{backup_name: string, started_at: Carbon, manifest: array{type?: string, created_at?: string, version?: string, components?: array<string, array<string, int|list<string>|string>|string>}, components: array<string, array<string, int|list<string>|string>|string>, completed_at: Carbon, status?: string}
      *
      * @psalm-suppress PossiblyUnusedMethod - Called by BackupController
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function restoreFromBackup(string $backupName): array
     {
@@ -223,7 +221,7 @@ class BackupService
             ]);
 
             return $results;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Restore failed', [
                 'backup_name' => $backupName,
                 'error' => $e->getMessage(),
@@ -256,7 +254,7 @@ class BackupService
         $directories = scandir($backupPath);
 
         foreach ($directories as $directory) {
-            if ($directory === '.' || $directory === '..') {
+            if ('.' === $directory || '..' === $directory) {
                 continue;
             }
 
@@ -270,12 +268,12 @@ class BackupService
 
                 $manifest = $this->readBackupManifest($backupDir);
                 $components = $manifest['components'] ?? [];
-                $componentsArray = is_array($components) ? $components : [];
+                $componentsArray = \is_array($components) ? $components : [];
 
                 $backups[] = [
                     'name' => $directory,
                     'type' => $manifest['type'] ?? 'unknown',
-                    'created_at' => isset($manifest['created_at']) && is_string($manifest['created_at'])
+                    'created_at' => isset($manifest['created_at']) && \is_string($manifest['created_at'])
                         ? $manifest['created_at']
                         : null,
                     'size' => $this->getBackupSize($backupDir),
@@ -334,7 +332,7 @@ class BackupService
             foreach ($backups as $backup) {
                 $createdAt = $backup['created_at'] ?? null;
 
-                if (! is_string($createdAt) || $createdAt === '') {
+                if (! \is_string($createdAt) || '' === $createdAt) {
                     continue;
                 }
 
@@ -351,16 +349,16 @@ class BackupService
                 }
 
                 if ($created->lessThan($cutoffDate)) {
-                    $name = is_string($backup['name'] ?? null) ? $backup['name'] : '';
+                    $name = \is_string($backup['name'] ?? null) ? $backup['name'] : '';
 
-                    if ($name === '') {
+                    if ('' === $name) {
                         continue;
                     }
 
                     $deleted = $this->deleteBackup($name);
 
                     if ($deleted) {
-                        $deletedCount++;
+                        ++$deletedCount;
                     } else {
                         Log::error('Failed to delete old backup', ['backup_name' => $name]);
                     }
@@ -370,11 +368,11 @@ class BackupService
             Log::info('Old backups cleaned', [
                 'days_old' => $daysOld,
                 'deleted' => $deletedCount,
-                'total' => count($backups),
+                'total' => \count($backups),
             ]);
 
             return $deletedCount;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Error cleaning old backups', ['error' => $e->getMessage()]);
 
             return 0;
@@ -384,12 +382,13 @@ class BackupService
     /**
      * Format backup result.
      *
-     * @param  array{path: string, size: int, manifest: array}  $result
+     * @param array{path: string, size: int, manifest: array} $result
+     *
      * @return array{
      *     backup_name: string,
-     *     started_at: \Carbon\Carbon,
-     *     components: array<string, array<string, int|string|list<string>>|string>,
-     *     completed_at: \Carbon\Carbon,
+     *     started_at: Carbon,
+     *     components: array<string, array<string, int|list<string>|string>|string>,
+     *     completed_at: Carbon,
      *     status: string,
      *     size: int
      * }
@@ -409,18 +408,19 @@ class BackupService
     /**
      * Format restore result.
      *
-     * @param  array{components: array, status: string}  $result
+     * @param array{components: array, status: string} $result
+     *
      * @return array{
      *     backup_name: string,
-     *     started_at: \Carbon\Carbon,
+     *     started_at: Carbon,
      *     manifest: array{
      *         type?: string,
      *         created_at?: string,
      *         version?: string,
-     *         components?: array<string, array<string, int|string|list<string>>|string>
+     *         components?: array<string, array<string, int|list<string>|string>|string>
      *     },
-     *     components: array<string, array<string, int|string|list<string>>|string>,
-     *     completed_at: \Carbon\Carbon,
+     *     components: array<string, array<string, int|list<string>|string>|string>,
+     *     completed_at: Carbon,
      *     status?: string
      * }
      */
@@ -448,12 +448,12 @@ class BackupService
         }
 
         $content = file_get_contents($manifestPath);
-        if ($content === false) {
+        if (false === $content) {
             return [];
         }
 
         $manifest = json_decode($content, true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
+        if (\JSON_ERROR_NONE !== json_last_error()) {
             return [];
         }
 
@@ -504,7 +504,7 @@ class BackupService
         );
 
         foreach ($iterator as $file) {
-            if (! ($file instanceof \SplFileInfo)) {
+            if (! $file instanceof \SplFileInfo) {
                 continue;
             }
 
@@ -517,7 +517,7 @@ class BackupService
                     continue;
                 }
 
-                if (PHP_OS_FAMILY === 'Windows') {
+                if (\PHP_OS_FAMILY === 'Windows') {
                     try {
                         chmod($path, 0o666);
                     } catch (\Throwable $e) {
@@ -527,7 +527,7 @@ class BackupService
 
                 unlink($path);
             } catch (\Throwable $e) {
-                \Illuminate\Support\Facades\Log::error('Failed to delete path', ['path' => $path, 'exception' => $e]);
+                Log::error('Failed to delete path', ['path' => $path, 'exception' => $e]);
             }
         }
 
@@ -535,7 +535,7 @@ class BackupService
             rmdir($dir);
             // removed: Log::info('Directory deleted', ['dir' => $dir]);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('Failed to remove directory', ['dir' => $dir, 'exception' => $e]);
+            Log::error('Failed to remove directory', ['dir' => $dir, 'exception' => $e]);
         }
     }
 }

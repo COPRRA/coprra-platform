@@ -31,7 +31,7 @@ class RateProvider
             return (float) $cachedRate;
         }
 
-        if ($cachedRate !== null) {
+        if (null !== $cachedRate) {
             Cache::forget($cacheKey);
         }
 
@@ -42,7 +42,7 @@ class RateProvider
     {
         $rate = ExchangeRate::getRate($from, $to);
 
-        if ($rate !== null) {
+        if (null !== $rate) {
             Cache::put("exchange_rate_{$from}_{$to}", $rate, self::CACHE_DURATION);
 
             return $rate;

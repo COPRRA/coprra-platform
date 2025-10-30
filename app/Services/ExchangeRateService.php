@@ -22,12 +22,7 @@ final readonly class ExchangeRateService
      */
     private const SUPPORTED_CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'SAR', 'AED', 'EGP'];
 
-    private \App\Services\ExchangeRates\RateProvider $rateProvider;
-
-    public function __construct(RateProvider $rateProvider)
-    {
-        $this->rateProvider = $rateProvider;
-    }
+    private RateProvider $rateProvider;
 
     /**
      * Get exchange rate between two currencies.
@@ -36,7 +31,7 @@ final readonly class ExchangeRateService
     {
         $rate = $this->rateProvider->getRate($fromCurrency, $toCurrency);
 
-        if ($rate !== null) {
+        if (null !== $rate) {
             return $rate;
         }
 
@@ -68,7 +63,7 @@ final readonly class ExchangeRateService
         try {
             $response = $this->fetchRatesFromApi();
 
-            if ($response === null) {
+            if (null === $response) {
                 return 0;
             }
 
@@ -83,18 +78,6 @@ final readonly class ExchangeRateService
     }
 
     /**
-     * Get supported currencies.
-     *
-     * @return array<string>
-     *
-     * @psalm-return list{'USD', 'EUR', 'GBP', 'JPY', 'SAR', 'AED', 'EGP'}
-     */
-    public function getSupportedCurrencies(): array
-    {
-        return self::SUPPORTED_CURRENCIES;
-    }
-
-    /**
      * Seed initial exchange rates from config.
      *
      * @psalm-return int<0, max>
@@ -104,14 +87,14 @@ final readonly class ExchangeRateService
         $count = 0;
         $rates = config('coprra.exchange_rates', []);
 
-        if (! is_array($rates)) {
+        if (! \is_array($rates)) {
             Log::warning('Invalid exchange rates configuration');
 
             return 0;
         }
 
         foreach ($rates as $currency => $rate) {
-            if ($currency === self::BASE_CURRENCY) {
+            if (self::BASE_CURRENCY === $currency) {
                 continue;
             }
 
@@ -166,7 +149,7 @@ final readonly class ExchangeRateService
     {
         $rates = config('coprra.exchange_rates', []);
 
-        if (! is_array($rates)) {
+        if (! \is_array($rates)) {
             return 1.0;
         }
 
@@ -188,12 +171,12 @@ final readonly class ExchangeRateService
     private function fetchRatesFromApi(): ?array
     {
         $apiUrl = config('coprra.exchange_rate_api_url', 'https://api.exchangerate-api.com/v4/latest/USD');
-        if (! is_string($apiUrl)) {
+        if (! \is_string($apiUrl)) {
             return null;
         }
 
         $apiKey = config('coprra.exchange_rate_api_key');
-        if ($apiKey !== null && is_string($apiKey)) {
+        if (null !== $apiKey && \is_string($apiKey)) {
             $apiUrl .= "?apikey={$apiKey}";
         }
 
@@ -212,20 +195,20 @@ final readonly class ExchangeRateService
     }
 
     /**
-     * @param  array<string, array<string, float>|string>  $data
+     * @param array<string, array<string, float>|string> $data
      *
      * @psalm-return int<0, max>
      */
     private function handleApiResponse(array $data): int
     {
-        if (! isset($data['rates']) || ! is_array($data['rates'])) {
+        if (! isset($data['rates']) || ! \is_array($data['rates'])) {
             Log::warning('Invalid exchange rate API response format');
 
             return 0;
         }
 
         $baseCurrency = $data['base'] ?? self::BASE_CURRENCY;
-        if (! is_string($baseCurrency)) {
+        if (! \is_string($baseCurrency)) {
             $baseCurrency = self::BASE_CURRENCY;
         }
 

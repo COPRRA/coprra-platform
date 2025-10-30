@@ -7,14 +7,20 @@ namespace Tests\Feature\Models;
 use App\Models\Reward;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class RewardTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class RewardTest extends TestCase
 {
     use RefreshDatabase;
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_can_create_a_reward(): void
+    #[Test]
+    public function itCanCreateAReward(): void
     {
         $reward = Reward::factory()->create([
             'name' => 'Discount Coupon',
@@ -28,16 +34,16 @@ class RewardTest extends TestCase
             'valid_until' => Carbon::now()->addDay(),
         ]);
 
-        $this->assertInstanceOf(Reward::class, $reward);
-        $this->assertEquals('Discount Coupon', $reward->name);
-        $this->assertEquals('10% off', $reward->description);
-        $this->assertEquals(100, $reward->points_required);
-        $this->assertEquals('discount', $reward->type);
-        $this->assertIsArray($reward->value);
-        $this->assertTrue($reward->is_active);
-        $this->assertEquals(100, $reward->usage_limit);
-        $this->assertInstanceOf(Carbon::class, $reward->valid_from);
-        $this->assertInstanceOf(Carbon::class, $reward->valid_until);
+        self::assertInstanceOf(Reward::class, $reward);
+        self::assertSame('Discount Coupon', $reward->name);
+        self::assertSame('10% off', $reward->description);
+        self::assertSame(100, $reward->points_required);
+        self::assertSame('discount', $reward->type);
+        self::assertIsArray($reward->value);
+        self::assertTrue($reward->is_active);
+        self::assertSame(100, $reward->usage_limit);
+        self::assertInstanceOf(Carbon::class, $reward->valid_from);
+        self::assertInstanceOf(Carbon::class, $reward->valid_until);
 
         $this->assertDatabaseHas('rewards', [
             'name' => 'Discount Coupon',
@@ -47,8 +53,8 @@ class RewardTest extends TestCase
         ]);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_casts_attributes_correctly(): void
+    #[Test]
+    public function itCastsAttributesCorrectly(): void
     {
         $reward = Reward::factory()->create([
             'value' => ['amount' => 50],
@@ -57,16 +63,16 @@ class RewardTest extends TestCase
             'valid_until' => '2023-12-31 23:59:59',
         ]);
 
-        $this->assertIsArray($reward->value);
-        $this->assertEquals(['amount' => 50], $reward->value);
-        $this->assertIsBool($reward->is_active);
-        $this->assertTrue($reward->is_active);
-        $this->assertInstanceOf(Carbon::class, $reward->valid_from);
-        $this->assertInstanceOf(Carbon::class, $reward->valid_until);
+        self::assertIsArray($reward->value);
+        self::assertSame(['amount' => 50], $reward->value);
+        self::assertIsBool($reward->is_active);
+        self::assertTrue($reward->is_active);
+        self::assertInstanceOf(Carbon::class, $reward->valid_from);
+        self::assertInstanceOf(Carbon::class, $reward->valid_until);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_has_active_scope(): void
+    #[Test]
+    public function itHasActiveScope(): void
     {
         // Active reward
         Reward::factory()->create([
@@ -92,12 +98,12 @@ class RewardTest extends TestCase
 
         $activeRewards = Reward::active()->get();
 
-        $this->assertCount(1, $activeRewards);
-        $this->assertTrue($activeRewards->first()->is_active);
+        self::assertCount(1, $activeRewards);
+        self::assertTrue($activeRewards->first()->is_active);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_has_available_for_points_scope(): void
+    #[Test]
+    public function itHasAvailableForPointsScope(): void
     {
         Reward::factory()->create([
             'points_required' => 50,
@@ -115,12 +121,12 @@ class RewardTest extends TestCase
 
         $availableRewards = Reward::availableForPoints(100)->get();
 
-        $this->assertCount(1, $availableRewards);
-        $this->assertEquals(50, $availableRewards->first()->points_required);
+        self::assertCount(1, $availableRewards);
+        self::assertSame(50, $availableRewards->first()->points_required);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_has_fillable_attributes(): void
+    #[Test]
+    public function itHasFillableAttributes(): void
     {
         $fillable = [
             'name',
@@ -134,6 +140,6 @@ class RewardTest extends TestCase
             'valid_until',
         ];
 
-        $this->assertEquals($fillable, (new Reward)->getFillable());
+        self::assertSame($fillable, (new Reward())->getFillable());
     }
 }

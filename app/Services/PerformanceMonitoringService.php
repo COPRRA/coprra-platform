@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 final class PerformanceMonitoringService
 {
     /**
-     * @var array<string, array<string, float|int|array>>
+     * @var array<string, array<string, array|float|int>>
      */
     private array $metrics = [];
 
@@ -40,7 +40,7 @@ final class PerformanceMonitoringService
     /**
      * End monitoring a specific operation.
      *
-     * @return array<string, float|int|string|array>
+     * @return array<string, array|float|int|string>
      */
     public function endOperation(string $operationName): array
     {
@@ -49,8 +49,8 @@ final class PerformanceMonitoringService
         }
         $operationData = $this->metrics[$operationName];
         if (
-            ! is_array($operationData) ||
-            ! isset($operationData['start_time'], $operationData['start_memory'], $operationData['queries'])
+            ! \is_array($operationData)
+            || ! isset($operationData['start_time'], $operationData['start_memory'], $operationData['queries'])
         ) {
             return [];
         }
@@ -60,21 +60,21 @@ final class PerformanceMonitoringService
         $operationData = $this->metrics[$operationName];
 
         // Ensure operationData has the expected structure
-        if (! is_array($operationData) || ! isset($operationData['start_time'], $operationData['start_memory'], $operationData['queries'])) {
+        if (! \is_array($operationData) || ! isset($operationData['start_time'], $operationData['start_memory'], $operationData['queries'])) {
             return [];
         }
 
         $startTime = is_numeric($operationData['start_time']) ? (float) $operationData['start_time'] : 0.0;
         $startMemory = is_numeric($operationData['start_memory']) ? (int) $operationData['start_memory'] : 0;
-        $queries = is_array($operationData['queries']) ? $operationData['queries'] : [];
+        $queries = \is_array($operationData['queries']) ? $operationData['queries'] : [];
 
         $result = [
             'operation' => $operationName,
             'execution_time' => $endTime - $startTime,
             'memory_usage' => $endMemory - $startMemory,
             'peak_memory' => memory_get_peak_usage(),
-            'queries_count' => count(DB::getQueryLog()) - count($queries),
-            'queries' => array_slice(DB::getQueryLog(), count($queries)),
+            'queries_count' => \count(DB::getQueryLog()) - \count($queries),
+            'queries' => \array_slice(DB::getQueryLog(), \count($queries)),
         ];
 
         // Check thresholds
@@ -101,7 +101,7 @@ final class PerformanceMonitoringService
             'total_execution_time' => $currentTime - $this->startTime,
             'total_memory_usage' => $currentMemory - $this->startMemory,
             'peak_memory' => memory_get_peak_usage(),
-            'total_queries' => count(DB::getQueryLog()),
+            'total_queries' => \count(DB::getQueryLog()),
             'queries' => DB::getQueryLog(),
             'cache_hits' => $this->getCacheHits(),
             'cache_misses' => $this->getCacheMisses(),
@@ -111,7 +111,7 @@ final class PerformanceMonitoringService
     /**
      * Monitor database performance.
      *
-     * @return array<string, int|float|list<array<string, string|int|list<string>>>>
+     * @return array<string, float|int|list<array<string, int|list<string>|string>>>
      */
     public function monitorDatabase(): array
     {
@@ -133,11 +133,11 @@ final class PerformanceMonitoringService
         }
 
         return [
-            'total_queries' => count($queries),
+            'total_queries' => \count($queries),
             'total_time' => $totalTime,
-            'average_time' => count($queries) > 0 ? $totalTime / count($queries) : 0,
+            'average_time' => \count($queries) > 0 ? $totalTime / \count($queries) : 0,
             'slow_queries' => $slowQueries,
-            'slow_queries_count' => count($slowQueries),
+            'slow_queries_count' => \count($slowQueries),
         ];
     }
 
@@ -173,7 +173,7 @@ final class PerformanceMonitoringService
     {
         $currentMemory = memory_get_usage();
         $peakMemory = memory_get_peak_usage();
-        $limit = ini_get('memory_limit');
+        $limit = \ini_get('memory_limit');
 
         return [
             'current_usage' => $currentMemory,
@@ -227,7 +227,7 @@ final class PerformanceMonitoringService
     /**
      * Check performance thresholds.
      *
-     * @param  array<string, float|int|string|array>  $metrics
+     * @param array<string, array|float|int|string> $metrics
      */
     private function checkThresholds(array $metrics): void
     {
@@ -287,16 +287,18 @@ final class PerformanceMonitoringService
     private function parseMemoryLimit(string $limit): int
     {
         $limit = trim($limit);
-        $last = strtolower($limit[strlen($limit) - 1]);
+        $last = strtolower($limit[\strlen($limit) - 1]);
         $limit = (int) $limit;
 
         switch ($last) {
             case 'g':
                 $limit *= 1024;
+
                 // fall through
                 // no break
             case 'm':
                 $limit *= 1024;
+
                 // fall through
                 // no break
             case 'k':
@@ -307,41 +309,41 @@ final class PerformanceMonitoringService
     }
 
     /**
-     * @param  array<string, float|int|string|array>  $metrics
-     * @param  array<string, scalar|array|null>  $config
+     * @param array<string, array|float|int|string> $metrics
+     * @param  array<string, scalar|array|* @method static \App\Models\Brand create(array<string, string|bool|null>  $config
      */
     private function isExecutionTimeExceeded(array $metrics, array $config): bool
     {
-        return is_array($config) &&
-            isset($config['execution_time_threshold']) &&
-            is_numeric($config['execution_time_threshold']) &&
-            is_numeric($metrics['execution_time']) &&
-            $metrics['execution_time'] > (float) $config['execution_time_threshold'];
+        return \is_array($config)
+            && isset($config['execution_time_threshold'])
+            && is_numeric($config['execution_time_threshold'])
+            && is_numeric($metrics['execution_time'])
+            && $metrics['execution_time'] > (float) $config['execution_time_threshold'];
     }
 
     /**
-     * @param  array<string, float|int|string|array>  $metrics
-     * @param  array<string, scalar|array|null>  $config
+     * @param array<string, array|float|int|string> $metrics
+     * @param  array<string, scalar|array|* @method static \App\Models\Brand create(array<string, string|bool|null>  $config
      */
     private function isMemoryUsageExceeded(array $metrics, array $config): bool
     {
-        return is_array($config) &&
-            isset($config['memory_threshold']) &&
-            is_numeric($config['memory_threshold']) &&
-            is_numeric($metrics['memory_usage']) &&
-            $metrics['memory_usage'] > ((float) $config['memory_threshold'] * 1024 * 1024);
+        return \is_array($config)
+            && isset($config['memory_threshold'])
+            && is_numeric($config['memory_threshold'])
+            && is_numeric($metrics['memory_usage'])
+            && $metrics['memory_usage'] > ((float) $config['memory_threshold'] * 1024 * 1024);
     }
 
     /**
-     * @param  array<string, float|int|string|array>  $metrics
-     * @param  array<string, scalar|array|null>  $config
+     * @param array<string, array|float|int|string> $metrics
+     * @param  array<string, scalar|array|* @method static \App\Models\Brand create(array<string, string|bool|null>  $config
      */
     private function isQueryCountExceeded(array $metrics, array $config): bool
     {
-        return is_array($config) &&
-            isset($config['query_count_threshold']) &&
-            is_numeric($config['query_count_threshold']) &&
-            is_numeric($metrics['queries_count']) &&
-            $metrics['queries_count'] > (int) $config['query_count_threshold'];
+        return \is_array($config)
+            && isset($config['query_count_threshold'])
+            && is_numeric($config['query_count_threshold'])
+            && is_numeric($metrics['queries_count'])
+            && $metrics['queries_count'] > (int) $config['query_count_threshold'];
     }
 }

@@ -18,7 +18,7 @@ final readonly class StyleFixer implements AgentFixerInterface
     public function fix(): bool
     {
         $this->output->info('🎨 Running Laravel Pint code style fixer...');
-        $pintPath = implode(DIRECTORY_SEPARATOR, ['.', 'vendor', 'bin', 'pint']);
+        $pintPath = implode(\DIRECTORY_SEPARATOR, ['.', 'vendor', 'bin', 'pint']);
         $pintResult = $this->processService->run($pintPath);
 
         if ($pintResult->failed()) {

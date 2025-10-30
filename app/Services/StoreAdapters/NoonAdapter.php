@@ -21,16 +21,15 @@ final class NoonAdapter extends StoreAdapter
     {
         parent::__construct($http, $cache, $logger);
         $apiKey = config()->get('services.noon.api_key');
-        $this->apiKey = is_string($apiKey) ? $apiKey : '';
+        $this->apiKey = \is_string($apiKey) ? $apiKey : '';
 
         $country = config()->get('services.noon.country');
-        $this->country = is_string($country) ? $country : 'ae'; // ae, sa, eg
+        $this->country = \is_string($country) ? $country : 'ae'; // ae, sa, eg
     }
 
     /**
      * @psalm-return 'Noon'
      */
-    #[\Override]
     public function getStoreName(): string
     {
         return 'Noon';
@@ -48,12 +47,9 @@ final class NoonAdapter extends StoreAdapter
     #[\Override]
     public function isAvailable(): bool
     {
-        return $this->apiKey !== null && $this->apiKey !== '';
+        return null !== $this->apiKey && '' !== $this->apiKey;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     #[\Override]
     public function fetchProduct(string $productIdentifier): ?array
     {
@@ -66,11 +62,12 @@ final class NoonAdapter extends StoreAdapter
         // Check cache first
         /** @var array{name: array|scalar, price: float, currency: array|scalar, url: array|scalar, image_url: array|scalar|null, availability: array|scalar, rating: float|null, reviews_count: int|null, description: array|scalar|null, brand: array|scalar|null, category: array|scalar|null, metadata: array|scalar}|null $cached */
         $cached = $this->getCachedProduct($productIdentifier);
-        if (is_array($cached)) {
+        if (\is_array($cached)) {
             return $cached;
         }
 
         $url = $this->buildApiUrl($productIdentifier);
+
         /** @var array<string, array>|null $response */
         $response = $this->makeRequest($url, [
             'api_key' => $this->apiKey,
@@ -89,13 +86,10 @@ final class NoonAdapter extends StoreAdapter
     }
 
     /**
-     * {@inheritdoc}
+     * @return array<int, array<string, scalar|array|* @method static \App\Models\Brand create(array<string, string|bool|null>>
      *
-     * @return array<int, array<string, scalar|array|null>>
-     *
-     * @psalm-return list<non-empty-array<string, scalar|array|null>>
+     * @psalm-return list<non-empty-array<string, scalar|array|* @method static \App\Models\Brand create(array<string, string|bool|null>>
      */
-    #[\Override]
     public function searchProducts(string $query, array $options = []): array
     {
         if (! $this->isAvailable()) {
@@ -127,11 +121,10 @@ final class NoonAdapter extends StoreAdapter
         return [];
     }
 
-    #[\Override]
     public function validateIdentifier(string $identifier): bool
     {
         // Noon SKU format: N followed by numbers
-        return preg_match('/^N\d+$/', $identifier) === 1;
+        return 1 === preg_match('/^N\d+$/', $identifier);
     }
 
     #[\Override]
@@ -142,10 +135,6 @@ final class NoonAdapter extends StoreAdapter
         return "https://www.{$domain}/product/{$identifier}";
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    #[\Override]
     public function getRateLimits(): array
     {
         return [
@@ -168,8 +157,9 @@ final class NoonAdapter extends StoreAdapter
     /**
      * Normalize Noon product data.
      *
-     * @param  array<string, array<string, string|int|float|bool|array|null>|string|int|float|bool|null>  $noonData
-     * @return array<array|scalar|null>
+     * @param  array<string, array<string, string|int|float|bool|array|* @method static \App\Models\Brand create(array<string, string|bool|null>|string|int|float|bool|* @method static \App\Models\Brand create(array<string, string|bool|null>  $noonData
+     *
+     * @return array<array|scalar|* @method static \App\Models\Brand create(array<string, string|bool|null>
      *
      * @phpstan-ignore-next-line
      *
@@ -178,7 +168,7 @@ final class NoonAdapter extends StoreAdapter
     private function normalizeNoonData(array $noonData): array
     {
         $price = $noonData['sale_price'] ?? $noonData['price'] ?? 0;
-        $sku = is_string($noonData['sku'] ?? null) ? $noonData['sku'] : '';
+        $sku = \is_string($noonData['sku'] ?? null) ? $noonData['sku'] : '';
 
         return $this->normalizeProductData([
             'name' => $noonData['name'] ?? '',

@@ -6,8 +6,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -17,7 +16,7 @@ return new class extends Migration
         Schema::dropIfExists('price_offers');
 
         // Create the table with the correct structure
-        Schema::create('price_offers', function (Blueprint $table): void {
+        Schema::create('price_offers', static function (Blueprint $table): void {
             $table->id();
             $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
             $table->string('product_sku')->nullable();

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use Closure;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -13,14 +13,14 @@ class InputSanitizationMiddleware
     /**
      * Handle an incoming request.
      */
-    public function handle(Request $request, Closure $next): \Symfony\Component\HttpFoundation\Response
+    public function handle(Request $request, \Closure $next): Response
     {
         // Sanitize input data
         $this->sanitizeInput($request);
 
         $response = $next($request);
 
-        if (! ($response instanceof \Symfony\Component\HttpFoundation\Response)) {
+        if (! $response instanceof Response) {
             throw new \RuntimeException('Middleware must return Response instance');
         }
 
@@ -45,9 +45,9 @@ class InputSanitizationMiddleware
      */
     private function sanitizeOutput(Response $response): void
     {
-        if ($response instanceof \Illuminate\Http\JsonResponse) {
+        if ($response instanceof JsonResponse) {
             $data = $response->getData(true);
-            if (is_array($data)) {
+            if (\is_array($data)) {
                 $sanitized = $this->sanitizeArray($data);
                 $response->setData($sanitized);
             }
@@ -57,15 +57,16 @@ class InputSanitizationMiddleware
     /**
      * Sanitize array recursively.
      *
-     * @param  array<array-key, array|bool|float|int|string|null>  $data
-     * @return array<array-key, array|bool|float|int|string|null>
+     * @param  array<array-key, array|bool|float|int|string|* @method static \App\Models\Brand create(array<string, string|bool|null>  $data
+     *
+     * @return array<array-key, array|bool|float|int|string|* @method static \App\Models\Brand create(array<string, string|bool|null>
      */
     private function sanitizeArray(array $data): array
     {
         foreach ($data as $key => $value) {
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 $data[$key] = $this->sanitizeArray($value);
-            } elseif (is_string($value)) {
+            } elseif (\is_string($value)) {
                 $data[$key] = $this->sanitizeString($value);
             }
         }

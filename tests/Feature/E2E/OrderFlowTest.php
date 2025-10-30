@@ -11,7 +11,12 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class OrderFlowTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class OrderFlowTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -30,7 +35,7 @@ class OrderFlowTest extends TestCase
         ]);
     }
 
-    public function test_complete_order_creation_flow(): void
+    public function testCompleteOrderCreationFlow(): void
     {
         $this->actingAs($this->user);
 
@@ -81,7 +86,7 @@ class OrderFlowTest extends TestCase
         ]);
     }
 
-    public function test_complete_order_status_update_flow(): void
+    public function testCompleteOrderStatusUpdateFlow(): void
     {
         $this->actingAs($this->user);
 
@@ -117,7 +122,7 @@ class OrderFlowTest extends TestCase
         ]);
     }
 
-    public function test_order_cancellation_flow(): void
+    public function testOrderCancellationFlow(): void
     {
         $this->actingAs($this->user);
 
@@ -141,7 +146,7 @@ class OrderFlowTest extends TestCase
         ]);
     }
 
-    public function test_cannot_cancel_shipped_order(): void
+    public function testCannotCancelShippedOrder(): void
     {
         $this->actingAs($this->user);
 
@@ -161,7 +166,7 @@ class OrderFlowTest extends TestCase
         ]);
     }
 
-    public function test_user_can_view_order_history(): void
+    public function testUserCanViewOrderHistory(): void
     {
         $this->actingAs($this->user);
 
@@ -176,7 +181,7 @@ class OrderFlowTest extends TestCase
         $response->assertSee($this->user->name);
     }
 
-    public function test_user_cannot_view_other_users_orders(): void
+    public function testUserCannotViewOtherUsersOrders(): void
     {
         $this->actingAs($this->user);
 

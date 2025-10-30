@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * Quick test summary - Get results faster by running tests in parallel batches
+ * Quick test summary - Get results faster by running tests in parallel batches.
  */
 echo "Running quick test summary...\n\n";
 
@@ -14,7 +16,7 @@ $passed = 0;
 $failed = 0;
 $errors = 0;
 
-echo "Found $totalTests test files\n";
+echo "Found {$totalTests} test files\n";
 echo "Running sample validation...\n\n";
 
 // Test a representative sample
@@ -29,15 +31,15 @@ foreach ($sample as $index => $file) {
 
     $output = implode("\n", $output);
 
-    if ($returnCode === 0) {
+    if (0 === $returnCode) {
         echo '✓ ';
-        $passed++;
-    } elseif (strpos($output, 'Error') !== false || strpos($output, 'Exception') !== false) {
+        ++$passed;
+    } elseif (false !== strpos($output, 'Error') || false !== strpos($output, 'Exception')) {
         echo 'E ';
-        $errors++;
+        ++$errors;
     } else {
         echo 'F ';
-        $failed++;
+        ++$failed;
     }
 
     if (($index + 1) % 10 === 0) {
@@ -50,11 +52,11 @@ foreach ($sample as $index => $file) {
 
 echo "\n\n";
 echo "╔══════════════════════════════════════════════════════════════╗\n";
-echo "║              SAMPLE TEST RESULTS (1/$sampleSize)              ║\n";
+echo "║              SAMPLE TEST RESULTS (1/{$sampleSize})              ║\n";
 echo "╚══════════════════════════════════════════════════════════════╝\n";
-echo "Passed:  $passed\n";
-echo "Failed:  $failed\n";
-echo "Errors:  $errors\n";
+echo "Passed:  {$passed}\n";
+echo "Failed:  {$failed}\n";
+echo "Errors:  {$errors}\n";
 
 $successRate = ($passed / $sampleSize) * 100;
 echo "\nEstimated Success Rate: ".number_format($successRate, 1)."%\n";

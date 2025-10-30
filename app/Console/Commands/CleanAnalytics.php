@@ -40,7 +40,7 @@ final class CleanAnalytics extends Command
         $forceRaw = $this->option('force');
         $force = (bool) $forceRaw;
 
-        if ($force === false && ! $this->confirm("This will delete analytics data older than {$days} days. Continue?")) {
+        if (false === $force && ! $this->confirm("This will delete analytics data older than {$days} days. Continue?")) {
             $this->info('Operation cancelled.');
 
             return self::SUCCESS;

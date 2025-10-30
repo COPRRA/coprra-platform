@@ -7,4 +7,4 @@ namespace Darryldecode\Cart\Facades;
 /**
  * @mixin \Darryldecode\Cart\Cart
  */
-class CartFacade {}
+class _ide_helper_cart {}

@@ -5,25 +5,30 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Database\Factories\BrandFactory;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\MessageBag;
 
 /**
- * @property int $id
- * @property string $name
- * @property string $slug
+ * @property int         $id
+ * @property string      $name
+ * @property string      $slug
  * @property string|null $description
  * @property string|null $logo_url
  * @property string|null $website_url
- * @property bool $is_active
- * @property \Carbon\Carbon|null $created_at
- * @property \Carbon\Carbon|null $updated_at
- * @property \Carbon\Carbon|null $deleted_at
- * @property int $products_count
- * @property \Illuminate\Database\Eloquent\Collection<int, Product> $products
+ * @property bool        $is_active
+ ** @property Carbon|nullCarbon|null $created_at
+ ** @property Carbon|nullCarbon|null $updated_at
+ ** @property Carbon|nullCarbon|null $deleted_at
+ * @property int                      $products_count
+ * @property Collection<int, Product> $products
  *
- * @method static \App\Models\Brand create(array<string, string|bool|null> $attributes = [])
- * @method static BrandFactory factory(...$parameters)
+ * @method static \App\Models\Brand create(array<string, string|bool* |* @method static \App\Models\Brand create(array<string, string|bool|null> $attributes = [])
+ * @method static BrandFactory      factory(...$parameters)
  *
  * @phpstan-type TFactory \Database\Factories\BrandFactory
  *
@@ -37,14 +42,14 @@ class Brand extends ValidatableModel
     use SoftDeletes;
 
     /**
-     * @var class-string<\Illuminate\Database\Eloquent\Factories\Factory<Brand>>
+     * @var class-string<Factory<Brand>>
      */
-    protected static $factory = \Database\Factories\BrandFactory::class;
+    protected static $factory = BrandFactory::class;
 
     /**
      * Validation errors.
      */
-    protected ?\Illuminate\Support\MessageBag $errors = null;
+    protected ?MessageBag $errors = null;
 
     /**
      * @var array<int, string>
@@ -79,12 +84,12 @@ class Brand extends ValidatableModel
         'is_active' => 'boolean',
     ];
 
+    // --- Relationships ---
+
     /**
-     * Products relationship.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<Product, Brand>
+     * Get the products for this brand.
      */
-    public function products(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function products(): HasMany
     {
         return $this->hasMany(Product::class);
     }
@@ -92,21 +97,29 @@ class Brand extends ValidatableModel
     // --- Scopes ---
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Builder<Brand>  $query
-     * @return \Illuminate\Database\Eloquent\Builder<Brand>
+     * Scope a query to only include active brands.
      */
-    public function scopeActive(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    public function scopeActive(Builder $query): Builder
     {
-        return $query->withTrashed()->where('is_active', true);
+        return $query->where('is_active', true);
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Builder<Brand>  $query
-     * @return \Illuminate\Database\Eloquent\Builder<Brand>
+     * Scope a query to search brands by name.
      */
-    public function scopeSearch(\Illuminate\Database\Eloquent\Builder $query, string $searchTerm): \Illuminate\Database\Eloquent\Builder
+    public function scopeSearch(Builder $query, string $search): Builder
     {
-        return $query->withTrashed()->where('name', 'like', "%{$searchTerm}%");
+        return $query->where('name', 'like', "%{$search}%");
+    }
+
+    // --- Methods ---
+
+    /**
+     * Get the validation rules for this model.
+     */
+    public function getRules(): array
+    {
+        return $this->rules;
     }
 
     /**
@@ -133,7 +146,7 @@ class Brand extends ValidatableModel
      */
     private function generateSlug(): void
     {
-        if (($this->slug === null) || ($this->slug === '')) {
+        if ((null === $this->slug) || ('' === $this->slug)) {
             $this->slug = str($this->name)->slug()->toString();
         }
     }

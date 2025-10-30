@@ -11,13 +11,17 @@ use App\Services\AgentFixer\MessageGeneratorService;
 use App\Services\AgentFixer\PullRequestService;
 use App\Services\ProcessService;
 use Illuminate\Console\Command;
+use Illuminate\Console\OutputStyle;
+use Illuminate\Console\View\Components\Factory;
+use Illuminate\Foundation\Application;
+use Symfony\Component\Console\Input\InputInterface;
 
 /**
- * @property \Illuminate\Foundation\Application $laravel
- * @property \Symfony\Component\Console\Input\InputInterface $input
- * @property \Illuminate\Console\OutputStyle $output
- * @property \Illuminate\Console\View\Components\Factory $components
- * @property string|null $name
+ * @property Application    $laravel
+ * @property InputInterface $input
+ * @property OutputStyle    $output
+ * @property Factory        $components
+ * @property string|null    $name
  *
  * @psalm-suppress PropertyNotSetInConstructor
  */
@@ -85,7 +89,7 @@ final class AgentProposeFixCommand extends Command
     {
         $this->gitWorkflowService = new GitWorkflowService($this->processService, $this->output);
         $this->pullRequestService = new PullRequestService($this->processService, $this->output);
-        $this->messageGenerator = new MessageGeneratorService;
+        $this->messageGenerator = new MessageGeneratorService();
         $this->fixExecutionService = new FixExecutionService($this->output);
         $this->agentFixerFactory = new AgentFixerFactory($this->processService, $this->output);
     }

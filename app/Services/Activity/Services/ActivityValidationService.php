@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\Services\Activity\Services;
 
 /**
- * Service for validating activity data
+ * Service for validating activity data.
  */
 class ActivityValidationService
 {
     /**
-     * Validate input data for activity checking
+     * Validate input data for activity checking.
      *
-     * @param  array<string, mixed>  $data
+     * @param array<string, mixed> $data
      */
     public function isValidInput(array $data): bool
     {
@@ -20,23 +20,23 @@ class ActivityValidationService
             return false;
         }
 
-        return isset($data['ip_address']) && is_string($data['ip_address']);
+        return isset($data['ip_address']) && \is_string($data['ip_address']);
     }
 
     /**
-     * Extract user ID from data
+     * Extract user ID from data.
      *
-     * @param  array<string, mixed>|\Traversable<string, mixed>  $data
+     * @param array<string, mixed>|\Traversable<string, mixed> $data
      */
     public function extractUserId(array|\Traversable $data): int
     {
-        if (is_array($data)) {
+        if (\is_array($data)) {
             return (int) ($data['user_id'] ?? 0);
         }
 
         // Handle iterable data
         foreach ($data as $key => $value) {
-            if ($key === 'user_id') {
+            if ('user_id' === $key) {
                 return (int) $value;
             }
         }
@@ -45,19 +45,19 @@ class ActivityValidationService
     }
 
     /**
-     * Extract IP address from data
+     * Extract IP address from data.
      *
-     * @param  array<string, mixed>|\Traversable<string, mixed>  $data
+     * @param array<string, mixed>|\Traversable<string, mixed> $data
      */
     public function extractIpAddress(array|\Traversable $data): string
     {
-        if (is_array($data)) {
+        if (\is_array($data)) {
             return (string) ($data['ip_address'] ?? '');
         }
 
         // Handle iterable data
         foreach ($data as $key => $value) {
-            if ($key === 'ip_address') {
+            if ('ip_address' === $key) {
                 return (string) $value;
             }
         }
@@ -66,14 +66,15 @@ class ActivityValidationService
     }
 
     /**
-     * Extract location from data
+     * Extract location from data.
      *
-     * @param  array<string, mixed>|\Traversable<string, mixed>  $data
+     * @param array<string, mixed>|\Traversable<string, mixed> $data
+     *
      * @return array<string, float>
      */
     public function extractLocation(array|\Traversable $data): array
     {
-        if (is_array($data) && isset($data['location']) && is_array($data['location'])) {
+        if (\is_array($data) && isset($data['location']) && \is_array($data['location'])) {
             return $data['location'];
         }
 
@@ -81,9 +82,9 @@ class ActivityValidationService
     }
 
     /**
-     * Validate monitoring rule
+     * Validate monitoring rule.
      *
-     * @param  array<string, mixed>  $rule
+     * @param array<string, mixed> $rule
      */
     public function isRuleEnabled(array $rule): bool
     {
@@ -91,9 +92,10 @@ class ActivityValidationService
     }
 
     /**
-     * Get rule configuration with defaults
+     * Get rule configuration with defaults.
      *
-     * @param  array<string, mixed>  $rule
+     * @param array<string, mixed> $rule
+     *
      * @return array{enabled: bool, time_window: int, threshold: int}
      */
     public function getRuleConfig(array $rule): array

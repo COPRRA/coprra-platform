@@ -11,7 +11,7 @@ final readonly class CacheStatisticsDisplayer
     public function __construct(private OutputStyle $output) {}
 
     /**
-     * @param  array<string, string|int|float|array|null>  $stats
+     * @param  array<string, string|int|float|array|* @method static \App\Models\Brand create(array<string, string|bool|null>  $stats
      */
     public function display(array $stats): void
     {
@@ -25,7 +25,7 @@ final readonly class CacheStatisticsDisplayer
     }
 
     /**
-     * @param  array<string, string|int|float|array|null>  $stats
+     * @param  array<string, string|int|float|array|* @method static \App\Models\Brand create(array<string, string|bool|null>  $stats
      */
     private function displayCacheTable(array $stats): void
     {
@@ -38,13 +38,13 @@ final readonly class CacheStatisticsDisplayer
     }
 
     /**
-     * @param  array<string, string|int|float|array|null>  $stats
+     * @param  array<string, string|int|float|array|* @method static \App\Models\Brand create(array<string, string|bool|null>  $stats
      */
     private function displayCachePrefixes(array $stats): void
     {
         $this->output->newLine();
         $this->output->info('Cache Prefixes:');
-        if (is_array($stats['prefixes'] ?? null)) {
+        if (\is_array($stats['prefixes'] ?? null)) {
             foreach ($stats['prefixes'] as $name => $prefix) {
                 $this->output->line("  {$name}: {$prefix}");
             }
@@ -52,13 +52,13 @@ final readonly class CacheStatisticsDisplayer
     }
 
     /**
-     * @param  array<string, string|int|float|array|null>  $stats
+     * @param  array<string, string|int|float|array|* @method static \App\Models\Brand create(array<string, string|bool|null>  $stats
      */
     private function displayCacheDurations(array $stats): void
     {
         $this->output->newLine();
         $this->output->info('Cache Durations:');
-        if (is_array($stats['durations'] ?? null)) {
+        if (\is_array($stats['durations'] ?? null)) {
             foreach ($stats['durations'] as $name => $duration) {
                 $minutes = is_numeric($duration) ? (float) $duration / 60 : 0;
                 $this->output->line("  {$name}: {$duration}s ({$minutes} minutes)");
@@ -67,11 +67,11 @@ final readonly class CacheStatisticsDisplayer
     }
 
     /**
-     * @param  array<string, string|int|float|array<string, string|int|float>>  $stats
+     * @param array<string, array<string, float|int|string>|float|int|string> $stats
      */
     private function displayRedisStatistics(array $stats): void
     {
-        if (isset($stats['redis']) && is_array($stats['redis'])) {
+        if (isset($stats['redis']) && \is_array($stats['redis'])) {
             $this->output->newLine();
             $this->output->info('Redis Statistics:');
             foreach ($stats['redis'] as $key => $value) {

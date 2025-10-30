@@ -30,18 +30,4 @@ class PaymentMethodFactory extends Factory
             'is_default' => false,
         ];
     }
-
-    public function inactive(): self
-    {
-        return $this->state(fn () => [
-            'is_active' => false,
-        ]);
-    }
-
-    public function default(): self
-    {
-        return $this->state(fn () => [
-            'is_default' => true,
-        ]);
-    }
 }

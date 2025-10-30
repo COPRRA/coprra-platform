@@ -4,31 +4,16 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Performance;
 
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class CacheHitRateTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class CacheHitRateTest extends TestCase
 {
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_performance_basic_functionality(): void
-    {
-        // Test basic performance functionality
-        $this->assertTrue(true);
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_performance_metrics(): void
-    {
-        // Test performance metrics
-        $this->assertTrue(true);
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_performance_optimization(): void
-    {
-        // Test performance optimization
-        $this->assertTrue(true);
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -37,5 +22,26 @@ class CacheHitRateTest extends TestCase
     protected function tearDown(): void
     {
         parent::tearDown();
+    }
+
+    #[Test]
+    public function testPerformanceBasicFunctionality(): void
+    {
+        // Test basic performance functionality
+        self::assertTrue(true);
+    }
+
+    #[Test]
+    public function testPerformanceMetrics(): void
+    {
+        // Test performance metrics
+        self::assertTrue(true);
+    }
+
+    #[Test]
+    public function testPerformanceOptimization(): void
+    {
+        // Test performance optimization
+        self::assertTrue(true);
     }
 }

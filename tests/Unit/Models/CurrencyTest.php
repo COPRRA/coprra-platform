@@ -14,44 +14,46 @@ use Tests\TestCase;
 
 /**
  * Unit tests for the Currency model.
+ *
+ * @internal
  */
 #[CoversClass(Currency::class)]
-class CurrencyTest extends TestCase
+final class CurrencyTest extends TestCase
 {
     /**
      * Test guarded attributes.
      */
-    public function test_guarded_attributes(): void
+    public function testGuardedAttributes(): void
     {
         $guarded = [];
 
-        $this->assertEquals($guarded, (new Currency)->getGuarded());
+        self::assertSame($guarded, (new Currency())->getGuarded());
     }
 
     /**
      * Test stores relation is a HasMany instance.
      */
-    public function test_stores_relation(): void
+    public function testStoresRelation(): void
     {
-        $currency = new Currency;
+        $currency = new Currency();
 
         $relation = $currency->stores();
 
-        $this->assertInstanceOf(HasMany::class, $relation);
-        $this->assertEquals(Store::class, $relation->getRelated()::class);
+        self::assertInstanceOf(HasMany::class, $relation);
+        self::assertSame(Store::class, $relation->getRelated()::class);
     }
 
     /**
      * Test languages relation is a BelongsToMany instance.
      */
-    public function test_languages_relation(): void
+    public function testLanguagesRelation(): void
     {
-        $currency = new Currency;
+        $currency = new Currency();
 
         $relation = $currency->languages();
 
-        $this->assertInstanceOf(BelongsToMany::class, $relation);
-        $this->assertEquals(Language::class, $relation->getRelated()::class);
-        $this->assertEquals('currency_language', $relation->getTable());
+        self::assertInstanceOf(BelongsToMany::class, $relation);
+        self::assertSame(Language::class, $relation->getRelated()::class);
+        self::assertSame('currency_language', $relation->getTable());
     }
 }

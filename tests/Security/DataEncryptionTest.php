@@ -7,34 +7,13 @@ namespace Tests\Security;
 use Illuminate\Support\Facades\Crypt;
 use Tests\TestCase;
 
-class DataEncryptionTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class DataEncryptionTest extends TestCase
 {
-    public function test_data_encryption(): void
-    {
-        $data = 'test data';
-        $encrypted = Crypt::encrypt($data);
-        $this->assertNotEquals($data, $encrypted);
-        $this->assertEquals($data, Crypt::decrypt($encrypted));
-    }
-
-    public function test_encryption_keys(): void
-    {
-        $data = 'secret';
-        $encrypted1 = Crypt::encrypt($data);
-        $encrypted2 = Crypt::encrypt($data);
-        $this->assertNotEquals($encrypted1, $encrypted2); // Different each time
-        $this->assertEquals($data, Crypt::decrypt($encrypted1));
-        $this->assertEquals($data, Crypt::decrypt($encrypted2));
-    }
-
-    public function test_decryption_works(): void
-    {
-        $data = 'another test';
-        $encrypted = Crypt::encrypt($data);
-        $decrypted = Crypt::decrypt($encrypted);
-        $this->assertEquals($data, $decrypted);
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -43,5 +22,31 @@ class DataEncryptionTest extends TestCase
     protected function tearDown(): void
     {
         parent::tearDown();
+    }
+
+    public function testDataEncryption(): void
+    {
+        $data = 'test data';
+        $encrypted = Crypt::encrypt($data);
+        self::assertNotSame($data, $encrypted);
+        self::assertSame($data, Crypt::decrypt($encrypted));
+    }
+
+    public function testEncryptionKeys(): void
+    {
+        $data = 'secret';
+        $encrypted1 = Crypt::encrypt($data);
+        $encrypted2 = Crypt::encrypt($data);
+        self::assertNotSame($encrypted1, $encrypted2); // Different each time
+        self::assertSame($data, Crypt::decrypt($encrypted1));
+        self::assertSame($data, Crypt::decrypt($encrypted2));
+    }
+
+    public function testDecryptionWorks(): void
+    {
+        $data = 'another test';
+        $encrypted = Crypt::encrypt($data);
+        $decrypted = Crypt::decrypt($encrypted);
+        self::assertSame($data, $decrypted);
     }
 }

@@ -13,14 +13,16 @@ use Tests\TestCase;
 
 /**
  * Unit tests for the OrderItem model.
+ *
+ * @internal
  */
 #[CoversClass(OrderItem::class)]
-class OrderItemTest extends TestCase
+final class OrderItemTest extends TestCase
 {
     /**
      * Test fillable attributes.
      */
-    public function test_fillable_attributes(): void
+    public function testFillableAttributes(): void
     {
         $fillable = [
             'order_id',
@@ -31,44 +33,44 @@ class OrderItemTest extends TestCase
             'product_details',
         ];
 
-        $this->assertEquals($fillable, (new OrderItem)->getFillable());
+        self::assertSame($fillable, (new OrderItem())->getFillable());
     }
 
     /**
      * Test casts.
      */
-    public function test_casts(): void
+    public function testCasts(): void
     {
         $casts = [
             'product_details' => 'array',
         ];
 
-        $this->assertEquals($casts, (new OrderItem)->getCasts());
+        self::assertSame($casts, (new OrderItem())->getCasts());
     }
 
     /**
      * Test order relation is a BelongsTo instance.
      */
-    public function test_order_relation(): void
+    public function testOrderRelation(): void
     {
-        $orderItem = new OrderItem;
+        $orderItem = new OrderItem();
 
         $relation = $orderItem->order();
 
-        $this->assertInstanceOf(BelongsTo::class, $relation);
-        $this->assertEquals(Order::class, $relation->getRelated()::class);
+        self::assertInstanceOf(BelongsTo::class, $relation);
+        self::assertSame(Order::class, $relation->getRelated()::class);
     }
 
     /**
      * Test product relation is a BelongsTo instance.
      */
-    public function test_product_relation(): void
+    public function testProductRelation(): void
     {
-        $orderItem = new OrderItem;
+        $orderItem = new OrderItem();
 
         $relation = $orderItem->product();
 
-        $this->assertInstanceOf(BelongsTo::class, $relation);
-        $this->assertEquals(Product::class, $relation->getRelated()::class);
+        self::assertInstanceOf(BelongsTo::class, $relation);
+        self::assertSame(Product::class, $relation->getRelated()::class);
     }
 }

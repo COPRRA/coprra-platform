@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Hostinger Deployment Script
+ * Hostinger Deployment Script.
  *
  * This script handles deployment to Hostinger shared hosting via FTP/SSH.
  * It uploads build artifacts, runs migrations, and performs post-deployment tasks.
@@ -14,16 +14,18 @@ declare(strict_types=1);
 
 // Load Laravel environment
 require_once __DIR__.'/../vendor/autoload.php';
-$app = require_once __DIR__.'/../bootstrap/app.php';
-$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
+use Illuminate\Contracts\Console\Kernel;
+
+$app = require_once __DIR__.'/../bootstrap/app.php';
+$app->make(Kernel::class)->bootstrap();
 use Illuminate\Support\Facades\Config;
 use phpseclib3\Net\SSH2;
 
 // Configuration
 $hostinger = Config::get('hostinger');
-$dryRun = in_array('--dry-run', $argv);
-$skipDb = in_array('--skip-db', $argv);
+$dryRun = in_array('--dry-run', $argv, true);
+$skipDb = in_array('--skip-db', $argv, true);
 
 echo "Hostinger Deployment Script\n";
 echo "==========================\n";
@@ -33,16 +35,20 @@ echo 'Skip DB: '.($skipDb ? 'YES' : 'NO')."\n\n";
 // Validate configuration
 if (empty($hostinger['ftp']['host']) || empty($hostinger['ftp']['username'])) {
     echo "ERROR: FTP configuration missing in config/hostinger.php\n";
+
     exit(1);
 }
 
 if (! $skipDb && (empty($hostinger['database']['host']) || empty($hostinger['database']['username']))) {
     echo "ERROR: Database configuration missing in config/hostinger.php\n";
+
     exit(1);
 }
 
 /**
  * Recursively upload directory via FTP.
+ *
+ * @param mixed $ftpConn
  */
 function uploadDirectory($ftpConn, string $localDir, string $remoteDir): void
 {
@@ -72,7 +78,7 @@ function buildAssets(bool $dryRun): void
     echo "Step 1: Building assets...\n";
     if (! $dryRun) {
         exec('npm run build', $output, $returnCode);
-        if ($returnCode !== 0) {
+        if (0 !== $returnCode) {
             throw new Exception('Asset build failed');
         }
     }
@@ -102,6 +108,7 @@ function prepareDeploymentPackage(bool $dryRun, array $hostinger, string $deploy
             foreach ($excludePatterns as $pattern) {
                 if (fnmatch($pattern, $relativePath) || fnmatch($pattern.'/*', $relativePath)) {
                     $skip = true;
+
                     break;
                 }
             }
@@ -145,6 +152,7 @@ function uploadViaFtp(bool $dryRun, array $hostinger, string $deployDir): void
 
         if (! ftp_login($ftpConn, $hostinger['ftp']['username'], $hostinger['ftp']['password'] ?? '')) {
             ftp_close($ftpConn);
+
             throw new Exception('FTP login failed');
         }
 
@@ -191,7 +199,7 @@ function runRemoteCommands(bool $dryRun, bool $skipDb, array $hostinger): void
         foreach ($commands as $command) {
             echo "Running: {$command}\n";
             $output = $ssh->exec($command);
-            if ($ssh->getExitStatus() !== 0) {
+            if (0 !== $ssh->getExitStatus()) {
                 throw new Exception("Command failed: {$command}\nOutput: {$output}");
             }
             echo $output;
@@ -219,7 +227,7 @@ function verifyDeployment(bool $dryRun, array $hostinger): void
 
         foreach ($checkCommands as $command) {
             $output = $ssh->exec($command);
-            if ($ssh->getExitStatus() !== 0) {
+            if (0 !== $ssh->getExitStatus()) {
                 echo "Verification failed: {$command}\n";
             }
         }
@@ -296,8 +304,10 @@ try {
     cleanup($dryRun, $deployDir);
 
     echo "🎉 Deployment to Hostinger successful!\n";
+
     exit(0);
 } catch (Exception $e) {
     echo '❌ Deployment failed: '.$e->getMessage()."\n";
+
     exit(1);
 }

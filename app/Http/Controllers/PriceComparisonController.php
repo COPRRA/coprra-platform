@@ -9,6 +9,7 @@ use App\Services\AnalyticsService;
 use App\Services\CacheService;
 use App\Services\PriceComparisonService;
 use App\Services\StoreAdapterManager;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -31,7 +32,7 @@ class PriceComparisonController extends Controller
             auth()->check() ? (int) auth()->id() : null
         );
 
-        /** @var array<int, array<string, string|float|bool|null>> $prices */
+        /** @var array<int, array<string, string|float|bool|* @method static \App\Models\Brand create(array<string, string|bool|null>> $prices */
         $prices = $this->cacheService->getCachedPriceComparison($product->id);
 
         if (! $prices) {
@@ -56,7 +57,7 @@ class PriceComparisonController extends Controller
     /**
      * API endpoint to refresh prices.
      */
-    public function refresh(Product $product): \Illuminate\Http\JsonResponse
+    public function refresh(Product $product): JsonResponse
     {
         $this->cacheService->invalidateProduct($product->id);
 

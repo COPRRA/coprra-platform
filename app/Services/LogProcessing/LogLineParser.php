@@ -7,7 +7,7 @@ namespace App\Services\LogProcessing;
 class LogLineParser
 {
     /**
-     * Check if a line contains an error
+     * Check if a line contains an error.
      */
     public function isErrorLine(string $line): bool
     {
@@ -15,9 +15,9 @@ class LogLineParser
     }
 
     /**
-     * Parse log line
+     * Parse log line.
      *
-     * @return array<string|array<string>>
+     * @return array<array<string>|string>
      *
      * @psalm-return array{id: string, timestamp: string, level: string, type: string, message: string, context: array<string, string>}
      */
@@ -37,7 +37,7 @@ class LogLineParser
     }
 
     /**
-     * Extract error type from log line
+     * Extract error type from log line.
      */
     private function extractErrorType(string $line): string
     {
@@ -61,20 +61,20 @@ class LogLineParser
     }
 
     /**
-     * Extract context from log line
+     * Extract context from log line.
      *
-     * @return array<array|object|scalar|null>
+     * @return array<array|object|scalar|* @method static \App\Models\Brand create(array<string, string|bool|null>
      *
-     * @psalm-return array<string, array|object|scalar|null>
+     * @psalm-return array<string, array|object|scalar|* @method static \App\Models\Brand create(array<string, string|bool|null>
      */
     private function extractContext(string $line): array
     {
         // Extract JSON context if present
         if (preg_match('/\{.*\}/', $line, $matches)) {
-            /** @var array<string, string|int|float|bool|array|object|null> $result */
+            /** @var array<string, string|int|float|bool|array|object|* @method static \App\Models\Brand create(array<string, string|bool|null> $result */
             $result = json_decode($matches[0], true);
 
-            return is_array($result) ? $result : [];
+            return \is_array($result) ? $result : [];
         }
 
         return [];

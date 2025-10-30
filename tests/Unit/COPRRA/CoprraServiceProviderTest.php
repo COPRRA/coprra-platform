@@ -10,263 +10,263 @@ use Illuminate\Support\Facades\View;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\TestCase;
 
+/**
+ * @internal
+ */
 #[CoversClass(CoprraServiceProvider::class)]
-class CoprraServiceProviderTest extends TestCase
+final class CoprraServiceProviderTest extends TestCase
 {
     protected function setUp(): void
     {
         parent::setUp();
 
         $provider = new CoprraServiceProvider($this->app);
-        $provider->boot();
+        $provider->register();
     }
 
-    public function test_it_registers_coprra_configuration(): void
+    public function testItRegistersCoprraConfiguration(): void
     {
-        $this->assertNotNull(config('coprra'));
-        $this->assertIsArray(config('coprra'));
+        self::assertNotNull(config('coprra'));
+        self::assertIsArray(config('coprra'));
     }
 
-    public function test_it_has_coprra_name_configuration(): void
+    public function testItHasCoprraNameConfiguration(): void
     {
         $name = config('coprra.name');
 
-        $this->assertNotNull($name);
-        $this->assertIsString($name);
-        $this->assertEquals('COPRRA', $name);
+        self::assertNotNull($name);
+        self::assertIsString($name);
+        self::assertSame('COPRRA', $name);
     }
 
-    public function test_it_has_coprra_version_configuration(): void
+    public function testItHasCoprraVersionConfiguration(): void
     {
         $version = config('coprra.version');
 
-        $this->assertNotNull($version);
-        $this->assertIsString($version);
-        $this->assertEquals('1.0.0', $version);
+        self::assertNotNull($version);
+        self::assertIsString($version);
+        self::assertSame('1.0.0', $version);
     }
 
-    public function test_it_has_default_currency_configuration(): void
+    public function testItHasDefaultCurrencyConfiguration(): void
     {
         $currency = config('coprra.default_currency');
 
-        $this->assertNotNull($currency);
-        $this->assertIsString($currency);
-        $this->assertEquals('USD', $currency);
+        self::assertNotNull($currency);
+        self::assertIsString($currency);
+        self::assertSame('USD', $currency);
     }
 
-    public function test_it_has_default_language_configuration(): void
+    public function testItHasDefaultLanguageConfiguration(): void
     {
         $language = config('coprra.default_language');
 
-        $this->assertNotNull($language);
-        $this->assertIsString($language);
-        $this->assertEquals('en', $language);
+        self::assertNotNull($language);
+        self::assertIsString($language);
+        self::assertSame('en', $language);
     }
 
-    public function test_it_has_price_comparison_settings(): void
+    public function testItHasPriceComparisonSettings(): void
     {
         $settings = config('coprra.price_comparison');
 
-        $this->assertIsArray($settings);
-        $this->assertArrayHasKey('cache_duration', $settings);
-        $this->assertArrayHasKey('max_stores_per_product', $settings);
-        $this->assertArrayHasKey('price_update_interval', $settings);
+        self::assertIsArray($settings);
+        self::assertArrayHasKey('cache_duration', $settings);
+        self::assertArrayHasKey('max_stores_per_product', $settings);
+        self::assertArrayHasKey('price_update_interval', $settings);
     }
 
-    public function test_it_has_search_settings(): void
+    public function testItHasSearchSettings(): void
     {
         $settings = config('coprra.search');
 
-        $this->assertIsArray($settings);
-        $this->assertArrayHasKey('max_results', $settings);
-        $this->assertArrayHasKey('min_query_length', $settings);
-        $this->assertArrayHasKey('enable_autocomplete', $settings);
+        self::assertIsArray($settings);
+        self::assertArrayHasKey('max_results', $settings);
+        self::assertArrayHasKey('min_query_length', $settings);
+        self::assertArrayHasKey('enable_autocomplete', $settings);
     }
 
-    public function test_it_has_exchange_rates_configuration(): void
+    public function testItHasExchangeRatesConfiguration(): void
     {
         $rates = config('coprra.exchange_rates');
 
-        $this->assertIsArray($rates);
-        $this->assertArrayHasKey('USD', $rates);
-        $this->assertArrayHasKey('EUR', $rates);
-        $this->assertArrayHasKey('SAR', $rates);
-        $this->assertEquals(1.0, $rates['USD']);
+        self::assertIsArray($rates);
+        self::assertArrayHasKey('USD', $rates);
+        self::assertArrayHasKey('EUR', $rates);
+        self::assertArrayHasKey('SAR', $rates);
+        self::assertSame(1.0, $rates['USD']);
     }
 
-    public function test_it_has_pagination_settings(): void
+    public function testItHasPaginationSettings(): void
     {
         $settings = config('coprra.pagination');
 
-        $this->assertIsArray($settings);
-        $this->assertArrayHasKey('default_items_per_page', $settings);
-        $this->assertArrayHasKey('max_wishlist_items', $settings);
-        $this->assertArrayHasKey('max_price_alerts', $settings);
+        self::assertIsArray($settings);
+        self::assertArrayHasKey('default_items_per_page', $settings);
+        self::assertArrayHasKey('max_wishlist_items', $settings);
+        self::assertArrayHasKey('max_price_alerts', $settings);
     }
 
-    public function test_it_has_api_configuration(): void
+    public function testItHasApiConfiguration(): void
     {
         $api = config('coprra.api');
 
-        $this->assertIsArray($api);
-        $this->assertArrayHasKey('rate_limit', $api);
-        $this->assertArrayHasKey('version', $api);
-        $this->assertArrayHasKey('enable_docs', $api);
+        self::assertIsArray($api);
+        self::assertArrayHasKey('rate_limit', $api);
+        self::assertArrayHasKey('version', $api);
+        self::assertArrayHasKey('enable_docs', $api);
     }
 
-    public function test_it_has_media_settings(): void
+    public function testItHasMediaSettings(): void
     {
         $media = config('coprra.media');
 
-        $this->assertIsArray($media);
-        $this->assertArrayHasKey('max_image_size', $media);
-        $this->assertArrayHasKey('allowed_image_types', $media);
-        $this->assertArrayHasKey('default_product_image', $media);
-        $this->assertArrayHasKey('default_store_logo', $media);
+        self::assertIsArray($media);
+        self::assertArrayHasKey('max_image_size', $media);
+        self::assertArrayHasKey('allowed_image_types', $media);
+        self::assertArrayHasKey('default_product_image', $media);
+        self::assertArrayHasKey('default_store_logo', $media);
     }
 
-    public function test_it_has_analytics_settings(): void
+    public function testItHasAnalyticsSettings(): void
     {
         $analytics = config('coprra.analytics');
 
-        $this->assertIsArray($analytics);
-        $this->assertArrayHasKey('track_user_behavior', $analytics);
-        $this->assertArrayHasKey('track_price_clicks', $analytics);
+        self::assertIsArray($analytics);
+        self::assertArrayHasKey('track_user_behavior', $analytics);
+        self::assertArrayHasKey('track_price_clicks', $analytics);
     }
 
-    public function test_it_has_security_settings(): void
+    public function testItHasSecuritySettings(): void
     {
         $security = config('coprra.security');
 
-        $this->assertIsArray($security);
-        $this->assertArrayHasKey('enable_2fa', $security);
-        $this->assertArrayHasKey('password_min_length', $security);
-        $this->assertArrayHasKey('session_timeout', $security);
+        self::assertIsArray($security);
+        self::assertArrayHasKey('enable_2fa', $security);
+        self::assertArrayHasKey('password_min_length', $security);
+        self::assertArrayHasKey('session_timeout', $security);
     }
 
-    public function test_it_has_performance_settings(): void
+    public function testItHasPerformanceSettings(): void
     {
         $performance = config('coprra.performance');
 
-        $this->assertIsArray($performance);
-        $this->assertArrayHasKey('enable_query_caching', $performance);
-        $this->assertArrayHasKey('enable_view_caching', $performance);
-        $this->assertArrayHasKey('enable_compression', $performance);
+        self::assertIsArray($performance);
+        self::assertArrayHasKey('enable_query_caching', $performance);
+        self::assertArrayHasKey('enable_view_caching', $performance);
+        self::assertArrayHasKey('enable_compression', $performance);
     }
 
-    public function test_it_shares_coprra_name_with_views(): void
+    public function testItSharesCoprraNameWithViews(): void
     {
-        $this->assertEquals('COPRRA', View::shared('coprraName'));
+        self::assertSame('COPRRA', View::shared('coprraName'));
     }
 
-    public function test_it_shares_coprra_version_with_views(): void
+    public function testItSharesCoprraVersionWithViews(): void
     {
-        $this->assertEquals('1.0.0', View::shared('coprraVersion'));
+        self::assertSame('1.0.0', View::shared('coprraVersion'));
     }
 
-    public function test_it_shares_default_currency_with_views(): void
+    public function testItSharesDefaultCurrencyWithViews(): void
     {
-        $this->assertEquals('USD', View::shared('defaultCurrency'));
+        self::assertSame('USD', View::shared('defaultCurrency'));
     }
 
-    public function test_it_shares_default_language_with_views(): void
+    public function testItSharesDefaultLanguageWithViews(): void
     {
-        $this->assertEquals('en', View::shared('defaultLanguage'));
+        self::assertSame('en', View::shared('defaultLanguage'));
     }
 
-    public function test_it_registers_currency_blade_directive(): void
-    {
-        $directives = Blade::getCustomDirectives();
-
-        $this->assertArrayHasKey('currency', $directives);
-        $this->assertIsCallable($directives['currency']);
-    }
-
-    public function test_it_registers_pricecompare_blade_directive(): void
+    public function testItRegistersCurrencyBladeDirective(): void
     {
         $directives = Blade::getCustomDirectives();
 
-        $this->assertArrayHasKey('pricecompare', $directives);
-        $this->assertIsCallable($directives['pricecompare']);
+        self::assertArrayHasKey('currency', $directives);
+        self::assertIsCallable($directives['currency']);
     }
 
-    public function test_it_registers_rtl_blade_directive(): void
+    public function testItRegistersPricecompareBladeDirective(): void
     {
         $directives = Blade::getCustomDirectives();
 
-        $this->assertArrayHasKey('rtl', $directives);
-        $this->assertIsCallable($directives['rtl']);
+        self::assertArrayHasKey('pricecompare', $directives);
+        self::assertIsCallable($directives['pricecompare']);
     }
 
-    /** @test */
-    public function currency_directive_generates_correct_php_code(): void
+    public function testItRegistersRtlBladeDirective(): void
+    {
+        $directives = Blade::getCustomDirectives();
+
+        self::assertArrayHasKey('rtl', $directives);
+        self::assertIsCallable($directives['rtl']);
+    }
+
+    public function testCurrencyDirectiveGeneratesCorrectPhpCode(): void
     {
         $directives = Blade::getCustomDirectives();
         $directive = $directives['currency'];
 
         $result = $directive('100.50');
 
-        $this->assertIsString($result);
-        $this->assertStringContainsString('number_format', $result);
-        $this->assertStringContainsString('100.50', $result);
+        self::assertIsString($result);
+        self::assertStringContainsString('number_format', $result);
+        self::assertStringContainsString('100.50', $result);
     }
 
-    /** @test */
-    public function pricecompare_directive_generates_correct_php_code(): void
+    public function testPricecompareDirectiveGeneratesCorrectPhpCode(): void
     {
         $directives = Blade::getCustomDirectives();
         $directive = $directives['pricecompare'];
 
         $result = $directive('100.50');
 
-        $this->assertIsString($result);
-        $this->assertStringContainsString('PriceHelper::formatPrice', $result);
-        $this->assertStringContainsString('100.50', $result);
+        self::assertIsString($result);
+        self::assertStringContainsString('PriceHelper::formatPrice', $result);
+        self::assertStringContainsString('100.50', $result);
     }
 
-    /** @test */
-    public function rtl_directive_generates_correct_php_code(): void
+    public function testRtlDirectiveGeneratesCorrectPhpCode(): void
     {
         $directives = Blade::getCustomDirectives();
         $directive = $directives['rtl'];
 
         $result = $directive();
 
-        $this->assertIsString($result);
-        $this->assertStringContainsString('app()->getLocale()', $result);
-        $this->assertStringContainsString('rtl', $result);
-        $this->assertStringContainsString('ltr', $result);
+        self::assertIsString($result);
+        self::assertStringContainsString('app()->getLocale()', $result);
+        self::assertStringContainsString('rtl', $result);
+        self::assertStringContainsString('ltr', $result);
     }
 
-    public function test_it_validates_price_cache_duration_is_numeric(): void
+    public function testItValidatesPriceCacheDurationIsNumeric(): void
     {
         $duration = config('coprra.price_comparison.cache_duration');
 
-        $this->assertIsNumeric($duration);
-        $this->assertGreaterThan(0, $duration);
+        self::assertIsNumeric($duration);
+        self::assertGreaterThan(0, $duration);
     }
 
-    public function test_it_validates_max_stores_per_product_is_numeric(): void
+    public function testItValidatesMaxStoresPerProductIsNumeric(): void
     {
         $max = config('coprra.price_comparison.max_stores_per_product');
 
-        $this->assertIsNumeric($max);
-        $this->assertGreaterThan(0, $max);
+        self::assertIsNumeric($max);
+        self::assertGreaterThan(0, $max);
     }
 
-    public function test_it_validates_search_max_results_is_numeric(): void
+    public function testItValidatesSearchMaxResultsIsNumeric(): void
     {
         $max = config('coprra.search.max_results');
 
-        $this->assertIsNumeric($max);
-        $this->assertGreaterThan(0, $max);
+        self::assertIsNumeric($max);
+        self::assertGreaterThan(0, $max);
     }
 
-    public function test_it_validates_api_rate_limit_is_numeric(): void
+    public function testItValidatesApiRateLimitIsNumeric(): void
     {
         $limit = config('coprra.api.rate_limit');
 
-        $this->assertIsNumeric($limit);
-        $this->assertGreaterThan(0, $limit);
+        self::assertIsNumeric($limit);
+        self::assertGreaterThan(0, $limit);
     }
 }

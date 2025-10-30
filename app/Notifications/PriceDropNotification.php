@@ -36,17 +36,4 @@ class PriceDropNotification extends Notification implements ShouldQueue
             'target_price' => $this->targetPrice,
         ];
     }
-
-    /**
-     * Determine notification delivery channels.
-     *
-     * @return array<string>
-     *
-     * @SuppressWarnings("UnusedFormalParameter")
-     */
-    public function via($notifiable): array
-    {
-        // Use database channel for testing; Notification::fake intercepts delivery
-        return ['database'];
-    }
 }

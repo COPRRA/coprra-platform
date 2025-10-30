@@ -4,18 +4,23 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Middleware;
 
+use App\Http\Middleware\TrimStrings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Tests\TestCase;
 
 /**
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class TrimStringsTest extends TestCase
+final class TrimStringsTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_trim_strings_middleware_trims_string_input(): void
+    public function testTrimStringsMiddlewareTrimsStringInput(): void
     {
         $request = Request::create('/test', 'POST', [
             'name' => '  John Doe  ',
@@ -23,18 +28,18 @@ class TrimStringsTest extends TestCase
             'description' => '  This is a test description  ',
         ]);
 
-        $middleware = new \App\Http\Middleware\TrimStrings;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new TrimStrings();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('John Doe', $request->input('name'));
-        $this->assertEquals('john@example.com', $request->input('email'));
-        $this->assertEquals('This is a test description', $request->input('description'));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('John Doe', $request->input('name'));
+        self::assertSame('john@example.com', $request->input('email'));
+        self::assertSame('This is a test description', $request->input('description'));
     }
 
-    public function test_trim_strings_middleware_does_not_trim_non_string_input(): void
+    public function testTrimStringsMiddlewareDoesNotTrimNonStringInput(): void
     {
         $request = Request::create('/test', 'POST', [
             'age' => 25,
@@ -42,18 +47,18 @@ class TrimStringsTest extends TestCase
             'tags' => ['tag1', 'tag2', 'tag3'],
         ]);
 
-        $middleware = new \App\Http\Middleware\TrimStrings;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new TrimStrings();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals(25, $request->input('age'));
-        $this->assertTrue($request->input('is_active'));
-        $this->assertEquals(['tag1', 'tag2', 'tag3'], $request->input('tags'));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(25, $request->input('age'));
+        self::assertTrue($request->input('is_active'));
+        self::assertSame(['tag1', 'tag2', 'tag3'], $request->input('tags'));
     }
 
-    public function test_trim_strings_middleware_handles_nested_arrays(): void
+    public function testTrimStringsMiddlewareHandlesNestedArrays(): void
     {
         $request = Request::create('/test', 'POST', [
             'user' => [
@@ -66,19 +71,19 @@ class TrimStringsTest extends TestCase
             ],
         ]);
 
-        $middleware = new \App\Http\Middleware\TrimStrings;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new TrimStrings();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('John Doe', $request->input('user.name'));
-        $this->assertEquals('john@example.com', $request->input('user.email'));
-        $this->assertEquals('123 Main St', $request->input('address.street'));
-        $this->assertEquals('New York', $request->input('address.city'));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('John Doe', $request->input('user.name'));
+        self::assertSame('john@example.com', $request->input('user.email'));
+        self::assertSame('123 Main St', $request->input('address.street'));
+        self::assertSame('New York', $request->input('address.city'));
     }
 
-    public function test_trim_strings_middleware_handles_empty_strings(): void
+    public function testTrimStringsMiddlewareHandlesEmptyStrings(): void
     {
         $request = Request::create('/test', 'POST', [
             'name' => '',
@@ -86,29 +91,29 @@ class TrimStringsTest extends TestCase
             'description' => null,
         ]);
 
-        $middleware = new \App\Http\Middleware\TrimStrings;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new TrimStrings();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('', $request->input('name'));
-        $this->assertEquals('', $request->input('email'));
-        $this->assertNull($request->input('description'));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('', $request->input('name'));
+        self::assertSame('', $request->input('email'));
+        self::assertNull($request->input('description'));
     }
 
-    public function test_trim_strings_middleware_passes_request_to_next_middleware(): void
+    public function testTrimStringsMiddlewarePassesRequestToNextMiddleware(): void
     {
         $request = Request::create('/test', 'POST', [
             'name' => '  John Doe  ',
         ]);
 
-        $middleware = new \App\Http\Middleware\TrimStrings;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new TrimStrings();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('OK', $response->getContent());
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('OK', $response->getContent());
     }
 }

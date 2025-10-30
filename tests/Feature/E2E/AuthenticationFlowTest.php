@@ -9,11 +9,16 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
-class AuthenticationFlowTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class AuthenticationFlowTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_complete_registration_flow(): void
+    public function testCompleteRegistrationFlow(): void
     {
         // Step 1: Visit registration page
         $response = $this->get('/register');
@@ -38,7 +43,7 @@ class AuthenticationFlowTest extends TestCase
         $this->assertAuthenticated();
     }
 
-    public function test_complete_login_flow(): void
+    public function testCompleteLoginFlow(): void
     {
         // Step 1: Create user
         $user = User::factory()->create([
@@ -62,7 +67,7 @@ class AuthenticationFlowTest extends TestCase
         $this->assertAuthenticatedAs($user);
     }
 
-    public function test_complete_logout_flow(): void
+    public function testCompleteLogoutFlow(): void
     {
         // Step 1: Create and authenticate user
         $user = User::factory()->create();
@@ -74,15 +79,15 @@ class AuthenticationFlowTest extends TestCase
         // Step 3: Logout
         $response = $this->post('/logout');
         // Accept both redirect and CSRF error (419) in testing environment
-        $this->assertContains($response->status(), [200, 201, 301, 302, 303, 307, 308, 419]);
+        self::assertContains($response->status(), [200, 201, 301, 302, 303, 307, 308, 419]);
 
         // Step 4: If logout succeeded, verify logged out
-        if ($response->status() !== 419) {
+        if (419 !== $response->status()) {
             $this->assertGuest();
         }
     }
 
-    public function test_complete_password_reset_flow(): void
+    public function testCompletePasswordResetFlow(): void
     {
         // Step 1: Create user
         $user = User::factory()->create(['email' => 'john@example.com']);
@@ -100,7 +105,7 @@ class AuthenticationFlowTest extends TestCase
         ]);
     }
 
-    public function test_rate_limiting_on_login(): void
+    public function testRateLimitingOnLogin(): void
     {
         $user = User::factory()->create([
             'email' => 'john@example.com',
@@ -108,7 +113,7 @@ class AuthenticationFlowTest extends TestCase
         ]);
 
         // Attempt login 6 times with wrong password
-        for ($i = 0; $i < 6; $i++) {
+        for ($i = 0; $i < 6; ++$i) {
             $response = $this->post('/login', [
                 'email' => 'john@example.com',
                 'password' => 'WrongPassword',
@@ -122,7 +127,7 @@ class AuthenticationFlowTest extends TestCase
         }
     }
 
-    public function test_authenticated_user_cannot_access_login_page(): void
+    public function testAuthenticatedUserCannotAccessLoginPage(): void
     {
         $user = User::factory()->create();
         $this->actingAs($user);
@@ -131,7 +136,7 @@ class AuthenticationFlowTest extends TestCase
         $response->assertRedirect('/dashboard');
     }
 
-    public function test_guest_cannot_access_dashboard(): void
+    public function testGuestCannotAccessDashboard(): void
     {
         $response = $this->get('/dashboard');
         $response->assertRedirect('/login');

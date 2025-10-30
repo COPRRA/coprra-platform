@@ -4,14 +4,20 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Middleware;
 
+use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 /**
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class SecurityHeadersTest extends TestCase
+final class SecurityHeadersTest extends TestCase
 {
     protected function setUp(): void
     {
@@ -20,93 +26,93 @@ class SecurityHeadersTest extends TestCase
         Log::shouldReceive('debug')->zeroOrMoreTimes();
     }
 
-    public function test_security_headers_middleware_adds_security_headers(): void
+    public function testSecurityHeadersMiddlewareAddsSecurityHeaders(): void
     {
         $request = Request::create('/test', 'GET');
 
         // Ø§Ø³ØªØ®Ø¯Ù… Ø§Ù„Ø­Ø§ÙˆÙŠØ© Ù„Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„ÙˆØ³ÙŠØ· Ù„ÙŠØªÙ… Ø­Ù‚Ù† Ø§Ù„Ø®Ø¯Ù…Ø© ØªÙ„Ù‚Ø§Ø¦ÙŠÙ‹Ø§
-        $middleware = $this->app->make(\App\Http\Middleware\SecurityHeaders::class);
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = $this->app->make(SecurityHeaders::class);
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('SAMEORIGIN', $response->headers->get('X-Frame-Options'));
-        $this->assertEquals('1; mode=block', $response->headers->get('X-XSS-Protection'));
-        $this->assertEquals('nosniff', $response->headers->get('X-Content-Type-Options'));
-        $this->assertEquals('strict-origin-when-cross-origin', $response->headers->get('Referrer-Policy'));
-        $this->assertStringContainsString("default-src 'self'", $response->headers->get('Content-Security-Policy'));
-        $this->assertStringContainsString('max-age=31536000', $response->headers->get('Strict-Transport-Security'));
-        $this->assertEquals('camera=(), microphone=(), geolocation=()', $response->headers->get('Permissions-Policy'));
-        $this->assertEquals('none', $response->headers->get('X-Permitted-Cross-Domain-Policies'));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('SAMEORIGIN', $response->headers->get('X-Frame-Options'));
+        self::assertSame('1; mode=block', $response->headers->get('X-XSS-Protection'));
+        self::assertSame('nosniff', $response->headers->get('X-Content-Type-Options'));
+        self::assertSame('strict-origin-when-cross-origin', $response->headers->get('Referrer-Policy'));
+        self::assertStringContainsString("default-src 'self'", $response->headers->get('Content-Security-Policy'));
+        self::assertStringContainsString('max-age=31536000', $response->headers->get('Strict-Transport-Security'));
+        self::assertSame('camera=(), microphone=(), geolocation=()', $response->headers->get('Permissions-Policy'));
+        self::assertSame('none', $response->headers->get('X-Permitted-Cross-Domain-Policies'));
     }
 
-    public function test_security_headers_middleware_handles_sensitive_routes(): void
+    public function testSecurityHeadersMiddlewareHandlesSensitiveRoutes(): void
     {
         $request = Request::create('/admin/dashboard', 'GET');
 
-        $middleware = $this->app->make(\App\Http\Middleware\SecurityHeaders::class);
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = $this->app->make(SecurityHeaders::class);
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('DENY', $response->headers->get('X-Frame-Options'));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('DENY', $response->headers->get('X-Frame-Options'));
     }
 
-    public function test_security_headers_middleware_handles_settings_routes(): void
+    public function testSecurityHeadersMiddlewareHandlesSettingsRoutes(): void
     {
         $request = Request::create('/settings/profile', 'GET');
 
-        $middleware = $this->app->make(\App\Http\Middleware\SecurityHeaders::class);
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = $this->app->make(SecurityHeaders::class);
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('DENY', $response->headers->get('X-Frame-Options'));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('DENY', $response->headers->get('X-Frame-Options'));
     }
 
-    public function test_security_headers_middleware_handles_profile_routes(): void
+    public function testSecurityHeadersMiddlewareHandlesProfileRoutes(): void
     {
         $request = Request::create('/profile/edit', 'GET');
 
-        $middleware = $this->app->make(\App\Http\Middleware\SecurityHeaders::class);
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = $this->app->make(SecurityHeaders::class);
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('DENY', $response->headers->get('X-Frame-Options'));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('DENY', $response->headers->get('X-Frame-Options'));
     }
 
-    public function test_security_headers_middleware_handles_billing_routes(): void
+    public function testSecurityHeadersMiddlewareHandlesBillingRoutes(): void
     {
         $request = Request::create('/billing/payment', 'GET');
 
-        $middleware = $this->app->make(\App\Http\Middleware\SecurityHeaders::class);
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = $this->app->make(SecurityHeaders::class);
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('DENY', $response->headers->get('X-Frame-Options'));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('DENY', $response->headers->get('X-Frame-Options'));
     }
 
-    public function test_security_headers_middleware_handles_admin_api_routes(): void
+    public function testSecurityHeadersMiddlewareHandlesAdminApiRoutes(): void
     {
         $request = Request::create('/api/v1/admin/users', 'GET');
 
-        $middleware = $this->app->make(\App\Http\Middleware\SecurityHeaders::class);
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = $this->app->make(SecurityHeaders::class);
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('DENY', $response->headers->get('X-Frame-Options'));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('DENY', $response->headers->get('X-Frame-Options'));
     }
 
-    public function test_security_headers_middleware_logs_suspicious_sql_injection_attempts(): void
+    public function testSecurityHeadersMiddlewareLogsSuspiciousSqlInjectionAttempts(): void
     {
         Log::shouldReceive('warning')->once()->with('Suspicious request detected', \Mockery::type('array'));
 
@@ -114,15 +120,15 @@ class SecurityHeadersTest extends TestCase
             'query' => 'SELECT * FROM users WHERE id = 1; DROP TABLE users; --',
         ]);
 
-        $middleware = $this->app->make(\App\Http\Middleware\SecurityHeaders::class);
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = $this->app->make(SecurityHeaders::class);
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
+        self::assertSame(200, $response->getStatusCode());
     }
 
-    public function test_security_headers_middleware_logs_suspicious_xss_attempts(): void
+    public function testSecurityHeadersMiddlewareLogsSuspiciousXssAttempts(): void
     {
         Log::shouldReceive('warning')->once()->with('Suspicious request detected', \Mockery::type('array'));
 
@@ -130,15 +136,15 @@ class SecurityHeadersTest extends TestCase
             'comment' => '<script>alert("XSS")</script>',
         ]);
 
-        $middleware = $this->app->make(\App\Http\Middleware\SecurityHeaders::class);
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = $this->app->make(SecurityHeaders::class);
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
+        self::assertSame(200, $response->getStatusCode());
     }
 
-    public function test_security_headers_middleware_logs_suspicious_file_uploads(): void
+    public function testSecurityHeadersMiddlewareLogsSuspiciousFileUploads(): void
     {
         Log::shouldReceive('warning')->once()->with('Suspicious request detected', \Mockery::type('array'));
 
@@ -149,7 +155,7 @@ class SecurityHeadersTest extends TestCase
         file_put_contents($tempFile, '<?php echo "test"; ?>');
 
         // Mock file upload
-        $file = new \Illuminate\Http\UploadedFile(
+        $file = new UploadedFile(
             $tempFile,
             'test.php',
             'application/x-php',
@@ -159,15 +165,15 @@ class SecurityHeadersTest extends TestCase
 
         $request->files->set('upload', $file);
 
-        $middleware = $this->app->make(\App\Http\Middleware\SecurityHeaders::class);
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = $this->app->make(SecurityHeaders::class);
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
+        self::assertSame(200, $response->getStatusCode());
     }
 
-    public function test_security_headers_middleware_does_not_log_normal_requests(): void
+    public function testSecurityHeadersMiddlewareDoesNotLogNormalRequests(): void
     {
         Log::shouldReceive('warning')->never();
 
@@ -176,42 +182,42 @@ class SecurityHeadersTest extends TestCase
             'email' => 'john@example.com',
         ]);
 
-        $middleware = $this->app->make(\App\Http\Middleware\SecurityHeaders::class);
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = $this->app->make(SecurityHeaders::class);
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
+        self::assertSame(200, $response->getStatusCode());
     }
 
-    public function test_security_headers_middleware_handles_https_redirect_in_production(): void
+    public function testSecurityHeadersMiddlewareHandlesHttpsRedirectInProduction(): void
     {
         $this->app->instance('env', 'production');
 
         $request = Request::create('http://example.com/test', 'GET');
         $request->server->set('HTTPS', false);
 
-        $middleware = $this->app->make(\App\Http\Middleware\SecurityHeaders::class);
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = $this->app->make(SecurityHeaders::class);
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(302, $response->getStatusCode());
-        $this->assertStringContainsString('https://', $response->headers->get('Location'));
+        self::assertSame(302, $response->getStatusCode());
+        self::assertStringContainsString('https://', $response->headers->get('Location'));
     }
 
-    public function test_security_headers_middleware_does_not_redirect_https_in_development(): void
+    public function testSecurityHeadersMiddlewareDoesNotRedirectHttpsInDevelopment(): void
     {
         $this->app->instance('env', 'local');
 
         $request = Request::create('http://example.com/test', 'GET');
         $request->server->set('HTTPS', false);
 
-        $middleware = $this->app->make(\App\Http\Middleware\SecurityHeaders::class);
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = $this->app->make(SecurityHeaders::class);
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
+        self::assertSame(200, $response->getStatusCode());
     }
 }

@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Automated test fixer script
- * Analyzes test output and fixes common patterns
+ * Analyzes test output and fixes common patterns.
  */
-class TestFixer
+class fix_all_tests
 {
     private array $fixes = [];
 
@@ -69,7 +71,7 @@ class TestFixer
     private function analyzeMiddlewareErrors(string $output): void
     {
         // Pattern: Declaration must be compatible
-        if (strpos($output, 'Declaration of') !== false) {
+        if (false !== strpos($output, 'Declaration of')) {
             $this->fixes[] = [
                 'type' => 'middleware_compatibility',
             ];
@@ -82,12 +84,17 @@ class TestFixer
             switch ($fix['type']) {
                 case 'constraint':
                     $this->fixConstraintViolation($fix['table'], $fix['column']);
+
                     break;
+
                 case 'missing_field':
                     $this->fixMissingField($fix['field']);
+
                     break;
+
                 case 'middleware_compatibility':
                     $this->fixMiddlewareCompatibility();
+
                     break;
             }
         }
@@ -96,21 +103,21 @@ class TestFixer
     private function fixConstraintViolation(string $table, string $column): void
     {
         echo "Fixing NOT NULL constraint for {$table}.{$column}\n";
-        $this->fixCount++;
+        ++$this->fixCount;
         // Implementation would go here
     }
 
     private function fixMissingField(string $field): void
     {
         echo "Fixing missing field: {$field}\n";
-        $this->fixCount++;
+        ++$this->fixCount;
         // Implementation would go here
     }
 
     private function fixMiddlewareCompatibility(): void
     {
         echo "Fixing middleware compatibility issues\n";
-        $this->fixCount++;
+        ++$this->fixCount;
         // Implementation would go here
     }
 
@@ -137,7 +144,7 @@ class TestFixer
     {
         $fullPath = __DIR__.'/'.$file;
         if (! file_exists($fullPath)) {
-            echo "File not found: $fullPath\n";
+            echo "File not found: {$fullPath}\n";
 
             return;
         }
@@ -145,26 +152,26 @@ class TestFixer
         $content = file_get_contents($fullPath);
 
         // Check if field already exists
-        if (strpos($content, "'$fieldName'") !== false) {
-            echo "Field $fieldName already exists in $file\n";
+        if (false !== strpos($content, "'{$fieldName}'")) {
+            echo "Field {$fieldName} already exists in {$file}\n";
 
             return;
         }
 
         // Add field before the shipped_at field
         $pattern = "/('shipped_at')/";
-        $replacement = "$line\n            $1";
+        $replacement = "{$line}\n            $1";
 
         $newContent = preg_replace($pattern, $replacement, $content, 1);
 
         if ($newContent !== $content) {
             file_put_contents($fullPath, $newContent);
-            echo "Added field $fieldName to $file\n";
-            $this->fixCount++;
+            echo "Added field {$fieldName} to {$file}\n";
+            ++$this->fixCount;
         }
     }
 }
 
 // Run the fixer
-$fixer = new TestFixer;
+$fixer = new TestFixer();
 $fixer->analyzeAndFix('feature_tests_output.txt');

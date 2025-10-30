@@ -4,26 +4,28 @@ declare(strict_types=1);
 
 namespace App\Services\AI\Services;
 
-/**
- * Service for validating monitoring rules and configurations
+use Carbon\Carbon;
+
+final /**
+ * Service for validating monitoring rules and configurations.
  */
 class RuleValidatorService
 {
     /**
-     * Validate rule configuration
+     * Validate rule configuration.
      *
-     * @param  array<string, mixed>  $rule
+     * @param array<string, mixed> $rule
      */
     public function validateRule(array $rule): bool
     {
         return isset($rule['name'], $rule['threshold'], $rule['command'])
-            && is_string($rule['name'])
+            && \is_string($rule['name'])
             && is_numeric($rule['threshold'])
-            && is_string($rule['command']);
+            && \is_string($rule['command']);
     }
 
     /**
-     * Validate health score value
+     * Validate health score value.
      *
      * @psalm-return int<0, 100>
      */
@@ -39,30 +41,30 @@ class RuleValidatorService
     }
 
     /**
-     * Validate last check timestamp
+     * Validate last check timestamp.
      */
     public function validateLastCheck(mixed $lastCheck): ?string
     {
-        return is_string($lastCheck) && $this->isValidIso8601($lastCheck) ? $lastCheck : null;
+        return \is_string($lastCheck) && $this->isValidIso8601($lastCheck) ? $lastCheck : null;
     }
 
     /**
-     * Validate detailed results
+     * Validate detailed results.
      *
      * @return array<string, mixed>
      */
     public function validateDetailedResults(mixed $results): array
     {
-        return is_array($results) ? $results : [];
+        return \is_array($results) ? $results : [];
     }
 
     /**
-     * Check if string is valid ISO8601 format
+     * Check if string is valid ISO8601 format.
      */
     private function isValidIso8601(string $date): bool
     {
         try {
-            \Carbon\Carbon::parse($date);
+            Carbon::parse($date);
 
             return true;
         } catch (\Exception) {

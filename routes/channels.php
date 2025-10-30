@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Models\User;
 use Illuminate\Support\Facades\Broadcast;
 
 /*
@@ -15,4 +16,4 @@ use Illuminate\Support\Facades\Broadcast;
 |
 */
 
-Broadcast::channel('App.Models.User.{id}', fn (\App\Models\User $user, mixed $id): bool => (int) $user->id === (is_numeric($id) ? (int) $id : 0));
+Broadcast::channel('App.Models.User.{id}', static fn (User $user, mixed $id): bool => (int) $user->id === (is_numeric($id) ? (int) $id : 0));

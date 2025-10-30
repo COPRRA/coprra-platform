@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use Closure;
 use Illuminate\Routing\Middleware\ValidateSignature as Middleware;
 
 class ValidateSignature extends Middleware
@@ -28,9 +27,9 @@ class ValidateSignature extends Middleware
      * In non-testing environments, fall back to default behavior.
      */
     #[\Override]
-    public function handle($request, Closure $next, ...$args)
+    public function handle($request, \Closure $next, ...$args)
     {
-        if (function_exists('app') && method_exists(app(), 'runningUnitTests') && app()->runningUnitTests()) {
+        if (\function_exists('app') && method_exists(app(), 'runningUnitTests') && app()->runningUnitTests()) {
             return $next($request);
         }
 

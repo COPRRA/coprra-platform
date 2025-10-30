@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Middleware;
 
+use App\Http\Middleware\RequirePassword;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
@@ -12,12 +13,16 @@ use Tests\TestCase;
 
 /**
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class RequirePasswordTest extends TestCase
+final class RequirePasswordTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_require_password_middleware_allows_requests_with_valid_password(): void
+    public function testRequirePasswordMiddlewareAllowsRequestsWithValidPassword(): void
     {
         $user = User::factory()->create([
             'password' => Hash::make('password123'),
@@ -31,18 +36,18 @@ class RequirePasswordTest extends TestCase
         $request = Request::create('/test', 'POST', [
             'password' => 'password123',
         ]);
-        $request->setUserResolver(fn () => $user);
+        $request->setUserResolver(static fn () => $user);
 
-        $middleware = new \App\Http\Middleware\RequirePassword;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new RequirePassword();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('OK', $response->getContent());
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('OK', $response->getContent());
     }
 
-    public function test_require_password_middleware_blocks_requests_with_invalid_password(): void
+    public function testRequirePasswordMiddlewareBlocksRequestsWithInvalidPassword(): void
     {
         $user = User::factory()->create([
             'password' => Hash::make('password123'),
@@ -52,47 +57,47 @@ class RequirePasswordTest extends TestCase
         $request = Request::create('/test', 'POST', [
             'password' => 'wrongpassword',
         ]);
-        $request->setUserResolver(fn () => $user);
+        $request->setUserResolver(static fn () => $user);
 
-        $middleware = new \App\Http\Middleware\RequirePassword;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new RequirePassword();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(302, $response->getStatusCode());
+        self::assertSame(302, $response->getStatusCode());
     }
 
-    public function test_require_password_middleware_blocks_requests_without_password(): void
+    public function testRequirePasswordMiddlewareBlocksRequestsWithoutPassword(): void
     {
         $user = User::factory()->create();
         $this->actingAs($user);
 
         $request = Request::create('/test', 'POST', []);
-        $request->setUserResolver(fn () => $user);
+        $request->setUserResolver(static fn () => $user);
 
-        $middleware = new \App\Http\Middleware\RequirePassword;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new RequirePassword();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(302, $response->getStatusCode());
+        self::assertSame(302, $response->getStatusCode());
     }
 
-    public function test_require_password_middleware_handles_unauthenticated_users(): void
+    public function testRequirePasswordMiddlewareHandlesUnauthenticatedUsers(): void
     {
         $request = Request::create('/test', 'POST', [
             'password' => 'password123',
         ]);
 
-        $middleware = new \App\Http\Middleware\RequirePassword;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new RequirePassword();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(302, $response->getStatusCode());
+        self::assertSame(302, $response->getStatusCode());
     }
 
-    public function test_require_password_middleware_handles_get_requests(): void
+    public function testRequirePasswordMiddlewareHandlesGetRequests(): void
     {
         $user = User::factory()->create();
         $this->actingAs($user);
@@ -102,14 +107,14 @@ class RequirePasswordTest extends TestCase
         $user->save();
 
         $request = Request::create('/test', 'GET');
-        $request->setUserResolver(fn () => $user);
+        $request->setUserResolver(static fn () => $user);
 
-        $middleware = new \App\Http\Middleware\RequirePassword;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new RequirePassword();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('OK', $response->getContent());
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('OK', $response->getContent());
     }
 }

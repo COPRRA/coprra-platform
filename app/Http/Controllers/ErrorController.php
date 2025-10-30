@@ -19,7 +19,7 @@ final class ErrorController extends Controller
     /**
      * Display error dashboard.
      */
-    public function index(Request $request): View|JsonResponse
+    public function index(Request $request): JsonResponse|View
     {
         $logFiles = $this->logProcessingService->getLogFiles();
 
@@ -41,7 +41,7 @@ final class ErrorController extends Controller
     /**
      * Display error details.
      */
-    public function show(Request $request, string $id): View|JsonResponse
+    public function show(Request $request, string $id): JsonResponse|View
     {
         $logFiles = $this->logProcessingService->getLogFiles();
         $error = $this->logProcessingService->getErrorById($logFiles, $id);
@@ -83,21 +83,21 @@ final class ErrorController extends Controller
     {
         try {
             $logFiles = glob(storage_path('logs/*.log'));
-            $errors = $this->processLogFilesForRecentErrors($logFiles ? $logFiles : []);
+            $errors = $this->processLogFilesForRecentErrors($logFiles ?: []);
 
             // Sort by timestamp (newest first)
             usort($errors, static function (array $a, array $b): int {
-                $timestampA = isset($a['timestamp']) && is_string($a['timestamp'])
+                $timestampA = isset($a['timestamp']) && \is_string($a['timestamp'])
                     ? strtotime($a['timestamp'])
                     : 0;
-                $timestampB = isset($b['timestamp']) && is_string($b['timestamp'])
+                $timestampB = isset($b['timestamp']) && \is_string($b['timestamp'])
                     ? strtotime($b['timestamp'])
                     : 0;
 
                 return (int) $timestampB - (int) $timestampA;
             });
 
-            return array_slice($errors, 0, $limit);
+            return \array_slice($errors, 0, $limit);
         } catch (\Exception $e) {
             Log::error('Failed to get recent errors', [
                 'error' => $e->getMessage(),
@@ -123,7 +123,7 @@ final class ErrorController extends Controller
         try {
             $logFiles = glob(storage_path('logs/*.log'));
 
-            return $this->processErrorStatistics($logFiles ? $logFiles : []);
+            return $this->processErrorStatistics($logFiles ?: []);
         } catch (\Exception $e) {
             Log::error('Failed to get error statistics', [
                 'error' => $e->getMessage(),

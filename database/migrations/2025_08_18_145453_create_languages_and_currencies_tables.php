@@ -6,15 +6,14 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
         // جدول اللغات
-        Schema::create('languages', function (Blueprint $table): void {
+        Schema::create('languages', static function (Blueprint $table): void {
             $table->id();
             $table->string('code', 5)->unique(); // ar, en, fr, etc.
             $table->string('name'); // Arabic, English, French
@@ -30,7 +29,7 @@ return new class extends Migration
         });
 
         // جدول العملات
-        Schema::create('currencies', function (Blueprint $table): void {
+        Schema::create('currencies', static function (Blueprint $table): void {
             $table->id();
             $table->string('code', 3)->unique(); // USD, EUR, SAR, etc.
             $table->string('name'); // US Dollar, Euro, Saudi Riyal
@@ -46,7 +45,7 @@ return new class extends Migration
         });
 
         // جدول ربط اللغات بالعملات
-        Schema::create('language_currency', function (Blueprint $table): void {
+        Schema::create('language_currency', static function (Blueprint $table): void {
             $table->id();
             $table->foreignId('language_id')->constrained()->onDelete('cascade');
             $table->foreignId('currency_id')->constrained()->onDelete('cascade');
@@ -57,7 +56,7 @@ return new class extends Migration
         });
 
         // جدول إعدادات المستخدم للغة والعملة
-        Schema::create('user_locale_settings', function (Blueprint $table): void {
+        Schema::create('user_locale_settings', static function (Blueprint $table): void {
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('session_id')->nullable(); // للزوار غير المسجلين

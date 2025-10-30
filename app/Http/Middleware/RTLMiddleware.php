@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use Closure;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class RTLMiddleware
 {
     /** @var array<string> */
     private array $rtlLanguages = ['ar', 'he', 'fa', 'ur'];
 
-    public function handle(Request $request, Closure $next): \Symfony\Component\HttpFoundation\Response
+    public function handle(Request $request, \Closure $next): Response
     {
         $locale = app()->getLocale();
 
-        if (in_array($locale, $this->rtlLanguages)) {
+        if (\in_array($locale, $this->rtlLanguages, true)) {
             view()->share('isRTL', true);
             view()->share('textDirection', 'rtl');
         } else {
@@ -25,7 +25,7 @@ class RTLMiddleware
         }
 
         $response = $next($request);
-        if (! ($response instanceof \Symfony\Component\HttpFoundation\Response)) {
+        if (! $response instanceof Response) {
             throw new \RuntimeException('Middleware must return Response instance');
         }
 

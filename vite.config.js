@@ -3,7 +3,10 @@ import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 import { visualizer } from "rollup-plugin-visualizer";
 import { analyzer } from "vite-bundle-analyzer";
+
 const ANALYZE = process.env.ANALYZE === "true";
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
+const IS_DEVELOPMENT = process.env.NODE_ENV === "development";
 
 export default defineConfig({
     plugins: [
@@ -43,32 +46,58 @@ export default defineConfig({
         analyzer({ analyzerMode: "static", openAnalyzer: false, fileName: "analyzer", defaultSizes: "gzip", summary: true, enabled: ANALYZE }),
     ],
 
-    // Build optimization
+    // Build optimization with maximum strictness
     build: {
         // Output directory for production build
         outDir: "public/build",
         emptyOutDir: true,
-        // Enable source maps for debugging (disable in production)
-        sourcemap: ANALYZE,
+        
+        // Enable source maps for debugging (disable in production for security)
+        sourcemap: IS_DEVELOPMENT || ANALYZE,
 
-        // Minification settings
-        minify: "terser",
+        // Strict minification settings
+        minify: IS_PRODUCTION ? "terser" : false,
         terserOptions: {
             compress: {
-                drop_console: true,
+                drop_console: IS_PRODUCTION,
                 drop_debugger: true,
-                pure_funcs: ["console.log", "console.info", "console.debug"],
+                pure_funcs: IS_PRODUCTION ? ["console.log", "console.info", "console.debug", "console.warn"] : [],
+                passes: 2,
+                unsafe: false,
+                unsafe_comps: false,
+                unsafe_Function: false,
+                unsafe_math: false,
+                unsafe_symbols: false,
+                unsafe_methods: false,
+                unsafe_proto: false,
+                unsafe_regexp: false,
+                unsafe_undefined: false,
             },
             mangle: {
                 safari10: true,
+                keep_classnames: false,
+                keep_fnames: false,
+            },
+            format: {
+                comments: false,
             },
         },
 
-        // Asset handling
-        assetsInlineLimit: 4096,
+        // Strict asset handling
+        assetsInlineLimit: 2048, // Reduced for better caching
+        assetsDir: "assets",
 
-        // Chunk size warnings
-        chunkSizeWarningLimit: 1000,
+        // Strict chunk size warnings
+        chunkSizeWarningLimit: 500, // More strict limit
+
+        // Report compressed size
+        reportCompressedSize: true,
+        
+        // CSS code splitting
+        cssCodeSplit: true,
+        
+        // Target modern browsers for better optimization
+        target: ["es2020", "chrome80", "firefox78", "safari14"],
 
         // Code splitting for better caching
         rollupOptions: {
@@ -100,34 +129,85 @@ export default defineConfig({
         },
     },
 
-    // Optimize dependencies
-    optimizeDeps: {
-        include: ["axios", "alpinejs", "lodash"],
-    },
-
-    // Development server
+    // Development server with enhanced security
     server: {
-        host: "0.0.0.0",
+        host: IS_DEVELOPMENT ? "localhost" : "0.0.0.0",
         port: 5173,
         strictPort: true,
+        open: false, // Don't auto-open browser for security
+        cors: {
+            origin: IS_DEVELOPMENT ? ["http://localhost:8000", "http://127.0.0.1:8000"] : false,
+            credentials: true,
+        },
         fs: {
             strict: true,
+            allow: [".."], // Restrict file system access
+            deny: [".env", ".env.*", "*.log"],
         },
         hmr: {
             host: "localhost",
+            port: 5174,
+            clientPort: 5174,
+        },
+        headers: {
+            "X-Content-Type-Options": "nosniff",
+            "X-Frame-Options": "DENY",
+            "X-XSS-Protection": "1; mode=block",
+            "Referrer-Policy": "strict-origin-when-cross-origin",
         },
     },
 
-    // CSS handling
+    // CSS handling with strict optimization
     css: {
-        devSourcemap: true,
+        devSourcemap: IS_DEVELOPMENT,
+        preprocessorOptions: {
+            scss: {
+                charset: false,
+            },
+        },
     },
 
-    // Resolve configuration
+    // Resolve configuration with strict settings
     resolve: {
         alias: {
             "@": "/resources/js",
             "~": "/resources",
+        },
+        extensions: [".js", ".ts", ".jsx", ".tsx", ".vue", ".json"],
+        preserveSymlinks: false,
+    },
+
+    // Enhanced error handling and logging
+    logLevel: IS_DEVELOPMENT ? "info" : "warn",
+    clearScreen: false,
+
+    // Strict mode configurations
+    define: {
+        __DEV__: IS_DEVELOPMENT,
+        __PROD__: IS_PRODUCTION,
+        "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
+    },
+
+    // Enhanced dependency optimization
+    optimizeDeps: {
+        include: ["axios", "alpinejs", "lodash"],
+        exclude: ["@vite/client", "@vite/env"],
+        esbuildOptions: {
+            target: "es2020",
+            supported: {
+                bigint: true,
+            },
+        },
+    },
+
+    // Experimental features for better performance
+    experimental: {
+        renderBuiltUrl(filename, { hostType }) {
+            if (hostType === "js") {
+                return { js: `"/${filename}"` };
+            } else {
+                return { relative: true };
+            }
         },
     },
 });

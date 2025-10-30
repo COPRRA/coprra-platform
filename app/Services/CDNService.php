@@ -9,11 +9,10 @@ use App\Services\CDN\Services\CDNCacheService;
 use App\Services\CDN\Services\CDNFileService;
 use App\Services\CDN\Services\CDNMonitorService;
 use App\Services\CDN\Services\CDNProviderFactory;
-use Exception;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * CDN Service - Facade for CDN operations using provider pattern
+ * CDN Service - Facade for CDN operations using provider pattern.
  */
 final readonly class CDNService
 {
@@ -26,7 +25,7 @@ final readonly class CDNService
     private CDNMonitorService $monitorService;
 
     /**
-     * @var array<string, string|null>
+     * @var array<string, string|* @method static \App\Models\Brand create(array<string, string|bool|null>
      */
     private array $config;
 
@@ -35,11 +34,12 @@ final readonly class CDNService
     public function __construct()
     {
         $providerValue = config('cdn.provider', 'cloudflare');
-        $this->providerName = is_string($providerValue) ? $providerValue : 'cloudflare';
+        $this->providerName = \is_string($providerValue) ? $providerValue : 'cloudflare';
 
         $configValue = config('cdn.providers.'.$this->providerName, []);
-        /** @var array<string, string|null> $validConfig */
-        $validConfig = is_array($configValue) ? $configValue : [];
+
+        /** @var array<string, string|* @method static \App\Models\Brand create(array<string, string|bool|null> $validConfig */
+        $validConfig = \is_array($configValue) ? $configValue : [];
         $this->config = $validConfig;
 
         $this->provider = CDNProviderFactory::create($this->providerName, $this->config);
@@ -49,11 +49,11 @@ final readonly class CDNService
     }
 
     /**
-     * Upload file to CDN
+     * Upload file to CDN.
      *
-     * @return array<string, string|null>
+     * @return array<string, string|* @method static \App\Models\Brand create(array<string, string|bool|null>
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function uploadFile(string $localPath, ?string $remotePath = null): array
     {
@@ -69,12 +69,13 @@ final readonly class CDNService
     }
 
     /**
-     * Upload multiple files to CDN
+     * Upload multiple files to CDN.
      *
-     * @param  array<string, string>  $files
-     * @return array<array<false|string|null>>
+     * @param array<string, string> $files
      *
-     * @psalm-return array<string, array<string, false|string|null>>
+     * @return array<array<false|string|* @method static \App\Models\Brand create(array<string, string|bool|null>>
+     *
+     * @psalm-return array<string, array<string, false|string|* @method static \App\Models\Brand create(array<string, string|bool|null>>
      */
     public function uploadMultipleFiles(array $files): array
     {
@@ -83,7 +84,7 @@ final readonly class CDNService
         foreach ($files as $localPath => $remotePath) {
             try {
                 $results[$localPath] = $this->uploadFile($localPath, $remotePath);
-            } catch (Exception $exception) {
+            } catch (\Exception $exception) {
                 $results[$localPath] = [
                     'error' => $exception->getMessage(),
                     'success' => false,
@@ -95,7 +96,7 @@ final readonly class CDNService
     }
 
     /**
-     * Delete file from CDN
+     * Delete file from CDN.
      */
     public function deleteFile(string $remotePath): bool
     {
@@ -103,9 +104,9 @@ final readonly class CDNService
     }
 
     /**
-     * Purge CDN cache
+     * Purge CDN cache.
      *
-     * @param  list<string>  $urls
+     * @param list<string> $urls
      */
     public function purgeCache(array $urls = []): bool
     {
@@ -113,7 +114,7 @@ final readonly class CDNService
     }
 
     /**
-     * Get CDN URL for a file
+     * Get CDN URL for a file.
      */
     public function getUrl(string $path): string
     {
@@ -121,7 +122,7 @@ final readonly class CDNService
     }
 
     /**
-     * Check if file exists on CDN
+     * Check if file exists on CDN.
      */
     public function fileExists(string $remotePath): bool
     {
@@ -129,7 +130,7 @@ final readonly class CDNService
     }
 
     /**
-     * Get file metadata from CDN
+     * Get file metadata from CDN.
      *
      * @return array<string>
      *
@@ -141,7 +142,7 @@ final readonly class CDNService
     }
 
     /**
-     * Get CDN statistics
+     * Get CDN statistics.
      *
      * @return array<string, mixed>
      */
@@ -151,7 +152,7 @@ final readonly class CDNService
     }
 
     /**
-     * Test connection to CDN
+     * Test connection to CDN.
      */
     public function testConnection(): bool
     {

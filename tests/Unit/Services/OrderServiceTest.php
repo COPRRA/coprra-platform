@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
+use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
@@ -12,7 +13,12 @@ use App\Services\OrderService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class OrderServiceTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class OrderServiceTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -21,10 +27,10 @@ class OrderServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new OrderService;
+        $this->service = new OrderService();
     }
 
-    public function test_create_order_creates_order_with_items(): void
+    public function testCreateOrderCreatesOrderWithItems(): void
     {
         // Arrange
         $user = User::factory()->create();
@@ -36,15 +42,15 @@ class OrderServiceTest extends TestCase
         $order = $this->service->createOrder($user, $cartItems, $addresses);
 
         // Assert
-        $this->assertInstanceOf(Order::class, $order);
-        $this->assertEquals($user->id, $order->user_id);
-        $this->assertEquals('pending', $order->status);
-        $this->assertEquals(20.00, $order->subtotal); // 2 * 10
-        $this->assertEquals(1, $order->items->count());
-        $this->assertEquals($product->id, $order->items->first()->product_id);
+        self::assertInstanceOf(Order::class, $order);
+        self::assertSame($user->id, $order->user_id);
+        self::assertSame(OrderStatus::PENDING, $order->status);
+        self::assertSame(20.00, $order->subtotal); // 2 * 10
+        self::assertSame(1, $order->items->count());
+        self::assertSame($product->id, $order->items->first()->product_id);
     }
 
-    public function test_update_order_status_updates_valid_transition(): void
+    public function testUpdateOrderStatusUpdatesValidTransition(): void
     {
         // Arrange
         $order = Order::factory()->create(['status' => 'pending']);
@@ -53,11 +59,11 @@ class OrderServiceTest extends TestCase
         $result = $this->service->updateOrderStatus($order, 'processing');
 
         // Assert
-        $this->assertTrue($result);
-        $this->assertEquals('processing', $order->fresh()->status);
+        self::assertTrue($result);
+        self::assertSame(OrderStatus::PROCESSING, $order->fresh()->status);
     }
 
-    public function test_update_order_status_fails_invalid_transition(): void
+    public function testUpdateOrderStatusFailsInvalidTransition(): void
     {
         // Arrange
         $order = Order::factory()->create(['status' => 'delivered']);
@@ -66,11 +72,11 @@ class OrderServiceTest extends TestCase
         $result = $this->service->updateOrderStatus($order, 'processing');
 
         // Assert
-        $this->assertFalse($result);
-        $this->assertEquals('delivered', $order->fresh()->status);
+        self::assertFalse($result);
+        self::assertSame(OrderStatus::DELIVERED, $order->fresh()->status);
     }
 
-    public function test_cancel_order_cancels_pending_order(): void
+    public function testCancelOrderCancelsPendingOrder(): void
     {
         // Arrange
         $order = Order::factory()->create(['status' => 'pending']);
@@ -81,12 +87,12 @@ class OrderServiceTest extends TestCase
         $result = $this->service->cancelOrder($order, 'Changed mind');
 
         // Assert
-        $this->assertTrue($result);
-        $this->assertEquals('cancelled', $order->fresh()->status);
-        $this->assertEquals(12, $product->fresh()->stock); // 10 + 2
+        self::assertTrue($result);
+        self::assertSame(OrderStatus::CANCELLED, $order->fresh()->status);
+        self::assertSame(12, $product->fresh()->stock); // 10 + 2
     }
 
-    public function test_cancel_order_fails_for_shipped_order(): void
+    public function testCancelOrderFailsForShippedOrder(): void
     {
         // Arrange
         $order = Order::factory()->create(['status' => 'shipped']);
@@ -95,11 +101,11 @@ class OrderServiceTest extends TestCase
         $result = $this->service->cancelOrder($order, 'Changed mind');
 
         // Assert
-        $this->assertFalse($result);
-        $this->assertEquals('shipped', $order->fresh()->status);
+        self::assertFalse($result);
+        self::assertSame(OrderStatus::SHIPPED, $order->fresh()->status);
     }
 
-    public function test_get_order_history_returns_user_orders(): void
+    public function testGetOrderHistoryReturnsUserOrders(): void
     {
         // Arrange
         $user = User::factory()->create();
@@ -110,7 +116,7 @@ class OrderServiceTest extends TestCase
         $orders = $this->service->getOrderHistory($user, 10);
 
         // Assert
-        $this->assertCount(1, $orders);
-        $this->assertEquals($user->id, $orders->first()->user_id);
+        self::assertCount(1, $orders);
+        self::assertSame($user->id, $orders->first()->user_id);
     }
 }

@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Script to migrate PHPUnit test annotations to PHPUnit 12 format
- * Converts @test annotations to test_ prefix
+ * Converts @test annotations to test_ prefix.
  */
 $directory = __DIR__.'/tests/Feature';
 
@@ -15,9 +17,9 @@ function processDirectory($dir)
 
     $count = 0;
     foreach ($files as $file) {
-        if ($file->isFile() && $file->getExtension() === 'php') {
+        if ($file->isFile() && 'php' === $file->getExtension()) {
             if (processFile($file->getPathname())) {
-                $count++;
+                ++$count;
             }
         }
     }
@@ -30,14 +32,14 @@ function processFile($filePath)
     $content = file_get_contents($filePath);
     $originalContent = $content;
 
-    // Pattern to match /** @test */ annotation followed by a public function
-    $pattern = '/\n\s*\/\*\*\s*@test\s*\*\/\s*\n\s*public\s+function\s+(?!test_)(\w+)/';
+    // Pattern to match @test annotation and public function
+    $pattern = '#\n\s*/\*\*\s*@test\s*\*/\s*\n\s*public\s+function\s+(?!test_)(\w+)#';
 
-    $content = preg_replace_callback($pattern, function ($matches) {
+    $content = preg_replace_callback($pattern, static function ($matches) {
         $functionName = $matches[1];
 
         // If function starts with 'it_', convert to 'test_'
-        if (strpos($functionName, 'it_') === 0) {
+        if (0 === strpos($functionName, 'it_')) {
             $newName = 'test_'.substr($functionName, 3);
         } else {
             $newName = 'test_'.$functionName;
@@ -49,7 +51,7 @@ function processFile($filePath)
 
     if ($content !== $originalContent) {
         file_put_contents($filePath, $content);
-        echo "Updated: $filePath\n";
+        echo "Updated: {$filePath}\n";
 
         return true;
     }
@@ -59,4 +61,4 @@ function processFile($filePath)
 
 echo "Migrating tests to PHPUnit 12 format...\n";
 $count = processDirectory($directory);
-echo "Completed! Updated $count files.\n";
+echo "Completed! Updated {$count} files.\n";

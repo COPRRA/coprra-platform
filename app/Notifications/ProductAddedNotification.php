@@ -6,6 +6,7 @@ declare(strict_types=1);
 
 namespace App\Notifications;
 
+use App\Models\Product;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
@@ -13,14 +14,12 @@ class ProductAddedNotification extends Notification
 {
     use Queueable;
 
-    protected \App\Models\Product $product;
+    protected Product $product;
 
     /**
      * Create a new notification instance.
-     *
-     * @return void
      */
-    public function __construct(\App\Models\Product $product)
+    public function __construct(Product $product)
     {
         $this->product = $product;
     }

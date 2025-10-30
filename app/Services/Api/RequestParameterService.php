@@ -7,12 +7,12 @@ namespace App\Services\Api;
 use Illuminate\Http\Request;
 
 /**
- * Service for handling API request parameters
+ * Service for handling API request parameters.
  */
 class RequestParameterService
 {
     /**
-     * Enhanced filtering with v2 features
+     * Enhanced filtering with v2 features.
      *
      * @return array<string, string>
      */
@@ -21,7 +21,7 @@ class RequestParameterService
         $filters = $request->except(['page', 'per_page', 'sort_by', 'sort_order', 'search', 'include', 'fields']);
 
         // Remove empty values
-        $filters = array_filter($filters, static fn ($value): bool => $value !== null && $value !== '');
+        $filters = array_filter($filters, static fn ($value): bool => null !== $value && '' !== $value);
 
         // Add v2 specific filters
         if ($request->has('date_from')) {
@@ -36,7 +36,7 @@ class RequestParameterService
     }
 
     /**
-     * Get include parameters for relationships
+     * Get include parameters for relationships.
      *
      * @return array<int>
      *
@@ -46,17 +46,17 @@ class RequestParameterService
     {
         $include = $request->get('include', '');
 
-        if ($include === null || $include === '') {
+        if (null === $include || '' === $include) {
             return [];
         }
 
-        $params = is_string($include) ? explode(',', $include) : [];
+        $params = \is_string($include) ? explode(',', $include) : [];
 
         return array_flip($params);
     }
 
     /**
-     * Get fields parameter for field selection
+     * Get fields parameter for field selection.
      *
      * @return array<int>
      *
@@ -66,19 +66,19 @@ class RequestParameterService
     {
         $fields = $request->get('fields', '');
 
-        if ($fields === null || $fields === '') {
+        if (null === $fields || '' === $fields) {
             return [];
         }
 
-        $params = is_string($fields) ? explode(',', $fields) : [];
+        $params = \is_string($fields) ? explode(',', $fields) : [];
 
         return array_flip($params);
     }
 
     /**
-     * Enhanced search with v2 features
+     * Enhanced search with v2 features.
      *
-     * @return array<string, string|array>
+     * @return array<string, array|string>
      */
     public function getSearchParams(Request $request): array
     {
@@ -94,7 +94,7 @@ class RequestParameterService
     }
 
     /**
-     * Get sorting parameters with v2 enhancements
+     * Get sorting parameters with v2 enhancements.
      *
      * @return array<string, string>
      */
@@ -105,7 +105,7 @@ class RequestParameterService
         $sortMode = $request->get('sort_mode', 'default'); // default, natural, custom
 
         // Validate sort order
-        if (! in_array($sortOrder, ['asc', 'desc'])) {
+        if (! \in_array($sortOrder, ['asc', 'desc'], true)) {
             $sortOrder = 'desc';
         }
 
@@ -117,7 +117,7 @@ class RequestParameterService
     }
 
     /**
-     * Get rate limit information for v2
+     * Get rate limit information for v2.
      *
      * @return array<float|int|string>
      *

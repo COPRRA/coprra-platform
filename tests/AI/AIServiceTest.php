@@ -10,10 +10,14 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Comprehensive AIService Test Suite
+ * Comprehensive AIService Test Suite.
  *
  * Tests all AIService methods with extensive edge cases and validation.
  * Follows MAX quality standards with strict type checking and comprehensive coverage.
+ *
+ * @internal
+ *
+ * @coversNothing
  */
 final class AIServiceTest extends TestCase
 {
@@ -29,39 +33,38 @@ final class AIServiceTest extends TestCase
 
     protected function tearDown(): void
     {
-        unset($this->aiService);
         parent::tearDown();
     }
 
     // ==================== analyzeText Tests ====================
 
     #[Test]
-    public function test_analyze_text_returns_valid_structure(): void
+    public function testAnalyzeTextReturnsValidStructure(): void
     {
         $result = $this->aiService->analyzeText('Test text');
 
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('result', $result);
-        $this->assertArrayHasKey('sentiment', $result);
-        $this->assertArrayHasKey('confidence', $result);
+        self::assertIsArray($result);
+        self::assertArrayHasKey('result', $result);
+        self::assertArrayHasKey('sentiment', $result);
+        self::assertArrayHasKey('confidence', $result);
 
-        $this->assertIsString($result['result']);
-        $this->assertIsString($result['sentiment']);
-        $this->assertIsFloat($result['confidence']);
+        self::assertIsString($result['result']);
+        self::assertIsString($result['sentiment']);
+        self::assertIsFloat($result['confidence']);
     }
 
     #[Test]
-    #[DataProvider('sentimentTextProvider')]
-    public function test_analyze_text_sentiment_detection(string $text, string $expectedSentiment): void
+    #[DataProvider('provideAnalyzeTextSentimentDetectionCases')]
+    public function testAnalyzeTextSentimentDetection(string $text, string $expectedSentiment): void
     {
         $result = $this->aiService->analyzeText($text);
 
-        $this->assertArrayHasKey('sentiment', $result);
-        $this->assertEquals($expectedSentiment, $result['sentiment']);
-        $this->assertContains($result['sentiment'], ['positive', 'negative', 'neutral']);
+        self::assertArrayHasKey('sentiment', $result);
+        self::assertSame($expectedSentiment, $result['sentiment']);
+        self::assertContains($result['sentiment'], ['positive', 'negative', 'neutral']);
     }
 
-    public static function sentimentTextProvider(): array
+    public static function provideAnalyzeTextSentimentDetectionCases(): iterable
     {
         return [
             'positive_arabic' => ['Ù…Ù†ØªØ¬ Ù…Ù…ØªØ§Ø² ÙˆØ±Ø§Ø¦Ø¹ Ø¬Ø¯Ø§Ù‹', 'positive'],
@@ -73,45 +76,45 @@ final class AIServiceTest extends TestCase
     }
 
     #[Test]
-    public function test_analyze_text_whitespace_only_returns_neutral(): void
+    public function testAnalyzeTextWhitespaceOnlyReturnsNeutral(): void
     {
         $result = $this->aiService->analyzeText('   ');
-        $this->assertArrayHasKey('sentiment', $result);
-        $this->assertEquals('neutral', $result['sentiment']);
+        self::assertArrayHasKey('sentiment', $result);
+        self::assertSame('neutral', $result['sentiment']);
     }
 
     #[Test]
-    public function test_analyze_text_with_empty_string(): void
+    public function testAnalyzeTextWithEmptyString(): void
     {
         $result = $this->aiService->analyzeText('');
 
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('sentiment', $result);
-        $this->assertEquals('neutral', $result['sentiment']);
+        self::assertIsArray($result);
+        self::assertArrayHasKey('sentiment', $result);
+        self::assertSame('neutral', $result['sentiment']);
     }
 
     #[Test]
-    public function test_analyze_text_confidence_score_range(): void
+    public function testAnalyzeTextConfidenceScoreRange(): void
     {
         $result = $this->aiService->analyzeText('Test product review');
 
-        $this->assertArrayHasKey('confidence', $result);
-        $this->assertGreaterThanOrEqual(0.0, $result['confidence']);
-        $this->assertLessThanOrEqual(1.0, $result['confidence']);
+        self::assertArrayHasKey('confidence', $result);
+        self::assertGreaterThanOrEqual(0.0, $result['confidence']);
+        self::assertLessThanOrEqual(1.0, $result['confidence']);
     }
 
     #[Test]
-    #[DataProvider('textTypeProvider')]
-    public function test_analyze_text_with_different_types(string $text, string $type): void
+    #[DataProvider('provideAnalyzeTextWithDifferentTypesCases')]
+    public function testAnalyzeTextWithDifferentTypes(string $text, string $type): void
     {
         $result = $this->aiService->analyzeText($text, $type);
 
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('sentiment', $result);
-        $this->assertIsString($result['sentiment']);
+        self::assertIsArray($result);
+        self::assertArrayHasKey('sentiment', $result);
+        self::assertIsString($result['sentiment']);
     }
 
-    public static function textTypeProvider(): array
+    public static function provideAnalyzeTextWithDifferentTypesCases(): iterable
     {
         return [
             'sentiment_type' => ['Great product', 'sentiment'],
@@ -121,37 +124,37 @@ final class AIServiceTest extends TestCase
     }
 
     #[Test]
-    public function test_analyze_text_with_special_characters(): void
+    public function testAnalyzeTextWithSpecialCharacters(): void
     {
         $text = 'Amazing!!! @#$%^&*() product ðŸ˜Š';
         $result = $this->aiService->analyzeText($text);
 
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('sentiment', $result);
-        $this->assertIsString($result['sentiment']);
+        self::assertIsArray($result);
+        self::assertArrayHasKey('sentiment', $result);
+        self::assertIsString($result['sentiment']);
     }
 
     #[Test]
-    public function test_analyze_text_with_very_long_text(): void
+    public function testAnalyzeTextWithVeryLongText(): void
     {
         $longText = str_repeat('This is a test sentence. ', 100);
         $result = $this->aiService->analyzeText($longText);
 
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('result', $result);
-        $this->assertNotEmpty($result['result']);
+        self::assertIsArray($result);
+        self::assertArrayHasKey('result', $result);
+        self::assertNotEmpty($result['result']);
     }
 
     #[Test]
-    #[DataProvider('caseInsensitiveProvider')]
-    public function test_analyze_text_case_insensitive(string $text): void
+    #[DataProvider('provideAnalyzeTextCaseInsensitiveCases')]
+    public function testAnalyzeTextCaseInsensitive(string $text): void
     {
         $result = $this->aiService->analyzeText($text);
-        $this->assertArrayHasKey('sentiment', $result);
-        $this->assertEquals('positive', $result['sentiment']);
+        self::assertArrayHasKey('sentiment', $result);
+        self::assertSame('positive', $result['sentiment']);
     }
 
-    public static function caseInsensitiveProvider(): array
+    public static function provideAnalyzeTextCaseInsensitiveCases(): iterable
     {
         return [
             'capitalized' => ['Excellent product'],
@@ -161,45 +164,45 @@ final class AIServiceTest extends TestCase
     }
 
     #[Test]
-    public function test_analyze_text_mixed_equal_positive_negative_returns_neutral(): void
+    public function testAnalyzeTextMixedEqualPositiveNegativeReturnsNeutral(): void
     {
         $result = $this->aiService->analyzeText('good and bad');
-        $this->assertArrayHasKey('sentiment', $result);
-        $this->assertEquals('neutral', $result['sentiment']);
+        self::assertArrayHasKey('sentiment', $result);
+        self::assertSame('neutral', $result['sentiment']);
     }
 
     // ==================== classifyProduct Tests ====================
 
     #[Test]
-    public function test_classify_product_returns_valid_structure(): void
+    public function testClassifyProductReturnsValidStructure(): void
     {
         $result = $this->aiService->classifyProduct('Smartphone description');
 
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('category', $result);
-        $this->assertArrayHasKey('subcategory', $result);
-        $this->assertArrayHasKey('tags', $result);
-        $this->assertArrayHasKey('confidence', $result);
+        self::assertIsArray($result);
+        self::assertArrayHasKey('category', $result);
+        self::assertArrayHasKey('subcategory', $result);
+        self::assertArrayHasKey('tags', $result);
+        self::assertArrayHasKey('confidence', $result);
 
-        $this->assertIsString($result['category']);
-        $this->assertIsString($result['subcategory']);
-        $this->assertIsArray($result['tags']);
-        $this->assertIsFloat($result['confidence']);
+        self::assertIsString($result['category']);
+        self::assertIsString($result['subcategory']);
+        self::assertIsArray($result['tags']);
+        self::assertIsFloat($result['confidence']);
     }
 
     #[Test]
-    #[DataProvider('productDescriptionProvider')]
-    public function test_classify_product_with_various_descriptions(string $description): void
+    #[DataProvider('provideClassifyProductWithVariousDescriptionsCases')]
+    public function testClassifyProductWithVariousDescriptions(string $description): void
     {
         $result = $this->aiService->classifyProduct($description);
 
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('category', $result);
-        $this->assertNotEmpty($result['category']);
-        $this->assertGreaterThan(0, strlen($result['category']));
+        self::assertIsArray($result);
+        self::assertArrayHasKey('category', $result);
+        self::assertNotEmpty($result['category']);
+        self::assertGreaterThan(0, \strlen($result['category']));
     }
 
-    public static function productDescriptionProvider(): array
+    public static function provideClassifyProductWithVariousDescriptionsCases(): iterable
     {
         return [
             'electronics' => ['Ù‡Ø§ØªÙ Ø¢ÙŠÙÙˆÙ† 15 Ø¨Ø±Ùˆ'],
@@ -214,53 +217,53 @@ final class AIServiceTest extends TestCase
     }
 
     #[Test]
-    public function test_classify_product_confidence_range(): void
+    public function testClassifyProductConfidenceRange(): void
     {
         $result = $this->aiService->classifyProduct('Gaming laptop');
 
-        $this->assertArrayHasKey('confidence', $result);
-        $this->assertGreaterThanOrEqual(0.0, $result['confidence']);
-        $this->assertLessThanOrEqual(1.0, $result['confidence']);
+        self::assertArrayHasKey('confidence', $result);
+        self::assertGreaterThanOrEqual(0.0, $result['confidence']);
+        self::assertLessThanOrEqual(1.0, $result['confidence']);
     }
 
     #[Test]
-    public function test_classify_product_tags_is_array(): void
+    public function testClassifyProductTagsIsArray(): void
     {
         $result = $this->aiService->classifyProduct('Modern smartphone');
 
-        $this->assertArrayHasKey('tags', $result);
-        $this->assertIsArray($result['tags']);
-        $this->assertGreaterThanOrEqual(0, count($result['tags']));
+        self::assertArrayHasKey('tags', $result);
+        self::assertIsArray($result['tags']);
+        self::assertGreaterThanOrEqual(0, \count($result['tags']));
     }
 
     #[Test]
-    public function test_classify_product_tags_count_and_strings(): void
+    public function testClassifyProductTagsCountAndStrings(): void
     {
         $result = $this->aiService->classifyProduct('Generic product');
-        $this->assertArrayHasKey('tags', $result);
-        $this->assertIsArray($result['tags']);
-        $this->assertCount(2, $result['tags']);
+        self::assertArrayHasKey('tags', $result);
+        self::assertIsArray($result['tags']);
+        self::assertCount(2, $result['tags']);
         foreach ($result['tags'] as $tag) {
-            $this->assertIsString($tag);
-            $this->assertNotEmpty($tag);
+            self::assertIsString($tag);
+            self::assertNotEmpty($tag);
         }
-        $this->assertArrayHasKey('category', $result);
-        $this->assertNotEmpty($result['category']);
+        self::assertArrayHasKey('category', $result);
+        self::assertNotEmpty($result['category']);
     }
 
     #[Test]
-    public function test_classify_product_category_not_empty(): void
+    public function testClassifyProductCategoryNotEmpty(): void
     {
         $result = $this->aiService->classifyProduct('Test product');
 
-        $this->assertNotEmpty($result['category']);
-        $this->assertGreaterThan(2, strlen($result['category']));
+        self::assertNotEmpty($result['category']);
+        self::assertGreaterThan(2, \strlen($result['category']));
     }
 
     // ==================== generateRecommendations Tests ====================
 
     #[Test]
-    public function test_generate_recommendations_returns_valid_structure(): void
+    public function testGenerateRecommendationsReturnsValidStructure(): void
     {
         $userPreferences = ['category' => 'electronics'];
         $products = [
@@ -270,29 +273,29 @@ final class AIServiceTest extends TestCase
 
         $result = $this->aiService->generateRecommendations($userPreferences, $products);
 
-        $this->assertIsArray($result);
-        $this->assertNotEmpty($result);
+        self::assertIsArray($result);
+        self::assertNotEmpty($result);
     }
 
     #[Test]
-    public function test_generate_recommendations_with_empty_preferences(): void
+    public function testGenerateRecommendationsWithEmptyPreferences(): void
     {
         $result = $this->aiService->generateRecommendations([], []);
 
-        $this->assertIsArray($result);
+        self::assertIsArray($result);
     }
 
     #[Test]
-    #[DataProvider('recommendationPreferencesProvider')]
-    public function test_generate_recommendations_with_various_preferences(array $preferences, array $products): void
+    #[DataProvider('provideGenerateRecommendationsWithVariousPreferencesCases')]
+    public function testGenerateRecommendationsWithVariousPreferences(array $preferences, array $products): void
     {
         $result = $this->aiService->generateRecommendations($preferences, $products);
 
-        $this->assertIsArray($result);
-        $this->assertNotNull($result);
+        self::assertIsArray($result);
+        self::assertNotNull($result);
     }
 
-    public static function recommendationPreferencesProvider(): array
+    public static function provideGenerateRecommendationsWithVariousPreferencesCases(): iterable
     {
         return [
             'single_category' => [
@@ -320,31 +323,31 @@ final class AIServiceTest extends TestCase
     // ==================== analyzeImage Tests ====================
 
     #[Test]
-    public function test_analyze_image_returns_valid_structure(): void
+    public function testAnalyzeImageReturnsValidStructure(): void
     {
         $imageUrl = 'https://example.com/image.jpg';
         $result = $this->aiService->analyzeImage($imageUrl);
 
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('category', $result);
-        $this->assertArrayHasKey('recommendations', $result);
-        $this->assertArrayHasKey('sentiment', $result);
-        $this->assertArrayHasKey('confidence', $result);
-        $this->assertArrayHasKey('description', $result);
+        self::assertIsArray($result);
+        self::assertArrayHasKey('category', $result);
+        self::assertArrayHasKey('recommendations', $result);
+        self::assertArrayHasKey('sentiment', $result);
+        self::assertArrayHasKey('confidence', $result);
+        self::assertArrayHasKey('description', $result);
     }
 
     #[Test]
-    #[DataProvider('imageUrlProvider')]
-    public function test_analyze_image_with_various_urls(string $url): void
+    #[DataProvider('provideAnalyzeImageWithVariousUrlsCases')]
+    public function testAnalyzeImageWithVariousUrls(string $url): void
     {
         $result = $this->aiService->analyzeImage($url);
 
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('category', $result);
-        $this->assertIsString($result['category']);
+        self::assertIsArray($result);
+        self::assertArrayHasKey('category', $result);
+        self::assertIsString($result['category']);
     }
 
-    public static function imageUrlProvider(): array
+    public static function provideAnalyzeImageWithVariousUrlsCases(): iterable
     {
         return [
             'jpg_image' => ['https://example.com/product.jpg'],
@@ -355,92 +358,92 @@ final class AIServiceTest extends TestCase
     }
 
     #[Test]
-    public function test_analyze_image_with_custom_prompt(): void
+    public function testAnalyzeImageWithCustomPrompt(): void
     {
         $imageUrl = 'https://example.com/image.jpg';
         $prompt = 'Identify the product category';
 
         $result = $this->aiService->analyzeImage($imageUrl, $prompt);
 
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('description', $result);
-        $this->assertIsString($result['description']);
+        self::assertIsArray($result);
+        self::assertArrayHasKey('description', $result);
+        self::assertIsString($result['description']);
     }
 
     #[Test]
-    public function test_analyze_image_with_invalid_url_returns_structure(): void
+    public function testAnalyzeImageWithInvalidUrlReturnsStructure(): void
     {
         $result = $this->aiService->analyzeImage('not-a-url');
-        $this->assertArrayHasKey('category', $result);
-        $this->assertArrayHasKey('recommendations', $result);
-        $this->assertArrayHasKey('sentiment', $result);
-        $this->assertArrayHasKey('confidence', $result);
-        $this->assertArrayHasKey('description', $result);
+        self::assertArrayHasKey('category', $result);
+        self::assertArrayHasKey('recommendations', $result);
+        self::assertArrayHasKey('sentiment', $result);
+        self::assertArrayHasKey('confidence', $result);
+        self::assertArrayHasKey('description', $result);
     }
 
     #[Test]
-    public function test_analyze_image_description_contains_mock_keyword(): void
+    public function testAnalyzeImageDescriptionContainsMockKeyword(): void
     {
         $result = $this->aiService->analyzeImage('https://example.com/img.jpg');
-        $this->assertArrayHasKey('description', $result);
-        $this->assertStringContainsString('Mock image analysis', $result['description']);
+        self::assertArrayHasKey('description', $result);
+        self::assertStringContainsString('Mock image analysis', $result['description']);
     }
 
     #[Test]
-    public function test_analyze_image_confidence_range(): void
+    public function testAnalyzeImageConfidenceRange(): void
     {
         $result = $this->aiService->analyzeImage('https://example.com/product.jpg');
 
-        $this->assertArrayHasKey('confidence', $result);
-        $this->assertGreaterThanOrEqual(0.0, $result['confidence']);
-        $this->assertLessThanOrEqual(1.0, $result['confidence']);
+        self::assertArrayHasKey('confidence', $result);
+        self::assertGreaterThanOrEqual(0.0, $result['confidence']);
+        self::assertLessThanOrEqual(1.0, $result['confidence']);
     }
 
     // ==================== Integration Tests ====================
 
     #[Test]
-    public function test_all_methods_return_arrays(): void
+    public function testAllMethodsReturnArrays(): void
     {
         $analyzeText = $this->aiService->analyzeText('Test');
         $classifyProduct = $this->aiService->classifyProduct('Product');
         $generateRecs = $this->aiService->generateRecommendations([], []);
         $analyzeImage = $this->aiService->analyzeImage('https://example.com/img.jpg');
 
-        $this->assertIsArray($analyzeText);
-        $this->assertIsArray($classifyProduct);
-        $this->assertIsArray($generateRecs);
-        $this->assertIsArray($analyzeImage);
+        self::assertIsArray($analyzeText);
+        self::assertIsArray($classifyProduct);
+        self::assertIsArray($generateRecs);
+        self::assertIsArray($analyzeImage);
     }
 
     #[Test]
-    public function test_service_consistency_across_multiple_calls(): void
+    public function testServiceConsistencyAcrossMultipleCalls(): void
     {
         $text = 'Consistent test text';
 
         $result1 = $this->aiService->analyzeText($text);
         $result2 = $this->aiService->analyzeText($text);
 
-        $this->assertEquals($result1['sentiment'], $result2['sentiment']);
-        $this->assertEquals($result1['confidence'], $result2['confidence']);
+        self::assertSame($result1['sentiment'], $result2['sentiment']);
+        self::assertSame($result1['confidence'], $result2['confidence']);
     }
 
     #[Test]
-    public function test_service_handles_unicode_correctly(): void
+    public function testServiceHandlesUnicodeCorrectly(): void
     {
         $unicodeText = 'Ù…Ù†ØªØ¬ Ø±Ø§Ø¦Ø¹ ðŸ‘ Ù…Ø¹ emoji ÙˆØ­Ø±ÙˆÙ Ø¹Ø±Ø¨ÙŠØ©';
         $result = $this->aiService->analyzeText($unicodeText);
 
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('sentiment', $result);
-        $this->assertIsString($result['sentiment']);
+        self::assertIsArray($result);
+        self::assertArrayHasKey('sentiment', $result);
+        self::assertIsString($result['sentiment']);
     }
 
     #[Test]
-    public function test_service_memory_efficiency(): void
+    public function testServiceMemoryEfficiency(): void
     {
         $memoryBefore = memory_get_usage();
 
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 10; ++$i) {
             $this->aiService->analyzeText("Test iteration {$i}");
         }
 
@@ -448,6 +451,6 @@ final class AIServiceTest extends TestCase
         $memoryUsed = $memoryAfter - $memoryBefore;
 
         // Should not use more than 5MB for 10 simple operations
-        $this->assertLessThan(5 * 1024 * 1024, $memoryUsed);
+        self::assertLessThan(5 * 1024 * 1024, $memoryUsed);
     }
 }

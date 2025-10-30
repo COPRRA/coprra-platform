@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Console\Commands\GenerateSitemap;
+use App\Console\Commands\SEOAudit;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Store;
@@ -14,10 +16,13 @@ use Illuminate\Support\Facades\File;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\TestCase;
 
-#[CoversClass(\App\Services\SEOService::class)]
-#[CoversClass(\App\Console\Commands\SEOAudit::class)]
-#[CoversClass(\App\Console\Commands\GenerateSitemap::class)]
-class SEOTest extends TestCase
+/**
+ * @internal
+ */
+#[CoversClass(SEOService::class)]
+#[CoversClass(SEOAudit::class)]
+#[CoversClass(GenerateSitemap::class)]
+final class SEOTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -30,7 +35,7 @@ class SEOTest extends TestCase
         $this->seoService = $this->app->make(SEOService::class);
     }
 
-    public function test_generates_meta_data_for_product(): void
+    public function testGeneratesMetaDataForProduct(): void
     {
         $product = Product::factory()->create([
             'name' => 'Test Product',
@@ -39,20 +44,20 @@ class SEOTest extends TestCase
 
         $metaData = $this->seoService->generateMetaData($product, 'Product');
 
-        $this->assertIsArray($metaData);
-        $this->assertArrayHasKey('title', $metaData);
-        $this->assertArrayHasKey('description', $metaData);
-        $this->assertArrayHasKey('keywords', $metaData);
-        $this->assertArrayHasKey('og_title', $metaData);
-        $this->assertArrayHasKey('og_description', $metaData);
-        $this->assertArrayHasKey('og_image', $metaData);
-        $this->assertArrayHasKey('canonical', $metaData);
+        self::assertIsArray($metaData);
+        self::assertArrayHasKey('title', $metaData);
+        self::assertArrayHasKey('description', $metaData);
+        self::assertArrayHasKey('keywords', $metaData);
+        self::assertArrayHasKey('og_title', $metaData);
+        self::assertArrayHasKey('og_description', $metaData);
+        self::assertArrayHasKey('og_image', $metaData);
+        self::assertArrayHasKey('canonical', $metaData);
 
-        $this->assertStringContainsString('Test Product', $metaData['title']);
-        $this->assertStringContainsString('test product description', $metaData['description']);
+        self::assertStringContainsString('Test Product', $metaData['title']);
+        self::assertStringContainsString('test product description', $metaData['description']);
     }
 
-    public function test_generates_meta_data_for_category(): void
+    public function testGeneratesMetaDataForCategory(): void
     {
         $category = Category::factory()->create([
             'name' => 'Electronics',
@@ -61,12 +66,12 @@ class SEOTest extends TestCase
 
         $metaData = $this->seoService->generateMetaData($category, 'Category');
 
-        $this->assertIsArray($metaData);
-        $this->assertStringContainsString('Electronics', $metaData['title']);
-        $this->assertStringContainsString('electronics', strtolower($metaData['description']));
+        self::assertIsArray($metaData);
+        self::assertStringContainsString('Electronics', $metaData['title']);
+        self::assertStringContainsString('electronics', strtolower($metaData['description']));
     }
 
-    public function test_generates_meta_data_for_store(): void
+    public function testGeneratesMetaDataForStore(): void
     {
         $store = Store::factory()->create([
             'name' => 'Amazon',
@@ -75,12 +80,12 @@ class SEOTest extends TestCase
 
         $metaData = $this->seoService->generateMetaData($store, 'Store');
 
-        $this->assertIsArray($metaData);
-        $this->assertStringContainsString('Amazon', $metaData['title']);
-        $this->assertStringContainsString('Amazon', $metaData['description']);
+        self::assertIsArray($metaData);
+        self::assertStringContainsString('Amazon', $metaData['title']);
+        self::assertStringContainsString('Amazon', $metaData['description']);
     }
 
-    public function test_generates_title_with_correct_length(): void
+    public function testGeneratesTitleWithCorrectLength(): void
     {
         $product = Product::factory()->create([
             'name' => 'Very Long Product Name That Should Be Truncated For SEO Purposes Because It Exceeds Maximum Length',
@@ -88,10 +93,10 @@ class SEOTest extends TestCase
 
         $metaData = $this->seoService->generateMetaData($product, 'Product');
 
-        $this->assertLessThanOrEqual(60, strlen($metaData['title']));
+        self::assertLessThanOrEqual(60, \strlen($metaData['title']));
     }
 
-    public function test_generates_description_with_correct_length(): void
+    public function testGeneratesDescriptionWithCorrectLength(): void
     {
         $product = Product::factory()->create([
             'description' => str_repeat('This is a very long description. ', 20),
@@ -99,10 +104,10 @@ class SEOTest extends TestCase
 
         $metaData = $this->seoService->generateMetaData($product, 'Product');
 
-        $this->assertLessThanOrEqual(160, strlen($metaData['description']));
+        self::assertLessThanOrEqual(160, \strlen($metaData['description']));
     }
 
-    public function test_validates_meta_data_correctly(): void
+    public function testValidatesMetaDataCorrectly(): void
     {
         $validMetaData = [
             'title' => 'This is a valid title for SEO testing',
@@ -113,10 +118,10 @@ class SEOTest extends TestCase
 
         $issues = $this->seoService->validateMetaData($validMetaData);
 
-        $this->assertEmpty($issues);
+        self::assertEmpty($issues);
     }
 
-    public function test_detects_missing_title(): void
+    public function testDetectsMissingTitle(): void
     {
         $invalidMetaData = [
             'title' => '',
@@ -127,11 +132,11 @@ class SEOTest extends TestCase
 
         $issues = $this->seoService->validateMetaData($invalidMetaData);
 
-        $this->assertNotEmpty($issues);
-        $this->assertStringContainsString('Title', implode(' ', $issues));
+        self::assertNotEmpty($issues);
+        self::assertStringContainsString('Title', implode(' ', $issues));
     }
 
-    public function test_detects_short_title(): void
+    public function testDetectsShortTitle(): void
     {
         $invalidMetaData = [
             'title' => 'Short',
@@ -142,11 +147,11 @@ class SEOTest extends TestCase
 
         $issues = $this->seoService->validateMetaData($invalidMetaData);
 
-        $this->assertNotEmpty($issues);
-        $this->assertStringContainsString('too short', implode(' ', $issues));
+        self::assertNotEmpty($issues);
+        self::assertStringContainsString('too short', implode(' ', $issues));
     }
 
-    public function test_detects_long_title(): void
+    public function testDetectsLongTitle(): void
     {
         $invalidMetaData = [
             'title' => str_repeat('Very long title ', 10),
@@ -157,11 +162,11 @@ class SEOTest extends TestCase
 
         $issues = $this->seoService->validateMetaData($invalidMetaData);
 
-        $this->assertNotEmpty($issues);
-        $this->assertStringContainsString('too long', implode(' ', $issues));
+        self::assertNotEmpty($issues);
+        self::assertStringContainsString('too long', implode(' ', $issues));
     }
 
-    public function test_detects_missing_description(): void
+    public function testDetectsMissingDescription(): void
     {
         $invalidMetaData = [
             'title' => 'Valid title for testing purposes',
@@ -172,11 +177,11 @@ class SEOTest extends TestCase
 
         $issues = $this->seoService->validateMetaData($invalidMetaData);
 
-        $this->assertNotEmpty($issues);
-        $this->assertStringContainsString('Description', implode(' ', $issues));
+        self::assertNotEmpty($issues);
+        self::assertStringContainsString('Description', implode(' ', $issues));
     }
 
-    public function test_generates_structured_data_for_product(): void
+    public function testGeneratesStructuredDataForProduct(): void
     {
         $product = Product::factory()->create([
             'name' => 'Test Product',
@@ -186,14 +191,14 @@ class SEOTest extends TestCase
 
         $structuredData = $this->seoService->generateStructuredData($product);
 
-        $this->assertIsArray($structuredData);
-        $this->assertEquals('https://schema.org/', $structuredData['@context']);
-        $this->assertEquals('Product', $structuredData['@type']);
-        $this->assertEquals('Test Product', $structuredData['name']);
-        $this->assertArrayHasKey('offers', $structuredData);
+        self::assertIsArray($structuredData);
+        self::assertSame('https://schema.org/', $structuredData['@context']);
+        self::assertSame('Product', $structuredData['@type']);
+        self::assertSame('Test Product', $structuredData['name']);
+        self::assertArrayHasKey('offers', $structuredData);
     }
 
-    public function test_generates_breadcrumb_structured_data(): void
+    public function testGeneratesBreadcrumbStructuredData(): void
     {
         $breadcrumbs = [
             ['name' => 'Home', 'url' => 'https://example.com'],
@@ -203,13 +208,13 @@ class SEOTest extends TestCase
 
         $structuredData = $this->seoService->generateBreadcrumbData($breadcrumbs);
 
-        $this->assertIsArray($structuredData);
-        $this->assertEquals('https://schema.org/', $structuredData['@context']);
-        $this->assertEquals('BreadcrumbList', $structuredData['@type']);
-        $this->assertCount(3, $structuredData['itemListElement']);
+        self::assertIsArray($structuredData);
+        self::assertSame('https://schema.org/', $structuredData['@context']);
+        self::assertSame('BreadcrumbList', $structuredData['@type']);
+        self::assertCount(3, $structuredData['itemListElement']);
     }
 
-    public function test_generates_sitemap_successfully(): void
+    public function testGeneratesSitemapSuccessfully(): void
     {
         // Create test data
         Product::factory()->count(5)->create(['is_active' => true]);
@@ -220,19 +225,19 @@ class SEOTest extends TestCase
         Artisan::call('sitemap:generate');
 
         // Check if sitemap file exists
-        $this->assertTrue(File::exists(public_path('sitemap.xml')));
+        self::assertTrue(File::exists(public_path('sitemap.xml')));
 
         // Check sitemap content
         $content = File::get(public_path('sitemap.xml'));
-        $this->assertStringContainsString('<?xml version="1.0" encoding="UTF-8"?>', $content);
-        $this->assertStringContainsString('<urlset', $content);
-        $this->assertStringContainsString('</urlset>', $content);
+        self::assertStringContainsString('<?xml version="1.0" encoding="UTF-8"?>', $content);
+        self::assertStringContainsString('<urlset', $content);
+        self::assertStringContainsString('</urlset>', $content);
 
         // Clean up
         File::delete(public_path('sitemap.xml'));
     }
 
-    public function test_sitemap_includes_products(): void
+    public function testSitemapIncludesProducts(): void
     {
         $product = Product::factory()->create([
             'name' => 'Test Product',
@@ -243,21 +248,21 @@ class SEOTest extends TestCase
         Artisan::call('sitemap:generate');
 
         $content = File::get(public_path('sitemap.xml'));
-        $this->assertStringContainsString('test-product', $content);
+        self::assertStringContainsString('test-product', $content);
 
         File::delete(public_path('sitemap.xml'));
     }
 
-    public function test_seo_audit_command_runs_successfully(): void
+    public function testSeoAuditCommandRunsSuccessfully(): void
     {
         Product::factory()->count(3)->create();
 
         $exitCode = Artisan::call('seo:audit');
 
-        $this->assertEquals(0, $exitCode);
+        self::assertSame(0, $exitCode);
     }
 
-    public function test_seo_audit_can_fix_issues(): void
+    public function testSeoAuditCanFixIssues(): void
     {
         $product = Product::factory()->create([
             'name' => 'Test Product',
@@ -270,21 +275,21 @@ class SEOTest extends TestCase
         $product->refresh();
 
         // Check if meta fields were populated
-        $this->assertNotNull($product->meta_title);
-        $this->assertNotNull($product->meta_description);
+        self::assertNotNull($product->meta_title);
+        self::assertNotNull($product->meta_description);
     }
 
-    public function test_robots_txt_file_exists(): void
+    public function testRobotsTxtFileExists(): void
     {
-        $this->assertTrue(File::exists(public_path('robots.txt')));
+        self::assertTrue(File::exists(public_path('robots.txt')));
     }
 
-    public function test_robots_txt_has_correct_content(): void
+    public function testRobotsTxtHasCorrectContent(): void
     {
         $content = File::get(public_path('robots.txt'));
 
-        $this->assertStringContainsString('User-agent:', $content);
-        $this->assertStringContainsString('Disallow: /admin', $content);
-        $this->assertStringContainsString('Sitemap:', $content);
+        self::assertStringContainsString('User-agent:', $content);
+        self::assertStringContainsString('Disallow: /admin', $content);
+        self::assertStringContainsString('Sitemap:', $content);
     }
 }

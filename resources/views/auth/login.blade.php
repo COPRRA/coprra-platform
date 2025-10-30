@@ -5,7 +5,7 @@
 @section('content')
 <div class="container py-5" style="max-width:480px">
     <h1 class="h3 mb-4">{{ __('messages.login') }}</h1>
-    <form method="POST" action="{{ route('login') }}">
+    <form method="POST" action="{{ route('login.post') }}">
         @csrf
         <div class="mb-3">
             <label class="form-label" for="email">Email</label>

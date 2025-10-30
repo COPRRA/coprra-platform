@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Rules;
 
-use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Contracts\Validation\ValidationRule;
 
-class DimensionSum implements Rule
+class DimensionSum implements ValidationRule
 {
     private readonly int $maxSum;
 
@@ -16,15 +16,12 @@ class DimensionSum implements Rule
     }
 
     #[\Override]
-    public function passes(mixed $attribute, mixed $value): bool
+    public function validate(string $attribute, mixed $value, \Closure $fail): void
     {
-        // تأكيد استخدام معامل $attribute لتجنب عدم استعماله ولتعزيز التحقق
-        if (! is_string($attribute) || $attribute === '') {
-            return false;
-        }
+        if (! \is_array($value) || 3 !== \count($value)) {
+            $fail('The :attribute must be an array with exactly 3 dimensions.');
 
-        if (! is_array($value) || count($value) !== 3) {
-            return false;
+            return;
         }
 
         // Support both indexed and associative arrays (length, width, height)
@@ -40,18 +37,16 @@ class DimensionSum implements Rule
         // Ensure all values are numeric
         foreach ($values as $val) {
             if (! is_numeric($val)) {
-                return false;
+                $fail('All dimension values must be numeric.');
+
+                return;
             }
         }
 
         $total = array_sum(array_map(static fn ($val): float => (float) $val, $values));
 
-        return $total <= $this->maxSum;
-    }
-
-    #[\Override]
-    public function message(): string
-    {
-        return 'The sum of dimensions cannot exceed '.$this->maxSum.' cm.';
+        if ($total > $this->maxSum) {
+            $fail("The sum of dimensions cannot exceed {$this->maxSum} cm.");
+        }
     }
 }

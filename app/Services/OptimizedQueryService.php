@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 final class OptimizedQueryService
 {
     /**
-     * @param  array<string, string|int|bool|array<string, string>>  $filters
+     * @param array<string, array<string, string>|bool|int|string> $filters
      */
     public function getProductsWithDetails(array $filters = [], int $perPage = 20): LengthAwarePaginator
     {
@@ -39,7 +39,7 @@ final class OptimizedQueryService
     }
 
     /**
-     * @param  array<string, string|int>  $filters
+     * @param array<string, int|string> $filters
      *
      * @psalm-return Collection<int, Order>
      */
@@ -95,11 +95,12 @@ final class OptimizedQueryService
                 'created_at',
                 'description',
             ])
-            ->where('is_active', true);
+            ->where('is_active', true)
+        ;
     }
 
     /**
-     * @param  array<string, string|int|float>  $filters
+     * @param array<string, float|int|string> $filters
      */
     private function applyProductFilters(Builder $query, array $filters): void
     {
@@ -119,7 +120,7 @@ final class OptimizedQueryService
             $query->where('price', '<=', $filters['price_max']);
         }
 
-        if (isset($filters['search']) && is_string($filters['search']) && $filters['search'] !== '') {
+        if (isset($filters['search']) && \is_string($filters['search']) && '' !== $filters['search']) {
             $query->where('name', 'LIKE', '%'.$filters['search'].'%');
         }
     }
@@ -127,24 +128,26 @@ final class OptimizedQueryService
     /**
      * @psalm-return Closure(Builder):void
      */
-    private function getReviewsQuery(): Closure
+    private function getReviewsQuery(): \Closure
     {
         return static function (Builder $q): void {
             $q->with('user:id,name')
                 ->where('is_approved', true)
                 ->orderBy('created_at', 'desc')
-                ->limit(10);
+                ->limit(10)
+            ;
         };
     }
 
     /**
      * @psalm-return Closure(Builder):void
      */
-    private function getPriceOffersQuery(): Closure
+    private function getPriceOffersQuery(): \Closure
     {
         return static function (Builder $q): void {
             $q->where('is_available', true)
-                ->orderBy('price', 'asc');
+                ->orderBy('price', 'asc')
+            ;
         };
     }
 
@@ -156,7 +159,8 @@ final class OptimizedQueryService
         return Order::with([
             'items' => static function (Builder $q): void {
                 $q->with('product:id,name')
-                    ->select('id', 'order_id', 'product_id', 'quantity', 'price');
+                    ->select('id', 'order_id', 'product_id', 'quantity', 'price')
+                ;
             },
         ])
             ->select([
@@ -169,11 +173,12 @@ final class OptimizedQueryService
                 'total_amount',
                 'created_at',
             ])
-            ->where('user_id', $userId);
+            ->where('user_id', $userId)
+        ;
     }
 
     /**
-     * @param  array<string, string|int>  $filters
+     * @param array<string, int|string> $filters
      */
     private function applyOrderFilters(Builder $query, array $filters): void
     {
@@ -181,11 +186,11 @@ final class OptimizedQueryService
             $query->where('status', $filters['status']);
         }
 
-        if (isset($filters['date_from']) && $filters['date_from'] !== '') {
+        if (isset($filters['date_from']) && '' !== $filters['date_from']) {
             $query->where('created_at', '>=', $filters['date_from']);
         }
 
-        if (isset($filters['date_to']) && $filters['date_to'] !== '') {
+        if (isset($filters['date_to']) && '' !== $filters['date_to']) {
             $query->where('created_at', '<=', $filters['date_to']);
         }
     }
@@ -204,7 +209,7 @@ final class OptimizedQueryService
             'monthly_revenue' => 0.0,
         ];
 
-        if (! is_object($analytics)) {
+        if (! \is_object($analytics)) {
             return $defaults;
         }
 

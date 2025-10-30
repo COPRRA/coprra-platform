@@ -8,9 +8,15 @@ use App\Models\Notification;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class NotificationTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class NotificationTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -19,8 +25,8 @@ class NotificationTest extends TestCase
         parent::setUp();
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_create_a_notification(): void
+    #[Test]
+    public function testItCanCreateANotification(): void
     {
         $user = User::factory()->create(['email' => 'user@example.com']);
         $notification = Notification::factory()->create([
@@ -36,17 +42,17 @@ class NotificationTest extends TestCase
             'tags' => ['price', 'alert'],
         ]);
 
-        $this->assertInstanceOf(Notification::class, $notification);
-        $this->assertNotNull($notification->user_id);
-        $this->assertEquals('price_drop', $notification->type);
-        $this->assertEquals('Price Drop Alert', $notification->title);
-        $this->assertEquals('The price has dropped!', $notification->message);
-        $this->assertEquals(['product_id' => 1, 'old_price' => 100, 'new_price' => 80], $notification->data);
-        $this->assertEquals(3, $notification->priority);
-        $this->assertEquals('email', $notification->channel);
-        $this->assertEquals('pending', $notification->status);
-        $this->assertEquals(['source' => 'system'], $notification->metadata);
-        $this->assertEquals(['price', 'alert'], $notification->tags);
+        self::assertInstanceOf(Notification::class, $notification);
+        self::assertNotNull($notification->user_id);
+        self::assertSame('price_drop', $notification->type);
+        self::assertSame('Price Drop Alert', $notification->title);
+        self::assertSame('The price has dropped!', $notification->message);
+        self::assertSame(['product_id' => 1, 'old_price' => 100, 'new_price' => 80], $notification->data);
+        self::assertSame(3, $notification->priority);
+        self::assertSame('email', $notification->channel);
+        self::assertSame('pending', $notification->status);
+        self::assertSame(['source' => 'system'], $notification->metadata);
+        self::assertSame(['price', 'alert'], $notification->tags);
 
         // Assert that the notification was actually saved to the database
         $this->assertDatabaseHas('custom_notifications', [
@@ -60,8 +66,8 @@ class NotificationTest extends TestCase
         ]);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_casts_attributes_correctly(): void
+    #[Test]
+    public function testItCastsAttributesCorrectly(): void
     {
         $user = User::factory()->create(['email' => 'user@example.com']);
         $notification = Notification::factory()->create([
@@ -74,26 +80,26 @@ class NotificationTest extends TestCase
             'tags' => ['urgent', 'system'],
         ]);
 
-        $this->assertIsArray($notification->data);
-        $this->assertInstanceOf(Carbon::class, $notification->read_at);
-        $this->assertInstanceOf(Carbon::class, $notification->sent_at);
-        $this->assertIsInt($notification->priority);
-        $this->assertIsArray($notification->metadata);
-        $this->assertIsArray($notification->tags);
+        self::assertIsArray($notification->data);
+        self::assertInstanceOf(Carbon::class, $notification->read_at);
+        self::assertInstanceOf(Carbon::class, $notification->sent_at);
+        self::assertIsInt($notification->priority);
+        self::assertIsArray($notification->metadata);
+        self::assertIsArray($notification->tags);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_belongs_to_user(): void
+    #[Test]
+    public function testItBelongsToUser(): void
     {
         $user = User::factory()->create(['email' => 'user@example.com']);
         $notification = Notification::factory()->create(['user_id' => $user->id]);
 
-        $this->assertInstanceOf(User::class, $notification->user);
-        $this->assertEquals($user->id, $notification->user->id);
+        self::assertInstanceOf(User::class, $notification->user);
+        self::assertSame($user->id, $notification->user->id);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_scope_unread_filters_unread_notifications(): void
+    #[Test]
+    public function testScopeUnreadFiltersUnreadNotifications(): void
     {
         Notification::factory()->create(['read_at' => null]);
         Notification::factory()->create(['read_at' => now()]);
@@ -101,12 +107,12 @@ class NotificationTest extends TestCase
 
         $unreadNotifications = Notification::unread()->get();
 
-        $this->assertCount(2, $unreadNotifications);
-        $this->assertTrue($unreadNotifications->every(fn ($n) => $n->read_at === null));
+        self::assertCount(2, $unreadNotifications);
+        self::assertTrue($unreadNotifications->every(static fn ($n) => null === $n->read_at));
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_scope_read_filters_read_notifications(): void
+    #[Test]
+    public function testScopeReadFiltersReadNotifications(): void
     {
         Notification::factory()->create(['read_at' => null]);
         Notification::factory()->create(['read_at' => now()]);
@@ -114,12 +120,12 @@ class NotificationTest extends TestCase
 
         $readNotifications = Notification::read()->get();
 
-        $this->assertCount(2, $readNotifications);
-        $this->assertTrue($readNotifications->every(fn ($n) => $n->read_at !== null));
+        self::assertCount(2, $readNotifications);
+        self::assertTrue($readNotifications->every(static fn ($n) => null !== $n->read_at));
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_scope_of_type_filters_by_type(): void
+    #[Test]
+    public function testScopeOfTypeFiltersByType(): void
     {
         Notification::factory()->create(['type' => 'price_drop']);
         Notification::factory()->create(['type' => 'new_product']);
@@ -128,14 +134,14 @@ class NotificationTest extends TestCase
         $priceDropNotifications = Notification::ofType('price_drop')->get();
         $newProductNotifications = Notification::ofType('new_product')->get();
 
-        $this->assertCount(2, $priceDropNotifications);
-        $this->assertCount(1, $newProductNotifications);
-        $this->assertTrue($priceDropNotifications->every(fn ($n) => $n->type === 'price_drop'));
-        $this->assertTrue($newProductNotifications->every(fn ($n) => $n->type === 'new_product'));
+        self::assertCount(2, $priceDropNotifications);
+        self::assertCount(1, $newProductNotifications);
+        self::assertTrue($priceDropNotifications->every(static fn ($n) => 'price_drop' === $n->type));
+        self::assertTrue($newProductNotifications->every(static fn ($n) => 'new_product' === $n->type));
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_scope_of_priority_filters_by_priority(): void
+    #[Test]
+    public function testScopeOfPriorityFiltersByPriority(): void
     {
         Notification::factory()->create(['priority' => 1]);
         Notification::factory()->create(['priority' => 2]);
@@ -144,14 +150,14 @@ class NotificationTest extends TestCase
         $lowPriorityNotifications = Notification::ofPriority(1)->get();
         $normalPriorityNotifications = Notification::ofPriority(2)->get();
 
-        $this->assertCount(2, $lowPriorityNotifications);
-        $this->assertCount(1, $normalPriorityNotifications);
-        $this->assertTrue($lowPriorityNotifications->every(fn ($n) => $n->priority === 1));
-        $this->assertTrue($normalPriorityNotifications->every(fn ($n) => $n->priority === 2));
+        self::assertCount(2, $lowPriorityNotifications);
+        self::assertCount(1, $normalPriorityNotifications);
+        self::assertTrue($lowPriorityNotifications->every(static fn ($n) => 1 === $n->priority));
+        self::assertTrue($normalPriorityNotifications->every(static fn ($n) => 2 === $n->priority));
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_scope_of_status_filters_by_status(): void
+    #[Test]
+    public function testScopeOfStatusFiltersByStatus(): void
     {
         Notification::factory()->create(['status' => 'pending']);
         Notification::factory()->create(['status' => 'sent']);
@@ -160,14 +166,14 @@ class NotificationTest extends TestCase
         $pendingNotifications = Notification::ofStatus('pending')->get();
         $sentNotifications = Notification::ofStatus('sent')->get();
 
-        $this->assertCount(2, $pendingNotifications);
-        $this->assertCount(1, $sentNotifications);
-        $this->assertTrue($pendingNotifications->every(fn ($n) => $n->status === 'pending'));
-        $this->assertTrue($sentNotifications->every(fn ($n) => $n->status === 'sent'));
+        self::assertCount(2, $pendingNotifications);
+        self::assertCount(1, $sentNotifications);
+        self::assertTrue($pendingNotifications->every(static fn ($n) => 'pending' === $n->status));
+        self::assertTrue($sentNotifications->every(static fn ($n) => 'sent' === $n->status));
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_scope_sent_filters_sent_notifications(): void
+    #[Test]
+    public function testScopeSentFiltersSentNotifications(): void
     {
         Notification::factory()->create(['sent_at' => now()]);
         Notification::factory()->create(['sent_at' => null]);
@@ -175,12 +181,12 @@ class NotificationTest extends TestCase
 
         $sentNotifications = Notification::sent()->get();
 
-        $this->assertCount(2, $sentNotifications);
-        $this->assertTrue($sentNotifications->every(fn ($n) => $n->sent_at !== null));
+        self::assertCount(2, $sentNotifications);
+        self::assertTrue($sentNotifications->every(static fn ($n) => null !== $n->sent_at));
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_scope_pending_filters_pending_notifications(): void
+    #[Test]
+    public function testScopePendingFiltersPendingNotifications(): void
     {
         Notification::factory()->create(['sent_at' => null, 'status' => 'pending']);
         Notification::factory()->create(['sent_at' => now(), 'status' => 'sent']);
@@ -188,12 +194,12 @@ class NotificationTest extends TestCase
 
         $pendingNotifications = Notification::pending()->get();
 
-        $this->assertCount(1, $pendingNotifications);
-        $this->assertTrue($pendingNotifications->every(fn ($n) => $n->sent_at === null && $n->status === 'pending'));
+        self::assertCount(1, $pendingNotifications);
+        self::assertTrue($pendingNotifications->every(static fn ($n) => null === $n->sent_at && 'pending' === $n->status));
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_scope_failed_filters_failed_notifications(): void
+    #[Test]
+    public function testScopeFailedFiltersFailedNotifications(): void
     {
         Notification::factory()->create(['status' => 'failed']);
         Notification::factory()->create(['status' => 'sent']);
@@ -201,12 +207,12 @@ class NotificationTest extends TestCase
 
         $failedNotifications = Notification::failed()->get();
 
-        $this->assertCount(2, $failedNotifications);
-        $this->assertTrue($failedNotifications->every(fn ($n) => $n->status === 'failed'));
+        self::assertCount(2, $failedNotifications);
+        self::assertTrue($failedNotifications->every(static fn ($n) => 'failed' === $n->status));
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_scope_for_user_filters_by_user_id(): void
+    #[Test]
+    public function testScopeForUserFiltersByUserId(): void
     {
         $user1 = User::factory()->create(['email' => 'user1@example.com']);
         $user2 = User::factory()->create(['email' => 'user2@example.com']);
@@ -218,14 +224,14 @@ class NotificationTest extends TestCase
         $user1Notifications = Notification::forUser($user1->id)->get();
         $user2Notifications = Notification::forUser($user2->id)->get();
 
-        $this->assertCount(2, $user1Notifications);
-        $this->assertCount(1, $user2Notifications);
-        $this->assertTrue($user1Notifications->every(fn ($n) => $n->user_id === $user1->id));
-        $this->assertTrue($user2Notifications->every(fn ($n) => $n->user_id === $user2->id));
+        self::assertCount(2, $user1Notifications);
+        self::assertCount(1, $user2Notifications);
+        self::assertTrue($user1Notifications->every(static fn ($n) => $n->user_id === $user1->id));
+        self::assertTrue($user2Notifications->every(static fn ($n) => $n->user_id === $user2->id));
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_scope_after_filters_notifications_after_date(): void
+    #[Test]
+    public function testScopeAfterFiltersNotificationsAfterDate(): void
     {
         $now = now();
         $yesterday = $now->copy()->subDay();
@@ -237,12 +243,12 @@ class NotificationTest extends TestCase
 
         $notificationsAfter = Notification::after($yesterday)->get();
 
-        $this->assertCount(2, $notificationsAfter);
-        $this->assertTrue($notificationsAfter->every(fn ($n) => $n->created_at->gt($yesterday)));
+        self::assertCount(2, $notificationsAfter);
+        self::assertTrue($notificationsAfter->every(static fn ($n) => $n->created_at->gt($yesterday)));
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_scope_before_filters_notifications_before_date(): void
+    #[Test]
+    public function testScopeBeforeFiltersNotificationsBeforeDate(): void
     {
         $now = now();
         $yesterday = $now->copy()->subDay();
@@ -254,12 +260,12 @@ class NotificationTest extends TestCase
 
         $notificationsBefore = Notification::before($tomorrow)->get();
 
-        $this->assertCount(2, $notificationsBefore);
-        $this->assertTrue($notificationsBefore->every(fn ($n) => $n->created_at->lt($tomorrow)));
+        self::assertCount(2, $notificationsBefore);
+        self::assertTrue($notificationsBefore->every(static fn ($n) => $n->created_at->lt($tomorrow)));
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_scope_between_filters_notifications_between_dates(): void
+    #[Test]
+    public function testScopeBetweenFiltersNotificationsBetweenDates(): void
     {
         $user = User::factory()->create(['email' => 'user@example.com']);
         $now = now();
@@ -274,111 +280,111 @@ class NotificationTest extends TestCase
 
         $notificationsBetween = Notification::between($yesterday, $tomorrow)->get();
 
-        $this->assertCount(3, $notificationsBetween);
+        self::assertCount(3, $notificationsBetween);
         // Check that we have the expected notifications
-        $this->assertTrue($notificationsBetween->count() >= 3);
+        self::assertTrue($notificationsBetween->count() >= 3);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_mark_as_read(): void
+    #[Test]
+    public function testMarkAsRead(): void
     {
         $notification = Notification::factory()->create(['read_at' => null]);
 
         $result = $notification->markAsRead();
 
-        $this->assertTrue($result);
-        $this->assertNotNull($notification->fresh()->read_at);
+        self::assertTrue($result);
+        self::assertNotNull($notification->fresh()->read_at);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_mark_as_unread(): void
+    #[Test]
+    public function testMarkAsUnread(): void
     {
         $notification = Notification::factory()->create(['read_at' => now()]);
 
         $result = $notification->markAsUnread();
 
-        $this->assertTrue($result);
-        $this->assertNull($notification->fresh()->read_at);
+        self::assertTrue($result);
+        self::assertNull($notification->fresh()->read_at);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_mark_as_sent(): void
+    #[Test]
+    public function testMarkAsSent(): void
     {
         $notification = Notification::factory()->create(['sent_at' => null, 'status' => 'pending']);
 
         $result = $notification->markAsSent();
 
-        $this->assertTrue($result);
-        $this->assertNotNull($notification->fresh()->sent_at);
-        $this->assertEquals('sent', $notification->fresh()->status);
+        self::assertTrue($result);
+        self::assertNotNull($notification->fresh()->sent_at);
+        self::assertSame('sent', $notification->fresh()->status);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_mark_as_failed(): void
+    #[Test]
+    public function testMarkAsFailed(): void
     {
         $notification = Notification::factory()->create(['status' => 'pending']);
 
         $result = $notification->markAsFailed('Connection timeout');
 
-        $this->assertTrue($result);
-        $this->assertEquals('failed', $notification->fresh()->status);
-        $this->assertEquals('Connection timeout', $notification->fresh()->getData('failure_reason'));
+        self::assertTrue($result);
+        self::assertSame('failed', $notification->fresh()->status);
+        self::assertSame('Connection timeout', $notification->fresh()->getData('failure_reason'));
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_is_read(): void
+    #[Test]
+    public function testIsRead(): void
     {
         $readNotification = Notification::factory()->create(['read_at' => now()]);
         $unreadNotification = Notification::factory()->create(['read_at' => null]);
 
-        $this->assertTrue($readNotification->isRead());
-        $this->assertFalse($unreadNotification->isRead());
+        self::assertTrue($readNotification->isRead());
+        self::assertFalse($unreadNotification->isRead());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_is_unread(): void
+    #[Test]
+    public function testIsUnread(): void
     {
         $readNotification = Notification::factory()->create(['read_at' => now()]);
         $unreadNotification = Notification::factory()->create(['read_at' => null]);
 
-        $this->assertFalse($readNotification->isUnread());
-        $this->assertTrue($unreadNotification->isUnread());
+        self::assertFalse($readNotification->isUnread());
+        self::assertTrue($unreadNotification->isUnread());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_is_sent(): void
+    #[Test]
+    public function testIsSent(): void
     {
         $sentNotification = Notification::factory()->create(['sent_at' => now()]);
         $unsentNotification = Notification::factory()->create(['sent_at' => null]);
 
-        $this->assertTrue($sentNotification->isSent());
-        $this->assertFalse($unsentNotification->isSent());
+        self::assertTrue($sentNotification->isSent());
+        self::assertFalse($unsentNotification->isSent());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_is_pending(): void
+    #[Test]
+    public function testIsPending(): void
     {
         $pendingNotification = Notification::factory()->create(['sent_at' => null, 'status' => 'pending']);
         $sentNotification = Notification::factory()->create(['sent_at' => now(), 'status' => 'sent']);
         $failedNotification = Notification::factory()->create(['sent_at' => null, 'status' => 'failed']);
 
-        $this->assertTrue($pendingNotification->isPending());
-        $this->assertFalse($sentNotification->isPending());
-        $this->assertFalse($failedNotification->isPending());
+        self::assertTrue($pendingNotification->isPending());
+        self::assertFalse($sentNotification->isPending());
+        self::assertFalse($failedNotification->isPending());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_is_failed(): void
+    #[Test]
+    public function testIsFailed(): void
     {
         $failedNotification = Notification::factory()->create(['status' => 'failed']);
         $sentNotification = Notification::factory()->create(['status' => 'sent']);
 
-        $this->assertTrue($failedNotification->isFailed());
-        $this->assertFalse($sentNotification->isFailed());
+        self::assertTrue($failedNotification->isFailed());
+        self::assertFalse($sentNotification->isFailed());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_priority_level(): void
+    #[Test]
+    public function testGetPriorityLevel(): void
     {
         $lowPriority = Notification::factory()->create(['priority' => 1]);
         $normalPriority = Notification::factory()->create(['priority' => 2]);
@@ -386,207 +392,207 @@ class NotificationTest extends TestCase
         $urgentPriority = Notification::factory()->create(['priority' => 4]);
         $unknownPriority = Notification::factory()->create(['priority' => 5]);
 
-        $this->assertEquals('low', $lowPriority->getPriorityLevel());
-        $this->assertEquals('normal', $normalPriority->getPriorityLevel());
-        $this->assertEquals('high', $highPriority->getPriorityLevel());
-        $this->assertEquals('urgent', $urgentPriority->getPriorityLevel());
-        $this->assertEquals('normal', $unknownPriority->getPriorityLevel());
+        self::assertSame('low', $lowPriority->getPriorityLevel());
+        self::assertSame('normal', $normalPriority->getPriorityLevel());
+        self::assertSame('high', $highPriority->getPriorityLevel());
+        self::assertSame('urgent', $urgentPriority->getPriorityLevel());
+        self::assertSame('normal', $unknownPriority->getPriorityLevel());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_icon_by_type(): void
+    #[Test]
+    public function testGetIconByType(): void
     {
         $priceDrop = Notification::factory()->create(['type' => 'price_drop']);
         $newProduct = Notification::factory()->create(['type' => 'new_product']);
         $system = Notification::factory()->create(['type' => 'system']);
         $custom = Notification::factory()->create(['type' => 'custom_type']);
 
-        $this->assertEquals('💰', $priceDrop->getIcon());
-        $this->assertEquals('🆕', $newProduct->getIcon());
-        $this->assertEquals('⚙️', $system->getIcon());
-        $this->assertEquals('📢', $custom->getIcon());
+        self::assertSame('💰', $priceDrop->getIcon());
+        self::assertSame('🆕', $newProduct->getIcon());
+        self::assertSame('⚙️', $system->getIcon());
+        self::assertSame('📢', $custom->getIcon());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_type_display_name(): void
+    #[Test]
+    public function testGetTypeDisplayName(): void
     {
         $priceDrop = Notification::factory()->create(['type' => 'price_drop']);
         $newProduct = Notification::factory()->create(['type' => 'new_product']);
         $system = Notification::factory()->create(['type' => 'system']);
         $custom = Notification::factory()->create(['type' => 'custom_type']);
 
-        $this->assertEquals('Price Drop Alert', $priceDrop->getTypeDisplayName());
-        $this->assertEquals('New Product', $newProduct->getTypeDisplayName());
-        $this->assertEquals('System Notification', $system->getTypeDisplayName());
-        $this->assertEquals('Custom type', $custom->getTypeDisplayName());
+        self::assertSame('Price Drop Alert', $priceDrop->getTypeDisplayName());
+        self::assertSame('New Product', $newProduct->getTypeDisplayName());
+        self::assertSame('System Notification', $system->getTypeDisplayName());
+        self::assertSame('Custom type', $custom->getTypeDisplayName());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_channel_display_name(): void
+    #[Test]
+    public function testGetChannelDisplayName(): void
     {
         $email = Notification::factory()->create(['channel' => 'email']);
         $sms = Notification::factory()->create(['channel' => 'sms']);
         $push = Notification::factory()->create(['channel' => 'push']);
         $custom = Notification::factory()->create(['channel' => 'custom_channel']);
 
-        $this->assertEquals('Email', $email->getChannelDisplayName());
-        $this->assertEquals('SMS', $sms->getChannelDisplayName());
-        $this->assertEquals('Push Notification', $push->getChannelDisplayName());
-        $this->assertEquals('Custom_channel', $custom->getChannelDisplayName());
+        self::assertSame('Email', $email->getChannelDisplayName());
+        self::assertSame('SMS', $sms->getChannelDisplayName());
+        self::assertSame('Push Notification', $push->getChannelDisplayName());
+        self::assertSame('Custom_channel', $custom->getChannelDisplayName());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_status_display_name(): void
+    #[Test]
+    public function testGetStatusDisplayName(): void
     {
         $pending = Notification::factory()->create(['status' => 'pending']);
         $sent = Notification::factory()->create(['status' => 'sent']);
         $failed = Notification::factory()->create(['status' => 'failed']);
         $custom = Notification::factory()->create(['status' => 'custom_status']);
 
-        $this->assertEquals('Pending', $pending->getStatusDisplayName());
-        $this->assertEquals('Sent', $sent->getStatusDisplayName());
-        $this->assertEquals('Failed', $failed->getStatusDisplayName());
-        $this->assertEquals('Custom_status', $custom->getStatusDisplayName());
+        self::assertSame('Pending', $pending->getStatusDisplayName());
+        self::assertSame('Sent', $sent->getStatusDisplayName());
+        self::assertSame('Failed', $failed->getStatusDisplayName());
+        self::assertSame('Custom_status', $custom->getStatusDisplayName());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_time_ago(): void
+    #[Test]
+    public function testGetTimeAgo(): void
     {
         $notification = Notification::factory()->create(['created_at' => now()->subHour()]);
 
-        $this->assertStringContainsString('1 hour ago', $notification->getTimeAgo());
+        self::assertStringContainsString('1 hour ago', $notification->getTimeAgo());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_read_time_ago(): void
+    #[Test]
+    public function testGetReadTimeAgo(): void
     {
         $readNotification = Notification::factory()->create(['read_at' => now()->subMinutes(30)]);
         $unreadNotification = Notification::factory()->create(['read_at' => null]);
 
-        $this->assertStringContainsString('30 minutes ago', $readNotification->getReadTimeAgo());
-        $this->assertNull($unreadNotification->getReadTimeAgo());
+        self::assertStringContainsString('30 minutes ago', $readNotification->getReadTimeAgo());
+        self::assertNull($unreadNotification->getReadTimeAgo());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_sent_time_ago(): void
+    #[Test]
+    public function testGetSentTimeAgo(): void
     {
         $sentNotification = Notification::factory()->create(['sent_at' => now()->subMinutes(15)]);
         $unsentNotification = Notification::factory()->create(['sent_at' => null]);
 
-        $this->assertStringContainsString('15 minutes ago', $sentNotification->getSentTimeAgo());
-        $this->assertNull($unsentNotification->getSentTimeAgo());
+        self::assertStringContainsString('15 minutes ago', $sentNotification->getSentTimeAgo());
+        self::assertNull($unsentNotification->getSentTimeAgo());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_data(): void
+    #[Test]
+    public function testGetData(): void
     {
         $notification = Notification::factory()->create([
             'data' => ['product_id' => 1, 'price' => 100, 'nested' => ['key' => 'value']],
         ]);
 
-        $this->assertEquals(['product_id' => 1, 'price' => 100, 'nested' => ['key' => 'value']], $notification->getData());
-        $this->assertEquals(1, $notification->getData('product_id'));
-        $this->assertEquals(100, $notification->getData('price'));
-        $this->assertEquals('value', $notification->getData('nested.key'));
-        $this->assertEquals('default', $notification->getData('nonexistent', 'default'));
+        self::assertSame(['product_id' => 1, 'price' => 100, 'nested' => ['key' => 'value']], $notification->getData());
+        self::assertSame(1, $notification->getData('product_id'));
+        self::assertSame(100, $notification->getData('price'));
+        self::assertSame('value', $notification->getData('nested.key'));
+        self::assertSame('default', $notification->getData('nonexistent', 'default'));
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_set_data(): void
+    #[Test]
+    public function testSetData(): void
     {
         $notification = Notification::factory()->create(['data' => []]);
 
         $result = $notification->setData('new_key', 'new_value');
 
-        $this->assertTrue($result);
-        $this->assertEquals('new_value', $notification->fresh()->getData('new_key'));
+        self::assertTrue($result);
+        self::assertSame('new_value', $notification->fresh()->getData('new_key'));
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_icon(): void
+    #[Test]
+    public function testGetIcon(): void
     {
         $priceDrop = Notification::factory()->create(['type' => 'price_drop']);
         $newProduct = Notification::factory()->create(['type' => 'new_product']);
         $system = Notification::factory()->create(['type' => 'system']);
         $custom = Notification::factory()->create(['type' => 'custom_type']);
 
-        $this->assertEquals('💰', $priceDrop->getIcon());
-        $this->assertEquals('🆕', $newProduct->getIcon());
-        $this->assertEquals('⚙️', $system->getIcon());
-        $this->assertEquals('📢', $custom->getIcon());
+        self::assertSame('💰', $priceDrop->getIcon());
+        self::assertSame('🆕', $newProduct->getIcon());
+        self::assertSame('⚙️', $system->getIcon());
+        self::assertSame('📢', $custom->getIcon());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_color(): void
+    #[Test]
+    public function testGetColor(): void
     {
         $lowPriority = Notification::factory()->create(['priority' => 1]);
         $normalPriority = Notification::factory()->create(['priority' => 2]);
         $highPriority = Notification::factory()->create(['priority' => 3]);
         $urgentPriority = Notification::factory()->create(['priority' => 4]);
 
-        $this->assertEquals('gray', $lowPriority->getColor());
-        $this->assertEquals('blue', $normalPriority->getColor());
-        $this->assertEquals('orange', $highPriority->getColor());
-        $this->assertEquals('red', $urgentPriority->getColor());
+        self::assertSame('gray', $lowPriority->getColor());
+        self::assertSame('blue', $normalPriority->getColor());
+        self::assertSame('orange', $highPriority->getColor());
+        self::assertSame('red', $urgentPriority->getColor());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_badge_text(): void
+    #[Test]
+    public function testGetBadgeText(): void
     {
         $unread = Notification::factory()->create(['read_at' => null]);
         $readFailed = Notification::factory()->create(['read_at' => now(), 'status' => 'failed']);
         $readPending = Notification::factory()->create(['read_at' => now(), 'sent_at' => null, 'status' => 'pending']);
         $readSent = Notification::factory()->create(['read_at' => now(), 'sent_at' => now(), 'status' => 'sent']);
 
-        $this->assertEquals('New', $unread->getBadgeText());
-        $this->assertEquals('Failed', $readFailed->getBadgeText());
-        $this->assertEquals('Pending', $readPending->getBadgeText());
-        $this->assertEquals('', $readSent->getBadgeText());
+        self::assertSame('New', $unread->getBadgeText());
+        self::assertSame('Failed', $readFailed->getBadgeText());
+        self::assertSame('Pending', $readPending->getBadgeText());
+        self::assertSame('', $readSent->getBadgeText());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_summary(): void
+    #[Test]
+    public function testGetSummary(): void
     {
         $longMessage = str_repeat('This is a very long message that should be truncated. ', 10);
         $notification = Notification::factory()->create(['message' => $longMessage]);
 
         $summary = $notification->getSummary(50);
-        $this->assertLessThanOrEqual(53, strlen($summary)); // 50 + '...'
-        $this->assertStringEndsWith('...', $summary);
+        self::assertLessThanOrEqual(53, \strlen($summary)); // 50 + '...'
+        self::assertStringEndsWith('...', $summary);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_url(): void
+    #[Test]
+    public function testGetUrl(): void
     {
         $notificationWithUrl = Notification::factory()->create(['data' => ['url' => 'https://example.com']]);
         $notificationWithoutUrl = Notification::factory()->create(['data' => []]);
 
-        $this->assertEquals('https://example.com', $notificationWithUrl->getUrl());
-        $this->assertNull($notificationWithoutUrl->getUrl());
+        self::assertSame('https://example.com', $notificationWithUrl->getUrl());
+        self::assertNull($notificationWithoutUrl->getUrl());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_action_text(): void
+    #[Test]
+    public function testGetActionText(): void
     {
         $notificationWithAction = Notification::factory()->create(['data' => ['action_text' => 'View Product']]);
         $notificationWithoutAction = Notification::factory()->create(['data' => []]);
 
-        $this->assertEquals('View Product', $notificationWithAction->getActionText());
-        $this->assertEquals('View Details', $notificationWithoutAction->getActionText());
+        self::assertSame('View Product', $notificationWithAction->getActionText());
+        self::assertSame('View Details', $notificationWithoutAction->getActionText());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_has_action(): void
+    #[Test]
+    public function testHasAction(): void
     {
         $notificationWithAction = Notification::factory()->create(['data' => ['url' => 'https://example.com']]);
         $notificationWithoutAction = Notification::factory()->create(['data' => []]);
 
-        $this->assertTrue($notificationWithAction->hasAction());
-        $this->assertFalse($notificationWithoutAction->hasAction());
+        self::assertTrue($notificationWithAction->hasAction());
+        self::assertFalse($notificationWithoutAction->hasAction());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_expiration_date(): void
+    #[Test]
+    public function testGetExpirationDate(): void
     {
         $notificationWithExpiration = Notification::factory()->create([
             'data' => ['expiration_days' => 7],
@@ -594,12 +600,12 @@ class NotificationTest extends TestCase
         ]);
         $notificationWithoutExpiration = Notification::factory()->create(['data' => []]);
 
-        $this->assertInstanceOf(Carbon::class, $notificationWithExpiration->getExpirationDate());
-        $this->assertNull($notificationWithoutExpiration->getExpirationDate());
+        self::assertInstanceOf(Carbon::class, $notificationWithExpiration->getExpirationDate());
+        self::assertNull($notificationWithoutExpiration->getExpirationDate());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_is_expired(): void
+    #[Test]
+    public function testIsExpired(): void
     {
         $expiredNotification = Notification::factory()->create([
             'data' => ['expiration_days' => 1],
@@ -610,147 +616,147 @@ class NotificationTest extends TestCase
             'created_at' => now(),
         ]);
 
-        $this->assertTrue($expiredNotification->isExpired());
-        $this->assertFalse($validNotification->isExpired());
+        self::assertTrue($expiredNotification->isExpired());
+        self::assertFalse($validNotification->isExpired());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_retry_count(): void
+    #[Test]
+    public function testGetRetryCount(): void
     {
         $notificationWithRetries = Notification::factory()->create(['data' => ['retry_count' => 3]]);
         $notificationWithoutRetries = Notification::factory()->create(['data' => []]);
 
-        $this->assertEquals(3, $notificationWithRetries->getRetryCount());
-        $this->assertEquals(0, $notificationWithoutRetries->getRetryCount());
+        self::assertSame(3, $notificationWithRetries->getRetryCount());
+        self::assertSame(0, $notificationWithoutRetries->getRetryCount());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_increment_retry_count(): void
+    #[Test]
+    public function testIncrementRetryCount(): void
     {
         $notification = Notification::factory()->create(['data' => ['retry_count' => 2]]);
 
         $result = $notification->incrementRetryCount();
 
-        $this->assertTrue($result);
-        $this->assertEquals(3, $notification->fresh()->getRetryCount());
+        self::assertTrue($result);
+        self::assertSame(3, $notification->fresh()->getRetryCount());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_can_retry(): void
+    #[Test]
+    public function testCanRetry(): void
     {
         $failedNotification = Notification::factory()->create(['status' => 'failed', 'data' => ['retry_count' => 2]]);
         $maxRetriesReached = Notification::factory()->create(['status' => 'failed', 'data' => ['retry_count' => 3]]);
         $sentNotification = Notification::factory()->create(['status' => 'sent']);
 
-        $this->assertTrue($failedNotification->canRetry(3));
-        $this->assertFalse($maxRetriesReached->canRetry(3));
-        $this->assertFalse($sentNotification->canRetry(3));
+        self::assertTrue($failedNotification->canRetry(3));
+        self::assertFalse($maxRetriesReached->canRetry(3));
+        self::assertFalse($sentNotification->canRetry(3));
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_failure_reason(): void
+    #[Test]
+    public function testGetFailureReason(): void
     {
         $notificationWithReason = Notification::factory()->create(['data' => ['failure_reason' => 'Connection timeout']]);
         $notificationWithoutReason = Notification::factory()->create(['data' => []]);
 
-        $this->assertEquals('Connection timeout', $notificationWithReason->getFailureReason());
-        $this->assertNull($notificationWithoutReason->getFailureReason());
+        self::assertSame('Connection timeout', $notificationWithReason->getFailureReason());
+        self::assertNull($notificationWithoutReason->getFailureReason());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_metadata(): void
+    #[Test]
+    public function testGetMetadata(): void
     {
         $notification = Notification::factory()->create(['data' => ['metadata' => ['source' => 'web', 'version' => '1.0']]]);
 
-        $this->assertEquals(['source' => 'web', 'version' => '1.0'], $notification->getMetadata());
+        self::assertSame(['source' => 'web', 'version' => '1.0'], $notification->getMetadata());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_set_metadata(): void
+    #[Test]
+    public function testSetMetadata(): void
     {
         $notification = Notification::factory()->create(['data' => []]);
 
         $result = $notification->setMetadata(['source' => 'api', 'version' => '2.0']);
 
-        $this->assertTrue($result);
-        $this->assertEquals(['source' => 'api', 'version' => '2.0'], $notification->fresh()->getMetadata());
+        self::assertTrue($result);
+        self::assertSame(['source' => 'api', 'version' => '2.0'], $notification->fresh()->getMetadata());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_tags(): void
+    #[Test]
+    public function testGetTags(): void
     {
         $notification = Notification::factory()->create(['data' => ['tags' => ['urgent', 'system', 'price']]]);
 
-        $this->assertEquals(['urgent', 'system', 'price'], $notification->getTags());
+        self::assertSame(['urgent', 'system', 'price'], $notification->getTags());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_set_tags(): void
+    #[Test]
+    public function testSetTags(): void
     {
         $notification = Notification::factory()->create(['data' => []]);
 
         $result = $notification->setTags(['urgent', 'system']);
 
-        $this->assertTrue($result);
-        $this->assertEquals(['urgent', 'system'], $notification->fresh()->getTags());
+        self::assertTrue($result);
+        self::assertSame(['urgent', 'system'], $notification->fresh()->getTags());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_add_tag(): void
+    #[Test]
+    public function testAddTag(): void
     {
         $notification = Notification::factory()->create(['data' => ['tags' => ['urgent']]]);
 
         $result = $notification->addTag('system');
 
-        $this->assertTrue($result);
-        $this->assertEquals(['urgent', 'system'], $notification->fresh()->getTags());
+        self::assertTrue($result);
+        self::assertSame(['urgent', 'system'], $notification->fresh()->getTags());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_add_existing_tag(): void
+    #[Test]
+    public function testAddExistingTag(): void
     {
         $notification = Notification::factory()->create(['data' => ['tags' => ['urgent']]]);
 
         $result = $notification->addTag('urgent');
 
-        $this->assertTrue($result);
-        $this->assertEquals(['urgent'], $notification->fresh()->getTags());
+        self::assertTrue($result);
+        self::assertSame(['urgent'], $notification->fresh()->getTags());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_remove_tag(): void
+    #[Test]
+    public function testRemoveTag(): void
     {
         $notification = Notification::factory()->create(['data' => ['tags' => ['urgent', 'system']]]);
 
         $result = $notification->removeTag('urgent');
 
-        $this->assertTrue($result);
-        $this->assertEquals(['system'], $notification->fresh()->getTags());
+        self::assertTrue($result);
+        self::assertSame(['system'], $notification->fresh()->getTags());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_has_tag(): void
+    #[Test]
+    public function testHasTag(): void
     {
         $notification = Notification::factory()->create(['data' => ['tags' => ['urgent', 'system']]]);
 
-        $this->assertTrue($notification->hasTag('urgent'));
-        $this->assertTrue($notification->hasTag('system'));
-        $this->assertFalse($notification->hasTag('price'));
+        self::assertTrue($notification->hasTag('urgent'));
+        self::assertTrue($notification->hasTag('system'));
+        self::assertFalse($notification->hasTag('price'));
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_factory_creates_valid_notification(): void
+    #[Test]
+    public function testFactoryCreatesValidNotification(): void
     {
         $notification = Notification::factory()->make();
 
-        $this->assertInstanceOf(Notification::class, $notification);
-        $this->assertNotEmpty($notification->type);
-        $this->assertNotEmpty($notification->title);
-        $this->assertNotEmpty($notification->message);
+        self::assertInstanceOf(Notification::class, $notification);
+        self::assertNotEmpty($notification->type);
+        self::assertNotEmpty($notification->title);
+        self::assertNotEmpty($notification->message);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_fillable_attributes(): void
+    #[Test]
+    public function testFillableAttributes(): void
     {
         $fillable = [
             'user_id',
@@ -767,14 +773,14 @@ class NotificationTest extends TestCase
             'tags',
         ];
 
-        $this->assertEquals($fillable, (new Notification)->getFillable());
+        self::assertSame($fillable, (new Notification())->getFillable());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_hidden_attributes(): void
+    #[Test]
+    public function testHiddenAttributes(): void
     {
         $hidden = ['data'];
 
-        $this->assertEquals($hidden, (new Notification)->getHidden());
+        self::assertSame($hidden, (new Notification())->getHidden());
     }
 }

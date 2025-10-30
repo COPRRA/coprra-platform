@@ -6,6 +6,7 @@ namespace Tests\Unit\Controllers;
 
 use App\Http\Controllers\Api\V2\BaseApiController;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Tests\TestCase;
 
 class ConcreteBaseApiController extends BaseApiController
@@ -47,20 +48,25 @@ class ConcreteBaseApiController extends BaseApiController
     }
 }
 
-class BaseApiControllerTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class BaseApiControllerTest extends TestCase
 {
     private ConcreteBaseApiController $controller;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->controller = new ConcreteBaseApiController;
+        $this->controller = new ConcreteBaseApiController();
     }
 
     /**
      * Test successResponse method returns correct JsonResponse.
      */
-    public function test_success_response(): void
+    public function testSuccessResponse(): void
     {
         // Arrange
         $data = ['key' => 'value'];
@@ -71,20 +77,20 @@ class BaseApiControllerTest extends TestCase
         $response = $this->controller->successResponsePublic($data, $message, $statusCode);
 
         // Assert
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals($statusCode, $response->getStatusCode());
+        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertSame($statusCode, $response->getStatusCode());
         $responseData = $response->getData(true);
-        $this->assertTrue($responseData['success']);
-        $this->assertEquals($data, $responseData['data']);
-        $this->assertEquals($message, $responseData['message']);
-        $this->assertEquals('2.0', $responseData['version']);
-        $this->assertArrayHasKey('timestamp', $responseData);
+        self::assertTrue($responseData['success']);
+        self::assertSame($data, $responseData['data']);
+        self::assertSame($message, $responseData['message']);
+        self::assertSame('2.0', $responseData['version']);
+        self::assertArrayHasKey('timestamp', $responseData);
     }
 
     /**
      * Test errorResponse method returns correct JsonResponse.
      */
-    public function test_error_response(): void
+    public function testErrorResponse(): void
     {
         // Arrange
         $message = 'Error message';
@@ -95,23 +101,23 @@ class BaseApiControllerTest extends TestCase
         $response = $this->controller->errorResponsePublic($message, $statusCode, $errors);
 
         // Assert
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals($statusCode, $response->getStatusCode());
+        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertSame($statusCode, $response->getStatusCode());
         $responseData = $response->getData(true);
-        $this->assertFalse($responseData['success']);
-        $this->assertEquals($message, $responseData['message']);
-        $this->assertEquals($errors, $responseData['errors']);
-        $this->assertEquals('2.0', $responseData['version']);
-        $this->assertArrayHasKey('timestamp', $responseData);
+        self::assertFalse($responseData['success']);
+        self::assertSame($message, $responseData['message']);
+        self::assertSame($errors, $responseData['errors']);
+        self::assertSame('2.0', $responseData['version']);
+        self::assertArrayHasKey('timestamp', $responseData);
     }
 
     /**
      * Test paginatedResponse method returns correct JsonResponse.
      */
-    public function test_paginated_response(): void
+    public function testPaginatedResponse(): void
     {
         // Arrange
-        $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+        $paginator = new LengthAwarePaginator(
             [['id' => 1], ['id' => 2]],
             2,
             15,
@@ -123,32 +129,32 @@ class BaseApiControllerTest extends TestCase
         $response = $this->controller->paginatedResponsePublic($paginator, $message);
 
         // Assert
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals(200, $response->getStatusCode());
+        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertSame(200, $response->getStatusCode());
         $responseData = $response->getData(true);
-        $this->assertTrue($responseData['success']);
-        $this->assertEquals([['id' => 1], ['id' => 2]], $responseData['data']);
-        $this->assertEquals($message, $responseData['message']);
-        $this->assertEquals('2.0', $responseData['version']);
-        $this->assertArrayHasKey('timestamp', $responseData);
-        $this->assertArrayHasKey('pagination', $responseData);
+        self::assertTrue($responseData['success']);
+        self::assertSame([['id' => 1], ['id' => 2]], $responseData['data']);
+        self::assertSame($message, $responseData['message']);
+        self::assertSame('2.0', $responseData['version']);
+        self::assertArrayHasKey('timestamp', $responseData);
+        self::assertArrayHasKey('pagination', $responseData);
     }
 
     /**
      * Test getRateLimitInfo method returns correct data.
      */
-    public function test_get_rate_limit_info(): void
+    public function testGetRateLimitInfo(): void
     {
         // Act
         $rateLimit = $this->controller->getRateLimitInfoPublic();
 
         // Assert
-        $this->assertIsArray($rateLimit);
-        $this->assertArrayHasKey('limit', $rateLimit);
-        $this->assertArrayHasKey('remaining', $rateLimit);
-        $this->assertArrayHasKey('reset', $rateLimit);
-        $this->assertArrayHasKey('version', $rateLimit);
-        $this->assertEquals(2000, $rateLimit['limit']);
-        $this->assertEquals('2.0', $rateLimit['version']);
+        self::assertIsArray($rateLimit);
+        self::assertArrayHasKey('limit', $rateLimit);
+        self::assertArrayHasKey('remaining', $rateLimit);
+        self::assertArrayHasKey('reset', $rateLimit);
+        self::assertArrayHasKey('version', $rateLimit);
+        self::assertSame(2000, $rateLimit['limit']);
+        self::assertSame('2.0', $rateLimit['version']);
     }
 }

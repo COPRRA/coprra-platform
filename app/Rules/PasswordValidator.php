@@ -31,7 +31,7 @@ final class PasswordValidator
     /**
      * Validate the password.
      *
-     * @return array<bool|int|array<string>>
+     * @return array<array<string>|bool|int>
      *
      * @psalm-return array{valid: bool, errors: array<int, string>, strength: int<min, 10>}
      */
@@ -47,7 +47,7 @@ final class PasswordValidator
         $this->validateForbiddenPatterns($password, $errors);
 
         return [
-            'valid' => $errors === [],
+            'valid' => [] === $errors,
             'errors' => $errors,
             'strength' => $this->calculatePasswordStrength($password),
         ];
@@ -72,22 +72,22 @@ final class PasswordValidator
 
         $configValue = $configRepository->get('password_policy', $defaultConfig);
 
-        return is_array($configValue) ? array_merge($defaultConfig, $configValue) : $defaultConfig;
+        return \is_array($configValue) ? array_merge($defaultConfig, $configValue) : $defaultConfig;
     }
 
     /**
-     * @param  array<int, string>  $errors
+     * @param array<int, string> $errors
      */
     private function validateLength(string $password, array &$errors): void
     {
         $minLength = (int) $this->config['min_length'];
-        if (strlen($password) < $minLength) {
+        if (\strlen($password) < $minLength) {
             $errors[] = "كلمة المرور يجب أن تكون على الأقل {$minLength} أحرف";
         }
     }
 
     /**
-     * @param  array<int, string>  $errors
+     * @param array<int, string> $errors
      */
     private function validateUppercase(string $password, array &$errors): void
     {
@@ -97,7 +97,7 @@ final class PasswordValidator
     }
 
     /**
-     * @param  array<int, string>  $errors
+     * @param array<int, string> $errors
      */
     private function validateLowercase(string $password, array &$errors): void
     {
@@ -107,7 +107,7 @@ final class PasswordValidator
     }
 
     /**
-     * @param  array<int, string>  $errors
+     * @param array<int, string> $errors
      */
     private function validateNumbers(string $password, array &$errors): void
     {
@@ -117,7 +117,7 @@ final class PasswordValidator
     }
 
     /**
-     * @param  array<int, string>  $errors
+     * @param array<int, string> $errors
      */
     private function validateSymbols(string $password, array &$errors): void
     {
@@ -127,17 +127,17 @@ final class PasswordValidator
     }
 
     /**
-     * @param  array<int, string>  $errors
+     * @param array<int, string> $errors
      */
     private function validateForbiddenPatterns(string $password, array &$errors): void
     {
         $forbiddenPatterns = $this->config['forbidden_patterns'] ?? [];
-        if (! is_array($forbiddenPatterns)) {
+        if (! \is_array($forbiddenPatterns)) {
             return;
         }
 
         foreach ($forbiddenPatterns as $pattern) {
-            if (is_string($pattern) && preg_match($pattern, $password)) {
+            if (\is_string($pattern) && preg_match($pattern, $password)) {
                 $errors[] = 'كلمة المرور تحتوي على نمط محظور';
 
                 break;
@@ -152,7 +152,7 @@ final class PasswordValidator
      */
     private function calculatePasswordStrength(string $password): int
     {
-        $score = min((int) (strlen($password) / 4), 3);
+        $score = min((int) (\strlen($password) / 4), 3);
         $diversity = $this->calculateDiversity($password);
 
         if ($diversity >= 3) {
@@ -177,7 +177,7 @@ final class PasswordValidator
         $diversity = 0;
         foreach ($patterns as $pattern) {
             if (preg_match($pattern, $password)) {
-                $diversity++;
+                ++$diversity;
             }
         }
 

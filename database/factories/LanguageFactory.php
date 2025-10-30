@@ -27,8 +27,8 @@ class LanguageFactory extends Factory
 
         return [
             'code' => $this->faker->unique()->randomElement(['en', 'ar', 'fr', 'de', 'es', 'it', 'pt', 'ru', 'ja', 'ko', 'zh', 'hi']),
-            'name' => (is_string($name) ? $name : '').' Language',
-            'native_name' => (is_string($nativeName) ? $nativeName : '').' Native',
+            'name' => (\is_string($name) ? $name : '').' Language',
+            'native_name' => (\is_string($nativeName) ? $nativeName : '').' Native',
             'direction' => $this->faker->randomElement(['ltr', 'rtl']),
             'is_active' => true,
             'sort_order' => $this->faker->numberBetween(1, 100),

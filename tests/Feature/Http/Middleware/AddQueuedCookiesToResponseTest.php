@@ -4,51 +4,57 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Middleware;
 
+use App\Http\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 // Disabled process isolation on Windows to avoid batch execution issues
+use Illuminate\Http\Response;
 use Tests\TestCase;
 
-class AddQueuedCookiesToResponseTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class AddQueuedCookiesToResponseTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_add_queued_cookies_middleware_adds_cookies_to_response(): void
+    public function testAddQueuedCookiesMiddlewareAddsCookiesToResponse(): void
     {
         $request = Request::create('/test', 'GET');
 
-        $middleware = new \App\Http\Middleware\AddQueuedCookiesToResponse;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new AddQueuedCookiesToResponse();
+        $response = $middleware->handle($request, static function ($req) {
             $response = new Response('OK', 200);
             $response->headers->setCookie(cookie('test_cookie', 'test_value'));
 
             return $response;
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertTrue($response->headers->has('Set-Cookie'));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertTrue($response->headers->has('Set-Cookie'));
     }
 
-    public function test_add_queued_cookies_middleware_passes_request_successfully(): void
+    public function testAddQueuedCookiesMiddlewarePassesRequestSuccessfully(): void
     {
         $request = Request::create('/test', 'GET');
 
-        $middleware = new \App\Http\Middleware\AddQueuedCookiesToResponse;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new AddQueuedCookiesToResponse();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('OK', $response->getContent());
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('OK', $response->getContent());
     }
 
-    public function test_add_queued_cookies_middleware_handles_multiple_cookies(): void
+    public function testAddQueuedCookiesMiddlewareHandlesMultipleCookies(): void
     {
         $request = Request::create('/test', 'GET');
 
-        $middleware = new \App\Http\Middleware\AddQueuedCookiesToResponse;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new AddQueuedCookiesToResponse();
+        $response = $middleware->handle($request, static function ($req) {
             $response = new Response('OK', 200);
             $response->headers->setCookie(cookie('cookie1', 'value1'));
             $response->headers->setCookie(cookie('cookie2', 'value2'));
@@ -56,8 +62,8 @@ class AddQueuedCookiesToResponseTest extends TestCase
             return $response;
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
+        self::assertSame(200, $response->getStatusCode());
         $cookies = $response->headers->getCookies();
-        $this->assertCount(2, $cookies);
+        self::assertCount(2, $cookies);
     }
 }

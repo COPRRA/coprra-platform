@@ -11,13 +11,8 @@ class CompressionService
      */
     private array $strategies = [];
 
-    public function __construct()
-    {
-        $this->registerStrategies();
-    }
-
     /**
-     * Get the best compression strategy for the given request
+     * Get the best compression strategy for the given request.
      *
      * @return array{content: string, encoding: string}|null
      */
@@ -26,7 +21,7 @@ class CompressionService
         foreach ($this->strategies as $strategy) {
             if ($strategy->isSupported() && $strategy->clientAccepts($acceptEncoding)) {
                 $result = $strategy->compress($content);
-                if ($result !== null) {
+                if (null !== $result) {
                     return $result;
                 }
             }
@@ -36,7 +31,7 @@ class CompressionService
     }
 
     /**
-     * Check if client accepts any supported compression
+     * Check if client accepts any supported compression.
      */
     public function clientAcceptsCompression(string $acceptEncoding): bool
     {
@@ -47,14 +42,5 @@ class CompressionService
         }
 
         return false;
-    }
-
-    /**
-     * Register available compression strategies
-     */
-    private function registerStrategies(): void
-    {
-        $this->strategies[] = new BrotliCompressionStrategy;
-        $this->strategies[] = new GzipCompressionStrategy;
     }
 }

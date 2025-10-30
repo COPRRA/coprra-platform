@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Middleware;
 
+use App\Http\Middleware\LocaleMiddleware;
+use App\Models\User;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
@@ -12,8 +14,12 @@ use Tests\TestCase;
 
 /**
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class LocaleMiddlewareTest extends TestCase
+final class LocaleMiddlewareTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -29,78 +35,78 @@ class LocaleMiddlewareTest extends TestCase
         $this->app->instance(Store::class, $sessionMock);
     }
 
-    public function test_locale_middleware_passes_request_successfully(): void
+    public function testLocaleMiddlewarePassesRequestSuccessfully(): void
     {
         $request = Request::create('/test', 'GET');
 
-        $middleware = new \App\Http\Middleware\LocaleMiddleware(
+        $middleware = new LocaleMiddleware(
             $this->app[Guard::class],
             $this->app[Store::class]
         );
-        $response = $middleware->handle($request, function ($req) {
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('OK', $response->getContent());
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('OK', $response->getContent());
     }
 
-    public function test_locale_middleware_handles_authenticated_user(): void
+    public function testLocaleMiddlewareHandlesAuthenticatedUser(): void
     {
-        $user = \App\Models\User::factory()->create();
+        $user = User::factory()->create();
         $guardMock = $this->app[Guard::class];
         $guardMock->shouldReceive('check')->andReturn(true);
         $guardMock->shouldReceive('user')->andReturn($user);
 
         $request = Request::create('/test', 'GET');
 
-        $middleware = new \App\Http\Middleware\LocaleMiddleware(
+        $middleware = new LocaleMiddleware(
             $guardMock,
             $this->app[Store::class]
         );
-        $response = $middleware->handle($request, function ($req) {
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
+        self::assertSame(200, $response->getStatusCode());
     }
 
-    public function test_locale_middleware_handles_session_locale(): void
+    public function testLocaleMiddlewareHandlesSessionLocale(): void
     {
-        $sessionMock = $this->app[Store::class];
-        $sessionMock->shouldReceive('has')->with('locale_language')->andReturn(true);
-        $sessionMock->shouldReceive('get')->with('locale_language')->andReturn('es');
+        // Use Laravel's session testing helpers instead of mocking
+        $this->withSession(['locale_language' => 'es']);
 
         $request = Request::create('/test', 'GET');
+        $request->setLaravelSession($this->app['session.store']);
 
-        $middleware = new \App\Http\Middleware\LocaleMiddleware(
+        $middleware = new LocaleMiddleware(
             $this->app[Guard::class],
-            $sessionMock
+            $this->app[Store::class]
         );
-        $response = $middleware->handle($request, function ($req) {
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
+        self::assertSame(200, $response->getStatusCode());
     }
 
-    public function test_locale_middleware_handles_browser_language(): void
+    public function testLocaleMiddlewareHandlesBrowserLanguage(): void
     {
         $request = Request::create('/test', 'GET');
         $request->server->set('HTTP_ACCEPT_LANGUAGE', 'fr-FR,fr;q=0.9,en;q=0.8');
 
-        $middleware = new \App\Http\Middleware\LocaleMiddleware(
+        $middleware = new LocaleMiddleware(
             $this->app[Guard::class],
             $this->app[Store::class]
         );
-        $response = $middleware->handle($request, function ($req) {
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
+        self::assertSame(200, $response->getStatusCode());
     }
 
-    public function test_locale_middleware_handles_exceptions_gracefully(): void
+    public function testLocaleMiddlewareHandlesExceptionsGracefully(): void
     {
         // Mock the Guard to throw an exception
         $guardMock = $this->mock(Guard::class);
@@ -108,15 +114,15 @@ class LocaleMiddlewareTest extends TestCase
 
         $request = Request::create('/test', 'GET');
 
-        $middleware = new \App\Http\Middleware\LocaleMiddleware(
+        $middleware = new LocaleMiddleware(
             $guardMock,
             $this->app[Store::class]
         );
-        $response = $middleware->handle($request, function ($req) {
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('OK', $response->getContent());
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('OK', $response->getContent());
     }
 }

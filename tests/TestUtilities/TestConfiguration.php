@@ -312,9 +312,9 @@ class TestConfiguration
         'retry_delay' => 60, // seconds
         'timeout' => 300, // seconds
         'jobs' => [
-            'email' => 'App\\Jobs\\SendEmail',
-            'notification' => 'App\\Jobs\\SendNotification',
-            'backup' => 'App\\Jobs\\ProcessBackup',
+            'email' => 'App\Jobs\SendEmail',
+            'notification' => 'App\Jobs\SendNotification',
+            'backup' => 'App\Jobs\ProcessBackup',
         ],
     ];
 
@@ -326,7 +326,7 @@ class TestConfiguration
         $keys = explode('.', $key);
         $value = self::getNestedValue(self::getAllConfig(), $keys);
 
-        return $value !== null ? $value : $default;
+        return null !== $value ? $value : $default;
     }
 
     /**
@@ -355,23 +355,6 @@ class TestConfiguration
     }
 
     /**
-     * Get nested configuration value.
-     */
-    private static function getNestedValue(array $config, array $keys): mixed
-    {
-        $current = $config;
-
-        foreach ($keys as $key) {
-            if (! isset($current[$key])) {
-                return null;
-            }
-            $current = $current[$key];
-        }
-
-        return $current;
-    }
-
-    /**
      * Validate configuration.
      */
     public static function validate(): array
@@ -385,8 +368,8 @@ class TestConfiguration
 
         // Validate security requirements
         if (
-            self::SECURITY_REQUIREMENTS['min_password_strength'] < 0 ||
-            self::SECURITY_REQUIREMENTS['min_password_strength'] > 100
+            self::SECURITY_REQUIREMENTS['min_password_strength'] < 0
+            || self::SECURITY_REQUIREMENTS['min_password_strength'] > 100
         ) {
             $errors[] = 'Password strength must be between 0 and 100';
         }
@@ -430,18 +413,21 @@ class TestConfiguration
                     'memory_limit' => $thresholds['memory_limit_mb'],
                     'max_queries' => $thresholds['max_queries_per_test'],
                 ];
+
             case 'integration':
                 return [
                     'max_time' => $thresholds['integration_test_max_time'],
                     'memory_limit' => $thresholds['memory_limit_mb'],
                     'max_queries' => $thresholds['max_queries_per_test'],
                 ];
+
             case 'api':
                 return [
                     'max_time' => $thresholds['api_test_max_time'],
                     'memory_limit' => $thresholds['memory_limit_mb'],
                     'max_queries' => $thresholds['max_queries_per_test'],
                 ];
+
             default:
                 return $thresholds;
         }
@@ -461,16 +447,19 @@ class TestConfiguration
                     'max_login_attempts' => $requirements['max_login_attempts'],
                     'session_timeout_minutes' => $requirements['session_timeout_minutes'],
                 ];
+
             case 'data_protection':
                 return [
                     'encryption_required' => $requirements['encryption_required'],
                     'csrf_protection_required' => $requirements['csrf_protection_required'],
                 ];
+
             case 'input_validation':
                 return [
                     'xss_protection_required' => $requirements['xss_protection_required'],
                     'sql_injection_protection_required' => $requirements['sql_injection_protection_required'],
                 ];
+
             default:
                 return $requirements;
         }
@@ -490,10 +479,29 @@ class TestConfiguration
                     'line_coverage_min' => $requirements['critical_path_coverage_min'],
                     'function_coverage_min' => $requirements['critical_path_coverage_min'],
                 ];
+
             case 'standard':
                 return $requirements;
+
             default:
                 return $requirements;
         }
+    }
+
+    /**
+     * Get nested configuration value.
+     */
+    private static function getNestedValue(array $config, array $keys): mixed
+    {
+        $current = $config;
+
+        foreach ($keys as $key) {
+            if (! isset($current[$key])) {
+                return null;
+            }
+            $current = $current[$key];
+        }
+
+        return $current;
     }
 }

@@ -4,8 +4,8 @@ WORKDIR /var/www/html
 
 # Install minimal dependencies needed for composer
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    unzip libzip-dev \
-    && docker-php-ext-install zip bcmath \
+    unzip libzip-dev libicu-dev \
+    && docker-php-ext-install zip bcmath intl \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY composer.json composer.lock ./
@@ -78,6 +78,10 @@ RUN chown -R www-data:www-data /var/www/html && \
     chmod -R 775 storage bootstrap/cache public/build
 
 USER www-data
+
+# Health check to ensure container is healthy
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+    CMD php artisan health:ping || exit 1
 
 EXPOSE 9000
 CMD ["php-fpm"]

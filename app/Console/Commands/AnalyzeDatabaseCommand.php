@@ -12,13 +12,17 @@ final class AnalyzeDatabaseCommand extends Command
 {
     /**
      * The name and signature of the console command.
+     *
+     * @var string
      */
     protected $signature = 'db:analyze';
 
     /**
      * The console command description.
+     *
+     * @var string
      */
-    protected $description = 'Analyze database performance and provide insights';
+    protected $description = 'Analyze database performance and structure';
 
     private readonly DatabaseManager $database;
 
@@ -52,15 +56,16 @@ final class AnalyzeDatabaseCommand extends Command
     /**
      * Get MySQL variable value.
      *
-     * @param  string  $variableName  The name of the MySQL variable
-     * @param  string  $default  Default value if variable not found
+     * @param string $variableName The name of the MySQL variable
+     * @param string $default      Default value if variable not found
+     *
      * @return string The value of the variable
      */
     private function getMySQLVariable(string $variableName, string $default = 'OFF'): string
     {
         try {
             $result = $this->database->select('SHOW VARIABLES LIKE ?', [$variableName]);
-            if (isset($result[0]->Value) && is_string($result[0]->Value)) {
+            if (isset($result[0]->Value) && \is_string($result[0]->Value)) {
                 return $result[0]->Value;
             }
         } catch (\Throwable $exception) {
@@ -76,7 +81,7 @@ final class AnalyzeDatabaseCommand extends Command
     private function checkSlowQueryLog(): void
     {
         $value = $this->getMySQLVariable('slow_query_log');
-        $status = $value === 'ON' ? '✓ Enabled' : '✗ Disabled';
+        $status = 'ON' === $value ? '✓ Enabled' : '✗ Disabled';
         $this->line("  Slow query log: {$status}");
     }
 
@@ -109,7 +114,7 @@ final class AnalyzeDatabaseCommand extends Command
             LIMIT 10
         ");
 
-        if ($tableSizes !== null) {
+        if (null !== $tableSizes) {
             $this->newLine();
             $this->line('  Top 10 largest tables:');
             $this->displayTableData($tableSizes);
@@ -119,13 +124,13 @@ final class AnalyzeDatabaseCommand extends Command
     /**
      * Display table data in a formatted table.
      *
-     * @param  array<int, object|array>  $data  The data to display
+     * @param array<int, object> $data The data to display
      */
     private function displayTableData(array $data): void
     {
         $this->table(
             ['Table', 'Size (MB)', 'Rows'],
-            array_map(fn (array|object $row): array => (array) $row, $data)
+            array_map(static fn (object $row): array => (array) $row, $data)
         );
     }
 
@@ -143,10 +148,11 @@ final class AnalyzeDatabaseCommand extends Command
     /**
      * Execute a database query with the current database name.
      *
-     * @param  string  $query  The SQL query to execute
-     * @return array<int, object|array>|null The query results
+     * @param string $query The SQL query to execute
+     *
+     * @return array<int, object>
      */
-    private function executeDatabaseQuery(string $query): ?array
+    private function executeDatabaseQuery(string $query): array
     {
         return $this->database->select($query, [$this->getDatabaseName()]);
     }
@@ -168,7 +174,7 @@ final class AnalyzeDatabaseCommand extends Command
                 AND s.index_name IS NULL
         ");
 
-        if ($tablesWithoutIndexes === null) {
+        if (null === $tablesWithoutIndexes) {
             $this->line('  ✓ All tables have indexes');
 
             return;
@@ -181,12 +187,12 @@ final class AnalyzeDatabaseCommand extends Command
     /**
      * Display tables without indexes.
      *
-     * @param  array<int, object>  $tables  Array of table objects
+     * @param array<int, object> $tables Array of table objects
      */
     private function displayTablesWithoutIndexes(array $tables): void
     {
         foreach ($tables as $table) {
-            if (is_object($table) && isset($table->table_name) && is_string($table->table_name)) {
+            if (\is_object($table) && isset($table->table_name) && \is_string($table->table_name)) {
                 $this->line('    - '.$table->table_name);
             }
         }

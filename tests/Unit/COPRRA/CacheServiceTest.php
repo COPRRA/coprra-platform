@@ -5,23 +5,23 @@ declare(strict_types=1);
 namespace Tests\Unit\COPRRA;
 
 use App\Services\CacheService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
-use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\TestCase;
 
-#[CoversClass(CacheService::class)]
-class CacheServiceTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class CacheServiceTest extends TestCase
 {
-    use RefreshDatabase;
-
     protected CacheService $cacheService;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->cacheService = new CacheService;
+        $this->cacheService = new CacheService();
         Cache::flush();
     }
 
@@ -31,71 +31,71 @@ class CacheServiceTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_it_generates_correct_product_cache_key(): void
+    public function testItGeneratesCorrectProductCacheKey(): void
     {
         $key = $this->cacheService->getProductKey(123);
 
-        $this->assertEquals('product:123', $key);
+        self::assertSame('product:123', $key);
     }
 
-    public function test_it_generates_correct_category_cache_key(): void
+    public function testItGeneratesCorrectCategoryCacheKey(): void
     {
         $key = $this->cacheService->getCategoryKey(456);
 
-        $this->assertEquals('category:456', $key);
+        self::assertSame('category:456', $key);
     }
 
-    public function test_it_generates_correct_store_cache_key(): void
+    public function testItGeneratesCorrectStoreCacheKey(): void
     {
         $key = $this->cacheService->getStoreKey(789);
 
-        $this->assertEquals('store:789', $key);
+        self::assertSame('store:789', $key);
     }
 
-    public function test_it_generates_correct_price_comparison_cache_key(): void
+    public function testItGeneratesCorrectPriceComparisonCacheKey(): void
     {
         $key = $this->cacheService->getPriceComparisonKey(123);
 
-        $this->assertEquals('price_comparison:123', $key);
+        self::assertSame('price_comparison:123', $key);
     }
 
-    public function test_it_generates_correct_exchange_rate_cache_key(): void
+    public function testItGeneratesCorrectExchangeRateCacheKey(): void
     {
         $key = $this->cacheService->getExchangeRateKey('USD', 'EUR');
 
-        $this->assertEquals('exchange_rate:USD_EUR', $key);
+        self::assertSame('exchange_rate:USD_EUR', $key);
     }
 
-    public function test_it_generates_correct_search_cache_key(): void
+    public function testItGeneratesCorrectSearchCacheKey(): void
     {
         $key = $this->cacheService->getSearchKey('laptop');
 
-        $this->assertStringStartsWith('search:', $key);
-        $this->assertStringContainsString(md5('laptop'), $key);
+        self::assertStringStartsWith('search:', $key);
+        self::assertStringContainsString(md5('laptop'), $key);
     }
 
-    public function test_it_generates_search_cache_key_with_filters(): void
+    public function testItGeneratesSearchCacheKeyWithFilters(): void
     {
         $filters = ['category' => 'electronics', 'price_min' => 100];
         $key = $this->cacheService->getSearchKey('laptop', $filters);
 
-        $this->assertStringStartsWith('search:', $key);
-        $this->assertStringContainsString(md5('laptop'), $key);
+        self::assertStringStartsWith('search:', $key);
+        self::assertStringContainsString(md5('laptop'), $key);
     }
 
-    public function test_it_caches_product_data(): void
+    public function testItCachesProductData(): void
     {
         $productData = ['id' => 123, 'name' => 'Test Product'];
 
         $result = $this->cacheService->cacheProduct(123, $productData);
 
-        $this->assertTrue($result);
+        self::assertTrue($result);
 
         $cached = $this->cacheService->getCachedProduct(123);
-        $this->assertEquals($productData, $cached);
+        self::assertSame($productData, $cached);
     }
 
-    public function test_it_caches_price_comparison_data(): void
+    public function testItCachesPriceComparisonData(): void
     {
         $priceData = [
             'product_id' => 123,
@@ -107,13 +107,13 @@ class CacheServiceTest extends TestCase
 
         $result = $this->cacheService->cachePriceComparison(123, $priceData);
 
-        $this->assertTrue($result);
+        self::assertTrue($result);
 
         $cached = $this->cacheService->getCachedPriceComparison(123);
-        $this->assertEquals($priceData, $cached);
+        self::assertSame($priceData, $cached);
     }
 
-    public function test_it_caches_search_results(): void
+    public function testItCachesSearchResults(): void
     {
         $searchResults = [
             ['id' => 1, 'name' => 'Product 1'],
@@ -122,101 +122,101 @@ class CacheServiceTest extends TestCase
 
         $result = $this->cacheService->cacheSearchResults('laptop', [], $searchResults);
 
-        $this->assertTrue($result);
+        self::assertTrue($result);
 
         $cached = $this->cacheService->getCachedSearchResults('laptop');
-        $this->assertEquals($searchResults, $cached);
+        self::assertSame($searchResults, $cached);
     }
 
-    public function test_it_invalidates_product_cache(): void
+    public function testItInvalidatesProductCache(): void
     {
         $productData = ['id' => 123, 'name' => 'Test Product'];
         $this->cacheService->cacheProduct(123, $productData);
 
-        $this->assertNotNull($this->cacheService->getCachedProduct(123));
+        self::assertNotNull($this->cacheService->getCachedProduct(123));
 
         $this->cacheService->invalidateProduct(123);
 
-        $this->assertNull($this->cacheService->getCachedProduct(123));
+        self::assertNull($this->cacheService->getCachedProduct(123));
     }
 
-    public function test_it_invalidates_category_cache(): void
+    public function testItInvalidatesCategoryCache(): void
     {
         $key = $this->cacheService->getCategoryKey(456);
         Cache::put($key, ['id' => 456, 'name' => 'Test Category'], 3600);
 
-        $this->assertNotNull(Cache::get($key));
+        self::assertNotNull(Cache::get($key));
 
         $this->cacheService->invalidateCategory(456);
 
-        $this->assertNull(Cache::get($key));
+        self::assertNull(Cache::get($key));
     }
 
-    public function test_it_invalidates_store_cache(): void
+    public function testItInvalidatesStoreCache(): void
     {
         $key = $this->cacheService->getStoreKey(789);
         Cache::put($key, ['id' => 789, 'name' => 'Test Store'], 3600);
 
-        $this->assertNotNull(Cache::get($key));
+        self::assertNotNull(Cache::get($key));
 
         $this->cacheService->invalidateStore(789);
 
-        $this->assertNull(Cache::get($key));
+        self::assertNull(Cache::get($key));
     }
 
-    public function test_it_returns_null_for_non_existent_cache(): void
+    public function testItReturnsNullForNonExistentCache(): void
     {
         $cached = $this->cacheService->getCachedProduct(999);
 
-        $this->assertNull($cached);
+        self::assertNull($cached);
     }
 
-    public function test_it_returns_cache_statistics(): void
+    public function testItReturnsCacheStatistics(): void
     {
         $stats = $this->cacheService->getStatistics();
 
-        $this->assertIsArray($stats);
-        $this->assertArrayHasKey('driver', $stats);
-        $this->assertArrayHasKey('prefixes', $stats);
-        $this->assertArrayHasKey('durations', $stats);
+        self::assertIsArray($stats);
+        self::assertArrayHasKey('driver', $stats);
+        self::assertArrayHasKey('prefixes', $stats);
+        self::assertArrayHasKey('durations', $stats);
     }
 
-    public function test_it_uses_remember_method_correctly(): void
+    public function testItUsesRememberMethodCorrectly(): void
     {
         $key = 'test_remember_key';
         $value = 'test_value';
 
-        $result = $this->cacheService->remember($key, 3600, function () use ($value) {
+        $result = $this->cacheService->remember($key, 3600, static function () use ($value) {
             return $value;
         });
 
-        $this->assertEquals($value, $result);
+        self::assertSame($value, $result);
 
         // Second call should return cached value
-        $result2 = $this->cacheService->remember($key, 3600, function () {
+        $result2 = $this->cacheService->remember($key, 3600, static function () {
             return 'different_value';
         });
 
-        $this->assertEquals($value, $result2);
+        self::assertSame($value, $result2);
     }
 
-    public function test_it_clears_all_cache(): void
+    public function testItClearsAllCache(): void
     {
         // Add some cache entries
         $this->cacheService->cacheProduct(1, ['name' => 'Product 1']);
         $this->cacheService->cacheProduct(2, ['name' => 'Product 2']);
 
-        $this->assertNotNull($this->cacheService->getCachedProduct(1));
-        $this->assertNotNull($this->cacheService->getCachedProduct(2));
+        self::assertNotNull($this->cacheService->getCachedProduct(1));
+        self::assertNotNull($this->cacheService->getCachedProduct(2));
 
         // Clear all cache
         $this->cacheService->clearAll();
 
-        $this->assertNull($this->cacheService->getCachedProduct(1));
-        $this->assertNull($this->cacheService->getCachedProduct(2));
+        self::assertNull($this->cacheService->getCachedProduct(1));
+        self::assertNull($this->cacheService->getCachedProduct(2));
     }
 
-    public function test_it_respects_custom_cache_duration(): void
+    public function testItRespectsCustomCacheDuration(): void
     {
         $productData = ['id' => 123, 'name' => 'Test Product'];
         $customDuration = 60; // 1 minute
@@ -224,10 +224,10 @@ class CacheServiceTest extends TestCase
         $this->cacheService->cacheProduct(123, $productData, $customDuration);
 
         $cached = $this->cacheService->getCachedProduct(123);
-        $this->assertEquals($productData, $cached);
+        self::assertSame($productData, $cached);
     }
 
-    public function test_it_handles_search_with_different_filters(): void
+    public function testItHandlesSearchWithDifferentFilters(): void
     {
         $results1 = [['id' => 1]];
         $results2 = [['id' => 2]];
@@ -241,8 +241,8 @@ class CacheServiceTest extends TestCase
         $cached1 = $this->cacheService->getCachedSearchResults('laptop', $filters1);
         $cached2 = $this->cacheService->getCachedSearchResults('laptop', $filters2);
 
-        $this->assertEquals($results1, $cached1);
-        $this->assertEquals($results2, $cached2);
-        $this->assertNotEquals($cached1, $cached2);
+        self::assertSame($results1, $cached1);
+        self::assertSame($results2, $cached2);
+        self::assertNotSame($cached1, $cached2);
     }
 }

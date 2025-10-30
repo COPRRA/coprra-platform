@@ -7,28 +7,27 @@ namespace App\Services\CDN\Services;
 use App\Services\CDN\Providers\CloudflareProvider;
 use App\Services\CDN\Providers\GoogleCloudProvider;
 use App\Services\CDN\Providers\S3Provider;
-use Exception;
 
 /**
- * Factory for creating CDN provider instances
+ * Factory for creating CDN provider instances.
  */
 final class CDNProviderFactory
 {
     /**
-     * Create CDN provider instance
+     * Create CDN provider instance.
      *
-     * @param  string  $provider  Provider name
-     * @param  array<string, string|null>  $config  Configuration
+     * @param string $provider Provider name
+     * @param  array<string, string|* @method static \App\Models\Brand create(array<string, string|bool|null>  $config  Configuration
      *
-     * @throws Exception
+     * @throws \Exception
      */
-    public static function create(string $provider, array $config): CloudflareProvider|S3Provider|GoogleCloudProvider
+    public static function create(string $provider, array $config): CloudflareProvider|GoogleCloudProvider|S3Provider
     {
         return match ($provider) {
             'cloudflare' => new CloudflareProvider($config),
             's3' => new S3Provider($config),
             'google_cloud' => new GoogleCloudProvider($config),
-            default => throw new Exception("Unsupported CDN provider: {$provider}"),
+            default => throw new \Exception("Unsupported CDN provider: {$provider}"),
         };
     }
 }

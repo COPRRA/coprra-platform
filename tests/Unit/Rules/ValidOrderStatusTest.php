@@ -7,65 +7,70 @@ namespace Tests\Unit\Rules;
 use App\Rules\ValidOrderStatus;
 use PHPUnit\Framework\TestCase;
 
-class ValidOrderStatusTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class ValidOrderStatusTest extends TestCase
 {
     private ValidOrderStatus $rule;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->rule = new ValidOrderStatus;
+        $this->rule = new ValidOrderStatus();
     }
 
-    public function test_passes_with_valid_status(): void
+    public function testPassesWithValidStatus(): void
     {
         $failCalled = false;
-        $fail = function () use (&$failCalled) {
+        $fail = static function () use (&$failCalled) {
             $failCalled = true;
         };
 
         $this->rule->validate('status', 'pending', $fail);
 
-        $this->assertFalse($failCalled);
+        self::assertFalse($failCalled);
     }
 
-    public function test_fails_with_invalid_status(): void
+    public function testFailsWithInvalidStatus(): void
     {
         $failCalled = false;
-        $fail = function () use (&$failCalled) {
+        $fail = static function () use (&$failCalled) {
             $failCalled = true;
         };
 
         $this->rule->validate('status', 'invalid_status', $fail);
 
-        $this->assertTrue($failCalled);
+        self::assertTrue($failCalled);
     }
 
-    public function test_fails_with_non_string_value(): void
+    public function testFailsWithNonStringValue(): void
     {
         $failCalled = false;
-        $fail = function () use (&$failCalled) {
+        $fail = static function () use (&$failCalled) {
             $failCalled = true;
         };
 
         $this->rule->validate('status', 123, $fail);
 
-        $this->assertTrue($failCalled);
+        self::assertTrue($failCalled);
     }
 
-    public function test_passes_with_all_valid_statuses(): void
+    public function testPassesWithAllValidStatuses(): void
     {
         $validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'];
 
         foreach ($validStatuses as $status) {
             $failCalled = false;
-            $fail = function () use (&$failCalled) {
+            $fail = static function () use (&$failCalled) {
                 $failCalled = true;
             };
 
             $this->rule->validate('status', $status, $fail);
 
-            $this->assertFalse($failCalled, "Status '{$status}' should be valid");
+            self::assertFalse($failCalled, "Status '{$status}' should be valid");
         }
     }
 }

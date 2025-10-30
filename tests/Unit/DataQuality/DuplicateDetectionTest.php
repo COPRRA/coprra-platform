@@ -4,31 +4,16 @@ declare(strict_types=1);
 
 namespace Tests\Unit\DataQuality;
 
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class DuplicateDetectionTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class DuplicateDetectionTest extends TestCase
 {
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_basic_functionality(): void
-    {
-        // Test basic functionality
-        $this->assertTrue(true);
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_expected_behavior(): void
-    {
-        // Test expected behavior
-        $this->assertTrue(true);
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_validation(): void
-    {
-        // Test validation
-        $this->assertTrue(true);
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -37,5 +22,26 @@ class DuplicateDetectionTest extends TestCase
     protected function tearDown(): void
     {
         parent::tearDown();
+    }
+
+    #[Test]
+    public function testBasicFunctionality(): void
+    {
+        // Test basic functionality
+        self::assertTrue(true);
+    }
+
+    #[Test]
+    public function testExpectedBehavior(): void
+    {
+        // Test expected behavior
+        self::assertTrue(true);
+    }
+
+    #[Test]
+    public function testValidation(): void
+    {
+        // Test validation
+        self::assertTrue(true);
     }
 }

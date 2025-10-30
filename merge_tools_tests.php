@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 $root = __DIR__;
 $sourceFiles = [
     'القائمه النهائيه للاختبارات والادوات.txt',
@@ -15,7 +17,7 @@ $debug = [];
 function addItem(&$set, $item)
 {
     $item = trim($item);
-    if ($item === '') {
+    if ('' === $item) {
         return;
     }
     $key = mb_strtolower($item);
@@ -37,32 +39,32 @@ foreach ($sourceFiles as $fn) {
     $sample = 0;
     $samples = [];
     if (! file_exists($path)) {
-        $debug[] = "Missing: $fn";
+        $debug[] = "Missing: {$fn}";
 
         continue;
     }
     $lines = @file($path, FILE_IGNORE_NEW_LINES);
     if (! $lines) {
-        $debug[] = "Empty/Unreadable: $fn";
+        $debug[] = "Empty/Unreadable: {$fn}";
 
         continue;
     }
     $currentTestPrefix = '';
     foreach ($lines as $line) {
-        $lineCount++;
+        ++$lineCount;
         $l = trim($line);
-        if ($l === '') {
+        if ('' === $l) {
             continue;
         }
 
-        if (strpos($l, 'tests/') !== false && $sample < 5) {
+        if (false !== strpos($l, 'tests/') && $sample < 5) {
             $samples[] = $l;
-            $sample++;
+            ++$sample;
         }
 
         if (preg_match('/المسار\s*:\s*\.?\/?([A-Za-z0-9_\/-\.]+)/u', $l, $m)) {
             $currentTestPrefix = ltrim($m[1], './');
-            if (strpos($currentTestPrefix, 'tests/') !== 0) {
+            if (0 !== strpos($currentTestPrefix, 'tests/')) {
                 $currentTestPrefix = ltrim($currentTestPrefix, '/');
             }
         }
@@ -71,7 +73,7 @@ foreach ($sourceFiles as $fn) {
         if (preg_match_all('/tests\/[A-Za-z0-9_\/-\.]+\.php/u', $l, $mm)) {
             foreach ($mm[0] as $p) {
                 addItem($tests, $p);
-                $fileTests++;
+                ++$fileTests;
             }
         }
 
@@ -80,29 +82,29 @@ foreach ($sourceFiles as $fn) {
             $p = rtrim($currentTestPrefix, '/').'/'.$m2[1];
             $p = preg_replace('/^\.\//', '', $p);
             addItem($tests, $p);
-            $fileTests++;
+            ++$fileTests;
         }
 
         // Arabic markers + path
         if (preg_match('/(?:اختبار|أداة اختبار)\s*:\s*([A-Za-z0-9_\/-\.]+\.php)/u', $l, $m3)) {
             $p = preg_replace('/^\.\//', '', $m3[1]);
             addItem($tests, $p);
-            $fileTests++;
+            ++$fileTests;
         }
 
         // Fallback: any token ending with Test.php
         if (preg_match_all('/[A-Za-z0-9_\/-\.]*Test\.php/u', $l, $mf)) {
             foreach ($mf[0] as $tok) {
-                if (strpos($tok, 'tests/') !== false) {
+                if (false !== strpos($tok, 'tests/')) {
                     addItem($tests, $tok);
-                    $fileTests++;
+                    ++$fileTests;
 
                     continue;
                 }
                 if ($currentTestPrefix) {
                     $p = rtrim($currentTestPrefix, '/').'/'.basename($tok);
                     addItem($tests, $p);
-                    $fileTests++;
+                    ++$fileTests;
                 }
             }
         }
@@ -110,17 +112,17 @@ foreach ($sourceFiles as $fn) {
         // Tools
         if (preg_match_all('/(?:^|\s)(\.[A-Za-z0-9_\.-]+|Dockerfile|docker-compose(?:\.[A-Za-z0-9_\.-]+)?|(?:docker|dev-docker|scripts|\.husky|\.github|phpstan|psalm|phpmd|phpunit|phpinsights|platform-tools|public|tmp)\/[A-Za-z0-9_\/-\.]+\.?[A-Za-z0-9_\.-]*)/u', $l, $mt)) {
             foreach ($mt[1] as $p) {
-                if ($p === '' || $p === '-') {
+                if ('' === $p || '-' === $p) {
                     continue;
                 }
                 addItem($tools, $p);
-                $fileTools++;
+                ++$fileTools;
             }
         }
 
         if (preg_match('/\b('.implode('|', array_map('preg_quote', $vendorCandidates)).')\b/i', $l, $mv)) {
             addItem($tools, 'vendor/bin/'.strtolower($mv[1]));
-            $fileTools++;
+            ++$fileTools;
         }
     }
     $debug[] = sprintf('Processed %s: lines=%d tools=%d tests=%d prefix=%s', $fn, $lineCount, $fileTools, $fileTests, $currentTestPrefix);
@@ -171,4 +173,4 @@ foreach ($debug as $d) {
 $target = $root.DIRECTORY_SEPARATOR.'اداوات واختبارات كوبر.txt';
 file_put_contents($target, implode(PHP_EOL, $out));
 
-echo "Wrote: $target\n";
+echo "Wrote: {$target}\n";

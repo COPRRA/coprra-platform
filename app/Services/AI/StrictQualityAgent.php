@@ -8,8 +8,8 @@ use App\DataObjects\Ai\Stage;
 use App\DataObjects\Ai\StageResult;
 use App\Enums\Ai\AgentStage;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Process;
+use Psr\Log\LoggerInterface;
 
 final class StrictQualityAgent
 {
@@ -25,8 +25,11 @@ final class StrictQualityAgent
     /** @var array<string, string> */
     private array $fixes = [];
 
-    public function __construct()
+    private readonly LoggerInterface $logger;
+
+    public function __construct(?LoggerInterface $logger = null)
     {
+        $this->logger = $logger ?? app(LoggerInterface::class);
         $this->initializeStages();
     }
 
@@ -73,92 +76,6 @@ final class StrictQualityAgent
             'stages' => $this->results,
             'errors' => $this->errors,
             'fixes' => $this->fixes,
-        ];
-    }
-
-    /**
-     * Auto-fix issues when possible.
-     *
-     * @return array<string>
-     *
-     * @psalm-return array{formatting?: 'تم إصلاح تنسيق الكود', dependencies?: 'تم إصلاح التبعيات', caches: 'تم مسح الذاكرة المؤقتة'}
-     */
-    public function autoFixIssues(): array
-    {
-        $this->log('🔧 بدء الإصلاح التلقائي للمشاكل...');
-
-        $fixes = [];
-
-        // Fix code formatting
-        $this->log('🎨 إصلاح تنسيق الكود...');
-        $result = Process::run('./vendor/bin/pint --config=pint.strict.json');
-        if ($result->successful()) {
-            $fixes['formatting'] = 'تم إصلاح تنسيق الكود';
-        }
-
-        // Fix composer issues
-        $this->log('📦 إصلاح مشاكل التبعيات...');
-        $result = Process::run('composer install --no-dev --optimize-autoloader');
-        if ($result->successful()) {
-            $fixes['dependencies'] = 'تم إصلاح التبعيات';
-        }
-
-        // Clear caches
-        $this->log('🗑️ مسح الذاكرة المؤقتة...');
-        $commands = [
-            'php artisan config:clear',
-            'php artisan cache:clear',
-            'php artisan route:clear',
-            'php artisan view:clear',
-        ];
-
-        foreach ($commands as $command) {
-            Process::run($command);
-        }
-
-        $fixes['caches'] = 'تم مسح الذاكرة المؤقتة';
-
-        $this->fixes = $fixes;
-
-        return $fixes;
-    }
-
-    /**
-     * Get stage status.
-     */
-    public function getStageStatus(string $stageId): ?StageResult
-    {
-        return $this->results[$stageId] ?? null;
-    }
-
-    /**
-     * Get all results.
-     *
-     * @return array<string, StageResult>
-     */
-    public function getAllResults(): array
-    {
-        return $this->results;
-    }
-
-    /**
-     * Get errors summary.
-     *
-     * @return array{
-     *     total_errors: int,
-     *     errors_by_stage: array<string, string>,
-     *     critical_errors: list<string>
-     * }
-     */
-    public function getErrorsSummary(): array
-    {
-        return [
-            'total_errors' => count($this->errors),
-            'errors_by_stage' => $this->errors,
-            'critical_errors' => array_filter(
-                $this->errors,
-                static fn (string $error): bool => str_contains($error, 'Fatal')
-            ),
         ];
     }
 
@@ -258,7 +175,7 @@ final class StrictQualityAgent
         try {
             $startTime = microtime(true);
 
-            $result = $stage->files !== null
+            $result = null !== $stage->files
                 ? $this->executeFileBasedStage($stage)
                 : $this->executeCommandStage($stage);
 
@@ -293,7 +210,7 @@ final class StrictQualityAgent
     /**
      * Execute file-based stage (like syntax check).
      *
-     * @return array<bool|string|array<string>>
+     * @return array<array<string>|bool|string>
      *
      * @psalm-return array{success: bool, output: 'تم العثور على أخطاء'|'جميع الملفات صحيحة', errors: list<string>}
      */
@@ -302,7 +219,7 @@ final class StrictQualityAgent
         $errors = [];
         $success = true;
 
-        if (is_array($stage->files)) {
+        if (\is_array($stage->files)) {
             foreach ($stage->files as $file) {
                 $this->runFileCommand($stage, $file, $errors, $success);
             }
@@ -316,7 +233,7 @@ final class StrictQualityAgent
     }
 
     /**
-     * @param  list<string>  $errors
+     * @param list<string> $errors
      */
     private function runFileCommand(Stage $stage, string $file, array &$errors, bool &$success): void
     {
@@ -332,7 +249,7 @@ final class StrictQualityAgent
     /**
      * Execute command-based stage.
      *
-     * @return array<bool|string|array<string>>
+     * @return array<array<string>|bool|string>
      *
      * @psalm-return array{success: bool, output: string, errors: list{0?: string}}
      */
@@ -361,7 +278,7 @@ final class StrictQualityAgent
             if (File::exists($dir)) {
                 $phpFiles = File::allFiles($dir);
                 foreach ($phpFiles as $file) {
-                    if ($file->getExtension() === 'php') {
+                    if ('php' === $file->getExtension()) {
                         $files[] = $file->getPathname();
                     }
                 }
@@ -379,12 +296,12 @@ final class StrictQualityAgent
         $report = [
             'timestamp' => now()->toISOString(),
             'overall_success' => $overallSuccess,
-            'total_stages' => count($this->stages),
-            'successful_stages' => count(array_filter(
+            'total_stages' => \count($this->stages),
+            'successful_stages' => \count(array_filter(
                 $this->results,
                 static fn (StageResult $r): bool => $r->success
             )),
-            'failed_stages' => count(array_filter(
+            'failed_stages' => \count(array_filter(
                 $this->results,
                 static fn (StageResult $r): bool => ! $r->success
             )),
@@ -394,8 +311,8 @@ final class StrictQualityAgent
         ];
 
         $reportPath = storage_path('logs/ai-quality-report.json');
-        $jsonContent = json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        if ($jsonContent !== false) {
+        $jsonContent = json_encode($report, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_UNICODE);
+        if (false !== $jsonContent) {
             File::put($reportPath, $jsonContent);
         }
 
@@ -407,7 +324,7 @@ final class StrictQualityAgent
      */
     private function log(string $message): void
     {
-        Log::info($message);
-        echo $message.PHP_EOL;
+        $this->logger->info($message);
+        echo $message.\PHP_EOL;
     }
 }

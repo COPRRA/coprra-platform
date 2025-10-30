@@ -6,15 +6,15 @@ namespace Tests\Unit\COPRRA;
 
 use App\Helpers\PriceHelper;
 use App\Models\Currency;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\TestCase;
 
+/**
+ * @internal
+ */
 #[CoversClass(PriceHelper::class)]
-class PriceHelperTest extends TestCase
+final class PriceHelperTest extends TestCase
 {
-    use RefreshDatabase;
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -45,225 +45,225 @@ class PriceHelperTest extends TestCase
         ]);
     }
 
-    public function test_it_formats_price_with_default_currency(): void
+    public function testItFormatsPriceWithDefaultCurrency(): void
     {
         $result = PriceHelper::formatPrice(100.50);
 
-        $this->assertIsString($result);
-        $this->assertStringContainsString('100.50', $result);
-        $this->assertStringContainsString('$', $result);
+        self::assertIsString($result);
+        self::assertStringContainsString('100.50', $result);
+        self::assertStringContainsString('$', $result);
     }
 
-    public function test_it_formats_price_with_specific_currency(): void
+    public function testItFormatsPriceWithSpecificCurrency(): void
     {
         $result = PriceHelper::formatPrice(100.50, 'EUR');
 
-        $this->assertIsString($result);
-        $this->assertStringContainsString('100.50', $result);
-        $this->assertStringContainsString('â‚¬', $result);
+        self::assertIsString($result);
+        self::assertStringContainsString('100.50', $result);
+        self::assertStringContainsString('â‚¬', $result);
     }
 
-    public function test_it_formats_price_with_sar_currency(): void
+    public function testItFormatsPriceWithSarCurrency(): void
     {
         $result = PriceHelper::formatPrice(100.50, 'SAR');
 
-        $this->assertIsString($result);
-        $this->assertStringContainsString('100.50', $result);
-        $this->assertStringContainsString('Ø±.Ø³', $result);
+        self::assertIsString($result);
+        self::assertStringContainsString('100.50', $result);
+        self::assertStringContainsString('Ø±.Ø³', $result);
     }
 
-    public function test_it_handles_non_existent_currency(): void
+    public function testItHandlesNonExistentCurrency(): void
     {
         $result = PriceHelper::formatPrice(100.50, 'XYZ');
 
-        $this->assertIsString($result);
-        $this->assertStringContainsString('100.50', $result);
-        $this->assertStringContainsString('XYZ', $result);
+        self::assertIsString($result);
+        self::assertStringContainsString('100.50', $result);
+        self::assertStringContainsString('XYZ', $result);
     }
 
-    public function test_it_calculates_price_difference_percentage(): void
+    public function testItCalculatesPriceDifferencePercentage(): void
     {
         $result = PriceHelper::calculatePriceDifference(100.0, 120.0);
 
-        $this->assertIsFloat($result);
-        $this->assertEquals(20.0, $result);
+        self::assertIsFloat($result);
+        self::assertSame(20.0, $result);
     }
 
-    public function test_it_calculates_negative_price_difference(): void
+    public function testItCalculatesNegativePriceDifference(): void
     {
         $result = PriceHelper::calculatePriceDifference(100.0, 80.0);
 
-        $this->assertIsFloat($result);
-        $this->assertEquals(-20.0, $result);
+        self::assertIsFloat($result);
+        self::assertSame(-20.0, $result);
     }
 
-    public function test_it_returns_zero_for_same_prices(): void
+    public function testItReturnsZeroForSamePrices(): void
     {
         $result = PriceHelper::calculatePriceDifference(100.0, 100.0);
 
-        $this->assertEquals(0.0, $result);
+        self::assertSame(0.0, $result);
     }
 
-    public function test_it_handles_zero_original_price(): void
+    public function testItHandlesZeroOriginalPrice(): void
     {
         $result = PriceHelper::calculatePriceDifference(0.0, 100.0);
 
-        $this->assertEquals(0.0, $result);
+        self::assertSame(0.0, $result);
     }
 
-    public function test_it_handles_negative_original_price(): void
+    public function testItHandlesNegativeOriginalPrice(): void
     {
         $result = PriceHelper::calculatePriceDifference(-10.0, 100.0);
 
-        $this->assertEquals(0.0, $result);
+        self::assertSame(0.0, $result);
     }
 
-    public function test_it_formats_positive_price_difference_string(): void
+    public function testItFormatsPositivePriceDifferenceString(): void
     {
         $result = PriceHelper::getPriceDifferenceString(100.0, 120.0);
 
-        $this->assertIsString($result);
-        $this->assertStringContainsString('+', $result);
-        $this->assertStringContainsString('20.0', $result);
-        $this->assertStringContainsString('%', $result);
+        self::assertIsString($result);
+        self::assertStringContainsString('+', $result);
+        self::assertStringContainsString('20.0', $result);
+        self::assertStringContainsString('%', $result);
     }
 
-    public function test_it_formats_negative_price_difference_string(): void
+    public function testItFormatsNegativePriceDifferenceString(): void
     {
         $result = PriceHelper::getPriceDifferenceString(100.0, 80.0);
 
-        $this->assertIsString($result);
-        $this->assertStringContainsString('-20.0', $result);
-        $this->assertStringContainsString('%', $result);
+        self::assertIsString($result);
+        self::assertStringContainsString('-20.0', $result);
+        self::assertStringContainsString('%', $result);
     }
 
-    public function test_it_formats_zero_price_difference_string(): void
+    public function testItFormatsZeroPriceDifferenceString(): void
     {
         $result = PriceHelper::getPriceDifferenceString(100.0, 100.0);
 
-        $this->assertEquals('0%', $result);
+        self::assertSame('0%', $result);
     }
 
-    public function test_it_identifies_good_deal(): void
+    public function testItIdentifiesGoodDeal(): void
     {
         $allPrices = [100.0, 110.0, 120.0, 130.0];
         $result = PriceHelper::isGoodDeal(95.0, $allPrices);
 
-        $this->assertTrue($result);
+        self::assertTrue($result);
     }
 
-    public function test_it_identifies_not_good_deal(): void
+    public function testItIdentifiesNotGoodDeal(): void
     {
         $allPrices = [100.0, 110.0, 120.0, 130.0];
         $result = PriceHelper::isGoodDeal(120.0, $allPrices);
 
-        $this->assertFalse($result);
+        self::assertFalse($result);
     }
 
-    public function test_it_handles_empty_prices_array_for_good_deal(): void
+    public function testItHandlesEmptyPricesArrayForGoodDeal(): void
     {
         $result = PriceHelper::isGoodDeal(100.0, []);
 
-        $this->assertFalse($result);
+        self::assertFalse($result);
     }
 
-    public function test_it_gets_best_price_from_array(): void
+    public function testItGetsBestPriceFromArray(): void
     {
         $prices = [100.0, 80.0, 120.0, 90.0];
         $result = PriceHelper::getBestPrice($prices);
 
-        $this->assertEquals(80.0, $result);
+        self::assertSame(80.0, $result);
     }
 
-    public function test_it_returns_null_for_empty_prices_array(): void
+    public function testItReturnsNullForEmptyPricesArray(): void
     {
         $result = PriceHelper::getBestPrice([]);
 
-        $this->assertNull($result);
+        self::assertNull($result);
     }
 
-    public function test_it_converts_currency(): void
+    public function testItConvertsCurrency(): void
     {
         $result = PriceHelper::convertCurrency(100.0, 'USD', 'EUR');
 
-        $this->assertIsFloat($result);
+        self::assertIsFloat($result);
         // USD to EUR: 100 / 1.0 * 0.85 = 85.0
-        $this->assertEquals(85.0, $result);
+        self::assertSame(85.0, $result);
     }
 
-    public function test_it_converts_currency_to_sar(): void
+    public function testItConvertsCurrencyToSar(): void
     {
         $result = PriceHelper::convertCurrency(100.0, 'USD', 'SAR');
 
-        $this->assertIsFloat($result);
+        self::assertIsFloat($result);
         // USD to SAR: 100 / 1.0 * 3.75 = 375.0
-        $this->assertEquals(375.0, $result);
+        self::assertSame(375.0, $result);
     }
 
-    public function test_it_formats_price_range_with_same_prices(): void
+    public function testItFormatsPriceRangeWithSamePrices(): void
     {
         $result = PriceHelper::formatPriceRange(100.0, 100.0, 'USD');
 
-        $this->assertIsString($result);
-        $this->assertStringContainsString('$', $result);
-        $this->assertStringContainsString('100.00', $result);
-        $this->assertStringNotContainsString('-', $result);
+        self::assertIsString($result);
+        self::assertStringContainsString('$', $result);
+        self::assertStringContainsString('100.00', $result);
+        self::assertStringNotContainsString('-', $result);
     }
 
-    public function test_it_formats_price_range_with_different_prices(): void
+    public function testItFormatsPriceRangeWithDifferentPrices(): void
     {
         $result = PriceHelper::formatPriceRange(100.0, 200.0, 'USD');
 
-        $this->assertIsString($result);
-        $this->assertStringContainsString('$', $result);
-        $this->assertStringContainsString('100.00', $result);
-        $this->assertStringContainsString('200.00', $result);
-        $this->assertStringContainsString('-', $result);
+        self::assertIsString($result);
+        self::assertStringContainsString('$', $result);
+        self::assertStringContainsString('100.00', $result);
+        self::assertStringContainsString('200.00', $result);
+        self::assertStringContainsString('-', $result);
     }
 
-    public function test_it_formats_price_range_with_default_currency(): void
+    public function testItFormatsPriceRangeWithDefaultCurrency(): void
     {
         $result = PriceHelper::formatPriceRange(100.0, 200.0);
 
-        $this->assertIsString($result);
-        $this->assertStringContainsString('$', $result);
+        self::assertIsString($result);
+        self::assertStringContainsString('$', $result);
     }
 
-    public function test_it_formats_price_range_with_non_existent_currency(): void
+    public function testItFormatsPriceRangeWithNonExistentCurrency(): void
     {
         $result = PriceHelper::formatPriceRange(100.0, 200.0, 'XYZ');
 
-        $this->assertIsString($result);
-        $this->assertStringContainsString('XYZ', $result);
-        $this->assertStringContainsString('100.00', $result);
-        $this->assertStringContainsString('200.00', $result);
+        self::assertIsString($result);
+        self::assertStringContainsString('XYZ', $result);
+        self::assertStringContainsString('100.00', $result);
+        self::assertStringContainsString('200.00', $result);
     }
 
-    public function test_it_handles_decimal_prices_correctly(): void
+    public function testItHandlesDecimalPricesCorrectly(): void
     {
         $result = PriceHelper::formatPrice(99.99, 'USD');
 
-        $this->assertStringContainsString('99.99', $result);
+        self::assertStringContainsString('99.99', $result);
     }
 
-    public function test_it_handles_large_prices(): void
+    public function testItHandlesLargePrices(): void
     {
         $result = PriceHelper::formatPrice(9999999.99, 'USD');
 
-        $this->assertStringContainsString('9,999,999.99', $result);
+        self::assertStringContainsString('9,999,999.99', $result);
     }
 
-    public function test_it_calculates_accurate_percentage_for_small_differences(): void
+    public function testItCalculatesAccuratePercentageForSmallDifferences(): void
     {
         $result = PriceHelper::calculatePriceDifference(100.0, 101.0);
 
-        $this->assertEquals(1.0, $result);
+        self::assertSame(1.0, $result);
     }
 
-    public function test_it_calculates_accurate_percentage_for_large_differences(): void
+    public function testItCalculatesAccuratePercentageForLargeDifferences(): void
     {
         $result = PriceHelper::calculatePriceDifference(100.0, 200.0);
 
-        $this->assertEquals(100.0, $result);
+        self::assertSame(100.0, $result);
     }
 }

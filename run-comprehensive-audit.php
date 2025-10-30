@@ -6,7 +6,7 @@ namespace App\Console\Commands;
 
 /**
  * Comprehensive Audit & Analysis Script
- * Executes all phases of the audit roadmap systematically
+ * Executes all phases of the audit roadmap systematically.
  */
 class ComprehensiveAuditor
 {
@@ -151,7 +151,7 @@ class ComprehensiveAuditor
         $exitCode = 0;
         exec($command, $outputArray, $exitCode);
 
-        if ($exitCode === 0) {
+        if (0 === $exitCode) {
             echo "  ✓ {$name}: PASS\n";
         } else {
             echo "  ⚠ {$name}: Issues found (see {$outputFile})\n";
@@ -176,8 +176,8 @@ class ComprehensiveAuditor
             if ($file->isDir()) {
                 $path = $file->getPathname();
                 if (
-                    strpos($path, 'C:') !== false ||
-                    strpos($path, 'Users') !== false
+                    false !== strpos($path, 'C:')
+                    || false !== strpos($path, 'Users')
                 ) {
                     $problematic[] = $path;
                 }
@@ -228,7 +228,7 @@ class ComprehensiveAuditor
         $report .= "---\n\n";
 
         $report .= "## Issues Detected\n\n";
-        if (count($this->findings) > 0) {
+        if (\count($this->findings) > 0) {
             foreach ($this->findings as $finding) {
                 $report .= "- {$finding}\n";
             }
@@ -238,7 +238,7 @@ class ComprehensiveAuditor
         $report .= "\n";
 
         $report .= "## Fixes Applied\n\n";
-        if (count($this->fixes) > 0) {
+        if (\count($this->fixes) > 0) {
             foreach ($this->fixes as $fix) {
                 $report .= "- {$fix}\n";
             }
@@ -248,7 +248,7 @@ class ComprehensiveAuditor
         $report .= "\n";
 
         $report .= "## Recommendations\n\n";
-        if (count($this->recommendations) > 0) {
+        if (\count($this->recommendations) > 0) {
             foreach ($this->recommendations as $recommendation) {
                 $report .= "- {$recommendation}\n";
             }
@@ -271,5 +271,5 @@ class ComprehensiveAuditor
 }
 
 // Run the audit
-$auditor = new ComprehensiveAuditor;
+$auditor = new ComprehensiveAuditor();
 $auditor->run();

@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Models\Product;
 use App\Models\Store;
+use App\Services\StoreClients\GenericStoreClient;
 use App\Services\StoreClients\StoreClientFactory;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
@@ -22,7 +23,8 @@ final readonly class ExternalStoreService
     }
 
     /**
-     * @param  array<string, mixed>  $filters
+     * @param array<string, mixed> $filters
+     *
      * @return array<array>
      *
      * @psalm-return list<array<string, mixed>>
@@ -33,7 +35,7 @@ final readonly class ExternalStoreService
         foreach (array_keys($this->storeConfigs) as $storeName) {
             try {
                 $client = StoreClientFactory::create($storeName);
-                if ($client instanceof \App\Services\StoreClients\GenericStoreClient) {
+                if ($client instanceof GenericStoreClient) {
                     $storeResults = $client->search($query, $filters);
                     $results = array_merge($results, $this->normalizeProducts($storeResults, $storeName));
                 }
@@ -53,7 +55,7 @@ final readonly class ExternalStoreService
         return Cache::remember("external_product_{$storeName}_{$productId}", 3600, function () use ($storeName, $productId): ?array {
             try {
                 $client = StoreClientFactory::create($storeName);
-                if ($client instanceof \App\Services\StoreClients\GenericStoreClient) {
+                if ($client instanceof GenericStoreClient) {
                     $productData = $client->getProduct($productId);
 
                     return $productData ? $this->normalizeProductData($productData, $storeName) : null;
@@ -75,10 +77,10 @@ final readonly class ExternalStoreService
 
         try {
             $client = StoreClientFactory::create($storeName);
-            if ($client instanceof \App\Services\StoreClients\GenericStoreClient) {
+            if ($client instanceof GenericStoreClient) {
                 $client->syncProducts(function ($productData) use ($storeName, &$syncedCount): void {
                     $this->syncProduct($productData, $storeName);
-                    $syncedCount++;
+                    ++$syncedCount;
                 });
             }
         } catch (\Exception $e) {
@@ -89,9 +91,9 @@ final readonly class ExternalStoreService
     }
 
     /**
-     * @return array<array<float|int|string|null>>
+     * @return array<array<float|int|string|* @method static \App\Models\Brand create(array<string, string|bool|null>>
      *
-     * @psalm-return array<string, array<string, float|int|string|null>>
+     * @psalm-return array<string, array<string, float|int|string|* @method static \App\Models\Brand create(array<string, string|bool|null>>
      */
     public function getStoreStatus(): array
     {
@@ -99,7 +101,7 @@ final readonly class ExternalStoreService
         foreach (array_keys($this->storeConfigs) as $storeName) {
             try {
                 $client = StoreClientFactory::create($storeName);
-                $status[$storeName] = $client instanceof \App\Services\StoreClients\GenericStoreClient ? $client->getStatus() : ['status' => 'error', 'error' => 'Invalid configuration'];
+                $status[$storeName] = $client instanceof GenericStoreClient ? $client->getStatus() : ['status' => 'error', 'error' => 'Invalid configuration'];
                 $status[$storeName]['last_check'] = now()->toISOString();
             } catch (\Exception $e) {
                 $status[$storeName] = ['status' => 'error', 'error' => $e->getMessage(), 'last_check' => now()->toISOString()];
@@ -110,8 +112,9 @@ final readonly class ExternalStoreService
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $products
-     * @return array<array<array|int|mixed|string|null>>
+     * @param array<int, array<string, mixed>> $products
+     *
+     * @return array<array<array|int|mixed|string|* @method static \App\Models\Brand create(array<string, string|bool|null>>
      *
      * @psalm-return array<int, array{external_id: mixed|null, name: ''|mixed, description: ''|mixed, price: 0|mixed, currency: 'USD'|mixed, image_url: ''|mixed, store_name: string, store_url: ''|mixed, rating: 0|mixed, reviews_count: 0|mixed, availability: 'in_stock'|mixed, shipping_info: array<never, never>|mixed, category: ''|mixed, brand: ''|mixed}>
      */
@@ -121,8 +124,9 @@ final readonly class ExternalStoreService
     }
 
     /**
-     * @param  array<string, mixed>  $productData
-     * @return array<array|int|mixed|string|null>
+     * @param array<string, mixed> $productData
+     *
+     * @return array<array|int|mixed|string|* @method static \App\Models\Brand create(array<string, string|bool|null>
      *
      * @psalm-return array{external_id: mixed|null, name: ''|mixed, description: ''|mixed, price: 0|mixed, currency: 'USD'|mixed, image_url: ''|mixed, store_name: string, store_url: ''|mixed, rating: 0|mixed, reviews_count: 0|mixed, availability: 'in_stock'|mixed, shipping_info: array<never, never>|mixed, category: ''|mixed, brand: ''|mixed}
      */
@@ -147,31 +151,32 @@ final readonly class ExternalStoreService
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $results
-     * @param  array<string, mixed>  $filters
+     * @param array<int, array<string, mixed>> $results
+     * @param array<string, mixed>             $filters
+     *
      * @return array<array>
      *
      * @psalm-return list<array<string, mixed>>
      */
     private function sortAndFilterResults(array $results, array $filters): array
     {
-        if (isset($filters['sort_by']) && $filters['sort_by'] === 'price') {
-            usort($results, fn (array $a, array $b): int => ($a['price'] ?? 0) <=> ($b['price'] ?? 0));
+        if (isset($filters['sort_by']) && 'price' === $filters['sort_by']) {
+            usort($results, static fn (array $a, array $b): int => ($a['price'] ?? 0) <=> ($b['price'] ?? 0));
         }
 
         if (isset($filters['min_price'])) {
-            $results = array_filter($results, fn (array $product): bool => ($product['price'] ?? 0) >= $filters['min_price']);
+            $results = array_filter($results, static fn (array $product): bool => ($product['price'] ?? 0) >= $filters['min_price']);
         }
 
         if (isset($filters['max_price'])) {
-            $results = array_filter($results, fn (array $product): bool => ($product['price'] ?? 0) <= $filters['max_price']);
+            $results = array_filter($results, static fn (array $product): bool => ($product['price'] ?? 0) <= $filters['max_price']);
         }
 
         return array_values($results);
     }
 
     /**
-     * @param  array<string, mixed>  $productData
+     * @param array<string, mixed> $productData
      */
     private function syncProduct(array $productData, string $storeName): void
     {

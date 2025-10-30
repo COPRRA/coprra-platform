@@ -9,11 +9,13 @@ use App\Services\Api\ApiInfoService;
 use App\Services\Api\PaginationService;
 use App\Services\Api\RequestParameterService;
 use App\Services\Api\ResponseBuilderService;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 /**
- * Base API Controller for v2 endpoints
+ * Base API Controller for v2 endpoints.
  *
  * @OA\Server(
  *     url="https://api.coprra.com/v2",
@@ -47,36 +49,37 @@ abstract class BaseApiController extends Controller
     }
 
     /**
-     * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator|\Illuminate\Support\Collection|array<int, array|object>  $data
-     * @return array<array<string|null>|bool|int|string|null>
+     * @param array<int, array|object>|Collection|LengthAwarePaginator $data
      *
-     * @psalm-return array{current_page: bool|int|string|null, per_page: bool|int|string|null, total: bool|int|string|null, last_page: bool|int|string|null, from: bool|int|string|null, to: bool|int|string|null, has_more_pages: bool|int|string|null, links: array<string, string|null>}
+     * @return array<array<string|* @method static \App\Models\Brand create(array<string, string|bool|null>|bool|int|string|* @method static \App\Models\Brand create(array<string, string|bool|null>
+     *
+     * @psalm-return array{current_page: bool|int|string|null, per_page: bool|int|string|null, total: bool|int|string|null, last_page: bool|int|string|null, from: bool|int|string|null, to: bool|int|string|null, has_more_pages: bool|int|string|null, links: array<string, string|* @method static \App\Models\Brand create(array<string, string|bool|null>}
      */
-    protected function getPaginationData(\Illuminate\Contracts\Pagination\LengthAwarePaginator|\Illuminate\Support\Collection|array $data): array
+    protected function getPaginationData(array|Collection|LengthAwarePaginator $data): array
     {
         return $this->paginationService->getPaginationData($data);
     }
 
     /**
-     * Get method value if exists on object
+     * Get method value if exists on object.
      *
      * @deprecated Use PaginationService directly
      */
-    protected function getMethodValue(array|\Illuminate\Contracts\Pagination\LengthAwarePaginator|\Illuminate\Support\Collection $object, string $method, string|int|bool|null $default): string|int|bool|null
+    protected function getMethodValue(array|Collection|LengthAwarePaginator $object, string $method, bool|int|string|null $default): bool|int|string|null
     {
         return $this->paginationService->getMethodValue($object, $method, $default);
     }
 
     /**
-     * Get pagination links
+     * Get pagination links.
      *
      * @deprecated Use PaginationService directly
      *
-     * @return array<bool|int|mixed|string|null>
+     * @return array<bool|int|mixed|string|* @method static \App\Models\Brand create(array<string, string|bool|null>
      *
      * @psalm-return array{first: mixed|string|null, last: mixed|string|null, prev: bool|int|string|null, next: bool|int|string|null}
      */
-    protected function getPaginationLinks(array|\Illuminate\Contracts\Pagination\LengthAwarePaginator|\Illuminate\Support\Collection $data, bool $isPaginator): array
+    protected function getPaginationLinks(array|Collection|LengthAwarePaginator $data, bool $isPaginator): array
     {
         return $this->paginationService->getPaginationLinks($data, $isPaginator);
     }
@@ -85,7 +88,7 @@ abstract class BaseApiController extends Controller
      * Enhanced success response with v2 features.
      */
     protected function successResponse(
-        array|object|string|int|null $data = null,
+        array|int|object|string|null $data = null,
         string $message = 'Success',
         int $statusCode = 200,
         array $meta = []
@@ -109,7 +112,7 @@ abstract class BaseApiController extends Controller
      * Enhanced paginated response with v2 features.
      */
     protected function paginatedResponse(
-        \Illuminate\Contracts\Pagination\LengthAwarePaginator|\Illuminate\Support\Collection|array $data,
+        array|Collection|LengthAwarePaginator $data,
         string $message = 'Success',
         array $meta = []
     ): JsonResponse {
@@ -245,7 +248,7 @@ abstract class BaseApiController extends Controller
     /**
      * Add deprecation headers to response.
      */
-    protected function addDeprecationHeaders(JsonResponse $response): JsonResponse
+    protected function addDeprecationHeaders(JsonResponse $response): \App\Services\Api\JsonResponse
     {
         return $this->responseBuilder->addDeprecationHeaders($response);
     }

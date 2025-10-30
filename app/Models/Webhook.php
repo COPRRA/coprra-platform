@@ -6,20 +6,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * @property int $id
- * @property string $store_identifier
- * @property string $event_type
- * @property string $product_identifier
+ * @property int      $id
+ * @property string   $store_identifier
+ * @property string   $event_type
+ * @property string   $product_identifier
  * @property int|null $product_id
- * @property array<string, string|int|float|bool|null> $payload
+ * @property array<string, string|int|float|bool|* @method static \App\Models\Brand create(array<string, string|bool|null> $payload
  * @property string|null $signature
- * @property string $status
- * @property string|null $error_message
- * @property \Carbon\Carbon|null $processed_at
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
+ * @property string      $status
+ ** @property |null $error_message
+ ** @property Carbon|nullCarbon|null $processed_at
+ ** @property Carbon|nullCarbon $created_at
+ ** @property Carbon|nullCarbon $updated_at
  */
 class Webhook extends Model
 {
@@ -76,9 +77,9 @@ class Webhook extends Model
     /**
      * Get the logs for the webhook.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<WebhookLog, Webhook>
+     * @return HasMany<WebhookLog, Webhook>
      */
-    public function logs(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function logs(): HasMany
     {
         return $this->hasMany(WebhookLog::class);
     }
@@ -117,7 +118,7 @@ class Webhook extends Model
     /**
      * Add log entry.
      *
-     * @param  array<string, string|int|bool|null>|null  $metadata
+     * @param  array<string, string|int|bool|* @method static \App\Models\Brand create(array<string, string|bool|null>|null  $metadata
      */
     public function addLog(string $action, string $message, ?array $metadata = null): void
     {
@@ -126,53 +127,5 @@ class Webhook extends Model
             'message' => $message,
             'metadata' => $metadata,
         ]);
-    }
-
-    /**
-     * Scope a query to only include pending webhooks.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder<Webhook>  $query
-     *
-     * @psalm-return \Illuminate\Database\Eloquent\Builder<self>
-     */
-    public function scopePending(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
-    {
-        return $query->where('status', self::STATUS_PENDING);
-    }
-
-    /**
-     * Scope a query to filter webhooks by status.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder<Webhook>  $query
-     *
-     * @psalm-return \Illuminate\Database\Eloquent\Builder<self>
-     */
-    public function scopeStatus(\Illuminate\Database\Eloquent\Builder $query, string $status): \Illuminate\Database\Eloquent\Builder
-    {
-        return $query->where('status', $status);
-    }
-
-    /**
-     * Scope a query to filter webhooks by store.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder<Webhook>  $query
-     *
-     * @psalm-return \Illuminate\Database\Eloquent\Builder<self>
-     */
-    public function scopeStore(\Illuminate\Database\Eloquent\Builder $query, string $storeIdentifier): \Illuminate\Database\Eloquent\Builder
-    {
-        return $query->where('store_identifier', $storeIdentifier);
-    }
-
-    /**
-     * Scope a query to filter webhooks by event type.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder<Webhook>  $query
-     *
-     * @psalm-return \Illuminate\Database\Eloquent\Builder<self>
-     */
-    public function scopeEventType(\Illuminate\Database\Eloquent\Builder $query, string $eventType): \Illuminate\Database\Eloquent\Builder
-    {
-        return $query->where('event_type', $eventType);
     }
 }

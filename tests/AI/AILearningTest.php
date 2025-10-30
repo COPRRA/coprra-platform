@@ -7,12 +7,17 @@ namespace Tests\AI;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-class AILearningTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class AILearningTest extends TestCase
 {
     use AITestTrait;
 
     #[Test]
-    public function ai_learns_from_text_feedback(): void
+    public function aiLearnsFromTextFeedback(): void
     {
         $aiService = $this->getAIService();
 
@@ -26,13 +31,13 @@ class AILearningTest extends TestCase
 
         // In a real application, you would have a mechanism to process this feedback
         // For this test, we'll just ensure the service doesn't crash
-        $this->assertTrue(true, 'Feedback mechanism needs implementation.');
+        self::assertTrue(true, 'Feedback mechanism needs implementation.');
 
-        $this->assertIsArray($initialResponse);
+        self::assertIsArray($initialResponse);
     }
 
     #[Test]
-    public function ai_learns_from_classification_feedback(): void
+    public function aiLearnsFromClassificationFeedback(): void
     {
         $aiService = $this->getAIService();
 
@@ -45,14 +50,14 @@ class AILearningTest extends TestCase
             'correct_category' => 'Electronics',
         ];
 
-        $this->assertTrue(true, 'Feedback mechanism needs implementation.');
+        self::assertTrue(true, 'Feedback mechanism needs implementation.');
 
-        $this->assertIsArray($initialCategory);
-        $this->assertArrayHasKey('category', $initialCategory);
+        self::assertIsArray($initialCategory);
+        self::assertArrayHasKey('category', $initialCategory);
     }
 
     #[Test]
-    public function ai_learns_from_recommendation_feedback(): void
+    public function aiLearnsFromRecommendationFeedback(): void
     {
         $aiService = $this->getAIService();
 
@@ -66,13 +71,13 @@ class AILearningTest extends TestCase
             'clicked_recommendation' => 'The Great Gatsby',
         ];
 
-        $this->assertTrue(true, 'Feedback mechanism needs implementation.');
+        self::assertTrue(true, 'Feedback mechanism needs implementation.');
 
-        $this->assertIsArray($initialRecommendations);
+        self::assertIsArray($initialRecommendations);
     }
 
     #[Test]
-    public function ai_learns_from_image_analysis_feedback(): void
+    public function aiLearnsFromImageAnalysisFeedback(): void
     {
         $aiService = $this->getAIService();
 
@@ -85,8 +90,8 @@ class AILearningTest extends TestCase
             'user_correction' => ['category' => 'Nature'],
         ];
 
-        $this->assertTrue(true, 'Feedback mechanism needs implementation.');
+        self::assertTrue(true, 'Feedback mechanism needs implementation.');
 
-        $this->assertIsArray($initialAnalysis);
+        self::assertIsArray($initialAnalysis);
     }
 }

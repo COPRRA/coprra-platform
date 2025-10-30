@@ -5,105 +5,230 @@ declare(strict_types=1);
 namespace Tests\Feature\Http\Controllers;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /**
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class ErrorControllerTest extends TestCase
+final class ErrorControllerTest extends TestCase
 {
     use RefreshDatabase;
 
     #[RunInSeparateProcess]
     #[Test]
-    public function it_can_display_error_dashboard(): void
+    public function itCanDisplayErrorDashboard(): void
     {
-        $this->assertTrue(true);
+        $response = $this->get('/admin/errors');
+
+        $response->assertStatus(200);
+        $response->assertViewIs('admin.errors.dashboard');
+        $response->assertViewHas(['errors', 'statistics']);
     }
 
     #[Test]
-    public function it_can_display_error_dashboard_as_json(): void
+    public function itCanDisplayErrorDashboardAsJson(): void
     {
-        $this->assertTrue(true);
+        $response = $this->getJson('/admin/errors');
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'errors' => [],
+            'statistics' => [
+                'total_errors',
+                'recent_errors',
+                'error_rate',
+            ],
+        ]);
     }
 
     #[Test]
-    public function it_can_show_error_details(): void
+    public function itCanShowErrorDetails(): void
     {
-        $this->assertTrue(true);
+        $response = $this->get('/admin/errors/1');
+
+        $response->assertStatus(200);
+        $response->assertViewIs('admin.errors.show');
+        $response->assertViewHas(['error', 'context']);
     }
 
     #[Test]
-    public function it_returns_404_for_nonexistent_error(): void
+    public function itReturns404ForNonexistentError(): void
     {
-        $this->assertTrue(true);
+        $response = $this->get('/admin/errors/999999');
+
+        $response->assertStatus(404);
     }
 
     #[Test]
-    public function it_can_get_recent_errors(): void
+    public function itCanGetRecentErrors(): void
     {
-        $this->assertTrue(true);
+        $response = $this->getJson('/admin/errors/recent');
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'data' => [],
+            'meta' => [
+                'total',
+                'per_page',
+                'current_page',
+            ],
+        ]);
     }
 
     #[Test]
-    public function it_can_get_error_statistics(): void
+    public function itCanGetErrorStatistics(): void
     {
-        $this->assertTrue(true);
+        $response = $this->getJson('/admin/errors/statistics');
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'total_errors',
+            'errors_today',
+            'errors_this_week',
+            'error_rate',
+            'top_errors',
+        ]);
     }
 
     #[Test]
-    public function it_can_get_system_health(): void
+    public function itCanGetSystemHealth(): void
     {
-        $this->assertTrue(true);
+        $response = $this->getJson('/admin/health');
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'status',
+            'checks' => [
+                'database',
+                'cache',
+                'storage',
+                'memory',
+                'disk_space',
+            ],
+            'timestamp',
+        ]);
     }
 
     #[Test]
-    public function it_checks_database_health(): void
+    public function itChecksDatabaseHealth(): void
     {
-        $this->assertTrue(true);
+        $response = $this->getJson('/admin/health/database');
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'status',
+            'connection_time',
+            'active_connections',
+        ]);
     }
 
     #[Test]
-    public function it_checks_cache_health(): void
+    public function itChecksCacheHealth(): void
     {
-        $this->assertTrue(true);
+        Cache::put('health_check', 'test', 60);
+
+        $response = $this->getJson('/admin/health/cache');
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'status',
+            'response_time',
+            'hit_rate',
+        ]);
     }
 
     #[Test]
-    public function it_checks_storage_health(): void
+    public function itChecksStorageHealth(): void
     {
-        $this->assertTrue(true);
+        $response = $this->getJson('/admin/health/storage');
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'status',
+            'available_space',
+            'total_space',
+            'usage_percentage',
+        ]);
     }
 
     #[Test]
-    public function it_checks_memory_health(): void
+    public function itChecksMemoryHealth(): void
     {
-        $this->assertTrue(true);
+        $response = $this->getJson('/admin/health/memory');
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'status',
+            'memory_usage',
+            'memory_limit',
+            'peak_usage',
+        ]);
     }
 
     #[Test]
-    public function it_checks_disk_space_health(): void
+    public function itChecksDiskSpaceHealth(): void
     {
-        $this->assertTrue(true);
+        $response = $this->getJson('/admin/health/disk');
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'status',
+            'free_space',
+            'total_space',
+            'usage_percentage',
+        ]);
     }
 
     #[Test]
-    public function it_handles_database_connection_failure(): void
+    public function itHandlesDatabaseConnectionFailure(): void
     {
-        $this->assertTrue(true);
+        // Simulate database connection failure by using invalid connection
+        config(['database.connections.testing.database' => 'invalid_database']);
+
+        $response = $this->getJson('/admin/health/database');
+
+        $response->assertStatus(503);
+        $response->assertJson([
+            'status' => 'error',
+            'message' => 'Database connection failed',
+        ]);
     }
 
     #[Test]
-    public function it_handles_cache_failure(): void
+    public function itHandlesCacheFailure(): void
     {
-        $this->assertTrue(true);
+        // Mock cache failure
+        Cache::shouldReceive('put')->andThrow(new \Exception('Cache connection failed'));
+
+        $response = $this->getJson('/admin/health/cache');
+
+        $response->assertStatus(503);
+        $response->assertJson([
+            'status' => 'error',
+            'message' => 'Cache system unavailable',
+        ]);
     }
 
     #[Test]
-    public function it_handles_storage_failure(): void
+    public function itHandlesStorageFailure(): void
     {
-        $this->assertTrue(true);
+        // Mock storage failure
+        Storage::shouldReceive('disk')->andThrow(new \Exception('Storage unavailable'));
+
+        $response = $this->getJson('/admin/health/storage');
+
+        $response->assertStatus(503);
+        $response->assertJson([
+            'status' => 'error',
+            'message' => 'Storage system unavailable',
+        ]);
     }
 }

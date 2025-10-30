@@ -7,20 +7,19 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
         // Add order_date column if missing
         if (! Schema::hasColumn('orders', 'order_date')) {
-            Schema::table('orders', function (Blueprint $table): void {
+            Schema::table('orders', static function (Blueprint $table): void {
                 $table->dateTime('order_date')->nullable()->after('delivered_at');
             });
         }
 
         // For SQLite testing environment, add triggers to enforce datetime format
         $driver = DB::getDriverName();
-        if ($driver === 'sqlite') {
+        if ('sqlite' === $driver) {
             // Enforce YYYY-MM-DD HH:MM:SS format when set
             DB::unprepared(<<<'SQL'
                     CREATE TRIGGER IF NOT EXISTS trg_orders_order_date_validate_insert
@@ -47,13 +46,13 @@ return new class extends Migration
     public function down(): void
     {
         $driver = DB::getDriverName();
-        if ($driver === 'sqlite') {
+        if ('sqlite' === $driver) {
             DB::unprepared('DROP TRIGGER IF EXISTS trg_orders_order_date_validate_insert;');
             DB::unprepared('DROP TRIGGER IF EXISTS trg_orders_order_date_validate_update;');
         }
 
         if (Schema::hasColumn('orders', 'order_date')) {
-            Schema::table('orders', function (Blueprint $table): void {
+            Schema::table('orders', static function (Blueprint $table): void {
                 $table->dropColumn('order_date');
             });
         }

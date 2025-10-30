@@ -7,17 +7,18 @@ namespace App\Services\Product\Services;
 use Illuminate\Support\Facades\Cache;
 
 /**
- * Service for handling product caching operations
+ * Service for handling product caching operations.
  */
 final class ProductCacheService
 {
     /**
-     * Cache search results
+     * Cache search results.
      *
      * @template T
      *
-     * @param  array<string, mixed>  $filters
-     * @param  callable(): T  $callback
+     * @param array<string, mixed> $filters
+     * @param callable(): T        $callback
+     *
      * @return T
      */
     public function rememberSearch(string $query, array $filters, int $perPage, int $page, callable $callback)
@@ -28,11 +29,12 @@ final class ProductCacheService
     }
 
     /**
-     * Cache product by slug
+     * Cache product by slug.
      *
      * @template T
      *
-     * @param  callable(): T  $callback
+     * @param callable(): T $callback
+     *
      * @return T
      */
     public function rememberProductBySlug(string $slug, callable $callback)
@@ -43,11 +45,12 @@ final class ProductCacheService
     }
 
     /**
-     * Cache related products
+     * Cache related products.
      *
      * @template T
      *
-     * @param  callable(): T  $callback
+     * @param callable(): T $callback
+     *
      * @return T
      */
     public function rememberRelatedProducts(int $productId, int $limit, callable $callback)
@@ -58,11 +61,12 @@ final class ProductCacheService
     }
 
     /**
-     * Cache active products
+     * Cache active products.
      *
      * @template T
      *
-     * @param  callable(): T  $callback
+     * @param callable(): T $callback
+     *
      * @return T
      */
     public function rememberActiveProducts(int $perPage, callable $callback)
@@ -73,9 +77,9 @@ final class ProductCacheService
     }
 
     /**
-     * Invalidate product caches
+     * Invalidate product caches.
      *
-     * @param  array<string>  $cacheKeys
+     * @param array<string> $cacheKeys
      */
     public function invalidateCaches(array $cacheKeys): void
     {
@@ -85,17 +89,17 @@ final class ProductCacheService
     }
 
     /**
-     * Generate search cache key
+     * Generate search cache key.
      *
-     * @param  array<string, mixed>  $filters
+     * @param array<string, mixed> $filters
      */
     private function generateSearchCacheKey(string $query, array $filters, int $perPage, int $page): string
     {
         $queryHash = hash('sha256', $query);
         $filtersJson = json_encode($filters);
-        $filtersHash = hash('sha256', is_string($filtersJson) ? $filtersJson : '');
+        $filtersHash = hash('sha256', \is_string($filtersJson) ? $filtersJson : '');
 
-        return sprintf(
+        return \sprintf(
             'products:search:%s:%s:%d:%d',
             $queryHash,
             $filtersHash,

@@ -9,14 +9,20 @@ use App\Models\PriceOffer;
 use App\Models\Product;
 use App\Models\Store;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class StoreModelTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class StoreModelTest extends TestCase
 {
     use RefreshDatabase;
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_store_has_fillable_attributes(): void
+    #[Test]
+    public function testStoreHasFillableAttributes(): void
     {
         // Arrange
         $attributes = [
@@ -39,13 +45,13 @@ class StoreModelTest extends TestCase
         $store = Store::create($attributes);
 
         // Assert
-        $this->assertInstanceOf(Store::class, $store);
-        $this->assertEquals('Test Store', $store->name);
-        $this->assertEquals('test-store', $store->slug);
+        self::assertInstanceOf(Store::class, $store);
+        self::assertSame('Test Store', $store->name);
+        self::assertSame('test-store', $store->slug);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_store_casts_attributes_correctly(): void
+    #[Test]
+    public function testStoreCastsAttributesCorrectly(): void
     {
         // Arrange
         $store = Store::factory()->create([
@@ -56,18 +62,18 @@ class StoreModelTest extends TestCase
         ]);
 
         // Act & Assert
-        $this->assertIsBool($store->is_active);
-        $this->assertTrue($store->is_active);
-        $this->assertIsInt($store->priority);
-        $this->assertEquals(5, $store->priority);
-        $this->assertIsArray($store->supported_countries);
-        $this->assertEquals(['US', 'CA'], $store->supported_countries);
-        $this->assertIsArray($store->api_config);
-        $this->assertEquals(['key' => 'value'], $store->api_config);
+        self::assertIsBool($store->is_active);
+        self::assertTrue($store->is_active);
+        self::assertIsInt($store->priority);
+        self::assertSame(5, $store->priority);
+        self::assertIsArray($store->supported_countries);
+        self::assertSame(['US', 'CA'], $store->supported_countries);
+        self::assertIsArray($store->api_config);
+        self::assertSame(['key' => 'value'], $store->api_config);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_store_relationships(): void
+    #[Test]
+    public function testStoreRelationships(): void
     {
         // Arrange
         $store = Store::factory()->create();
@@ -82,14 +88,14 @@ class StoreModelTest extends TestCase
         $store->refresh();
 
         // Assert
-        $this->assertInstanceOf(Currency::class, $store->currency);
-        $this->assertEquals($currency->id, $store->currency->id);
-        $this->assertCount(1, $store->products);
-        $this->assertCount(1, $store->priceOffers);
+        self::assertInstanceOf(Currency::class, $store->currency);
+        self::assertSame($currency->id, $store->currency->id);
+        self::assertCount(1, $store->products);
+        self::assertCount(1, $store->priceOffers);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_active_scope(): void
+    #[Test]
+    public function testActiveScope(): void
     {
         // Arrange
         Store::factory()->create(['is_active' => true]);
@@ -99,12 +105,12 @@ class StoreModelTest extends TestCase
         $activeStores = Store::active()->get();
 
         // Assert
-        $this->assertCount(1, $activeStores);
-        $this->assertTrue($activeStores->first()->is_active);
+        self::assertCount(1, $activeStores);
+        self::assertTrue($activeStores->first()->is_active);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_search_scope(): void
+    #[Test]
+    public function testSearchScope(): void
     {
         // Arrange
         Store::factory()->create(['name' => 'Apple Store']);
@@ -115,12 +121,12 @@ class StoreModelTest extends TestCase
         $results = Store::search('Apple')->get();
 
         // Assert
-        $this->assertCount(1, $results);
-        $this->assertEquals('Apple Store', $results->first()->name);
+        self::assertCount(1, $results);
+        self::assertSame('Apple Store', $results->first()->name);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_generate_affiliate_url(): void
+    #[Test]
+    public function testGenerateAffiliateUrl(): void
     {
         // Arrange
         $store = Store::factory()->create([
@@ -133,11 +139,11 @@ class StoreModelTest extends TestCase
 
         // Assert
         $expected = 'https://affiliate.com/TEST123?url=https%3A//product.com/item';
-        $this->assertEquals($expected, $affiliateUrl);
+        self::assertSame($expected, $affiliateUrl);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_generate_affiliate_url_without_config(): void
+    #[Test]
+    public function testGenerateAffiliateUrlWithoutConfig(): void
     {
         // Arrange
         $store = Store::factory()->create([
@@ -149,31 +155,31 @@ class StoreModelTest extends TestCase
         $affiliateUrl = $store->generateAffiliateUrl('https://product.com/item');
 
         // Assert
-        $this->assertEquals('https://product.com/item', $affiliateUrl);
+        self::assertSame('https://product.com/item', $affiliateUrl);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_slug_generation_on_create(): void
+    #[Test]
+    public function testSlugGenerationOnCreate(): void
     {
         // Arrange & Act
         $store = Store::create(['name' => 'Test Store Name']);
 
         // Assert
-        $this->assertEquals('test-store-name', $store->slug);
+        self::assertSame('test-store-name', $store->slug);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_validation_rules(): void
+    #[Test]
+    public function testValidationRules(): void
     {
         // Arrange
-        $store = new Store;
+        $store = new Store();
 
         // Act
         $rules = $store->getRules();
 
         // Assert
-        $this->assertIsArray($rules);
-        $this->assertArrayHasKey('name', $rules);
-        $this->assertEquals('required|string|max:255', $rules['name']);
+        self::assertIsArray($rules);
+        self::assertArrayHasKey('name', $rules);
+        self::assertSame('required|string|max:255', $rules['name']);
     }
 }

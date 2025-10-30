@@ -6,10 +6,15 @@ namespace Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 final class TranslationFallbackTest extends TestCase
 {
-    public function test_basic_truth(): void
+    public function testBasicTruth(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 }

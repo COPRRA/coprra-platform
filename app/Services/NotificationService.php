@@ -28,12 +28,13 @@ class NotificationService
             $priceAlerts = PriceAlert::where('product_id', $product->id)
                 ->where('is_active', true)
                 ->with('user')
-                ->get();
+                ->get()
+            ;
 
             foreach ($priceAlerts as $alert) {
                 $user = $alert->user;
 
-                if ($user instanceof \App\Models\User && $user->email) {
+                if ($user instanceof User && $user->email) {
                     // Send email notification
                     $user->notify(new PriceDropNotification($product, $oldPrice, $newPrice, (float) $alert->target_price));
 
@@ -122,12 +123,12 @@ class NotificationService
     /**
      * Send system notification to users.
      *
-     * @param  array<int>  $userIds
+     * @param array<int> $userIds
      */
     public function sendSystemNotification(string $title, string $message, array $userIds = []): void
     {
         try {
-            $users = $userIds === [] ? User::all() : User::whereIn('id', $userIds)->get();
+            $users = [] === $userIds ? User::all() : User::whereIn('id', $userIds)->get();
 
             foreach ($users as $user) {
                 $user->notify(new SystemNotification($title, $message));
@@ -172,7 +173,7 @@ class NotificationService
 
             Log::info('Price alert confirmation sent', [
                 'alert_id' => $alert->id,
-                'user_id' => $user instanceof \App\Models\User ? $user->id : null,
+                'user_id' => $user instanceof User ? $user->id : null,
             ]);
         } catch (\Exception $e) {
             Log::error('Failed to send price alert confirmation', [
@@ -192,7 +193,8 @@ class NotificationService
             $alerts = PriceAlert::where('user_id', $user->id)
                 ->where('is_active', true)
                 ->with('product')
-                ->get();
+                ->get()
+            ;
 
             if ($alerts->isEmpty()) {
                 return;

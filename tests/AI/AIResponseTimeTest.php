@@ -8,12 +8,27 @@ namespace Tests\AI;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-class AIResponseTimeTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class AIResponseTimeTest extends TestCase
 {
     use AITestTrait;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+    }
+
     #[Test]
-    public function text_analysis_response_time_is_acceptable(): void
+    public function textAnalysisResponseTimeIsAcceptable(): void
     {
         $aiService = $this->getAIService();
 
@@ -23,12 +38,12 @@ class AIResponseTimeTest extends TestCase
 
         $responseTime = ($endTime - $startTime) * 1000; // Convert to milliseconds
 
-        $this->assertTrue(isset($result['result']) || isset($result['error']));
-        $this->assertLessThan(5000, $responseTime); // Less than 5 seconds
+        self::assertTrue(isset($result['result']) || isset($result['error']));
+        self::assertLessThan(5000, $responseTime); // Less than 5 seconds
     }
 
     #[Test]
-    public function product_classification_response_time_is_acceptable(): void
+    public function productClassificationResponseTimeIsAcceptable(): void
     {
         $aiService = $this->getAIService();
 
@@ -40,12 +55,12 @@ class AIResponseTimeTest extends TestCase
 
         $responseTime = ($endTime - $startTime) * 1000;
 
-        $this->assertNotEmpty($result);
-        $this->assertLessThan(5000, $responseTime);
+        self::assertNotEmpty($result);
+        self::assertLessThan(5000, $responseTime);
     }
 
     #[Test]
-    public function recommendation_generation_response_time_is_acceptable(): void
+    public function recommendationGenerationResponseTimeIsAcceptable(): void
     {
         $aiService = $this->getAIService();
 
@@ -63,12 +78,12 @@ class AIResponseTimeTest extends TestCase
 
         $responseTime = ($endTime - $startTime) * 1000;
 
-        $this->assertTrue(isset($result['recommendations']) || isset($result['error']));
-        $this->assertLessThan(5000, $responseTime);
+        self::assertTrue(isset($result['recommendations']) || isset($result['error']));
+        self::assertLessThan(5000, $responseTime);
     }
 
     #[Test]
-    public function image_processing_response_time_is_acceptable(): void
+    public function imageProcessingResponseTimeIsAcceptable(): void
     {
         $aiService = $this->getAIService();
 
@@ -81,12 +96,12 @@ class AIResponseTimeTest extends TestCase
 
         $responseTime = ($endTime - $startTime) * 1000;
 
-        $this->assertArrayHasKey('category', $result);
-        $this->assertLessThan(5000, $responseTime);
+        self::assertArrayHasKey('category', $result);
+        self::assertLessThan(5000, $responseTime);
     }
 
     #[Test]
-    public function batch_processing_response_time_is_acceptable(): void
+    public function batchProcessingResponseTimeIsAcceptable(): void
     {
         $aiService = $this->getAIService();
 
@@ -109,12 +124,12 @@ class AIResponseTimeTest extends TestCase
         $endTime = microtime(true);
         $responseTime = ($endTime - $startTime) * 1000;
 
-        $this->assertCount(5, $results);
-        $this->assertLessThan(10000, $responseTime); // Less than 10 seconds for batch
+        self::assertCount(5, $results);
+        self::assertLessThan(10000, $responseTime); // Less than 10 seconds for batch
     }
 
     #[Test]
-    public function concurrent_requests_handle_gracefully(): void
+    public function concurrentRequestsHandleGracefully(): void
     {
         $aiService = $this->getAIService();
 
@@ -122,19 +137,19 @@ class AIResponseTimeTest extends TestCase
         $results = [];
 
         // Ù…Ø­Ø§ÙƒØ§Ø© Ø·Ù„Ø¨Ø§Øª Ù…ØªØ²Ø§Ù…Ù†Ø©
-        for ($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 5; ++$i) {
             $results[] = $aiService->analyzeText("Ø·Ù„Ø¨ Ø±Ù‚Ù… {$i}");
         }
 
         $endTime = microtime(true);
         $responseTime = ($endTime - $startTime) * 1000;
 
-        $this->assertCount(5, $results);
-        $this->assertLessThan(10000, $responseTime);
+        self::assertCount(5, $results);
+        self::assertLessThan(10000, $responseTime);
     }
 
     #[Test]
-    public function response_time_improves_with_caching(): void
+    public function responseTimeImprovesWithCaching(): void
     {
         $aiService = $this->getAIService();
 
@@ -150,13 +165,13 @@ class AIResponseTimeTest extends TestCase
         $result2 = $aiService->analyzeText($text);
         $secondRequestTime = (microtime(true) - $startTime) * 1000;
 
-        $this->assertTrue(isset($result1['result']) || isset($result1['error']));
-        $this->assertTrue(isset($result2['result']) || isset($result2['error']));
+        self::assertTrue(isset($result1['result']) || isset($result1['error']));
+        self::assertTrue(isset($result2['result']) || isset($result2['error']));
         // Ø§Ø®ØªØ¨Ø§Ø± Ø¨Ø³ÙŠØ· - Ù„Ø§ Ù†ØªØ­Ù‚Ù‚ Ù…Ù† Ø£Ù† Ø§Ù„Ø·Ù„Ø¨ Ø§Ù„Ø«Ø§Ù†ÙŠ Ø£Ø³Ø±Ø¹ //
     }
 
     #[Test]
-    public function response_time_scales_linearly_with_input_size(): void
+    public function responseTimeScalesLinearlyWithInputSize(): void
     {
         $aiService = $this->getAIService();
 
@@ -173,18 +188,8 @@ class AIResponseTimeTest extends TestCase
         $largeResult = $aiService->analyzeText($largeText);
         $largeTime = (microtime(true) - $startTime) * 1000;
 
-        $this->assertTrue(isset($smallResult['result']) || isset($smallResult['error']));
-        $this->assertTrue(isset($largeResult['result']) || isset($largeResult['error']));
-        $this->assertLessThan(10000, $largeTime); // Large text should still be reasonable
-    }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
+        self::assertTrue(isset($smallResult['result']) || isset($smallResult['error']));
+        self::assertTrue(isset($largeResult['result']) || isset($largeResult['error']));
+        self::assertLessThan(10000, $largeTime); // Large text should still be reasonable
     }
 }

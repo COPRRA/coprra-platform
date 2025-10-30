@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Models\PriceOffer;
 use App\Services\PriceUpdate\PriceQueryBuilderService;
 use App\Services\PriceUpdate\PriceUpdateDisplayService;
 use App\Services\PriceUpdate\PriceUpdateProcessorService;
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * @property string $signature
@@ -42,7 +44,7 @@ final class UpdatePricesCommand extends Command
         $this->info('🔄 Starting price update process...');
 
         $options = $this->getOptions();
-        $dryRun = is_bool($options['dryRun']) ? $options['dryRun'] : (bool) $options['dryRun'];
+        $dryRun = \is_bool($options['dryRun']) ? $options['dryRun'] : (bool) $options['dryRun'];
         $this->displayService->displayDryRunWarning($dryRun);
 
         $results = $this->runPriceUpdate($options, $dryRun);
@@ -71,14 +73,15 @@ final class UpdatePricesCommand extends Command
     private function initializeServices(): void
     {
         $this->displayService = new PriceUpdateDisplayService($this);
-        $this->queryBuilderService = new PriceQueryBuilderService;
+        $this->queryBuilderService = new PriceQueryBuilderService();
         $this->priceProcessor = new PriceUpdateProcessorService($this->displayService);
     }
 
     /**
      * Run the price update process.
      *
-     * @param  array{storeId: string|null, productId: string|null, dryRun: bool}  $options
+     * @param array{storeId: string|null, productId: string|null, dryRun: bool} $options
+     *
      * @return array{updatedCount: int, errorCount: int}
      */
     private function runPriceUpdate(array $options, bool $dryRun): array
@@ -93,10 +96,11 @@ final class UpdatePricesCommand extends Command
     /**
      * Fetch price offers based on options.
      *
-     * @param  array{storeId: string|null, productId: string|null, dryRun: bool}  $options
-     * @return \Illuminate\Database\Eloquent\Collection<int, \App\Models\PriceOffer>
+     * @param array{storeId: string|null, productId: string|null, dryRun: bool} $options
+     *
+     * @return Collection<int, PriceOffer>
      */
-    private function fetchPriceOffers(array $options): \Illuminate\Database\Eloquent\Collection
+    private function fetchPriceOffers(array $options): Collection
     {
         $query = $this->queryBuilderService->buildQuery($options);
         $priceOffers = $query->get();
@@ -108,10 +112,11 @@ final class UpdatePricesCommand extends Command
     /**
      * Process all price offers.
      *
-     * @param  \Illuminate\Database\Eloquent\Collection<int, \App\Models\PriceOffer>  $priceOffers
+     * @param Collection<int, PriceOffer> $priceOffers
+     *
      * @return array{updatedCount: int, errorCount: int}
      */
-    private function processPriceOffers(\Illuminate\Database\Eloquent\Collection $priceOffers, bool $dryRun): array
+    private function processPriceOffers(Collection $priceOffers, bool $dryRun): array
     {
         $results = [
             'updatedCount' => 0,

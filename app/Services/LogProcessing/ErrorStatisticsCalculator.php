@@ -6,15 +6,11 @@ namespace App\Services\LogProcessing;
 
 class ErrorStatisticsCalculator
 {
-    public function __construct(
-        private readonly LogFileReader $fileReader,
-        private readonly LogLineParser $lineParser
-    ) {}
-
     /**
-     * Calculate error statistics for log files
+     * Calculate error statistics for log files.
      *
-     * @param  list<string>  $logFiles
+     * @param list<string> $logFiles
+     *
      * @return array{
      *     total_errors: int,
      *     critical_errors: int,
@@ -41,7 +37,7 @@ class ErrorStatisticsCalculator
     }
 
     /**
-     * Process a single log file for statistics
+     * Process a single log file for statistics.
      *
      * @param array{
      *     total_errors: int,
@@ -54,7 +50,7 @@ class ErrorStatisticsCalculator
     private function processLogFileForStats(array &$stats, string $logFile): void
     {
         $content = $this->fileReader->readFile($logFile);
-        if ($content === '' || $content === '0') {
+        if ('' === $content || '0' === $content) {
             return;
         }
 
@@ -67,7 +63,7 @@ class ErrorStatisticsCalculator
     }
 
     /**
-     * Update error statistics
+     * Update error statistics.
      *
      * @param array{
      *     total_errors: int,
@@ -81,10 +77,10 @@ class ErrorStatisticsCalculator
     {
         $error = $this->lineParser->parseLogLine($line);
 
-        $stats['total_errors']++;
+        ++$stats['total_errors'];
 
         if (str_contains($line, 'CRITICAL')) {
-            $stats['critical_errors']++;
+            ++$stats['critical_errors'];
         }
 
         $this->updateErrorTypeStats($stats, $error);
@@ -92,7 +88,7 @@ class ErrorStatisticsCalculator
     }
 
     /**
-     * Update error type statistics
+     * Update error type statistics.
      *
      * @param array{
      *     total_errors: int,
@@ -104,12 +100,12 @@ class ErrorStatisticsCalculator
      */
     private function updateErrorTypeStats(array &$stats, array $error): void
     {
-        $type = is_string($error['type'] ?? '') ? $error['type'] : 'Unknown';
+        $type = \is_string($error['type'] ?? '') ? $error['type'] : 'Unknown';
         $stats['errors_by_type'][$type] = ($stats['errors_by_type'][$type] ?? 0) + 1;
     }
 
     /**
-     * Update time-based statistics
+     * Update time-based statistics.
      *
      * @param array{
      *     total_errors: int,
@@ -122,8 +118,8 @@ class ErrorStatisticsCalculator
     private function updateTimeBasedStats(array &$stats, array $error): void
     {
         $timestampValue = $error['timestamp'] ?? null;
-        $timestamp = is_string($timestampValue) ? strtotime($timestampValue) : time();
-        $validTimestamp = $timestamp === false ? time() : $timestamp;
+        $timestamp = \is_string($timestampValue) ? strtotime($timestampValue) : time();
+        $validTimestamp = false === $timestamp ? time() : $timestamp;
 
         $hour = date('H', $validTimestamp);
         $stats['errors_by_hour'][$hour] = ($stats['errors_by_hour'][$hour] ?? 0) + 1;

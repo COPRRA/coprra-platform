@@ -21,13 +21,13 @@ class CompressionResponseService
     }
 
     /**
-     * Check if response should be compressed
+     * Check if response should be compressed.
      */
     public function shouldCompress(string $acceptEncoding, Response $response): bool
     {
         $content = $response->getContent();
 
-        if (! is_string($content) || $content === '') {
+        if (! \is_string($content) || '' === $content) {
             return false;
         }
 
@@ -37,13 +37,13 @@ class CompressionResponseService
     }
 
     /**
-     * Apply compression to response
+     * Apply compression to response.
      */
     public function compressResponse(Response $response, string $acceptEncoding): void
     {
         $content = $response->getContent();
 
-        if (! is_string($content) || $content === '') {
+        if (! \is_string($content) || '' === $content) {
             return;
         }
 
@@ -52,16 +52,16 @@ class CompressionResponseService
         if ($compression) {
             $response->setContent($compression['content']);
             $response->headers->set('Content-Encoding', $compression['encoding']);
-            $response->headers->set('Content-Length', (string) strlen($compression['content']));
+            $response->headers->set('Content-Length', (string) \strlen($compression['content']));
             $response->headers->set('Vary', 'Accept-Encoding');
         }
     }
 
     /**
-     * Check if content is large enough to warrant compression
+     * Check if content is large enough to warrant compression.
      */
     private function isContentLargeEnough(string $content): bool
     {
-        return strlen($content) > 1024;
+        return \strlen($content) > 1024;
     }
 }

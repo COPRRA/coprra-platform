@@ -9,8 +9,11 @@ use App\Services\StoreAdapters\AmazonAdapter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\TestCase;
 
+/**
+ * @internal
+ */
 #[CoversClass(StoreAdapterManager::class)]
-class StoreAdapterManagerTest extends TestCase
+final class StoreAdapterManagerTest extends TestCase
 {
     protected StoreAdapterManager $manager;
 
@@ -21,147 +24,144 @@ class StoreAdapterManagerTest extends TestCase
         $this->manager = new StoreAdapterManager([]);
     }
 
-    public function test_it_registers_default_adapters(): void
+    public function testItRegistersDefaultAdapters(): void
     {
         $adapters = $this->manager->getAllAdapters();
 
-        $this->assertCount(3, $adapters);
-        $this->assertArrayHasKey('amazon', $adapters);
-        $this->assertArrayHasKey('ebay', $adapters);
-        $this->assertArrayHasKey('noon', $adapters);
+        self::assertCount(3, $adapters);
+        self::assertArrayHasKey('amazon', $adapters);
+        self::assertArrayHasKey('ebay', $adapters);
+        self::assertArrayHasKey('noon', $adapters);
     }
 
-    public function test_it_gets_adapter_by_identifier(): void
+    public function testItGetsAdapterByIdentifier(): void
     {
         $adapter = $this->manager->getAdapter('amazon');
 
-        $this->assertInstanceOf(AmazonAdapter::class, $adapter);
-        $this->assertEquals('Amazon', $adapter->getStoreName());
+        self::assertInstanceOf(AmazonAdapter::class, $adapter);
+        self::assertSame('Amazon', $adapter->getStoreName());
     }
 
-    public function test_it_returns_null_for_unknown_adapter(): void
+    public function testItReturnsNullForUnknownAdapter(): void
     {
         $adapter = $this->manager->getAdapter('unknown_store');
 
-        $this->assertNull($adapter);
+        self::assertNull($adapter);
     }
 
-    public function test_it_checks_if_store_is_supported(): void
+    public function testItChecksIfStoreIsSupported(): void
     {
-        $this->assertTrue($this->manager->isStoreSupported('amazon'));
-        $this->assertTrue($this->manager->isStoreSupported('ebay'));
-        $this->assertTrue($this->manager->isStoreSupported('noon'));
-        $this->assertFalse($this->manager->isStoreSupported('unknown'));
+        self::assertTrue($this->manager->isStoreSupported('amazon'));
+        self::assertTrue($this->manager->isStoreSupported('ebay'));
+        self::assertTrue($this->manager->isStoreSupported('noon'));
+        self::assertFalse($this->manager->isStoreSupported('unknown'));
     }
 
-    public function test_it_gets_supported_stores(): void
+    public function testItGetsSupportedStores(): void
     {
         $stores = $this->manager->getSupportedStores();
 
-        $this->assertIsArray($stores);
-        $this->assertContains('amazon', $stores);
-        $this->assertContains('ebay', $stores);
-        $this->assertContains('noon', $stores);
+        self::assertIsArray($stores);
+        self::assertContains('amazon', $stores);
+        self::assertContains('ebay', $stores);
+        self::assertContains('noon', $stores);
     }
 
-    public function test_it_validates_amazon_identifier(): void
+    public function testItValidatesAmazonIdentifier(): void
     {
-        $this->assertTrue($this->manager->validateIdentifier('amazon', 'B08N5WRWNW'));
-        $this->assertFalse($this->manager->validateIdentifier('amazon', 'invalid'));
-        $this->assertFalse($this->manager->validateIdentifier('amazon', '123'));
+        self::assertTrue($this->manager->validateIdentifier('amazon', 'B08N5WRWNW'));
+        self::assertFalse($this->manager->validateIdentifier('amazon', 'invalid'));
+        self::assertFalse($this->manager->validateIdentifier('amazon', '123'));
     }
 
-    public function test_it_validates_ebay_identifier(): void
+    public function testItValidatesEbayIdentifier(): void
     {
-        $this->assertTrue($this->manager->validateIdentifier('ebay', '123456789012'));
-        $this->assertFalse($this->manager->validateIdentifier('ebay', 'abc'));
-        $this->assertFalse($this->manager->validateIdentifier('ebay', '123'));
+        self::assertTrue($this->manager->validateIdentifier('ebay', '123456789012'));
+        self::assertFalse($this->manager->validateIdentifier('ebay', 'abc'));
+        self::assertFalse($this->manager->validateIdentifier('ebay', '123'));
     }
 
-    public function test_it_validates_noon_identifier(): void
+    public function testItValidatesNoonIdentifier(): void
     {
-        $this->assertTrue($this->manager->validateIdentifier('noon', 'N12345678'));
-        $this->assertFalse($this->manager->validateIdentifier('noon', '12345678'));
-        $this->assertFalse($this->manager->validateIdentifier('noon', 'ABC123'));
+        self::assertTrue($this->manager->validateIdentifier('noon', 'N12345678'));
+        self::assertFalse($this->manager->validateIdentifier('noon', '12345678'));
+        self::assertFalse($this->manager->validateIdentifier('noon', 'ABC123'));
     }
 
-    public function test_it_gets_product_url_for_amazon(): void
+    public function testItGetsProductUrlForAmazon(): void
     {
         $url = $this->manager->getProductUrl('amazon', 'B08N5WRWNW');
 
-        $this->assertStringContainsString('amazon.com', $url);
-        $this->assertStringContainsString('B08N5WRWNW', $url);
+        self::assertStringContainsString('amazon.com', $url);
+        self::assertStringContainsString('B08N5WRWNW', $url);
     }
 
-    public function test_it_gets_product_url_for_ebay(): void
+    public function testItGetsProductUrlForEbay(): void
     {
         $url = $this->manager->getProductUrl('ebay', '123456789012');
 
-        $this->assertStringContainsString('ebay.com', $url);
-        $this->assertStringContainsString('123456789012', $url);
+        self::assertStringContainsString('ebay.com', $url);
+        self::assertStringContainsString('123456789012', $url);
     }
 
-    public function test_it_gets_product_url_for_noon(): void
+    public function testItGetsProductUrlForNoon(): void
     {
         $url = $this->manager->getProductUrl('noon', 'N12345678');
 
-        $this->assertStringContainsString('noon.com', $url);
-        $this->assertStringContainsString('N12345678', $url);
+        self::assertStringContainsString('noon.com', $url);
+        self::assertStringContainsString('N12345678', $url);
     }
 
-    public function test_it_returns_null_for_unknown_store_url(): void
+    public function testItReturnsNullForUnknownStoreUrl(): void
     {
         $url = $this->manager->getProductUrl('unknown', '123');
 
-        $this->assertNull($url);
+        self::assertNull($url);
     }
 
-    public function test_it_gets_statistics(): void
+    public function testItGetsStatistics(): void
     {
         $stats = $this->manager->getStatistics();
 
-        $this->assertIsArray($stats);
-        $this->assertArrayHasKey('total_adapters', $stats);
-        $this->assertArrayHasKey('available_adapters', $stats);
-        $this->assertArrayHasKey('adapters', $stats);
-        $this->assertEquals(3, $stats['total_adapters']);
+        self::assertIsArray($stats);
+        self::assertArrayHasKey('total_adapters', $stats);
+        self::assertArrayHasKey('available_adapters', $stats);
+        self::assertArrayHasKey('adapters', $stats);
+        self::assertSame(3, $stats['total_adapters']);
     }
 
-    public function test_it_gets_adapter_rate_limits(): void
+    public function testItGetsAdapterRateLimits(): void
     {
         $adapter = $this->manager->getAdapter('amazon');
         $limits = $adapter->getRateLimits();
 
-        $this->assertIsArray($limits);
-        $this->assertArrayHasKey('requests_per_minute', $limits);
-        $this->assertArrayHasKey('requests_per_hour', $limits);
-        $this->assertArrayHasKey('requests_per_day', $limits);
+        self::assertIsArray($limits);
+        self::assertArrayHasKey('requests_per_minute', $limits);
+        self::assertArrayHasKey('requests_per_hour', $limits);
+        self::assertArrayHasKey('requests_per_day', $limits);
     }
 
-    /** @test */
-    public function amazon_adapter_has_correct_properties(): void
+    public function testAmazonAdapterHasCorrectProperties(): void
     {
         $adapter = $this->manager->getAdapter('amazon');
 
-        $this->assertEquals('Amazon', $adapter->getStoreName());
-        $this->assertEquals('amazon', $adapter->getStoreIdentifier());
+        self::assertSame('Amazon', $adapter->getStoreName());
+        self::assertSame('amazon', $adapter->getStoreIdentifier());
     }
 
-    /** @test */
-    public function ebay_adapter_has_correct_properties(): void
+    public function testEbayAdapterHasCorrectProperties(): void
     {
         $adapter = $this->manager->getAdapter('ebay');
 
-        $this->assertEquals('eBay', $adapter->getStoreName());
-        $this->assertEquals('ebay', $adapter->getStoreIdentifier());
+        self::assertSame('eBay', $adapter->getStoreName());
+        self::assertSame('ebay', $adapter->getStoreIdentifier());
     }
 
-    /** @test */
-    public function noon_adapter_has_correct_properties(): void
+    public function testNoonAdapterHasCorrectProperties(): void
     {
         $adapter = $this->manager->getAdapter('noon');
 
-        $this->assertEquals('Noon', $adapter->getStoreName());
-        $this->assertEquals('noon', $adapter->getStoreIdentifier());
+        self::assertSame('Noon', $adapter->getStoreName());
+        self::assertSame('noon', $adapter->getStoreIdentifier());
     }
 }

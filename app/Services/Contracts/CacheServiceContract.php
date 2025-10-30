@@ -12,8 +12,8 @@ interface CacheServiceContract
     /**
      * Remember a value in cache or compute via callback on miss.
      *
-     * @param  callable(): mixed  $callback
-     * @param  array<int, string>  $tags
+     * @param callable(): mixed  $callback
+     * @param array<int, string> $tags
      */
     public function remember(string $key, int $ttl, callable $callback, array $tags = []): mixed;
 
@@ -26,13 +26,6 @@ interface CacheServiceContract
      * Forget a value by key.
      */
     public function forget(string $key): bool;
-
-    /**
-     * Forget caches by tags when supported.
-     *
-     * @param  array<int, string>  $tags
-     */
-    public function forgetByTags(array $tags): bool;
 
     /**
      * Flush entire cache store when appropriate.

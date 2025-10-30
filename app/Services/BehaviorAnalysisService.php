@@ -8,21 +8,26 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\User;
+use App\Repositories\BehaviorAnalysisRepository;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Behavior Analysis Service
+ * Behavior Analysis Service.
  *
  * Tracks and analyzes user behavior patterns for personalization and analytics.
  * Not marked as final to allow mocking in unit tests while maintaining production integrity.
  */
 class BehaviorAnalysisService
 {
+    public function __construct(
+        private readonly BehaviorAnalysisRepository $behaviorRepository
+    ) {}
+
     /**
-     * Track user behavior action
+     * Track user behavior action.
      *
-     * @param  array<string, string|int|float|bool|null>  $data
+     * @param  array<string, string|int|float|bool|* @method static \App\Models\Brand create(array<string, string|bool|null>  $data
      */
     public function trackUserBehavior(User $user, string $action, array $data = []): void
     {
@@ -36,29 +41,22 @@ class BehaviorAnalysisService
             'updated_at' => now(),
         ];
 
-        // Use Query Builder insert in production; align with test expectations during unit tests
-        if (\function_exists('app') && app()->runningUnitTests()) {
-            DB::table('user_behaviors');
-            DB::insert($payload);
-        } else {
-            DB::table('user_behaviors')->insert($payload);
-        }
+        $this->behaviorRepository->insertUserBehavior($payload);
     }
 
     /**
-     * Get comprehensive user analytics
+     * Get comprehensive user analytics.
      *
-     * @return array<string, array<string, int|string>|float|int>
+     * @return array<string, mixed>
      */
     public function getUserAnalytics(User $user): array
     {
         $cacheKey = "user_analytics_{$user->id}";
 
-        return Cache::remember($cacheKey, 1800, /**
-         * @return array<array<array<array<array<scalar|null>>|scalar|null>|int>|float>
-         *
-         * @psalm-return array{purchase_history: array<int, array<string, array<int, array<string, scalar|null>>|scalar|null>>, browsing_patterns: array<string, array<int, int>|int>, preferences: array<string, array<int, float|int|null>>, engagement_score: float, lifetime_value: float, recommendation_score: float}
-         */
+        return Cache::remember(
+            $cacheKey,
+            1800,
+            /** @return array<string, mixed> */
             function () use ($user): array {
                 return [
                     'purchase_history' => $this->getPurchaseHistory($user),
@@ -68,64 +66,57 @@ class BehaviorAnalysisService
                     'lifetime_value' => $this->calculateLifetimeValue($user),
                     'recommendation_score' => $this->calculateRecommendationScore($user),
                 ];
-            });
+            }
+        );
     }
 
     /**
-     * Get site-wide analytics
+     * Get site-wide analytics.
      *
-     * @return array<string, float|int|array<int, array<string, string|int|null>>>
+     * @return array<string, mixed>
      */
     public function getSiteAnalytics(): array
     {
         $cacheKey = 'site_analytics';
 
-        return Cache::remember($cacheKey, 3600, /**
-         * @return array<array<array<int|string|null>>|float|int|mixed>
-         *
-         * @psalm-return array{total_users: mixed, active_users: int, total_orders: mixed, total_revenue: mixed, average_order_value: mixed, conversion_rate: float, most_viewed_products: array<int, array<string, int|string|null>>, top_selling_products: array<int, array<string, int|string|null>>}
-         */
+        return Cache::remember(
+            $cacheKey,
+            3600,
+            /** @return array<string, mixed> */
             function (): array {
                 return [
-                    'total_users' => User::count(),
-                    'active_users' => $this->getActiveUsersCount(),
-                    'total_orders' => Order::count(),
-                    'total_revenue' => Order::sum('total_amount'),
-                    'average_order_value' => Order::avg('total_amount'),
+                    'total_users' => $this->behaviorRepository->getTotalUsersCount(),
+                    'active_users' => $this->behaviorRepository->getActiveUsersCount(),
+                    'total_orders' => $this->behaviorRepository->getTotalOrdersCount(),
+                    'total_revenue' => $this->behaviorRepository->getTotalRevenue(),
+                    'average_order_value' => $this->behaviorRepository->getAverageOrderValue(),
                     'conversion_rate' => $this->getConversionRate(),
                     'most_viewed_products' => $this->getMostViewedProducts(),
                     'top_selling_products' => $this->getTopSellingProducts(),
                 ];
-            });
+            }
+        );
     }
 
     /**
-     * Get user's purchase history
+     * Get user's purchase history.
      *
-     * @return array<int, array<string, string|int|float|bool|array<int, array<string, string|int|float|bool|null>>|null>>
+     * @return array<int, array<string, string|int|float|bool|array<int, array<string, string|int|float|bool|* @method static \App\Models\Brand create(array<string, string|bool|null>>|* @method static \App\Models\Brand create(array<string, string|bool|null>>
      */
     private function getPurchaseHistory(User $user): array
     {
-        /** @var array<int, array<string, string|int|float|bool|array<int, array<string, string|int|float|bool|null>>|null>> $history */
-        $history = Order::where('user_id', $user->id)
-            ->with(['items.product'])
-            ->orderBy('created_at', 'desc')
-            ->limit(10)
-            ->get()
-            ->map(/**
-             * @psalm-return array{order_number: mixed, total_amount: mixed, status: mixed, created_at: mixed, products: mixed}
-             */
+        /** @var array<int, array<string, mixed>> $history */
+        $history = $this->behaviorRepository->getUserPurchaseHistory($user, 10)
+            ->map(
+                /** @return array<string, mixed> */
                 static function (Order $order): array {
                     return [
                         'order_number' => $order->order_number,
                         'total_amount' => $order->total_amount,
                         'status' => $order->status,
                         'created_at' => $order->created_at,
-                        'products' => $order->items->map(/**
-                     * @return array<mixed|string>
-                     *
-                     * @psalm-return array{name: ''|mixed, price: mixed, quantity: mixed}
-                     */
+                        'products' => $order->items->map(
+                            /** @return array<string, mixed> */
                             static function (OrderItem $item): array {
                                 $product = $item->product;
 
@@ -139,24 +130,22 @@ class BehaviorAnalysisService
                     ];
                 }
             )
-            ->toArray();
+            ->toArray()
+        ;
 
         return $history;
     }
 
     /**
-     * Get user's browsing patterns
+     * Get user's browsing patterns.
      *
-     * @return array<int|array<int>>
+     * @return array<array<int>|int>
      *
      * @psalm-return array{page_views: int<0, max>, product_views: int<0, max>, search_queries: int<0, max>, cart_additions: int<0, max>, wishlist_additions: int<0, max>, most_viewed_categories: array<int, int>, peak_activity_hours: array<int, int>}
      */
     private function getBrowsingPatterns(User $user): array
     {
-        $behaviors = DB::table('user_behaviors')
-            ->where('user_id', $user->id)
-            ->where('created_at', '>=', now()->subDays(30))
-            ->get();
+        $behaviors = $this->behaviorRepository->getUserBehaviors($user, 30);
 
         $patterns = [
             'page_views' => $behaviors->where('action', 'page_view')->count(),
@@ -173,7 +162,7 @@ class BehaviorAnalysisService
     }
 
     /**
-     * Get user preferences based on purchase history
+     * Get user preferences based on purchase history.
      *
      * @return array<array|mixed>
      *
@@ -181,11 +170,7 @@ class BehaviorAnalysisService
      */
     private function getUserPreferences(User $user): array
     {
-        $purchases = OrderItem::whereHas('order', static function ($query) use ($user): void {
-            $query->where('user_id', $user->id);
-        })
-            ->with('product')
-            ->get();
+        $purchases = $this->behaviorRepository->getUserOrderItems($user);
 
         if ($purchases->isEmpty()) {
             return [];
@@ -200,7 +185,8 @@ class BehaviorAnalysisService
                 return $items->sum('quantity');
             })
             ->sortDesc()
-            ->take(5);
+            ->take(5)
+        ;
 
         $brands = $purchases->groupBy(static function (OrderItem $item): int {
             $product = $item->product;
@@ -211,7 +197,8 @@ class BehaviorAnalysisService
                 return $items->sum('quantity');
             })
             ->sortDesc()
-            ->take(5);
+            ->take(5)
+        ;
 
         $priceRange = $purchases->map(static function (OrderItem $item) {
             $product = $item->product;
@@ -231,14 +218,15 @@ class BehaviorAnalysisService
     }
 
     /**
-     * Calculate user engagement score (0-1)
+     * Calculate user engagement score (0-1).
      */
     private function calculateEngagementScore(User $user): float
     {
         $behaviors = DB::table('user_behaviors')
             ->where('user_id', $user->id)
             ->where('created_at', '>=', now()->subDays(30))
-            ->get();
+            ->get()
+        ;
 
         $score = 0;
 
@@ -257,25 +245,27 @@ class BehaviorAnalysisService
         // Purchases (weight: 10)
         $score += Order::where('user_id', $user->id)
             ->where('created_at', '>=', now()->subDays(30))
-            ->count() * 10;
+            ->count() * 10
+        ;
 
         return min($score / 100, 1.0); // Normalize to 0-1
     }
 
     /**
-     * Calculate user's lifetime value
+     * Calculate user's lifetime value.
      */
     private function calculateLifetimeValue(User $user): float
     {
         $sum = Order::where('user_id', $user->id)
             ->where('status', '!=', 'cancelled')
-            ->sum('total_amount');
+            ->sum('total_amount')
+        ;
 
         return is_numeric($sum) ? (float) $sum : 0.0;
     }
 
     /**
-     * Calculate recommendation score
+     * Calculate recommendation score.
      */
     private function calculateRecommendationScore(User $user): float
     {
@@ -287,12 +277,12 @@ class BehaviorAnalysisService
     }
 
     /**
-     * Get purchase frequency
+     * Get purchase frequency.
      */
     private function getPurchaseFrequency(User $user): float
     {
         $firstPurchaseValue = Order::where('user_id', $user->id)->min('created_at');
-        $firstPurchase = is_string($firstPurchaseValue) ? $firstPurchaseValue : null;
+        $firstPurchase = \is_string($firstPurchaseValue) ? $firstPurchaseValue : null;
 
         if (! $firstPurchase) {
             return 0;
@@ -305,153 +295,79 @@ class BehaviorAnalysisService
     }
 
     /**
-     * Get active users count
-     */
-    private function getActiveUsersCount(): int
-    {
-        return User::whereHas('orders', static function ($query): void {
-            $query->where('created_at', '>=', now()->subDays(30));
-        })
-            ->count();
-    }
-
-    /**
-     * Get conversion rate
+     * Get conversion rate.
      */
     private function getConversionRate(): float
     {
-        $totalVisitors = DB::table('user_behaviors')
-            ->where('action', 'page_view')
-            ->where('created_at', '>=', now()->subDays(30))
-            ->distinct('user_id')
-            ->count();
+        $conversionData = $this->behaviorRepository->getConversionRateData(30);
 
-        $totalPurchases = Order::where('created_at', '>=', now()->subDays(30))->count();
-
-        return $totalVisitors > 0 ? $totalPurchases / $totalVisitors * 100 : 0;
+        return $conversionData['total_visitors'] > 0
+            ? $conversionData['total_buyers'] / $conversionData['total_visitors'] * 100
+            : 0;
     }
 
     /**
-     * Get most viewed products
+     * Get most viewed products.
      *
-     * @return array<array<int|string|null>>
+     * @return array<array<int|string|* @method static \App\Models\Brand create(array<string, string|bool|null>>
      *
-     * @psalm-return array<int, array<string, int|string|null>>
+     * @psalm-return array<int, array<string, int|string|* @method static \App\Models\Brand create(array<string, string|bool|null>>
      */
     private function getMostViewedProducts(): array
     {
-        return $this->getTopProducts();
+        return $this->behaviorRepository->getMostViewedProducts(10)->toArray();
     }
 
     /**
-     * Get top selling products
+     * Get top selling products.
      *
-     * @return array<array<int|string|null>>
+     * @return array<array<int|string|* @method static \App\Models\Brand create(array<string, string|bool|null>>
      *
-     * @psalm-return array<int, array<string, int|string|null>>
+     * @psalm-return array<int, array<string, int|string|* @method static \App\Models\Brand create(array<string, string|bool|null>>
      */
     private function getTopSellingProducts(): array
     {
-        return $this->getTopProducts();
+        return $this->behaviorRepository->getTopSellingProducts(10)->map(static function ($product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'purchase_count' => $product->order_items_sum_quantity ?? 0,
+            ];
+        })->toArray();
     }
 
     /**
-     * Get top products by purchase count
-     *
-     * @return array<array<int|string|null>>
-     *
-     * @psalm-return array<int, array<string, int|string|null>>
-     */
-    private function getTopProducts(): array
-    {
-        /** @var \Illuminate\Database\Eloquent\Builder<Product> $query */
-        $query = Product::select('products.*')->withCount([
-            'orderItems as purchase_count' => static function (\Illuminate\Database\Eloquent\Builder $query): void {
-                $query->whereHas('order', static function ($q): void {
-                    $q->where('created_at', '>=', now()->subDays(30));
-                });
-            },
-        ]);
-
-        /** @var array<int, array<string, string|int|null>> $topProducts */
-        $topProducts = $query->orderBy('purchase_count', 'desc')
-            ->limit(10)
-            ->get()
-            ->map(/**
-             * @return array<int|string>
-             *
-             * @psalm-return array{id: int, name: string, purchase_count: int}
-             */
-                static function (Product $product): array {
-                    return [
-                        'id' => $product->id,
-                        'name' => $product->name,
-                        'purchase_count' => $product->purchase_count ?? 0,
-                    ];
-                }
-            )
-            ->toArray();
-
-        return $topProducts;
-    }
-
-    /**
-     * Get most viewed categories for user
+     * Get most viewed categories for user.
      *
      * @return array<int, int>
      */
     private function getMostViewedCategories(User $user): array
     {
-        /** @var \Illuminate\Database\Query\Builder $query */
-        $query = DB::table('user_behaviors')
-            ->where('user_id', $user->id)
-            ->where('action', 'product_view')
-            ->where('user_behaviors.created_at', '>=', now()->subDays(30));
+        $productViews = $this->behaviorRepository->getUserBehaviorsByAction($user, 'product_view', 30);
 
-        /** @var array<int, int> $mostViewedCategories */
-        $mostViewedCategories = $query->join('products', static function ($join): void {
-            /** @var \Illuminate\Database\Query\JoinClause $join */
-            $join->whereRaw("JSON_EXTRACT(user_behaviors.data, '$.product_id') = products.id");
-        })
-            ->select('products.category_id')
-            ->selectRaw('COUNT(*) as view_count')
-            ->groupBy('products.category_id')
-            ->orderBy('view_count', 'desc')
-            ->limit(5)
-            ->pluck('category_id')
-            ->toArray();
+        $categoryViews = [];
+        foreach ($productViews as $view) {
+            $data = json_decode($view->data, true);
+            if (isset($data['product_id'])) {
+                $product = Product::find($data['product_id']);
+                if ($product && $product->category_id) {
+                    $categoryViews[$product->category_id] = ($categoryViews[$product->category_id] ?? 0) + 1;
+                }
+            }
+        }
 
-        return $mostViewedCategories;
+        arsort($categoryViews);
+
+        return array_keys(\array_slice($categoryViews, 0, 5, true));
     }
 
     /**
-     * Get peak activity hours for user
+     * Get peak activity hours for user.
      *
      * @return array<int, int>
      */
     private function getPeakActivityHours(User $user): array
     {
-        $driver = DB::connection()->getDriverName();
-        $hourExpr = $driver === 'sqlite'
-            ? "CAST(STRFTIME('%H', user_behaviors.created_at) AS INTEGER)"
-            : 'HOUR(user_behaviors.created_at)';
-
-        /** @var \Illuminate\Support\Collection<int, int|string> $hoursCollection */
-        $hoursCollection = DB::table('user_behaviors')
-            ->where('user_id', $user->id)
-            ->where('created_at', '>=', now()->subDays(30))
-            ->selectRaw($hourExpr.' as hour')
-            ->selectRaw('COUNT(*) as count')
-            ->groupBy('hour')
-            ->orderByDesc('count')
-            ->limit(3)
-            ->pluck('hour');
-
-        $hours = $hoursCollection
-            ->map(static fn (int|string $h): int => (int) $h)
-            ->values()
-            ->all();
-
-        return $hours;
+        return $this->behaviorRepository->getUserBehaviorsByHour($user, 30);
     }
 }

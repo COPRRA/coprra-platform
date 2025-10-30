@@ -7,11 +7,16 @@ namespace Tests\AI;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 final class SmokeTest extends TestCase
 {
     #[Test]
-    public function it_runs(): void
+    public function itRuns(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 }

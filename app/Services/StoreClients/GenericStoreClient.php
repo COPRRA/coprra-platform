@@ -7,8 +7,9 @@ namespace App\Services\StoreClients;
 class GenericStoreClient extends BaseStoreClient
 {
     /**
-     * @param  array<string, string|int|float|bool>  $filters
-     * @return array<int, array<string, scalar|array|object|null>>
+     * @param array<string, bool|float|int|string> $filters
+     *
+     * @return array<int, array<string, scalar|array|object|* @method static \App\Models\Brand create(array<string, string|bool|null>>
      */
     #[\Override]
     public function search(string $query, array $filters): array
@@ -30,11 +31,11 @@ class GenericStoreClient extends BaseStoreClient
             $data = $data();
         }
 
-        return is_array($data) ? ($data['products'] ?? []) : [];
+        return \is_array($data) ? ($data['products'] ?? []) : [];
     }
 
     /**
-     * @return array<string, scalar|array|object|null>|null
+     * @return array<string, scalar|array|object|* @method static \App\Models\Brand create(array<string, string|bool|null>|null
      */
     #[\Override]
     public function getProduct(string $productId): ?array
@@ -52,7 +53,7 @@ class GenericStoreClient extends BaseStoreClient
             $data = $data();
         }
 
-        return is_array($data) ? $data : null;
+        return \is_array($data) ? $data : null;
     }
 
     #[\Override]
@@ -80,7 +81,7 @@ class GenericStoreClient extends BaseStoreClient
                 $data = $data();
             }
 
-            $data = is_array($data) ? $data : [];
+            $data = \is_array($data) ? $data : [];
             $products = $data['products'] ?? [];
 
             foreach ($products as $productData) {
@@ -88,7 +89,7 @@ class GenericStoreClient extends BaseStoreClient
             }
 
             $hasMore = ($data['has_more'] ?? false) === true;
-            $page++;
+            ++$page;
         }
     }
 }

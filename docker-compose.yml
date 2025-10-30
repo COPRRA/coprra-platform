@@ -23,6 +23,12 @@ services:
       MAIL_PORT: 1025
       SENTRY_LARAVEL_DSN: ${SENTRY_LARAVEL_DSN:-}
       SENTRY_TRACES_SAMPLE_RATE: ${SENTRY_TRACES_SAMPLE_RATE:-0.1}
+    healthcheck:
+      test: ["CMD", "php", "artisan", "health:ping"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 30s
     depends_on:
       - mysql
       - redis
@@ -51,8 +57,14 @@ services:
       MYSQL_USER: coprra
       MYSQL_PASSWORD: coprra
       MYSQL_ROOT_PASSWORD: root
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - db-data:/var/lib/mysql
     networks:
@@ -61,6 +73,11 @@ services:
   redis:
     image: redis:7-alpine
     container_name: coprra-redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
     ports:
       - "6379:6379"
     networks:
@@ -70,8 +87,8 @@ services:
     image: mailhog/mailhog:latest
     container_name: coprra-mailhog
     ports:
-      - "8025:8025"
-      - "1025:1025"
+      - "8026:8025"
+      - "1026:1025"
     networks:
       - coprra-net
 
@@ -81,4 +98,3 @@ networks:
 
 volumes:
   db-data:
-

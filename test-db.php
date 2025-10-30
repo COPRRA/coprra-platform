@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 try {
     $dsn = 'mysql:host=db;port=3306;dbname=coprra;charset=utf8mb4';
     $pdo = new PDO($dsn, 'coprra', 'coprra', [

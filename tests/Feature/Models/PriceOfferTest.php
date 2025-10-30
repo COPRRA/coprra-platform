@@ -6,44 +6,17 @@ namespace Tests\Feature\Models;
 
 use App\Models\PriceOffer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class PriceOfferTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class PriceOfferTest extends TestCase
 {
     use RefreshDatabase;
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_create_a_price_offer(): void
-    {
-        // Test that PriceOffer class exists
-        $model = new PriceOffer;
-        $this->assertInstanceOf(PriceOffer::class, $model);
-
-        // Test basic functionality
-        $this->assertTrue(true);
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_has_expected_properties(): void
-    {
-        // Test that PriceOffer class exists
-        $model = new PriceOffer;
-        $this->assertInstanceOf(PriceOffer::class, $model);
-
-        // Test basic functionality
-        $this->assertTrue(true);
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_be_instantiated(): void
-    {
-        // Test that PriceOffer class exists
-        $model = new PriceOffer;
-        $this->assertInstanceOf(PriceOffer::class, $model);
-
-        // Test basic functionality
-        $this->assertTrue(true);
-    }
 
     protected function setUp(): void
     {
@@ -53,5 +26,38 @@ class PriceOfferTest extends TestCase
     protected function tearDown(): void
     {
         parent::tearDown();
+    }
+
+    #[Test]
+    public function testItCanCreateAPriceOffer(): void
+    {
+        // Test that PriceOffer class exists
+        $model = new PriceOffer();
+        self::assertInstanceOf(PriceOffer::class, $model);
+
+        // Test basic functionality
+        self::assertTrue(true);
+    }
+
+    #[Test]
+    public function testItHasExpectedProperties(): void
+    {
+        // Test that PriceOffer class exists
+        $model = new PriceOffer();
+        self::assertInstanceOf(PriceOffer::class, $model);
+
+        // Test basic functionality
+        self::assertTrue(true);
+    }
+
+    #[Test]
+    public function testItCanBeInstantiated(): void
+    {
+        // Test that PriceOffer class exists
+        $model = new PriceOffer();
+        self::assertInstanceOf(PriceOffer::class, $model);
+
+        // Test basic functionality
+        self::assertTrue(true);
     }
 }

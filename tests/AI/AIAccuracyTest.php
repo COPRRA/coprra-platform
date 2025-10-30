@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Tests\AI;
 
-use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-class AIAccuracyTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class AIAccuracyTest extends TestCase
 {
     use AITestTrait;
 
@@ -24,37 +28,37 @@ class AIAccuracyTest extends TestCase
     protected function tearDown(): void
     {
         $this->aiService = null;
-        Mockery::close();
+        \Mockery::close();
         parent::tearDown();
     }
 
     #[Test]
-    #[DataProvider('sentimentAnalysisDataProvider')]
-    public function sentiment_analysis_accuracy_is_acceptable(string $text, string $expectedSentiment, float $minConfidence): void
+    #[DataProvider('provideSentimentAnalysisAccuracyIsAcceptableCases')]
+    public function sentimentAnalysisAccuracyIsAcceptable(string $text, string $expectedSentiment, float $minConfidence): void
     {
         $result = $this->aiService->analyzeText($text);
 
         // Validate response structure
-        $this->assertIsArray($result, 'AI service should return an array');
+        self::assertIsArray($result, 'AI service should return an array');
 
         // Validate successful response structure
-        $this->assertArrayHasKey('result', $result, 'Result should contain result key');
-        $this->assertIsString($result['result'], 'Result should be a string');
-        $this->assertNotEmpty($result['result'], 'Result should not be empty');
+        self::assertArrayHasKey('result', $result, 'Result should contain result key');
+        self::assertIsString($result['result'], 'Result should be a string');
+        self::assertNotEmpty($result['result'], 'Result should not be empty');
 
         // Validate sentiment analysis
-        $this->assertArrayHasKey('sentiment', $result, 'Result should contain sentiment key');
-        $this->assertIsString($result['sentiment'], 'Sentiment should be a string');
-        $this->assertContains($result['sentiment'], ['positive', 'negative', 'neutral'], 'Sentiment should be valid');
+        self::assertArrayHasKey('sentiment', $result, 'Result should contain sentiment key');
+        self::assertIsString($result['sentiment'], 'Sentiment should be a string');
+        self::assertContains($result['sentiment'], ['positive', 'negative', 'neutral'], 'Sentiment should be valid');
 
         // Validate confidence score
-        $this->assertArrayHasKey('confidence', $result, 'Result should contain confidence key');
-        $this->assertIsFloat($result['confidence'], 'Confidence should be a float');
-        $this->assertGreaterThanOrEqual(0.0, $result['confidence'], 'Confidence should be >= 0');
-        $this->assertLessThanOrEqual(1.0, $result['confidence'], 'Confidence should be <= 1');
+        self::assertArrayHasKey('confidence', $result, 'Result should contain confidence key');
+        self::assertIsFloat($result['confidence'], 'Confidence should be a float');
+        self::assertGreaterThanOrEqual(0.0, $result['confidence'], 'Confidence should be >= 0');
+        self::assertLessThanOrEqual(1.0, $result['confidence'], 'Confidence should be <= 1');
     }
 
-    public static function sentimentAnalysisDataProvider(): array
+    public static function provideSentimentAnalysisAccuracyIsAcceptableCases(): iterable
     {
         return [
             'positive_arabic_text' => ['Ù…Ù†ØªØ¬ Ù…Ù…ØªØ§Ø² ÙˆØ±Ø§Ø¦Ø¹', 'positive', 0.7],
@@ -69,32 +73,32 @@ class AIAccuracyTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('productClassificationDataProvider')]
-    public function product_classification_accuracy_is_acceptable(array $productData, string $expectedCategory, float $minConfidence): void
+    #[DataProvider('provideProductClassificationAccuracyIsAcceptableCases')]
+    public function productClassificationAccuracyIsAcceptable(array $productData, string $expectedCategory, float $minConfidence): void
     {
         $result = $this->aiService->classifyProduct(json_encode($productData));
 
         // Validate response structure - classifyProduct returns an array
-        $this->assertIsArray($result, 'Classification should return an array');
-        $this->assertArrayHasKey('category', $result, 'Result should contain category');
-        $this->assertArrayHasKey('subcategory', $result, 'Result should contain subcategory');
-        $this->assertArrayHasKey('tags', $result, 'Result should contain tags');
-        $this->assertArrayHasKey('confidence', $result, 'Result should contain confidence');
+        self::assertIsArray($result, 'Classification should return an array');
+        self::assertArrayHasKey('category', $result, 'Result should contain category');
+        self::assertArrayHasKey('subcategory', $result, 'Result should contain subcategory');
+        self::assertArrayHasKey('tags', $result, 'Result should contain tags');
+        self::assertArrayHasKey('confidence', $result, 'Result should contain confidence');
 
         // Validate category value
-        $this->assertIsString($result['category'], 'Category should be a string');
-        $this->assertNotEmpty($result['category'], 'Category should not be empty');
+        self::assertIsString($result['category'], 'Category should be a string');
+        self::assertNotEmpty($result['category'], 'Category should not be empty');
 
         // Validate that the category is one of the expected categories
         $validCategories = ['Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠØ§Øª', 'Ù…Ù„Ø§Ø¨Ø³', 'Ø£Ø¯ÙˆØ§Øª Ù…Ù†Ø²Ù„ÙŠØ©', 'ÙƒØªØ¨', 'Ø±ÙŠØ§Ø¶Ø©'];
-        $this->assertContains($result['category'], $validCategories, 'Classification should return a valid category');
+        self::assertContains($result['category'], $validCategories, 'Classification should return a valid category');
 
         // Validate confidence
-        $this->assertGreaterThanOrEqual(0.0, $result['confidence'], 'Confidence should be >= 0');
-        $this->assertLessThanOrEqual(1.0, $result['confidence'], 'Confidence should be <= 1');
+        self::assertGreaterThanOrEqual(0.0, $result['confidence'], 'Confidence should be >= 0');
+        self::assertLessThanOrEqual(1.0, $result['confidence'], 'Confidence should be <= 1');
     }
 
-    public static function productClassificationDataProvider(): array
+    public static function provideProductClassificationAccuracyIsAcceptableCases(): iterable
     {
         return [
             'electronics_phone' => [
@@ -131,25 +135,25 @@ class AIAccuracyTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('keywordExtractionDataProvider')]
-    public function keyword_extraction_accuracy_is_acceptable(string $text, array $expectedKeywords, int $minKeywords): void
+    #[DataProvider('provideKeywordExtractionAccuracyIsAcceptableCases')]
+    public function keywordExtractionAccuracyIsAcceptable(string $text, array $expectedKeywords, int $minKeywords): void
     {
         // Since extractKeywords method doesn't exist, we'll test using analyzeText with keyword extraction
         $result = $this->aiService->analyzeText($text, 'keywords');
 
         // Validate response structure
-        $this->assertIsArray($result, 'Keyword extraction should return an array');
+        self::assertIsArray($result, 'Keyword extraction should return an array');
 
         // Validate successful response
-        $this->assertArrayHasKey('result', $result, 'Result should contain result key');
-        $this->assertIsString($result['result'], 'Result should be a string');
-        $this->assertNotEmpty($result['result'], 'Result should not be empty');
+        self::assertArrayHasKey('result', $result, 'Result should contain result key');
+        self::assertIsString($result['result'], 'Result should be a string');
+        self::assertNotEmpty($result['result'], 'Result should not be empty');
 
         // For meaningful text, we expect a substantial response
         if (! empty($text)) {
-            $this->assertGreaterThan(
+            self::assertGreaterThan(
                 5,
-                strlen($result['result']),
+                \strlen($result['result']),
                 'Keyword extraction should return meaningful results'
             );
         }
@@ -160,18 +164,18 @@ class AIAccuracyTest extends TestCase
             $foundKeywords = 0;
             foreach ($expectedKeywords as $keyword) {
                 if (str_contains($resultText, strtolower($keyword))) {
-                    $foundKeywords++;
+                    ++$foundKeywords;
                 }
             }
-            $this->assertGreaterThanOrEqual(
-                min($minKeywords, count($expectedKeywords)),
+            self::assertGreaterThanOrEqual(
+                min($minKeywords, \count($expectedKeywords)),
                 $foundKeywords,
                 'Should find expected keywords in the result'
             );
         }
     }
 
-    public static function keywordExtractionDataProvider(): array
+    public static function provideKeywordExtractionAccuracyIsAcceptableCases(): iterable
     {
         return [
             'laptop_description' => [
@@ -203,37 +207,37 @@ class AIAccuracyTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('recommendationDataProvider')]
-    public function recommendation_relevance_is_acceptable(array $userPreferences, array $products, int $expectedMinRecommendations): void
+    #[DataProvider('provideRecommendationRelevanceIsAcceptableCases')]
+    public function recommendationRelevanceIsAcceptable(array $userPreferences, array $products, int $expectedMinRecommendations): void
     {
         $result = $this->aiService->generateRecommendations($userPreferences, $products);
 
         // Validate response structure
-        $this->assertIsArray($result, 'Recommendations should return an array');
+        self::assertIsArray($result, 'Recommendations should return an array');
 
         // Validate successful response structure
-        $this->assertArrayHasKey('recommendations', $result, 'Result should contain recommendations key');
-        $this->assertIsArray($result['recommendations'], 'Recommendations should be an array');
-        $this->assertGreaterThanOrEqual(
+        self::assertArrayHasKey('recommendations', $result, 'Result should contain recommendations key');
+        self::assertIsArray($result['recommendations'], 'Recommendations should be an array');
+        self::assertGreaterThanOrEqual(
             $expectedMinRecommendations,
-            count($result['recommendations']),
+            \count($result['recommendations']),
             'Should provide minimum number of recommendations'
         );
 
         // Validate confidence score
-        $this->assertArrayHasKey('confidence', $result, 'Result should contain confidence key');
-        $this->assertIsFloat($result['confidence'], 'Confidence should be a float');
-        $this->assertGreaterThanOrEqual(0.0, $result['confidence'], 'Confidence should be >= 0');
-        $this->assertLessThanOrEqual(1.0, $result['confidence'], 'Confidence should be <= 1');
+        self::assertArrayHasKey('confidence', $result, 'Result should contain confidence key');
+        self::assertIsFloat($result['confidence'], 'Confidence should be a float');
+        self::assertGreaterThanOrEqual(0.0, $result['confidence'], 'Confidence should be >= 0');
+        self::assertLessThanOrEqual(1.0, $result['confidence'], 'Confidence should be <= 1');
 
         // Validate each recommendation
         foreach ($result['recommendations'] as $recommendation) {
-            $this->assertIsString($recommendation, 'Each recommendation should be a string');
-            $this->assertNotEmpty($recommendation, 'Recommendation should not be empty');
+            self::assertIsString($recommendation, 'Each recommendation should be a string');
+            self::assertNotEmpty($recommendation, 'Recommendation should not be empty');
         }
     }
 
-    public static function recommendationDataProvider(): array
+    public static function provideRecommendationRelevanceIsAcceptableCases(): iterable
     {
         return [
             'electronics_preference' => [
@@ -268,42 +272,42 @@ class AIAccuracyTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('imageAnalysisDataProvider')]
-    public function image_analysis_accuracy_is_acceptable(string $imagePath, array $expectedTags, int $minTags): void
+    #[DataProvider('provideImageAnalysisAccuracyIsAcceptableCases')]
+    public function imageAnalysisAccuracyIsAcceptable(string $imagePath, array $expectedTags, int $minTags): void
     {
         // Since analyzeImage method doesn't exist, we'll test using analyzeText with image analysis
         $result = $this->aiService->analyzeText("Analyze this image: {$imagePath}", 'image_analysis');
 
         // Validate response structure
-        $this->assertIsArray($result, 'Image analysis should return an array');
+        self::assertIsArray($result, 'Image analysis should return an array');
 
         // Validate successful response
-        $this->assertArrayHasKey('result', $result, 'Result should contain result key');
-        $this->assertIsString($result['result'], 'Result should be a string');
-        $this->assertNotEmpty($result['result'], 'Result should not be empty');
+        self::assertArrayHasKey('result', $result, 'Result should contain result key');
+        self::assertIsString($result['result'], 'Result should be a string');
+        self::assertNotEmpty($result['result'], 'Result should not be empty');
 
         // Validate sentiment analysis
-        $this->assertArrayHasKey('sentiment', $result, 'Result should contain sentiment key');
-        $this->assertIsString($result['sentiment'], 'Sentiment should be a string');
-        $this->assertContains($result['sentiment'], ['positive', 'negative', 'neutral'], 'Sentiment should be valid');
+        self::assertArrayHasKey('sentiment', $result, 'Result should contain sentiment key');
+        self::assertIsString($result['sentiment'], 'Sentiment should be a string');
+        self::assertContains($result['sentiment'], ['positive', 'negative', 'neutral'], 'Sentiment should be valid');
 
         // Validate confidence score
-        $this->assertArrayHasKey('confidence', $result, 'Result should contain confidence key');
-        $this->assertIsFloat($result['confidence'], 'Confidence should be a float');
-        $this->assertGreaterThanOrEqual(0.0, $result['confidence'], 'Confidence should be >= 0');
-        $this->assertLessThanOrEqual(1.0, $result['confidence'], 'Confidence should be <= 1');
+        self::assertArrayHasKey('confidence', $result, 'Result should contain confidence key');
+        self::assertIsFloat($result['confidence'], 'Confidence should be a float');
+        self::assertGreaterThanOrEqual(0.0, $result['confidence'], 'Confidence should be >= 0');
+        self::assertLessThanOrEqual(1.0, $result['confidence'], 'Confidence should be <= 1');
 
         // For valid image paths, we expect a meaningful response
-        if ($imagePath !== 'nonexistent.jpg') {
-            $this->assertGreaterThan(
+        if ('nonexistent.jpg' !== $imagePath) {
+            self::assertGreaterThan(
                 10,
-                strlen($result['result']),
+                \strlen($result['result']),
                 'Image analysis should return meaningful results'
             );
         }
     }
 
-    public static function imageAnalysisDataProvider(): array
+    public static function provideImageAnalysisAccuracyIsAcceptableCases(): iterable
     {
         return [
             'phone_image' => [
@@ -330,35 +334,35 @@ class AIAccuracyTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('confidenceScoreDataProvider')]
-    public function confidence_scores_are_reasonable(string $text, float $minConfidence, float $maxConfidence): void
+    #[DataProvider('provideConfidenceScoresAreReasonableCases')]
+    public function confidenceScoresAreReasonable(string $text, float $minConfidence, float $maxConfidence): void
     {
         $result = $this->aiService->analyzeText($text);
 
-        $this->assertIsArray($result, 'AI service should return an array');
+        self::assertIsArray($result, 'AI service should return an array');
 
         // Validate successful response
-        $this->assertArrayHasKey('result', $result, 'Result should contain result key');
-        $this->assertIsString($result['result'], 'Result should be a string');
-        $this->assertNotEmpty($result['result'], 'Result should not be empty');
+        self::assertArrayHasKey('result', $result, 'Result should contain result key');
+        self::assertIsString($result['result'], 'Result should be a string');
+        self::assertNotEmpty($result['result'], 'Result should not be empty');
 
         // Validate confidence score
-        $this->assertArrayHasKey('confidence', $result, 'Result should contain confidence key');
-        $this->assertIsFloat($result['confidence'], 'Confidence should be a float');
-        $this->assertGreaterThanOrEqual($minConfidence, $result['confidence'], 'Confidence should meet minimum threshold');
-        $this->assertLessThanOrEqual($maxConfidence, $result['confidence'], 'Confidence should not exceed maximum threshold');
+        self::assertArrayHasKey('confidence', $result, 'Result should contain confidence key');
+        self::assertIsFloat($result['confidence'], 'Confidence should be a float');
+        self::assertGreaterThanOrEqual($minConfidence, $result['confidence'], 'Confidence should meet minimum threshold');
+        self::assertLessThanOrEqual($maxConfidence, $result['confidence'], 'Confidence should not exceed maximum threshold');
 
         // For meaningful text, we expect a substantial response
         if (! empty($text)) {
-            $this->assertGreaterThan(
+            self::assertGreaterThan(
                 5,
-                strlen($result['result']),
+                \strlen($result['result']),
                 'AI response should be meaningful'
             );
         }
     }
 
-    public static function confidenceScoreDataProvider(): array
+    public static function provideConfidenceScoresAreReasonableCases(): iterable
     {
         return [
             'clear_positive' => ['Ù…Ù†ØªØ¬ Ø±Ø§Ø¦Ø¹ ÙˆÙ…Ù…ØªØ§Ø²', 0.8, 1.0],
@@ -370,35 +374,35 @@ class AIAccuracyTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('learningFeedbackDataProvider')]
-    public function ai_learns_from_corrective_feedback(string $text, string $feedback, string $expectedImprovement): void
+    #[DataProvider('provideAiLearnsFromCorrectiveFeedbackCases')]
+    public function aiLearnsFromCorrectiveFeedback(string $text, string $feedback, string $expectedImprovement): void
     {
         // Initial analysis
         $initialResult = $this->aiService->analyzeText($text);
-        $this->assertIsArray($initialResult, 'Initial analysis should return array');
+        self::assertIsArray($initialResult, 'Initial analysis should return array');
 
-        $this->assertArrayHasKey('result', $initialResult, 'Should have result');
-        $this->assertArrayHasKey('sentiment', $initialResult, 'Should have sentiment');
-        $this->assertArrayHasKey('confidence', $initialResult, 'Should have confidence');
+        self::assertArrayHasKey('result', $initialResult, 'Should have result');
+        self::assertArrayHasKey('sentiment', $initialResult, 'Should have sentiment');
+        self::assertArrayHasKey('confidence', $initialResult, 'Should have confidence');
 
         // Apply feedback (simulate learning by re-analyzing with feedback context)
         $feedbackText = "{$text} [Feedback: {$feedback}]";
         $improvedResult = $this->aiService->analyzeText($feedbackText);
-        $this->assertIsArray($improvedResult, 'Improved analysis should return array');
+        self::assertIsArray($improvedResult, 'Improved analysis should return array');
 
-        $this->assertArrayHasKey('result', $improvedResult, 'Should have result');
-        $this->assertArrayHasKey('sentiment', $improvedResult, 'Should have sentiment');
-        $this->assertArrayHasKey('confidence', $improvedResult, 'Should have confidence');
+        self::assertArrayHasKey('result', $improvedResult, 'Should have result');
+        self::assertArrayHasKey('sentiment', $improvedResult, 'Should have sentiment');
+        self::assertArrayHasKey('confidence', $improvedResult, 'Should have confidence');
 
         // Validate that both results are meaningful
-        $this->assertNotEmpty($initialResult['result'], 'Initial result should not be empty');
-        $this->assertNotEmpty($improvedResult['result'], 'Improved result should not be empty');
+        self::assertNotEmpty($initialResult['result'], 'Initial result should not be empty');
+        self::assertNotEmpty($improvedResult['result'], 'Improved result should not be empty');
 
         // Validate that the feedback context is included in the improved result
-        $this->assertStringContainsString($feedback, $improvedResult['result'], 'Improved result should include feedback context');
+        self::assertStringContainsString($feedback, $improvedResult['result'], 'Improved result should include feedback context');
     }
 
-    public static function learningFeedbackDataProvider(): array
+    public static function provideAiLearnsFromCorrectiveFeedbackCases(): iterable
     {
         return [
             'positive_feedback' => [
@@ -420,43 +424,43 @@ class AIAccuracyTest extends TestCase
     }
 
     #[Test]
-    public function ai_handles_error_conditions_gracefully(): void
+    public function aiHandlesErrorConditionsGracefully(): void
     {
         // Test with empty string
         $result = $this->aiService->analyzeText('');
-        $this->assertIsArray($result, 'Should return array even with empty input');
-        $this->assertArrayHasKey('result', $result, 'Should have result');
-        $this->assertArrayHasKey('sentiment', $result, 'Should have sentiment');
-        $this->assertArrayHasKey('confidence', $result, 'Should have confidence');
+        self::assertIsArray($result, 'Should return array even with empty input');
+        self::assertArrayHasKey('result', $result, 'Should have result');
+        self::assertArrayHasKey('sentiment', $result, 'Should have sentiment');
+        self::assertArrayHasKey('confidence', $result, 'Should have confidence');
 
         // Test with extremely long text
         $longText = str_repeat('Ù…Ù†ØªØ¬ Ø±Ø§Ø¦Ø¹ ', 1000); // Reduced length for testing
         $result = $this->aiService->analyzeText($longText);
-        $this->assertIsArray($result, 'Should handle long text');
-        $this->assertArrayHasKey('result', $result, 'Should process long text');
-        $this->assertArrayHasKey('sentiment', $result, 'Should have sentiment');
-        $this->assertArrayHasKey('confidence', $result, 'Should have confidence');
+        self::assertIsArray($result, 'Should handle long text');
+        self::assertArrayHasKey('result', $result, 'Should process long text');
+        self::assertArrayHasKey('sentiment', $result, 'Should have sentiment');
+        self::assertArrayHasKey('confidence', $result, 'Should have confidence');
 
         // Test with special characters
-        $specialText = 'Ù…Ù†ØªØ¬!!! @#$%^&*()_+{}|:"<>?[]\\;\'.,/';
+        $specialText = 'Ù…Ù†ØªØ¬!!! @#$%^&*()_+{}|:"<>?[]\;\'.,/';
         $result = $this->aiService->analyzeText($specialText);
-        $this->assertIsArray($result, 'Should handle special characters');
-        $this->assertArrayHasKey('result', $result, 'Should process special characters');
-        $this->assertArrayHasKey('sentiment', $result, 'Should have sentiment');
-        $this->assertArrayHasKey('confidence', $result, 'Should have confidence');
+        self::assertIsArray($result, 'Should handle special characters');
+        self::assertArrayHasKey('result', $result, 'Should process special characters');
+        self::assertArrayHasKey('sentiment', $result, 'Should have sentiment');
+        self::assertArrayHasKey('confidence', $result, 'Should have confidence');
 
         // Validate that all results are meaningful
-        $this->assertNotEmpty($result['result'], 'Result should not be empty');
-        $this->assertContains($result['sentiment'], ['positive', 'negative', 'neutral'], 'Sentiment should be valid');
-        $this->assertGreaterThanOrEqual(0.0, $result['confidence'], 'Confidence should be >= 0');
-        $this->assertLessThanOrEqual(1.0, $result['confidence'], 'Confidence should be <= 1');
+        self::assertNotEmpty($result['result'], 'Result should not be empty');
+        self::assertContains($result['sentiment'], ['positive', 'negative', 'neutral'], 'Sentiment should be valid');
+        self::assertGreaterThanOrEqual(0.0, $result['confidence'], 'Confidence should be >= 0');
+        self::assertLessThanOrEqual(1.0, $result['confidence'], 'Confidence should be <= 1');
     }
 
     /**
      * Test that AIAccuracyTest can be instantiated.
      */
-    public function test_can_be_instantiated(): void
+    public function testCanBeInstantiated(): void
     {
-        $this->assertInstanceOf(self::class, $this);
+        self::assertInstanceOf(self::class, $this);
     }
 }

@@ -8,55 +8,54 @@ class FakerFactoryStub
 {
     public static function create($locale = null)
     {
-        return new class($locale)
-        {
+        return new class($locale) {
             public function __construct($locale = null) {}
 
             public function __call(string $name, array $arguments)
             {
-                if ($name === 'randomDigit') {
+                if ('randomDigit' === $name) {
                     return 5;
                 }
-                if ($name === 'name') {
+                if ('name' === $name) {
                     return 'Test User';
                 }
-                if ($name === 'email') {
+                if ('email' === $name) {
                     return 'user@example.com';
                 }
-                if ($name === 'safeEmail') {
+                if ('safeEmail' === $name) {
                     return 'user@example.com';
                 }
-                if ($name === 'phoneNumber') {
+                if ('phoneNumber' === $name) {
                     return '+10000000000';
                 }
-                if ($name === 'address') {
+                if ('address' === $name) {
                     return '123 Test St';
                 }
-                if ($name === 'uuid') {
+                if ('uuid' === $name) {
                     return '00000000-0000-0000-0000-000000000000';
                 }
-                if ($name === 'word') {
+                if ('word' === $name) {
                     return 'word';
                 }
-                if ($name === 'sentence') {
+                if ('sentence' === $name) {
                     return 'sentence';
                 }
-                if ($name === 'text') {
+                if ('text' === $name) {
                     return 'text';
                 }
-                if ($name === 'city') {
+                if ('city' === $name) {
                     return 'City';
                 }
-                if ($name === 'country') {
+                if ('country' === $name) {
                     return 'Country';
                 }
-                if ($name === 'postcode') {
+                if ('postcode' === $name) {
                     return '00000';
                 }
-                if ($name === 'randomElement') {
+                if ('randomElement' === $name) {
                     return $arguments[0][0] ?? null;
                 }
-                if ($name === 'randomNumber') {
+                if ('randomNumber' === $name) {
                     return 42;
                 }
 

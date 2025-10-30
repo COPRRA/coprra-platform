@@ -7,61 +7,63 @@ namespace Tests\Unit\Models;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\PaymentMethod;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\TestCase;
 
 /**
  * Unit tests for the Payment model.
+ *
+ * @internal
  */
 #[CoversClass(Payment::class)]
-class PaymentTest extends TestCase
+final class PaymentTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        \Mockery::close();
+        parent::tearDown();
+    }
+
     /**
      * Test that order relation is a BelongsTo instance.
      */
-    public function test_order_relation(): void
+    public function testOrderRelation(): void
     {
-        $payment = new Payment;
+        $payment = new Payment();
 
         $relation = $payment->order();
 
-        $this->assertInstanceOf(BelongsTo::class, $relation);
-        $this->assertEquals(Order::class, $relation->getRelated()::class);
+        self::assertInstanceOf(BelongsTo::class, $relation);
+        self::assertSame(Order::class, $relation->getRelated()::class);
     }
 
     /**
      * Test that paymentMethod relation is a BelongsTo instance.
      */
-    public function test_payment_method_relation(): void
+    public function testPaymentMethodRelation(): void
     {
-        $payment = new Payment;
+        $payment = new Payment();
 
         $relation = $payment->paymentMethod();
 
-        $this->assertInstanceOf(BelongsTo::class, $relation);
-        $this->assertEquals(PaymentMethod::class, $relation->getRelated()::class);
+        self::assertInstanceOf(BelongsTo::class, $relation);
+        self::assertSame(PaymentMethod::class, $relation->getRelated()::class);
     }
 
     /**
      * Test scopeByStatus adds where clause for status.
      */
-    public function test_scope_by_status(): void
+    public function testScopeByStatus(): void
     {
         $status = 'completed';
-        $query = Mockery::mock(\Illuminate\Database\Eloquent\Builder::class);
+        $query = \Mockery::mock(Builder::class);
         $query->shouldReceive('where')->once()->with('status', $status)->andReturnSelf();
 
-        $payment = new Payment;
+        $payment = new Payment();
         $result = $payment->scopeByStatus($query, $status);
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Builder::class, $result);
-    }
-
-    protected function tearDown(): void
-    {
-        Mockery::close();
-        parent::tearDown();
+        self::assertInstanceOf(Builder::class, $result);
     }
 }

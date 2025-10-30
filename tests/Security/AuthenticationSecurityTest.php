@@ -6,26 +6,13 @@ namespace Tests\Security;
 
 use Tests\TestCase;
 
-class AuthenticationSecurityTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class AuthenticationSecurityTest extends TestCase
 {
-    public function test_authentication_security(): void
-    {
-        // Ø§Ø®ØªØ¨Ø§Ø± Ø¨Ø³ÙŠØ·
-        $this->assertTrue(true);
-    }
-
-    public function test_password_security(): void
-    {
-        // Ø§Ø®ØªØ¨Ø§Ø± Ø¨Ø³ÙŠØ·
-        $this->assertTrue(true);
-    }
-
-    public function test_session_security(): void
-    {
-        // Ø§Ø®ØªØ¨Ø§Ø± Ø¨Ø³ÙŠØ·
-        $this->assertTrue(true);
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -34,5 +21,23 @@ class AuthenticationSecurityTest extends TestCase
     protected function tearDown(): void
     {
         parent::tearDown();
+    }
+
+    public function testAuthenticationSecurity(): void
+    {
+        // Ø§Ø®ØªØ¨Ø§Ø± Ø¨Ø³ÙŠØ·
+        self::assertTrue(true);
+    }
+
+    public function testPasswordSecurity(): void
+    {
+        // Ø§Ø®ØªØ¨Ø§Ø± Ø¨Ø³ÙŠØ·
+        self::assertTrue(true);
+    }
+
+    public function testSessionSecurity(): void
+    {
+        // Ø§Ø®ØªØ¨Ø§Ø± Ø¨Ø³ÙŠØ·
+        self::assertTrue(true);
     }
 }

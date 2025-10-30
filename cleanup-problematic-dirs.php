@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use Exception;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-
 class DirectoryCleaner
 {
     /**
@@ -31,11 +27,13 @@ class DirectoryCleaner
         $this->printSummary();
         $this->printNextSteps();
 
-        if (count($this->removed) > 0) {
+        if (\count($this->removed) > 0) {
             echo "✓ Cleanup completed successfully!\n\n";
+
             exit(0);
         }
         echo "⚠ No directories were removed. Manual intervention may be required.\n\n";
+
         exit(1);
     }
 
@@ -50,16 +48,16 @@ class DirectoryCleaner
         }
 
         $items = scandir($dir);
-        if ($items === false) {
+        if (false === $items) {
             return false;
         }
 
         foreach ($items as $item) {
-            if ($item === '.' || $item === '..') {
+            if ('.' === $item || '..' === $item) {
                 continue;
             }
 
-            $path = $dir.DIRECTORY_SEPARATOR.$item;
+            $path = $dir.\DIRECTORY_SEPARATOR.$item;
 
             if (is_dir($path)) {
                 if (! $this->deleteDirectory($path)) {
@@ -90,15 +88,15 @@ class DirectoryCleaner
     }
 
     /**
-     * Scan directories for problematic paths
+     * Scan directories for problematic paths.
      *
      * @return array<int, string>
      */
     private function scanForProblematicDirectories(): array
     {
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator('.', RecursiveDirectoryIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::SELF_FIRST
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator('.', \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::SELF_FIRST
         );
 
         $problematicDirs = [];
@@ -114,9 +112,9 @@ class DirectoryCleaner
     }
 
     /**
-     * Process individual directory path for problematic patterns
+     * Process individual directory path for problematic patterns.
      *
-     * @param  array<int, string>  $problematicDirs
+     * @param array<int, string> $problematicDirs
      */
     private function processDirectoryPath(string $path, array &$problematicDirs): void
     {
@@ -125,31 +123,32 @@ class DirectoryCleaner
         }
 
         $topLevelDir = $this->extractTopLevelDirectory($path);
-        if ($topLevelDir && ! in_array($topLevelDir, $problematicDirs)) {
+        if ($topLevelDir && ! \in_array($topLevelDir, $problematicDirs, true)) {
             $problematicDirs[] = $topLevelDir;
         }
     }
 
     /**
-     * Check if path contains problematic patterns
+     * Check if path contains problematic patterns.
      */
     private function isProblematicPath(string $path): bool
     {
-        return strpos($path, 'C:') !== false ||
-               (strpos($path, 'Users') !== false && strpos($path, 'Desktop') !== false);
+        return false !== strpos($path, 'C:')
+               || (false !== strpos($path, 'Users') && false !== strpos($path, 'Desktop'));
     }
 
     /**
-     * Extract top-level problematic directory from path
+     * Extract top-level problematic directory from path.
      */
     private function extractTopLevelDirectory(string $path): ?string
     {
-        $parts = explode(DIRECTORY_SEPARATOR, $path);
+        $parts = explode(\DIRECTORY_SEPARATOR, $path);
         $topLevel = '';
 
         foreach ($parts as $part) {
-            if (strpos($part, 'C:') !== false) {
+            if (false !== strpos($part, 'C:')) {
                 $topLevel = $part;
+
                 break;
             }
         }
@@ -162,22 +161,23 @@ class DirectoryCleaner
     }
 
     /**
-     * Build full path to top-level directory
+     * Build full path to top-level directory.
      */
     private function buildFullPathToTopLevel(string $path, string $topLevel): string
     {
-        $fullPath = dirname($path);
-        while (basename($fullPath) !== $topLevel && $fullPath !== '.') {
-            $fullPath = dirname($fullPath);
+        $fullPath = \dirname($path);
+        while (basename($fullPath) !== $topLevel && '.' !== $fullPath) {
+            $fullPath = \dirname($fullPath);
         }
 
         return $fullPath;
     }
 
     /**
-     * Finalize problematic directories list
+     * Finalize problematic directories list.
      *
-     * @param  array<int, string>  $problematicDirs
+     * @param array<int, string> $problematicDirs
+     *
      * @return array<int, string>
      */
     private function finalizeProblematicList(array $problematicDirs): array
@@ -189,13 +189,13 @@ class DirectoryCleaner
     }
 
     /**
-     * Display found problematic directories
+     * Display found problematic directories.
      *
-     * @param  array<int, string>  $problematicDirs
+     * @param array<int, string> $problematicDirs
      */
     private function displayProblematicDirectories(array $problematicDirs): void
     {
-        echo 'Found '.count($problematicDirs)." problematic director(ies):\n\n";
+        echo 'Found '.\count($problematicDirs)." problematic director(ies):\n\n";
 
         foreach ($problematicDirs as $dir) {
             echo "  - {$dir}\n";
@@ -205,9 +205,9 @@ class DirectoryCleaner
     }
 
     /**
-     * Remove problematic directories
+     * Remove problematic directories.
      *
-     * @param  array<int, string>  $problematicDirs
+     * @param array<int, string> $problematicDirs
      */
     private function removeProblematicDirectories(array $problematicDirs): void
     {
@@ -217,7 +217,7 @@ class DirectoryCleaner
     }
 
     /**
-     * Attempt to remove a single directory
+     * Attempt to remove a single directory.
      */
     private function attemptDirectoryRemoval(string $dir): void
     {
@@ -231,7 +231,7 @@ class DirectoryCleaner
                 echo "✗ FAILED\n";
                 $this->failed[] = $dir;
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             echo '✗ ERROR: '.$e->getMessage()."\n";
             $this->failed[] = $dir;
         }
@@ -249,7 +249,7 @@ class DirectoryCleaner
 
     private function printRemovedDirectories(): void
     {
-        echo 'Removed: '.count($this->removed)." director(ies)\n";
+        echo 'Removed: '.\count($this->removed)." director(ies)\n";
         foreach ($this->removed as $dir) {
             echo "  ✓ {$dir}\n";
         }
@@ -261,7 +261,7 @@ class DirectoryCleaner
             return;
         }
 
-        echo "\nFailed: ".count($this->failed)." director(ies)\n";
+        echo "\nFailed: ".\count($this->failed)." director(ies)\n";
         foreach ($this->failed as $dir) {
             echo "  ✗ {$dir}\n";
         }
@@ -288,5 +288,5 @@ class DirectoryCleaner
 }
 
 // Create and run the cleaner
-$cleaner = new DirectoryCleaner;
+$cleaner = new DirectoryCleaner();
 $cleaner->run();

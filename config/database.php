@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+use Illuminate\Support\Str;
 
 return [
     'default' => env('DB_CONNECTION', 'mysql'),
@@ -75,7 +76,7 @@ return [
         'client' => env('REDIS_CLIENT', 'phpredis'),
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', \Illuminate\Support\Str::slug((string) (env('APP_NAME', 'laravel') ?: 'laravel'), '_').'_database_'),
+            'prefix' => env('REDIS_PREFIX', Str::slug((string) (env('APP_NAME', 'laravel') ?: 'laravel'), '_').'_database_'),
         ],
         'default' => [
             'url' => env('REDIS_URL'),

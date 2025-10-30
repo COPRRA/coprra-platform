@@ -14,14 +14,28 @@ use Tests\TestCase;
  * @runTestsInSeparateProcesses
  *
  * @preserveGlobalState disabled
+ *
+ * @internal
+ *
+ * @coversNothing
  */
 #[RunTestsInSeparateProcesses]
 #[PreserveGlobalState(false)]
-class CSRFTest extends TestCase
+final class CSRFTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_csrf_protection_on_state_changing_endpoints(): void
+    protected function setUp(): void
+    {
+        parent::setUp();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+    }
+
+    public function testCsrfProtectionOnStateChangingEndpoints(): void
     {
         // Create a user
         $user = User::factory()->create();
@@ -33,10 +47,10 @@ class CSRFTest extends TestCase
 
         // For web routes, this should fail with 419 (CSRF token mismatch), 401 (not authenticated), 302 (redirect to login), or 422 (validation)
         // For API routes, it might be different
-        $this->assertContains($response->status(), [419, 401, 422, 302]);
+        self::assertContains($response->status(), [419, 401, 422, 302]);
     }
 
-    public function test_csrf_token_validation_in_forms(): void
+    public function testCsrfTokenValidationInForms(): void
     {
         // Test that CSRF token is required for form submissions
         $response = $this->get('/login');
@@ -46,10 +60,10 @@ class CSRFTest extends TestCase
         $content = $response->getContent();
 
         // Check if CSRF token is present in the form
-        $this->assertStringContainsString('_token', $content);
+        self::assertStringContainsString('_token', $content);
     }
 
-    public function test_csrf_protection_bypassing_with_valid_token(): void
+    public function testCsrfProtectionBypassingWithValidToken(): void
     {
         // Create user
         $user = User::factory()->create();
@@ -63,7 +77,7 @@ class CSRFTest extends TestCase
         $token = $matches[1] ?? null;
 
         // Assert that token was found
-        $this->assertNotNull($token, 'CSRF token should be present in login form');
+        self::assertNotNull($token, 'CSRF token should be present in login form');
 
         if ($token) {
             // Test POST with valid token
@@ -74,11 +88,11 @@ class CSRFTest extends TestCase
             ]);
 
             // Should not fail due to CSRF
-            $this->assertNotEquals(419, $response->status());
+            self::assertNotSame(419, $response->status());
         }
     }
 
-    public function test_api_routes_bypass_csrf(): void
+    public function testApiRoutesBypassCsrf(): void
     {
         // API routes should not require CSRF tokens
         $data = [
@@ -89,10 +103,10 @@ class CSRFTest extends TestCase
         $response = $this->postJson('/api/products', $data);
 
         // Should not fail with CSRF error (419)
-        $this->assertNotEquals(419, $response->status());
+        self::assertNotSame(419, $response->status());
     }
 
-    public function test_csrf_token_regeneration(): void
+    public function testCsrfTokenRegeneration(): void
     {
         // Test that CSRF token changes after certain actions
         $response1 = $this->get('/login');
@@ -102,7 +116,7 @@ class CSRFTest extends TestCase
         preg_match('/name="_token" value="([^"]+)"/', $content1, $matches1);
         $token1 = $matches1[1] ?? null;
 
-        $this->assertNotNull($token1, 'First CSRF token should be present in login form');
+        self::assertNotNull($token1, 'First CSRF token should be present in login form');
 
         // Perform some action that might regenerate token
         $response = $this->get('/register');
@@ -117,16 +131,16 @@ class CSRFTest extends TestCase
 
         // Tokens should be different or same depending on implementation
         // This test ensures token handling works
-        $this->assertNotNull($token2, 'Second CSRF token should be present in login form');
+        self::assertNotNull($token2, 'Second CSRF token should be present in login form');
 
         // Verify both tokens are valid strings
-        $this->assertIsString($token1);
-        $this->assertIsString($token2);
-        $this->assertNotEmpty($token1);
-        $this->assertNotEmpty($token2);
+        self::assertIsString($token1);
+        self::assertIsString($token2);
+        self::assertNotEmpty($token1);
+        self::assertNotEmpty($token2);
     }
 
-    public function test_csrf_protection_on_delete_requests(): void
+    public function testCsrfProtectionOnDeleteRequests(): void
     {
         $user = User::factory()->create();
 
@@ -134,16 +148,6 @@ class CSRFTest extends TestCase
         $response = $this->delete("/user/{$user->id}");
 
         // Should fail with CSRF, auth error, or not found
-        $this->assertContains($response->status(), [419, 401, 403, 405, 404]);
-    }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
+        self::assertContains($response->status(), [419, 401, 403, 405, 404]);
     }
 }

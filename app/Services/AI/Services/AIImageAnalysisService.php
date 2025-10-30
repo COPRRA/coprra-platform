@@ -4,68 +4,65 @@ declare(strict_types=1);
 
 namespace App\Services\AI\Services;
 
-// use Illuminate\Support\Facades\Log; // replaced with logger() helper
+use App\Services\AI\PromptManager;
+use Illuminate\Support\Facades\Log;
 
 /**
- * Service for AI image analysis operations
+ * Service for AI image analysis operations.
  */
 class AIImageAnalysisService
 {
     private readonly AIRequestService $requestService;
+    private readonly PromptManager $promptManager;
 
-    public function __construct(AIRequestService $requestService)
+    public function __construct(AIRequestService $requestService, PromptManager $promptManager)
     {
         $this->requestService = $requestService;
+        $this->promptManager = $promptManager;
     }
 
     /**
-     * Analyze image using GPT-4 Vision
+     * Analyze an image using AI vision capabilities.
      *
-     * @return array{
-     *     category: string,
-     *     recommendations: list<string>,
-     *     sentiment: string,
-     *     confidence: float,
-     *     description: string
-     * }
+     * @param string               $imageUrl URL of the image to analyze
+     * @param string               $prompt   Custom prompt for analysis (optional)
+     * @param array<string, mixed> $options  Additional options for analysis
      *
-     * @throws \Exception
+     * @return array<string, mixed> Analysis results
      */
-    public function analyzeImage(string $imageUrl, string $prompt = 'Analyze this image and provide insights'): array
+    public function analyzeImage(string $imageUrl, ?string $prompt = null, array $options = []): array
     {
-        logger()->info('🖼️ تحليل الصورة', ['image_url' => $imageUrl, 'prompt' => $prompt]);
+        try {
+            Log::info('Analyzing image', ['url' => $imageUrl, 'prompt' => $prompt]);
 
-        $data = [
-            'model' => 'gpt-4-vision-preview',
-            'messages' => [
-                [
-                    'role' => 'user',
-                    'content' => [
-                        [
-                            'type' => 'text',
-                            'text' => $prompt,
-                        ],
-                        [
-                            'type' => 'image_url',
-                            'image_url' => [
-                                'url' => $imageUrl,
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-            'max_tokens' => 300,
-        ];
+            $messages = $this->promptManager->buildImageMessages($imageUrl, $prompt);
 
-        $response = $this->requestService->makeRequest('/chat/completions', $data);
+            $data = [
+                'model' => 'gpt-4-vision-preview',
+                'messages' => $messages,
+                'max_tokens' => 500,
+            ];
 
-        return $this->parseImageAnalysis($response);
+            $response = $this->requestService->makeRequest('/chat/completions', $data);
+
+            return $this->parseImageAnalysis($response);
+        } catch (\Exception $e) {
+            return [
+                'category' => 'error',
+                'recommendations' => [],
+                'sentiment' => 'neutral',
+                'confidence' => 0.0,
+                'description' => 'Error analyzing image: '.$e->getMessage(),
+                'error' => $e->getMessage(),
+            ];
+        }
     }
 
     /**
-     * Parse image analysis response
+     * Parse image analysis response.
      *
-     * @param  array<string, mixed>  $response
+     * @param array<string, mixed> $response
+     *
      * @return array{
      *     category: string,
      *     recommendations: list<string>,
@@ -88,7 +85,7 @@ class AIImageAnalysisService
     }
 
     /**
-     * Extract category from content
+     * Extract category from content.
      */
     private function extractCategory(string $content): string
     {
@@ -100,7 +97,7 @@ class AIImageAnalysisService
     }
 
     /**
-     * Extract recommendations from content
+     * Extract recommendations from content.
      *
      * @return list<string>
      */
@@ -115,7 +112,7 @@ class AIImageAnalysisService
     }
 
     /**
-     * Extract sentiment from content
+     * Extract sentiment from content.
      */
     private function extractSentiment(string $content): string
     {
@@ -127,7 +124,7 @@ class AIImageAnalysisService
     }
 
     /**
-     * Extract confidence from content
+     * Extract confidence from content.
      */
     private function extractConfidence(string $content): float
     {

@@ -22,15 +22,16 @@ class RestoreService
     /**
      * Restore from backup.
      *
-     * @param  array<string, string|int|null>  $backup
-     * @return array<ZipArchive|bool|string>
+     * @param  array<string, string|int|* @method static \App\Models\Brand create(array<string, string|bool|null>  $backup
+     *
+     * @return array<bool|string|\ZipArchive>
      *
      * @psalm-return array<string, ZipArchive|bool|string>
      */
     public function restoreFromBackup(array $backup): array
     {
         try {
-            $filename = is_string($backup['filename'] ?? '')
+            $filename = \is_string($backup['filename'] ?? '')
             ? $backup['filename'] ?? ''
             : '';
             $filePath = $this->backupPath.'/'.$filename;
@@ -49,7 +50,7 @@ class RestoreService
     /**
      * Perform the actual restore operation.
      *
-     * @return array<ZipArchive|bool|string>
+     * @return array<bool|string|\ZipArchive>
      *
      * @psalm-return array{success: bool, message?: 'Backup file not found'|'Backup restored successfully'|'Cannot open backup file', zip?: ZipArchive}
      */
@@ -66,7 +67,7 @@ class RestoreService
     /**
      * Prepare backup for restore by checking file existence and opening the zip archive.
      *
-     * @return array<ZipArchive|bool|string>
+     * @return array<bool|string|\ZipArchive>
      *
      * @psalm-return array{success: bool, zip?: ZipArchive, message?: 'Backup file not found'|'Cannot open backup file'}
      */
@@ -79,8 +80,8 @@ class RestoreService
             ];
         }
 
-        $zip = new ZipArchive;
-        if ($zip->open($filePath) !== true) {
+        $zip = new \ZipArchive();
+        if (true !== $zip->open($filePath)) {
             return [
                 'success' => false,
                 'message' => 'Cannot open backup file',
@@ -100,7 +101,7 @@ class RestoreService
      *
      * @psalm-return array{success: true, message: 'Backup restored successfully'}
      */
-    private function executeRestoreProcess(ZipArchive $zip): array
+    private function executeRestoreProcess(\ZipArchive $zip): array
     {
         $tempDir = $this->extractBackup($zip);
 
@@ -116,7 +117,7 @@ class RestoreService
     /**
      * Extract backup to temporary directory.
      */
-    private function extractBackup(ZipArchive $zip): string
+    private function extractBackup(\ZipArchive $zip): string
     {
         $tempDir = storage_path('app/temp/restore_'.uniqid());
         mkdir($tempDir, 0o755, true);
@@ -181,18 +182,18 @@ class RestoreService
      *
      * @psalm-return RecursiveIteratorIterator<RecursiveDirectoryIterator>
      */
-    private function getFilesToRestore(string $tempDir): RecursiveIteratorIterator
+    private function getFilesToRestore(string $tempDir): \RecursiveIteratorIterator
     {
-        return new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($tempDir),
-            RecursiveIteratorIterator::LEAVES_ONLY
+        return new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($tempDir),
+            \RecursiveIteratorIterator::LEAVES_ONLY
         );
     }
 
     /**
      * Restore collection of files.
      */
-    private function restoreFileCollection(RecursiveIteratorIterator $files, string $tempDir): void
+    private function restoreFileCollection(\RecursiveIteratorIterator $files, string $tempDir): void
     {
         foreach ($files as $file) {
             if ($file instanceof \SplFileInfo && $file->isFile()) {
@@ -207,7 +208,7 @@ class RestoreService
     private function restoreSingleFile(\SplFileInfo $file, string $tempDir): void
     {
         $realPath = $file->getRealPath();
-        if ($realPath === false) {
+        if (false === $realPath) {
             return;
         }
 
@@ -221,7 +222,7 @@ class RestoreService
      */
     private function getTargetPath(string $realPath, string $tempDir): string
     {
-        $relativePath = substr($realPath, strlen($tempDir) + 1);
+        $relativePath = substr($realPath, \strlen($tempDir) + 1);
 
         return base_path($relativePath);
     }
@@ -231,7 +232,7 @@ class RestoreService
      */
     private function ensureTargetDirectory(string $targetPath): void
     {
-        $targetDir = dirname($targetPath);
+        $targetDir = \dirname($targetPath);
         if (! is_dir($targetDir)) {
             mkdir($targetDir, 0o755, true);
         }

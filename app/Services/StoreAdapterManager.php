@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Services\Contracts\StoreAdapterContract;
+use App\Contracts\StoreAdapter;
 use App\Services\StoreAdapters\AmazonAdapter;
 use App\Services\StoreAdapters\EbayAdapter;
 use App\Services\StoreAdapters\NoonAdapter;
@@ -18,33 +18,23 @@ use Psr\Log\LoggerInterface;
 final class StoreAdapterManager
 {
     /**
-     * @var array<string, StoreAdapterContract>
+     * @var array<string, StoreAdapter>
      */
-    protected array $adapters = [];
+    private array $defaultAdapters = [];
 
     /**
-     * @param  iterable<StoreAdapterContract>  $adapters
+     * @param array<string, mixed> $config
      */
-    public function __construct(iterable $adapters)
+    public function __construct(array $config = [])
     {
-        // If no adapters provided, register default adapters
-        $adaptersArray = is_array($adapters) ? $adapters : iterator_to_array($adapters);
-
-        if ($adaptersArray === []) {
-            $this->registerDefaultAdapters();
-
-            return;
-        }
-
-        foreach ($adaptersArray as $adapter) {
-            $this->register($adapter);
-        }
+        $this->adapters = [];
+        $this->registerDefaultAdapters();
     }
 
     /**
      * Register a store adapter.
      */
-    public function register(StoreAdapterContract $adapter): void
+    public function register(StoreAdapter $adapter): void
     {
         $this->adapters[$adapter->getStoreIdentifier()] = $adapter;
     }
@@ -52,15 +42,15 @@ final class StoreAdapterManager
     /**
      * Get adapter by store identifier.
      */
-    public function getAdapter(string $storeIdentifier): ?StoreAdapterContract
+    public function getAdapter(string $identifier): ?StoreAdapter
     {
-        return $this->adapters[$storeIdentifier] ?? null;
+        return $this->adapters[$identifier] ?? null;
     }
 
     /**
      * Get all registered adapters.
      *
-     * @return array<string, StoreAdapterContract>
+     * @return array<string, StoreAdapter>
      */
     public function getAllAdapters(): array
     {
@@ -70,18 +60,18 @@ final class StoreAdapterManager
     /**
      * Get all available (configured) adapters.
      *
-     * @return array<string, StoreAdapterContract>
+     * @return array<string, StoreAdapter>
      */
     public function getAvailableAdapters(): array
     {
         return array_filter(
             $this->adapters,
-            fn (StoreAdapterContract $adapter): bool => $adapter->isAvailable()
+            static fn (StoreAdapter $adapter): bool => $adapter->isAvailable()
         );
     }
 
     /**
-     * Check if a store is supported.
+     * Check if store is supported.
      */
     public function isStoreSupported(string $storeIdentifier): bool
     {
@@ -89,7 +79,7 @@ final class StoreAdapterManager
     }
 
     /**
-     * Get list of supported store identifiers.
+     * Get supported stores.
      *
      * @return list<string>
      */
@@ -105,7 +95,7 @@ final class StoreAdapterManager
     {
         $adapter = $this->getAdapter($storeIdentifier);
 
-        if (! $adapter instanceof \App\Services\Contracts\StoreAdapterContract) {
+        if (! $adapter) {
             return false;
         }
 
@@ -119,7 +109,7 @@ final class StoreAdapterManager
     {
         $adapter = $this->getAdapter($storeIdentifier);
 
-        if (! $adapter instanceof \App\Services\Contracts\StoreAdapterContract) {
+        if (! $adapter) {
             return null;
         }
 
@@ -127,40 +117,40 @@ final class StoreAdapterManager
     }
 
     /**
-     * Get statistics about registered adapters.
+     * Get statistics about adapters.
      *
-     * @return array<array<array<bool|string>>|int>
-     *
-     * @psalm-return array{total_adapters: int<0, max>, available_adapters: int<0, max>, adapters: array<string, array{name: string, identifier: string, available: bool}>}
+     * @return array<string, mixed>
      */
     public function getStatistics(): array
     {
-        $adaptersInfo = [];
-        foreach ($this->adapters as $identifier => $adapter) {
-            $adaptersInfo[$identifier] = [
-                'name' => $adapter->getStoreName(),
-                'identifier' => $adapter->getStoreIdentifier(),
-                'available' => $adapter->isAvailable(),
-            ];
-        }
+        $available = $this->getAvailableAdapters();
 
         return [
-            'total_adapters' => count($this->adapters),
-            'available_adapters' => count($this->getAvailableAdapters()),
-            'adapters' => $adaptersInfo,
+            'total_adapters' => \count($this->adapters),
+            'available_adapters' => \count($available),
+            'adapters' => array_map(
+                static fn (StoreAdapter $adapter) => [
+                    'name' => $adapter->getStoreName(),
+                    'identifier' => $adapter->getStoreIdentifier(),
+                    'available' => $adapter->isAvailable(),
+                ],
+                $this->adapters
+            ),
         ];
     }
 
     /**
      * Fetch product from specific store.
      *
-     * @return array<string, string|int|float|null>|null
+     * @return (array|scalar|null)[]|null
+     *
+     * @psalm-return array{name: array|scalar, price: float, currency: array|scalar, url: array|scalar, image_url: array|null|scalar, availability: array|scalar, rating: float|null, reviews_count: int|null, description: array|null|scalar, brand: array|null|scalar, category: array|null|scalar, metadata: array|scalar}|null
      */
     public function fetchProduct(string $storeIdentifier, string $productIdentifier): ?array
     {
         $adapter = $this->getAdapter($storeIdentifier);
 
-        if (! $adapter instanceof \App\Services\Contracts\StoreAdapterContract) {
+        if (! $adapter instanceof StoreAdapter) {
             return null;
         }
 
@@ -182,10 +172,12 @@ final class StoreAdapterManager
     }
 
     /**
-     * Register default store adapters.
+     * Register default adapters.
      */
     private function registerDefaultAdapters(): void
     {
+        // For testing purposes, we'll create mock adapters
+        // In production, these would be properly injected
         $http = app(HttpFactory::class);
         $cache = app(CacheRepository::class);
         $logger = app(LoggerInterface::class);

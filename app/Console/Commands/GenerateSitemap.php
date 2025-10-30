@@ -10,6 +10,7 @@ use App\Models\Product;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor, UnusedClass
@@ -45,7 +46,7 @@ final class GenerateSitemap extends Command
         $sitemap .= $this->addUrl(url('/'), '1.0', 'daily');
 
         // Products
-        Product::query()->chunk(100, function (\Illuminate\Support\Collection $products) use (&$sitemap): void {
+        Product::query()->chunk(100, function (Collection $products) use (&$sitemap): void {
             foreach ($products as $product) {
                 $sitemap .= $this->addUrl(
                     route('products.show', $product->slug),
@@ -56,7 +57,7 @@ final class GenerateSitemap extends Command
         });
 
         // Categories
-        Category::query()->chunk(100, function (\Illuminate\Support\Collection $categories) use (&$sitemap): void {
+        Category::query()->chunk(100, function (Collection $categories) use (&$sitemap): void {
             foreach ($categories as $category) {
                 $sitemap .= $this->addUrl(
                     route('categories.show', $category->id),
@@ -67,7 +68,7 @@ final class GenerateSitemap extends Command
         });
 
         // Brands
-        Brand::query()->chunk(100, function (\Illuminate\Support\Collection $brands) use (&$sitemap): void {
+        Brand::query()->chunk(100, function (Collection $brands) use (&$sitemap): void {
             foreach ($brands as $brand) {
                 $sitemap .= $this->addUrl(
                     route('brands.show', $brand->id),

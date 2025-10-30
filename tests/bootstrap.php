@@ -7,6 +7,7 @@ use Illuminate\Contracts\Console\Kernel;
 // Ensure Composer autoload is available
 if (! file_exists(__DIR__.'/../vendor/autoload.php')) {
     fwrite(STDERR, "[bootstrap] Missing vendor/autoload.php. Run 'composer install' first.\n");
+
     exit(1);
 }
 
@@ -19,19 +20,18 @@ $_ENV['REDIS_CLIENT'] ??= 'predis';
 $_SERVER['REDIS_CLIENT'] ??= 'predis';
 $_ENV['CACHE_DRIVER'] ??= 'array';
 $_SERVER['CACHE_DRIVER'] ??= 'array';
+$_ENV['SESSION_DRIVER'] ??= 'array';
+$_SERVER['SESSION_DRIVER'] ??= 'array';
+$_ENV['QUEUE_CONNECTION'] ??= 'sync';
+$_SERVER['QUEUE_CONNECTION'] ??= 'sync';
 
 // Removed PhpParser\Node preloading to avoid nested vendor redeclare conflicts
 
 require __DIR__.'/../vendor/autoload.php';
 
-// Ensure base test case is loaded even if dev autoload is unavailable
-require_once __DIR__.'/TestCase.php';
-// Load cross-suite base unit test if dev autoload is unavailable
-@require_once __DIR__.'/Unit/PureUnitTest.php';
-
 // Minimal PSR-4 autoloader fallback for the Tests namespace when autoload-dev is unavailable
 spl_autoload_register(static function (string $class): void {
-    if (strpos($class, 'Tests\\') === 0) {
+    if (0 === strpos($class, 'Tests\\')) {
         $relative = substr($class, strlen('Tests\\'));
         $path = __DIR__.'/'.str_replace('\\', '/', $relative).'.php';
         if (file_exists($path)) {

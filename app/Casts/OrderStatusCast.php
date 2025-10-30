@@ -6,17 +6,23 @@ namespace App\Casts;
 
 use App\Enums\OrderStatus;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
-use ValueError;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Custom cast for Order status to gracefully handle legacy alias "completed".
+ *
+ * @implements CastsAttributes<OrderStatus|string, OrderStatus|string>
  */
-class OrderStatusCast implements CastsAttributes
+final class OrderStatusCast implements CastsAttributes
 {
     /**
      * Cast the given value.
      *
-     * @param  array<string, mixed>  $attributes
+     * @param Model                $model
+     * @param mixed                $value
+     * @param array<string, mixed> $attributes
+     *
+     * @return OrderStatus|string
      *
      * @SuppressWarnings("UnusedFormalParameter")
      */
@@ -25,10 +31,10 @@ class OrderStatusCast implements CastsAttributes
     {
         // لا حاجة لاستخدام المتغيرات غير المستعملة هنا؛ نتركها دون لمس
 
-        $raw = is_string($value) ? strtolower($value) : $value;
+        $raw = \is_string($value) ? strtolower($value) : $value;
 
         // Preserve legacy string for tests expecting raw 'completed'
-        if ($raw === 'completed') {
+        if ('completed' === $raw) {
             return 'completed';
         }
 
@@ -42,14 +48,16 @@ class OrderStatusCast implements CastsAttributes
             'delivered' => OrderStatus::DELIVERED,
             'cancelled' => OrderStatus::CANCELLED,
             'refunded' => OrderStatus::REFUNDED,
-            default => throw new ValueError("Invalid enum value '{$normalized}' for OrderStatus"),
+            default => throw new \ValueError("Invalid enum value '{$normalized}' for OrderStatus"),
         };
     }
 
     /**
      * Prepare the given value for storage.
      *
-     * @param  array<string, mixed>  $attributes
+     * @param Model                $model
+     * @param mixed                $value
+     * @param array<string, mixed> $attributes
      *
      * @SuppressWarnings("UnusedFormalParameter")
      */
@@ -62,10 +70,10 @@ class OrderStatusCast implements CastsAttributes
             return $value->value;
         }
 
-        if (is_string($value)) {
+        if (\is_string($value)) {
             $normalized = strtolower($value);
             // Store legacy alias as-is for backward compatibility
-            if ($normalized === 'completed') {
+            if ('completed' === $normalized) {
                 return 'completed';
             }
 

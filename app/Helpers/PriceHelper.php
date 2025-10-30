@@ -53,15 +53,15 @@ final class PriceHelper
     /**
      * Check if price is a good deal (below average).
      *
-     * @param  array<float>  $allPrices
+     * @param array<float> $allPrices
      */
     public static function isGoodDeal(float $price, array $allPrices): bool
     {
-        if ($allPrices === []) {
+        if ([] === $allPrices) {
             return false;
         }
 
-        $average = array_sum($allPrices) / count($allPrices);
+        $average = array_sum($allPrices) / \count($allPrices);
 
         // Consider a price a good deal if it's strictly below the average
         return $price < $average;
@@ -70,11 +70,11 @@ final class PriceHelper
     /**
      * Get best price from array of prices.
      *
-     * @param  array<float>  $prices
+     * @param array<float> $prices
      */
     public static function getBestPrice(array $prices): ?float
     {
-        if ($prices === []) {
+        if ([] === $prices) {
             return null;
         }
 
@@ -87,9 +87,10 @@ final class PriceHelper
     public static function convertCurrency(float $amount, string $fromCurrency, string $toCurrency): float
     {
         // Prefer Currency model exchange_rate values set in DB/tests
-        /** @var \App\Models\Currency|null $from */
+        /** @var Currency|null $from */
         $from = Currency::where('code', $fromCurrency)->first();
-        /** @var \App\Models\Currency|null $to */
+
+        /** @var Currency|null $to */
         $to = Currency::where('code', $toCurrency)->first();
 
         if ($from && $to && is_numeric($from->exchange_rate) && is_numeric($to->exchange_rate)) {
@@ -129,11 +130,11 @@ final class PriceHelper
     {
         $currencyCode ??= config('coprra.default_currency', 'USD');
 
-        /** @var \App\Models\Currency|null $currency */
+        /** @var Currency|null $currency */
         $currency = Currency::where('code', $currencyCode)->first();
 
         if (! $currency) {
-            return is_string($currencyCode) ? $currencyCode : 'USD';
+            return \is_string($currencyCode) ? $currencyCode : 'USD';
         }
 
         return (string) $currency->symbol;

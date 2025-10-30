@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Services\Validators;
 
+use App\Models\Product;
 use Illuminate\Support\Facades\Log;
 
 class PriceChangeValidator
 {
-    public function validate(\App\Models\Product $product, float|int|string $newPrice, int $threshold = 50): void
+    public function validate(Product $product, float|int|string $newPrice, int $threshold = 50): void
     {
-        $oldPrice = $product instanceof \App\Models\Product ? $product->price : null;
+        $oldPrice = $product instanceof Product ? $product->price : null;
 
         if ($oldPrice && $newPrice && is_numeric($oldPrice) && $oldPrice > 0) {
             $oldPriceFloat = (float) $oldPrice;

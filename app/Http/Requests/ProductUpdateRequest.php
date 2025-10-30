@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use App\Models\Product;
 use App\Rules\DimensionSum;
 use App\Services\Validators\PriceChangeValidator;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Unique;
 
 class ProductUpdateRequest extends FormRequest
 {
-    private readonly \App\Services\Validators\PriceChangeValidator $priceChangeValidator;
+    private readonly PriceChangeValidator $priceChangeValidator;
 
     public function __construct(PriceChangeValidator $priceChangeValidator)
     {
@@ -111,7 +114,7 @@ class ProductUpdateRequest extends FormRequest
     /**
      * Configure the validator instance.
      */
-    public function withValidator(\Illuminate\Contracts\Validation\Validator $validator): void
+    public function withValidator(Validator $validator): void
     {
         $validator->after(function (): void {
             if ($this->has('price')) {
@@ -129,14 +132,15 @@ class ProductUpdateRequest extends FormRequest
         $validated = parent::validated($key, $default);
 
         // Add computed fields
-        if (is_array($validated) && isset($validated['name'])) {
+        if (\is_array($validated) && isset($validated['name'])) {
             $name = $validated['name'];
-            $validated['slug'] = str(is_string($name) ? $name : '')
+            $validated['slug'] = str(\is_string($name) ? $name : '')
                 ->slug()
-                ->toString();
+                ->toString()
+            ;
         }
 
-        if (is_array($validated)) {
+        if (\is_array($validated)) {
             $validated['updated_by'] = $this->user()?->id;
         }
 
@@ -150,10 +154,10 @@ class ProductUpdateRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge(array_filter([
-            'name' => is_string($this->name) ? trim($this->name) : null,
-            'description' => is_string($this->description) ? trim($this->description) : null,
-            'sku' => is_string($this->sku) ? strtoupper(trim($this->sku)) : null,
-            'tags' => is_array($this->tags) ? array_map(static fn ($tag): string => is_string($tag) ? trim($tag) : '', $this->tags) : null,
+            'name' => \is_string($this->name) ? trim($this->name) : null,
+            'description' => \is_string($this->description) ? trim($this->description) : null,
+            'sku' => \is_string($this->sku) ? strtoupper(trim($this->sku)) : null,
+            'tags' => \is_array($this->tags) ? array_map(static fn ($tag): string => \is_string($tag) ? trim($tag) : '', $this->tags) : null,
         ]));
     }
 
@@ -161,7 +165,7 @@ class ProductUpdateRequest extends FormRequest
     {
         $product = $this->route('product');
 
-        return $product instanceof \App\Models\Product ? $product->id : (is_numeric($product) ? (int) $product : null);
+        return $product instanceof Product ? $product->id : (is_numeric($product) ? (int) $product : null);
     }
 
     /**
@@ -173,7 +177,7 @@ class ProductUpdateRequest extends FormRequest
      */
     private function getBaseRules(): array
     {
-        /** @return array */
+        // @return array
         return [
             'name' => [
                 'sometimes',
@@ -227,13 +231,13 @@ class ProductUpdateRequest extends FormRequest
     /**
      * Get SKU validation rules.
      *
-     * @return array<array<\Illuminate\Validation\Rules\Unique|string>>
+     * @return array<array<string|Unique>>
      *
-     * @psalm-return array{sku: list{'sometimes', 'string', 'max:100', \Illuminate\Validation\Rules\Unique}}
+     * @psalm-return array{sku: list{'sometimes', 'string', 'max:100', Unique}}
      */
     private function getSkuRules(?int $productId): array
     {
-        /** @return array */
+        // @return array
         return [
             'sku' => [
                 'sometimes',
@@ -253,7 +257,7 @@ class ProductUpdateRequest extends FormRequest
      */
     private function getDimensionRules(): array
     {
-        /** @return array */
+        // @return array
         return [
             'dimensions' => [
                 'nullable',
@@ -291,7 +295,7 @@ class ProductUpdateRequest extends FormRequest
      */
     private function getImageRules(): array
     {
-        /** @return array */
+        // @return array
         return [
             'images' => [
                 'nullable',
@@ -315,7 +319,7 @@ class ProductUpdateRequest extends FormRequest
      */
     private function getTagRules(): array
     {
-        /** @return array */
+        // @return array
         return [
             'tags' => [
                 'nullable',

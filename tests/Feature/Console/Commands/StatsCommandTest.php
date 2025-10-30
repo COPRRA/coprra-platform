@@ -8,60 +8,68 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class StatsCommandTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class StatsCommandTest extends TestCase
 {
     use RefreshDatabase;
 
     #[Test]
-    public function stats_command_runs_successfully_without_detailed_option(): void
+    public function statsCommandRunsSuccessfullyWithoutDetailedOption(): void
     {
         $this->artisan('stats')->assertExitCode(0);
     }
 
     #[Test]
-    public function stats_command_runs_successfully_with_detailed_option(): void
+    public function statsCommandRunsSuccessfullyWithDetailedOption(): void
     {
         $this->artisan('stats', ['--detailed' => true])->assertExitCode(0);
     }
 
     #[Test]
-    public function stats_command_displays_correct_basic_stats(): void
+    public function statsCommandDisplaysCorrectBasicStats(): void
     {
         $this->artisan('stats')
             ->expectsOutputToContain('Basic Stats')
-            ->assertExitCode(0);
+            ->assertExitCode(0)
+        ;
     }
 
     #[Test]
-    public function stats_command_displays_detailed_stats_when_requested(): void
+    public function statsCommandDisplaysDetailedStatsWhenRequested(): void
     {
         $this->artisan('stats', ['--detailed' => true])
             ->expectsOutputToContain('Detailed Stats')
-            ->assertExitCode(0);
+            ->assertExitCode(0)
+        ;
     }
 
     #[Test]
-    public function stats_command_handles_empty_database(): void
+    public function statsCommandHandlesEmptyDatabase(): void
     {
         $this->artisan('stats')->assertExitCode(0);
     }
 
     #[Test]
-    public function stats_command_handles_detailed_stats_with_empty_database(): void
+    public function statsCommandHandlesDetailedStatsWithEmptyDatabase(): void
     {
         $this->artisan('stats', ['--detailed' => true])->assertExitCode(0);
     }
 
     #[Test]
-    public function stats_command_displays_recent_activity(): void
+    public function statsCommandDisplaysRecentActivity(): void
     {
         $this->artisan('stats')
             ->expectsOutputToContain('Recent Activity')
-            ->assertExitCode(0);
+            ->assertExitCode(0)
+        ;
     }
 
     #[Test]
-    public function stats_command_displays_top_categories(): void
+    public function statsCommandDisplaysTopCategories(): void
     {
         $this->artisan('stats', ['--detailed' => true])
             ->expectsOutputToContain('Top Categories')

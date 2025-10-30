@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Mail\Message;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -57,9 +58,10 @@ final class PasswordResetService
                 'user' => $user,
                 'token' => $token,
                 'expiry' => self::TOKEN_EXPIRY,
-            ], static function (\Illuminate\Mail\Message $message) use ($user): void {
+            ], static function (Message $message) use ($user): void {
                 $message->to($user->email, $user->name)
-                    ->subject('استعادة كلمة المرور - كوبرا');
+                    ->subject('استعادة كلمة المرور - كوبرا')
+                ;
             });
 
             Log::info('Password reset email sent', [
@@ -128,14 +130,14 @@ final class PasswordResetService
     /**
      * Get reset token info.
      *
-     * @return array<string, string|int|null>|null
+     * @return array<string, string|int|* @method static \App\Models\Brand create(array<string, string|bool|null>|null
      */
     public function getResetTokenInfo(string $email): ?array
     {
         $key = self::CACHE_PREFIX.hash('sha256', $email);
         $data = Cache::get($key);
 
-        if (! $data || ! is_array($data)) {
+        if (! $data || ! \is_array($data)) {
             return null;
         }
 
@@ -144,7 +146,7 @@ final class PasswordResetService
 
         return [
             'created_at' => $createdAt,
-            'expires_at' => $createdAt && is_string($createdAt) ? Carbon::parse($createdAt)->addMinutes(self::TOKEN_EXPIRY)->toISOString() : null,
+            'expires_at' => $createdAt && \is_string($createdAt) ? Carbon::parse($createdAt)->addMinutes(self::TOKEN_EXPIRY)->toISOString() : null,
             'attempts' => $attempts,
             'remaining_attempts' => self::MAX_ATTEMPTS - $attempts,
         ];
@@ -208,7 +210,7 @@ final class PasswordResetService
         $key = self::CACHE_PREFIX.hash('sha256', $email);
         $data = Cache::get($key);
 
-        if (! $data || ! is_array($data)) {
+        if (! $data || ! \is_array($data)) {
             return false;
         }
 
@@ -229,7 +231,7 @@ final class PasswordResetService
 
         // Check if token is expired
         $createdAtValue = $data['created_at'] ?? null;
-        if ($createdAtValue && is_string($createdAtValue)) {
+        if ($createdAtValue && \is_string($createdAtValue)) {
             $createdAt = Carbon::parse($createdAtValue);
             if ($createdAt->addMinutes(self::TOKEN_EXPIRY)->isPast()) {
                 Cache::forget($key);

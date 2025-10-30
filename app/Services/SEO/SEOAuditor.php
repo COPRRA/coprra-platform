@@ -9,7 +9,6 @@ use App\Models\Product;
 use App\Models\Store;
 use App\Services\SEOService;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
 
 final readonly class SEOAuditor
 {
@@ -23,7 +22,7 @@ final readonly class SEOAuditor
     /**
      * Get the model map for auditing.
      *
-     * @return array<string>
+     * @return string[]
      *
      * @psalm-return array{'App\\Models\\Product'::class: 'Products', 'App\\Models\\Category'::class: 'Categories', 'App\\Models\\Store'::class: 'Stores'}
      */
@@ -34,18 +33,6 @@ final readonly class SEOAuditor
             Category::class => 'Categories',
             Store::class => 'Stores',
         ];
-    }
-
-    /**
-     * Audit all instances of a given model.
-     *
-     * @return Collection<int, SEOAuditResult>
-     */
-    public function auditModels(string $modelClass): Collection
-    {
-        return $modelClass::all()->map(function (Model $model): \App\Services\SEO\SEOAuditResult {
-            return $this->auditModel($model);
-        });
     }
 
     /**
@@ -76,7 +63,8 @@ final readonly class SEOAuditor
     /**
      * Validate metadata for SEO issues.
      *
-     * @param  array<string, string>  $metaData
+     * @param array<string, string> $metaData
+     *
      * @return array<string>
      *
      * @psalm-return array<int, string>

@@ -4,25 +4,18 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use Exception;
+use App\Contracts\SuspiciousActivityNotifierInterface;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Mail\Mailer;
 use Psr\Log\LoggerInterface;
 
-final readonly class SuspiciousActivityNotifier
+final readonly class SuspiciousActivityNotifier implements SuspiciousActivityNotifierInterface
 {
     private LoggerInterface $logger;
 
     private Mailer $mailer;
 
     private Repository $configRepository;
-
-    public function __construct(LoggerInterface $logger, Mailer $mailer, Repository $configRepository)
-    {
-        $this->logger = $logger;
-        $this->mailer = $mailer;
-        $this->configRepository = $configRepository;
-    }
 
     /**
      * Send notifications.
@@ -31,14 +24,15 @@ final readonly class SuspiciousActivityNotifier
      *     type: string,
      *     severity: string,
      *     user_id: int,
-     *     details: array<string, int|string|array<string, string|int|float|bool|array|null>>,
+     *
+     *     details: array<string, int|string|array<string, string|int|float|bool|array|* @method static \App\Models\Brand create(array<string, string|bool|null>>,
      *     timestamp: string,
      *     ip_address?: string
      * } $activity
      */
     public function sendNotifications(array $activity): void
     {
-        $notification = is_array($this->configRepository->get('suspicious_activity.notification'))
+        $notification = \is_array($this->configRepository->get('suspicious_activity.notification'))
             ? $this->configRepository->get('suspicious_activity.notification')
             : [];
 
@@ -62,7 +56,8 @@ final readonly class SuspiciousActivityNotifier
      *     type: string,
      *     severity: string,
      *     user_id: int,
-     *     details: array<string, int|string|array<string, string|int|float|bool|array|null>>,
+     *
+     *     details: array<string, int|string|array<string, string|int|float|bool|array|* @method static \App\Models\Brand create(array<string, string|bool|null>>,
      *     timestamp: string,
      *     ip_address?: string
      * } $activity
@@ -72,8 +67,8 @@ final readonly class SuspiciousActivityNotifier
         try {
             $adminEmails = config('app.admin_emails', []);
 
-            if ($adminEmails !== []) {
-                $activityType = is_string($activity['type'] ?? null) ? $activity['type'] : 'unknown';
+            if ([] !== $adminEmails) {
+                $activityType = \is_string($activity['type'] ?? null) ? $activity['type'] : 'unknown';
                 $subject = 'Suspicious Activity Alert - '.$activityType;
                 $message = $this->formatActivityMessage($activity);
 
@@ -83,7 +78,7 @@ final readonly class SuspiciousActivityNotifier
 
                 $this->mailer->raw($message, $closure);
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->logger->error(
                 'Failed to send email notification',
                 [
@@ -101,7 +96,8 @@ final readonly class SuspiciousActivityNotifier
      *     type: string,
      *     severity: string,
      *     user_id: int,
-     *     details: array<string, int|string|array<string, string|int|float|bool|array|null>>,
+     *
+     *     details: array<string, int|string|array<string, string|int|float|bool|array|* @method static \App\Models\Brand create(array<string, string|bool|null>>,
      *     timestamp: string,
      *     ip_address?: string
      * } $activity
@@ -119,7 +115,8 @@ final readonly class SuspiciousActivityNotifier
      *     type: string,
      *     severity: string,
      *     user_id: int,
-     *     details: array<string, int|string|array<string, string|int|float|bool|array|null>>,
+     *
+     *     details: array<string, int|string|array<string, string|int|float|bool|array|* @method static \App\Models\Brand create(array<string, string|bool|null>>,
      *     timestamp: string,
      *     ip_address?: string
      * } $activity
@@ -137,7 +134,8 @@ final readonly class SuspiciousActivityNotifier
      *     type: string,
      *     severity: string,
      *     user_id: int,
-     *     details: array<string, int|string|array<string, string|int|float|bool|array|null>>,
+     *
+     *     details: array<string, int|string|array<string, string|int|float|bool|array|* @method static \App\Models\Brand create(array<string, string|bool|null>>,
      *     timestamp: string,
      *     ip_address?: string
      * } $activity
@@ -146,7 +144,7 @@ final readonly class SuspiciousActivityNotifier
     {
         $message = "Suspicious activity detected:\n";
         foreach ($activity as $key => $value) {
-            $message .= "{$key}: ".json_encode($value, JSON_PRETTY_PRINT)."\n";
+            $message .= "{$key}: ".json_encode($value, \JSON_PRETTY_PRINT)."\n";
         }
 
         return $message;

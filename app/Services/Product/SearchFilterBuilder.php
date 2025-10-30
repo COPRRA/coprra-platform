@@ -9,12 +9,12 @@ use Illuminate\Http\Request;
 final class SearchFilterBuilder
 {
     /**
-     * @return array<string, string|int|float>
+     * @return array<string, float|int|string>
      */
     public function buildFromRequest(Request $request): array
     {
         $filters = $request->only(['category', 'brand', 'sort', 'order']);
-        $filters = is_array($filters) ? $filters : [];
+        $filters = \is_array($filters) ? $filters : [];
 
         $this->buildSortBy($filters);
         $this->buildCategory($filters);
@@ -24,20 +24,20 @@ final class SearchFilterBuilder
     }
 
     /**
-     * @param  array<string, string|int|float>  $filters
+     * @param array<string, float|int|string> $filters
      */
     private function buildSortBy(array &$filters): void
     {
-        if (isset($filters['sort']) && isset($filters['order'])) {
-            $sort = is_string($filters['sort']) ? $filters['sort'] : '';
-            $order = is_string($filters['order']) ? $filters['order'] : '';
+        if (isset($filters['sort'], $filters['order'])) {
+            $sort = \is_string($filters['sort']) ? $filters['sort'] : '';
+            $order = \is_string($filters['order']) ? $filters['order'] : '';
             $filters['sort_by'] = $sort.'_'.$order;
             unset($filters['sort'], $filters['order']);
         }
     }
 
     /**
-     * @param  array<string, string|int|float>  $filters
+     * @param array<string, float|int|string> $filters
      */
     private function buildCategory(array &$filters): void
     {
@@ -48,7 +48,7 @@ final class SearchFilterBuilder
     }
 
     /**
-     * @param  array<string, string|int|float>  $filters
+     * @param array<string, float|int|string> $filters
      */
     private function buildBrand(array &$filters): void
     {

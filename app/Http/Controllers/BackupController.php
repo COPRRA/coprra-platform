@@ -30,8 +30,8 @@ class BackupController extends Controller
     public function __construct()
     {
         $this->backupPath = storage_path('app/backups');
-        $this->backupService = app(\App\Services\BackupService::class);
-        $this->backupValidator = new BackupValidator;
+        $this->backupService = app(BackupService::class);
+        $this->backupValidator = new BackupValidator();
         $this->backupListService = new BackupListService($this->backupPath);
         $this->backupFileService = new BackupFileService($this->backupPath);
         $this->restoreService = new RestoreService($this->backupPath);
@@ -42,6 +42,8 @@ class BackupController extends Controller
      */
     public function index(): JsonResponse
     {
+        $this->authorize('viewAny', 'App\Models\User');
+
         try {
             $backups = $this->backupListService->getBackupsList();
 
@@ -56,13 +58,15 @@ class BackupController extends Controller
      */
     public function create(Request $request): JsonResponse
     {
+        $this->authorize('create', 'App\Models\User');
+
         try {
             $backupConfig = $this->backupValidator->validateBackupRequest($request);
             $type = $backupConfig['type'] ?? 'full';
 
-            if ($type === 'database') {
+            if ('database' === $type) {
                 $backup = $this->backupService->createDatabaseBackup();
-            } elseif ($type === 'files') {
+            } elseif ('files' === $type) {
                 $backup = $this->backupService->createFilesBackup();
             } else {
                 $backup = $this->backupService->createFullBackup();
@@ -79,6 +83,8 @@ class BackupController extends Controller
      */
     public function download(string $id): JsonResponse
     {
+        $this->authorize('download', 'App\Models\User');
+
         try {
             $backup = $this->backupListService->getBackupById($id);
 
@@ -101,6 +107,8 @@ class BackupController extends Controller
      */
     public function destroy(string $id): JsonResponse
     {
+        $this->authorize('delete', 'App\Models\User');
+
         try {
             $backup = $this->backupListService->getBackupById($id);
 
@@ -121,6 +129,8 @@ class BackupController extends Controller
      */
     public function restore(string $id): JsonResponse
     {
+        $this->authorize('restore', 'App\Models\User');
+
         try {
             $backup = $this->backupListService->getBackupById($id);
 
@@ -156,7 +166,7 @@ class BackupController extends Controller
     /**
      * Create success response.
      *
-     * @param  array<string, mixed>  $data
+     * @param array<string, mixed> $data
      */
     private function createSuccessResponse(array $data, string $message): JsonResponse
     {
@@ -181,7 +191,7 @@ class BackupController extends Controller
     /**
      * Create download response for backup.
      *
-     * @param  array<string, string|int|null>  $backup
+     * @param  array<string, string|int|* @method static \App\Models\Brand create(array<string, string|bool|null>  $backup
      */
     private function createDownloadResponse(array $backup): JsonResponse
     {
@@ -200,11 +210,11 @@ class BackupController extends Controller
     /**
      * Build download URL for backup.
      *
-     * @param  array<string, string|int|null>  $backup
+     * @param  array<string, string|int|* @method static \App\Models\Brand create(array<string, string|bool|null>  $backup
      */
     private function buildDownloadUrl(array $backup): string
     {
-        $filename = is_string($backup['filename'] ?? '') ? $backup['filename'] ?? '' : '';
+        $filename = \is_string($backup['filename'] ?? '') ? $backup['filename'] ?? '' : '';
 
         return url('storage/backups/'.$filename);
     }

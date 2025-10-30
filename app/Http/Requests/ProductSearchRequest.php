@@ -107,7 +107,7 @@ class ProductSearchRequest extends FormRequest
     /**
      * Get search filters.
      *
-     * @return array<string, string|int|bool|array<string>|null>
+     * @return array<string, string|int|bool|array<string>|* @method static \App\Models\Brand create(array<string, string|bool|null>
      */
     public function getFilters(): array
     {
@@ -121,7 +121,7 @@ class ProductSearchRequest extends FormRequest
     {
         $query = $this->validated('q', '');
 
-        return is_string($query) ? $query : '';
+        return \is_string($query) ? $query : '';
     }
 
     /**
@@ -193,7 +193,7 @@ class ProductSearchRequest extends FormRequest
     }
 
     /**
-     * @return array<string, string|int>
+     * @return array<string, int|string>
      */
     private function mergeSortingAndPagination(): array
     {
@@ -207,7 +207,7 @@ class ProductSearchRequest extends FormRequest
 
     private function prepareQueryForValidation(): string
     {
-        return is_string($this->q) ? trim($this->q) : '';
+        return \is_string($this->q) ? trim($this->q) : '';
     }
 
     /**
@@ -215,7 +215,7 @@ class ProductSearchRequest extends FormRequest
      */
     private function prepareTagsForValidation(): array
     {
-        return is_array($this->tags) ? array_map(static fn ($tag): string => is_string($tag) ? trim($tag) : '', $this->tags) : [];
+        return \is_array($this->tags) ? array_map(static fn ($tag): string => \is_string($tag) ? trim($tag) : '', $this->tags) : [];
     }
 
     /**

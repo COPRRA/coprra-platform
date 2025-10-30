@@ -6,98 +6,18 @@ namespace App\Services;
 
 use App\Models\Product;
 use App\Models\Webhook;
-use Exception;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Psr\Log\LoggerInterface;
 
 final readonly class WebhookService
 {
-    private CacheService $cacheService;
-
-    private LoggerInterface $logger;
-
-    private Dispatcher $dispatcher;
-
-    private Webhook $webhook;
-
-    private Product $product;
-
     public function __construct(
-        CacheService $cacheService,
-        LoggerInterface $logger,
-        Dispatcher $dispatcher,
-        Webhook $webhook,
-        Product $product
-    ) {
-        $this->cacheService = $cacheService;
-        $this->logger = $logger;
-        $this->dispatcher = $dispatcher;
-        $this->webhook = $webhook;
-        $this->product = $product;
-    }
-
-    /**
-     * Handle incoming webhook.
-     *
-     * @param  array<string, scalar|array|null>  $payload
-     */
-    public function handleWebhook(
-        string $storeIdentifier,
-        string $eventType,
-        array $payload,
-        ?string $signature = null
-    ): Webhook {
-        try {
-            // Create webhook record
-            $webhook = Webhook::query()->create([
-                'store_identifier' => $storeIdentifier,
-                'event_type' => $eventType,
-                'product_identifier' => $payload['product_identifier'] ?? '',
-                'payload' => $payload,
-                'signature' => $signature,
-                'status' => Webhook::STATUS_PENDING,
-            ]);
-
-            try {
-                $webhook->addLog('received', 'Webhook received from store', [
-                    'store' => $storeIdentifier,
-                    'event' => $eventType,
-                ]);
-            } catch (Exception $e) {
-                // Ignore logging errors in testing environment
-                if (! app()->environment('testing')) {
-                    throw $e;
-                }
-            }
-
-            // Process webhook asynchronously (skip in testing to avoid sync execution)
-            if (! app()->environment('testing')) {
-                $pendingDispatch = $this->dispatcher->dispatch(function () use ($webhook): void {
-                    $this->processWebhook($webhook);
-                });
-
-                // Call afterResponse only if dispatch returns a valid object
-                if ($pendingDispatch && method_exists($pendingDispatch, 'afterResponse')) {
-                    $pendingDispatch->afterResponse();
-                }
-            }
-
-            return $webhook;
-        } catch (Exception $e) {
-            // If webhook creation fails, create a failed webhook record
-            $webhook = Webhook::query()->create([
-                'store_identifier' => $storeIdentifier,
-                'event_type' => $eventType,
-                'product_identifier' => $payload['product_identifier'] ?? '',
-                'payload' => $payload,
-                'signature' => $signature,
-                'status' => Webhook::STATUS_FAILED,
-                'error_message' => $e->getMessage(),
-            ]);
-
-            return $webhook;
-        }
-    }
+        private CacheService $cacheService,
+        private LoggerInterface $logger,
+        private Dispatcher $dispatcher,
+        private Webhook $webhook,
+        private Product $product
+    ) {}
 
     /**
      * Process webhook.
@@ -108,44 +28,70 @@ final readonly class WebhookService
             $this->prepareWebhookForProcessing($webhook);
             $this->processWebhookEvent($webhook);
             $this->finalizeWebhookProcessing($webhook);
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $this->handleWebhookProcessingError($webhook, $exception);
         }
     }
 
     /**
-     * Get webhook statistics for the given number of days.
-     *
-     * @return array{
-     *     total: int,
-     *     pending: int,
-     *     processing: int,
-     *     completed: int,
-     *     failed: int
-     * }
+     * Handle incoming webhook and create webhook record.
+     */
+    public function handleWebhook(string $storeIdentifier, string $eventType, array $payload): Webhook
+    {
+        try {
+            $webhook = $this->webhook->create([
+                'store_identifier' => $storeIdentifier,
+                'event_type' => $eventType,
+                'product_identifier' => $payload['product_identifier'] ?? null,
+                'payload' => $payload,
+                'status' => Webhook::STATUS_PENDING,
+            ]);
+
+            $webhook->addLog('created', 'Webhook created successfully');
+
+            return $webhook;
+        } catch (\Exception $exception) {
+            $this->logger->error('Failed to create webhook', [
+                'store_identifier' => $storeIdentifier,
+                'event_type' => $eventType,
+                'error' => $exception->getMessage(),
+            ]);
+
+            // Create failed webhook record for tracking
+            $webhook = $this->webhook->create([
+                'store_identifier' => $storeIdentifier,
+                'event_type' => $eventType,
+                'product_identifier' => $payload['product_identifier'] ?? null,
+                'payload' => $payload,
+                'status' => Webhook::STATUS_FAILED,
+                'error_message' => $exception->getMessage(),
+            ]);
+
+            return $webhook;
+        }
+    }
+
+    /**
+     * Get webhook statistics for the specified number of days.
      */
     public function getStatistics(int $days = 30): array
     {
-        $since = now()->subDays($days);
+        $startDate = now()->subDays($days);
 
-        $total = $this->webhook->where('created_at', '>=', $since)->count();
-        $pending = $this->webhook->where('created_at', '>=', $since)
-            ->where('status', Webhook::STATUS_PENDING)
-            ->count();
-        $processing = $this->webhook->where('created_at', '>=', $since)
-            ->where('status', Webhook::STATUS_PROCESSING)
-            ->count();
-        $completed = $this->webhook->where('created_at', '>=', $since)
-            ->where('status', Webhook::STATUS_COMPLETED)
-            ->count();
-        $failed = $this->webhook->where('created_at', '>=', $since)
-            ->where('status', Webhook::STATUS_FAILED)
-            ->count();
+        $total = $this->webhook->where('created_at', '>=', $startDate)->count();
+        $pending = $this->webhook->where('created_at', '>=', $startDate)
+            ->where('status', Webhook::STATUS_PENDING)->count()
+        ;
+        $completed = $this->webhook->where('created_at', '>=', $startDate)
+            ->where('status', Webhook::STATUS_COMPLETED)->count()
+        ;
+        $failed = $this->webhook->where('created_at', '>=', $startDate)
+            ->where('status', Webhook::STATUS_FAILED)->count()
+        ;
 
         return [
             'total' => $total,
             'pending' => $pending,
-            'processing' => $processing,
             'completed' => $completed,
             'failed' => $failed,
         ];
@@ -157,7 +103,7 @@ final readonly class WebhookService
         $webhook->addLog('processing', 'Started processing webhook');
 
         if ($webhook->signature && ! $this->verifySignature($webhook)) {
-            throw new Exception('Invalid webhook signature');
+            throw new \Exception('Invalid webhook signature');
         }
     }
 
@@ -165,7 +111,7 @@ final readonly class WebhookService
     {
         $product = $this->findOrCreateProduct($webhook);
 
-        if ($product instanceof \App\Models\Product) {
+        if ($product instanceof Product) {
             $webhook->update(['product_id' => $product->id]);
         }
 
@@ -173,7 +119,7 @@ final readonly class WebhookService
             Webhook::EVENT_PRICE_UPDATE => $this->handlePriceUpdate($webhook, $product),
             Webhook::EVENT_STOCK_UPDATE => $this->handleStockUpdate($webhook, $product),
             Webhook::EVENT_PRODUCT_UPDATE => $this->handleProductUpdate($webhook, $product),
-            default => throw new Exception("Unknown event type: {$webhook->event_type}"),
+            default => throw new \Exception("Unknown event type: {$webhook->event_type}"),
         };
     }
 
@@ -183,7 +129,7 @@ final readonly class WebhookService
         $webhook->addLog('completed', 'Webhook processed successfully');
     }
 
-    private function handleWebhookProcessingError(Webhook $webhook, Exception $exception): void
+    private function handleWebhookProcessingError(Webhook $webhook, \Exception $exception): void
     {
         $webhook->markAsFailed($exception->getMessage());
         $webhook->addLog('failed', 'Webhook processing failed', [
@@ -202,18 +148,19 @@ final readonly class WebhookService
      */
     private function handlePriceUpdate(Webhook $webhook, ?Product $product): void
     {
-        if (! $product instanceof \App\Models\Product) {
-            throw new Exception('Product not found for price update');
+        if (! $product instanceof Product) {
+            throw new \Exception('Product not found for price update');
         }
 
         $payload = $webhook->payload;
-        /** @var array<string, scalar|array|null> $payload */
-        /** @var string|int|float|null $priceValue */
+
+        /** @var array<string, scalar|array|* @method static \App\Models\Brand create(array<string, string|bool|null> $payload */
+        /** @var float|int|string|null $priceValue */
         $priceValue = $payload['price'] ?? null;
         $newPrice = is_numeric($priceValue) ? (float) $priceValue : null;
 
         if (! $newPrice) {
-            throw new Exception('Price not provided in payload');
+            throw new \Exception('Price not provided in payload');
         }
 
         $this->updateProductPrice(
@@ -226,7 +173,7 @@ final readonly class WebhookService
         // Invalidate cache
         $this->cacheService->invalidateProduct($product->id);
 
-        $newPriceStr = strval($newPrice);
+        $newPriceStr = (string) $newPrice;
         $webhook->addLog('price_updated', 'Price updated to '.$newPriceStr, [
             'new_price' => $newPrice,
         ]);
@@ -244,7 +191,7 @@ final readonly class WebhookService
          *     updated_at: string
          * }> $storePrices */
         $storePrices = $product->store_prices ?? [];
-        if (! is_array($storePrices)) {
+        if (! \is_array($storePrices)) {
             $storePrices = [];
         }
         $storePrices[$storeIdentifier] = [
@@ -261,24 +208,24 @@ final readonly class WebhookService
      */
     private function handleStockUpdate(Webhook $webhook, ?Product $product): void
     {
-        if (! $product instanceof \App\Models\Product) {
-            throw new Exception('Product not found for stock update');
+        if (! $product instanceof Product) {
+            throw new \Exception('Product not found for stock update');
         }
 
         $payload = $webhook->payload;
         $inStock = $payload['in_stock'] ?? null;
 
-        if ($inStock === null) {
-            throw new Exception('Stock status not provided in payload');
+        if (null === $inStock) {
+            throw new \Exception('Stock status not provided in payload');
         }
 
-        /** @var string|int|null $quantityValue */
+        /** @var int|string|null $quantityValue */
         $quantityValue = $payload['quantity'] ?? null;
         $quantity = is_numeric($quantityValue) ? (int) $quantityValue : null;
 
         // Update product stock for this store
         $storeStock = $product->store_stock ?? [];
-        if (! is_array($storeStock)) {
+        if (! \is_array($storeStock)) {
             $storeStock = [];
         }
 
@@ -304,14 +251,14 @@ final readonly class WebhookService
      */
     private function handleProductUpdate(Webhook $webhook, ?Product $product): void
     {
-        if (! $product instanceof \App\Models\Product) {
-            throw new Exception('Product not found for product update');
+        if (! $product instanceof Product) {
+            throw new \Exception('Product not found for product update');
         }
 
         $payload = $webhook->payload;
         $updates = $this->getProductUpdatesFromPayload($payload);
 
-        if ($updates !== []) {
+        if ([] !== $updates) {
             $product->update($updates);
 
             // Invalidate cache
@@ -322,14 +269,15 @@ final readonly class WebhookService
     }
 
     /**
-     * @param  iterable<string, scalar|array|null>  $payload
-     * @return array<string, scalar|array|null>
+     * @param  iterable<string, scalar|array|* @method static \App\Models\Brand create(array<string, string|bool|null>  $payload
+     *
+     * @return array<string, scalar|array|* @method static \App\Models\Brand create(array<string, string|bool|null>
      */
     private function getProductUpdatesFromPayload(iterable $payload): array
     {
         $updates = [];
 
-        if (isset($payload['title']) && is_string($payload['title'])) {
+        if (isset($payload['title']) && \is_string($payload['title'])) {
             $updates['name'] = $payload['name'];
         }
 
@@ -358,9 +306,9 @@ final readonly class WebhookService
         )->first();
 
         if (
-            ! $product &&
-            isset($webhook->payload['create_if_not_exists']) &&
-            $webhook->payload['create_if_not_exists']
+            ! $product
+            && isset($webhook->payload['create_if_not_exists'])
+            && $webhook->payload['create_if_not_exists']
         ) {
             // Create new product
             $product = $this->product->create([
@@ -392,16 +340,16 @@ final readonly class WebhookService
         }
 
         $payload = $webhook->payload;
-        if (! is_array($payload)) {
+        if (! \is_array($payload)) {
             return false; // Invalid payload format
         }
 
         $payloadJson = json_encode($payload);
-        if ($payloadJson === false) {
+        if (false === $payloadJson) {
             return false; // Invalid payload
         }
 
-        $secretStr = strval($secret);
+        $secretStr = (string) $secret;
         $expectedSignature = hash_hmac('sha256', $payloadJson, $secretStr);
 
         return hash_equals((string) $webhook->signature, $expectedSignature);

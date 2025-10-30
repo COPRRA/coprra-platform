@@ -5,14 +5,19 @@ declare(strict_types=1);
 namespace Tests\Feature\Services;
 
 use App\Services\LoginAttemptService;
+use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use Mockery;
 use Tests\TestCase;
 
-class LoginAttemptServiceTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class LoginAttemptServiceTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -24,20 +29,22 @@ class LoginAttemptServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->service = new LoginAttemptService;
+        $this->service = new LoginAttemptService();
 
-        $this->request = Mockery::mock(Request::class);
-        $this->request->shouldReceive('ip')->andReturn('127.0.0.1');
-        $this->request->shouldReceive('userAgent')->andReturn('Test Agent');
+        // Use real Request instead of mocking simple data access
+        $this->request = Request::create('/', 'GET', [], [], [], [
+            'REMOTE_ADDR' => '127.0.0.1',
+            'HTTP_USER_AGENT' => 'Test Agent',
+        ]);
     }
 
     protected function tearDown(): void
     {
-        Mockery::close();
+        \Mockery::close();
         parent::tearDown();
     }
 
-    public function test_records_failed_attempt_with_email()
+    public function testRecordsFailedAttemptWithEmail()
     {
         // Arrange
         $email = 'test@example.com';
@@ -45,218 +52,217 @@ class LoginAttemptServiceTest extends TestCase
         $userAgent = 'Test Agent';
 
         Cache::shouldReceive('get')
-            ->with(Mockery::pattern('/^ip_attempts:/'), [])
-            ->andReturn([]);
+            ->with(\Mockery::pattern('/^ip_attempts:/'), [])
+            ->andReturn([])
+        ;
 
         Cache::shouldReceive('put')
-            ->with(Mockery::pattern('/^ip_attempts:/'), Mockery::type('array'), Mockery::type('object'))
-            ->andReturn(true);
+            ->with(\Mockery::pattern('/^ip_attempts:/'), \Mockery::type('array'), \Mockery::type('object'))
+            ->andReturn(true)
+        ;
 
         Cache::shouldReceive('get')
-            ->with(Mockery::pattern('/^login_attempts:/'), [])
-            ->andReturn([]);
+            ->with(\Mockery::pattern('/^login_attempts:/'), [])
+            ->andReturn([])
+        ;
 
         Cache::shouldReceive('put')
-            ->with(Mockery::pattern('/^login_attempts:/'), Mockery::type('array'), Mockery::type('object'))
-            ->andReturn(true);
+            ->with(\Mockery::pattern('/^login_attempts:/'), \Mockery::type('array'), \Mockery::type('object'))
+            ->andReturn(true)
+        ;
 
         Log::shouldReceive('warning')
-            ->with('Failed login attempt', Mockery::type('array'));
+            ->with('Failed login attempt', \Mockery::type('array'))
+        ;
 
         // Act
         $this->service->recordFailedAttempt($this->request, $email);
 
-        // Assert
-        $this->assertTrue(true);
+        // Assert - Verify that the service method completed without throwing exceptions
+        $this->addToAssertionCount(1);
 
         // Verify cache interactions were called
-        Cache::shouldHaveReceived('get')->with(Mockery::pattern('/^ip_attempts:/'), [])->once();
-        Cache::shouldHaveReceived('put')->with(Mockery::pattern('/^ip_attempts:/'), Mockery::type('array'), Mockery::type('object'))->once();
-        Cache::shouldHaveReceived('get')->with(Mockery::pattern('/^login_attempts:/'), [])->once();
-        Cache::shouldHaveReceived('put')->with(Mockery::pattern('/^login_attempts:/'), Mockery::type('array'), Mockery::type('object'))->once();
-        Log::shouldHaveReceived('warning')->with('Failed login attempt', Mockery::type('array'))->once();
-
-        // Verify that cache was accessed for both IP and email attempts
-        Cache::shouldHaveReceived('get')->with(Mockery::pattern('/^ip_attempts:/'), [])->once();
-        Cache::shouldHaveReceived('get')->with(Mockery::pattern('/^login_attempts:/'), [])->once();
-
-        // Verify that cache was updated for both IP and email attempts
-        Cache::shouldHaveReceived('put')->with(Mockery::pattern('/^ip_attempts:/'), Mockery::type('array'), Mockery::type('object'))->once();
-        Cache::shouldHaveReceived('put')->with(Mockery::pattern('/^login_attempts:/'), Mockery::type('array'), Mockery::type('object'))->once();
-
-        // Verify that logging was called
-        Log::shouldHaveReceived('warning')->with('Failed login attempt', Mockery::type('array'))->once();
+        Cache::shouldHaveReceived('get')->with(\Mockery::pattern('/^ip_attempts:/'), [])->once();
+        Cache::shouldHaveReceived('put')->with(\Mockery::pattern('/^ip_attempts:/'), \Mockery::type('array'), \Mockery::type('object'))->once();
+        Cache::shouldHaveReceived('get')->with(\Mockery::pattern('/^login_attempts:/'), [])->once();
+        Cache::shouldHaveReceived('put')->with(\Mockery::pattern('/^login_attempts:/'), \Mockery::type('array'), \Mockery::type('object'))->once();
+        Log::shouldHaveReceived('warning')->with('Failed login attempt', \Mockery::type('array'))->once();
     }
 
-    public function test_records_failed_attempt_without_email()
+    public function testRecordsFailedAttemptWithoutEmail()
     {
         // Arrange
         Cache::shouldReceive('get')
-            ->with(Mockery::pattern('/^ip_attempts:/'), [])
-            ->andReturn([]);
+            ->with(\Mockery::pattern('/^ip_attempts:/'), [])
+            ->andReturn([])
+        ;
 
         Cache::shouldReceive('put')
-            ->with(Mockery::pattern('/^ip_attempts:/'), Mockery::type('array'), Mockery::type('object'))
-            ->andReturn(true);
+            ->with(\Mockery::pattern('/^ip_attempts:/'), \Mockery::type('array'), \Mockery::type('object'))
+            ->andReturn(true)
+        ;
 
         Log::shouldReceive('warning')
-            ->with('Failed login attempt', Mockery::type('array'));
+            ->with('Failed login attempt', \Mockery::type('array'))
+        ;
 
         // Act
         $this->service->recordFailedAttempt($this->request);
 
-        // Assert
-        $this->assertTrue(true);
+        // Assert - Verify that the service method completed without throwing exceptions
+        $this->addToAssertionCount(1);
 
         // Verify that cache was accessed for IP attempts only (no email)
-        Cache::shouldHaveReceived('get')->with(Mockery::pattern('/^ip_attempts:/'), [])->once();
+        Cache::shouldHaveReceived('get')->with(\Mockery::pattern('/^ip_attempts:/'), [])->once();
 
         // Verify that cache was updated for IP attempts only
-        Cache::shouldHaveReceived('put')->with(Mockery::pattern('/^ip_attempts:/'), Mockery::type('array'), Mockery::type('object'))->once();
+        Cache::shouldHaveReceived('put')->with(\Mockery::pattern('/^ip_attempts:/'), \Mockery::type('array'), \Mockery::type('object'))->once();
 
         // Verify that logging was called
-        Log::shouldHaveReceived('warning')->with('Failed login attempt', Mockery::type('array'))->once();
+        Log::shouldHaveReceived('warning')->with('Failed login attempt', \Mockery::type('array'))->once();
     }
 
-    public function test_records_successful_attempt()
+    public function testRecordsSuccessfulAttempt()
     {
         // Arrange
         $email = 'test@example.com';
         $ip = '127.0.0.1';
 
         Cache::shouldReceive('forget')
-            ->with(Mockery::pattern('/^login_attempts:/'))
-            ->andReturn(true);
+            ->with(\Mockery::pattern('/^login_attempts:/'))
+            ->andReturn(true)
+        ;
 
         Cache::shouldReceive('forget')
-            ->with(Mockery::pattern('/^ip_attempts:/'))
-            ->andReturn(true);
+            ->with(\Mockery::pattern('/^ip_attempts:/'))
+            ->andReturn(true)
+        ;
 
         Log::shouldReceive('info')
-            ->with('Successful login', Mockery::type('array'));
+            ->with('Successful login', \Mockery::type('array'))
+        ;
 
         // Act
         $this->service->recordSuccessfulAttempt($this->request, $email);
 
-        // Assert
-        $this->assertTrue(true);
+        // Assert - Verify that the service method completed without throwing exceptions
+        $this->addToAssertionCount(1);
 
         // Verify cache interactions were called
-        Cache::shouldHaveReceived('forget')->with(Mockery::pattern('/^login_attempts:/'))->once();
-        Cache::shouldHaveReceived('forget')->with(Mockery::pattern('/^ip_attempts:/'))->once();
-        Log::shouldHaveReceived('info')->with('Successful login', Mockery::type('array'))->once();
-
-        // Verify that cache was cleared for both IP and email attempts
-        Cache::shouldHaveReceived('forget')->with(Mockery::pattern('/^login_attempts:/'))->once();
-        Cache::shouldHaveReceived('forget')->with(Mockery::pattern('/^ip_attempts:/'))->once();
-
-        // Verify that logging was called for successful login
-        Log::shouldHaveReceived('info')->with('Successful login', Mockery::type('array'))->once();
+        Cache::shouldHaveReceived('forget')->with(\Mockery::pattern('/^login_attempts:/'))->once();
+        Cache::shouldHaveReceived('forget')->with(\Mockery::pattern('/^ip_attempts:/'))->once();
+        Log::shouldHaveReceived('info')->with('Successful login', \Mockery::type('array'))->once();
     }
 
-    public function test_checks_email_blocked_when_under_limit()
+    public function testChecksEmailBlockedWhenUnderLimit()
     {
         // Arrange
         $email = 'test@example.com';
         $attempts = [['timestamp' => now()->toISOString()]];
 
         Cache::shouldReceive('get')
-            ->with(Mockery::pattern('/^login_attempts:/'), [])
-            ->andReturn($attempts);
+            ->with(\Mockery::pattern('/^login_attempts:/'), [])
+            ->andReturn($attempts)
+        ;
 
         // Act
         $result = $this->service->isEmailBlocked($email);
 
         // Assert
-        $this->assertFalse($result);
+        self::assertFalse($result);
     }
 
-    public function test_checks_email_blocked_when_over_limit()
+    public function testChecksEmailBlockedWhenOverLimit()
     {
         // Arrange
         $email = 'test@example.com';
         $attempts = array_fill(0, 5, ['timestamp' => now()->toISOString()]);
 
         Cache::shouldReceive('get')
-            ->with(Mockery::pattern('/^login_attempts:/'), [])
-            ->andReturn($attempts);
+            ->with(\Mockery::pattern('/^login_attempts:/'), [])
+            ->andReturn($attempts)
+        ;
 
         // Act
         $result = $this->service->isEmailBlocked($email);
 
         // Assert
-        $this->assertTrue($result);
+        self::assertTrue($result);
     }
 
-    public function test_checks_ip_blocked_when_under_limit()
+    public function testChecksIpBlockedWhenUnderLimit()
     {
         // Arrange
         $ip = '127.0.0.1';
         $attempts = [['timestamp' => now()->toISOString()]];
 
         Cache::shouldReceive('get')
-            ->with(Mockery::pattern('/^ip_attempts:/'), [])
-            ->andReturn($attempts);
+            ->with(\Mockery::pattern('/^ip_attempts:/'), [])
+            ->andReturn($attempts)
+        ;
 
         // Act
         $result = $this->service->isIpBlocked($ip);
 
         // Assert
-        $this->assertFalse($result);
+        self::assertFalse($result);
     }
 
-    public function test_checks_ip_blocked_when_over_limit()
+    public function testChecksIpBlockedWhenOverLimit()
     {
         // Arrange
         $ip = '127.0.0.1';
         $attempts = array_fill(0, 5, ['timestamp' => now()->toISOString()]);
 
         Cache::shouldReceive('get')
-            ->with(Mockery::pattern('/^ip_attempts:/'), [])
-            ->andReturn($attempts);
+            ->with(\Mockery::pattern('/^ip_attempts:/'), [])
+            ->andReturn($attempts)
+        ;
 
         // Act
         $result = $this->service->isIpBlocked($ip);
 
         // Assert
-        $this->assertTrue($result);
+        self::assertTrue($result);
     }
 
-    public function test_gets_remaining_attempts_for_email()
+    public function testGetsRemainingAttemptsForEmail()
     {
         // Arrange
         $email = 'test@example.com';
         $attempts = [['timestamp' => now()->toISOString()]];
 
         Cache::shouldReceive('get')
-            ->with(Mockery::pattern('/^login_attempts:/'), [])
-            ->andReturn($attempts);
+            ->with(\Mockery::pattern('/^login_attempts:/'), [])
+            ->andReturn($attempts)
+        ;
 
         // Act
         $result = $this->service->getRemainingAttempts($email);
 
         // Assert
-        $this->assertEquals(4, $result);
+        self::assertSame(4, $result);
     }
 
-    public function test_gets_remaining_attempts_for_ip()
+    public function testGetsRemainingAttemptsForIp()
     {
         // Arrange
         $ip = '127.0.0.1';
         $attempts = [['timestamp' => now()->toISOString()]];
 
         Cache::shouldReceive('get')
-            ->with(Mockery::pattern('/^ip_attempts:/'), [])
-            ->andReturn($attempts);
+            ->with(\Mockery::pattern('/^ip_attempts:/'), [])
+            ->andReturn($attempts)
+        ;
 
         // Act
         $result = $this->service->getRemainingIpAttempts($ip);
 
         // Assert
-        $this->assertEquals(4, $result);
+        self::assertSame(4, $result);
     }
 
-    public function test_gets_lockout_time_remaining_for_email()
+    public function testGetsLockoutTimeRemainingForEmail()
     {
         // Arrange
         $email = 'test@example.com';
@@ -264,18 +270,19 @@ class LoginAttemptServiceTest extends TestCase
         $attempts = array_fill(0, 5, ['timestamp' => $futureTime->toISOString()]);
 
         Cache::shouldReceive('get')
-            ->with(Mockery::pattern('/^login_attempts:/'), [])
-            ->andReturn($attempts);
+            ->with(\Mockery::pattern('/^login_attempts:/'), [])
+            ->andReturn($attempts)
+        ;
 
         // Act
         $result = $this->service->getLockoutTimeRemaining($email);
 
         // Assert
-        $this->assertIsInt($result);
-        $this->assertNotNull($result);
+        self::assertIsInt($result);
+        self::assertNotNull($result);
     }
 
-    public function test_gets_lockout_time_remaining_for_ip()
+    public function testGetsLockoutTimeRemainingForIp()
     {
         // Arrange
         $ip = '127.0.0.1';
@@ -283,229 +290,243 @@ class LoginAttemptServiceTest extends TestCase
         $attempts = array_fill(0, 5, ['timestamp' => $futureTime->toISOString()]);
 
         Cache::shouldReceive('get')
-            ->with(Mockery::pattern('/^ip_attempts:/'), [])
-            ->andReturn($attempts);
+            ->with(\Mockery::pattern('/^ip_attempts:/'), [])
+            ->andReturn($attempts)
+        ;
 
         // Act
         $result = $this->service->getIpLockoutTimeRemaining($ip);
 
         // Assert
-        $this->assertIsInt($result);
-        $this->assertNotNull($result);
+        self::assertIsInt($result);
+        self::assertNotNull($result);
     }
 
-    public function test_returns_null_when_no_lockout()
+    public function testReturnsNullWhenNoLockout()
     {
         // Arrange
         $email = 'test@example.com';
         $attempts = [['timestamp' => now()->toISOString()]];
 
         Cache::shouldReceive('get')
-            ->with(Mockery::pattern('/^login_attempts:/'), [])
-            ->andReturn($attempts);
+            ->with(\Mockery::pattern('/^login_attempts:/'), [])
+            ->andReturn($attempts)
+        ;
 
         // Act
         $result = $this->service->getLockoutTimeRemaining($email);
 
         // Assert
-        $this->assertNull($result);
+        self::assertNull($result);
     }
 
-    public function test_handles_invalid_attempts_data()
+    public function testHandlesInvalidAttemptsData()
     {
         // Arrange
         $email = 'test@example.com';
         $attempts = 'invalid_data';
 
         Cache::shouldReceive('get')
-            ->with(Mockery::pattern('/^login_attempts:/'), [])
-            ->andReturn($attempts);
+            ->with(\Mockery::pattern('/^login_attempts:/'), [])
+            ->andReturn($attempts)
+        ;
 
         // Act
         $result = $this->service->isEmailBlocked($email);
 
         // Assert
-        $this->assertFalse($result);
+        self::assertFalse($result);
     }
 
-    public function test_handles_null_attempts_data()
+    public function testHandlesNullAttemptsData()
     {
         // Arrange
         $email = 'test@example.com';
 
         Cache::shouldReceive('get')
-            ->with(Mockery::pattern('/^login_attempts:/'), [])
-            ->andReturn(null);
+            ->with(\Mockery::pattern('/^login_attempts:/'), [])
+            ->andReturn(null)
+        ;
 
         // Act
         $result = $this->service->isEmailBlocked($email);
 
         // Assert
-        $this->assertFalse($result);
+        self::assertFalse($result);
     }
 
-    public function test_unblocks_email()
+    public function testUnblocksEmail()
     {
         // Arrange
         $email = 'test@example.com';
 
         Cache::shouldReceive('forget')
-            ->with(Mockery::pattern('/^login_attempts:/'))
-            ->andReturn(true);
+            ->with(\Mockery::pattern('/^login_attempts:/'))
+            ->andReturn(true)
+        ;
 
         Log::shouldReceive('info')
-            ->with('Email unblocked', Mockery::type('array'));
+            ->with('Email unblocked', \Mockery::type('array'))
+        ;
 
         // Act
         $this->service->unblockEmail($email);
 
         // Assert
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
-    public function test_unblocks_ip()
+    public function testUnblocksIp()
     {
         // Arrange
         $ip = '127.0.0.1';
 
         Cache::shouldReceive('forget')
-            ->with(Mockery::pattern('/^ip_attempts:/'))
-            ->andReturn(true);
+            ->with(\Mockery::pattern('/^ip_attempts:/'))
+            ->andReturn(true)
+        ;
 
         Log::shouldReceive('info')
-            ->with('IP unblocked', Mockery::type('array'));
+            ->with('IP unblocked', \Mockery::type('array'))
+        ;
 
         // Act
         $this->service->unblockIp($ip);
 
         // Assert
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
-    public function test_gets_statistics()
+    public function testGetsStatistics()
     {
         // Arrange
-        $this->mockFunction('count', function ($array) {
-            return is_array($array) ? count($array) : 0;
+        $this->mockFunction('count', static function ($array) {
+            return \is_array($array) ? \count($array) : 0;
         });
 
         // Act
         $result = $this->service->getStatistics();
 
         // Assert
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('max_attempts', $result);
-        $this->assertArrayHasKey('lockout_duration', $result);
-        $this->assertArrayHasKey('blocked_emails_count', $result);
-        $this->assertArrayHasKey('blocked_ips_count', $result);
-        $this->assertEquals(5, $result['max_attempts']);
-        $this->assertEquals(15, $result['lockout_duration']);
+        self::assertIsArray($result);
+        self::assertArrayHasKey('max_attempts', $result);
+        self::assertArrayHasKey('lockout_duration', $result);
+        self::assertArrayHasKey('blocked_emails_count', $result);
+        self::assertArrayHasKey('blocked_ips_count', $result);
+        self::assertSame(5, $result['max_attempts']);
+        self::assertSame(15, $result['lockout_duration']);
     }
 
-    public function test_handles_expired_lockout()
+    public function testHandlesExpiredLockout()
     {
         // Arrange
         $email = 'test@example.com';
         $attempts = array_fill(0, 5, ['timestamp' => now()->subMinutes(20)->toISOString()]);
 
         Cache::shouldReceive('get')
-            ->with(Mockery::pattern('/^login_attempts:/'), [])
-            ->andReturn($attempts);
+            ->with(\Mockery::pattern('/^login_attempts:/'), [])
+            ->andReturn($attempts)
+        ;
 
         // Act
         $result = $this->service->getLockoutTimeRemaining($email);
 
         // Assert
-        $this->assertNull($result);
+        self::assertNull($result);
     }
 
-    public function test_handles_malformed_timestamp()
+    public function testHandlesMalformedTimestamp()
     {
         // Arrange
         $email = 'test@example.com';
         $attempts = array_fill(0, 5, ['timestamp' => 'invalid_timestamp']);
 
         Cache::shouldReceive('get')
-            ->with(Mockery::pattern('/^login_attempts:/'), [])
-            ->andReturn($attempts);
+            ->with(\Mockery::pattern('/^login_attempts:/'), [])
+            ->andReturn($attempts)
+        ;
 
         // Act & Assert
-        $this->expectException(\Carbon\Exceptions\InvalidFormatException::class);
+        $this->expectException(InvalidFormatException::class);
         $this->service->getLockoutTimeRemaining($email);
     }
 
-    public function test_handles_empty_attempts_array()
+    public function testHandlesEmptyAttemptsArray()
     {
         // Arrange
         $email = 'test@example.com';
         $attempts = [];
 
         Cache::shouldReceive('get')
-            ->with(Mockery::pattern('/^login_attempts:/'), [])
-            ->andReturn($attempts);
+            ->with(\Mockery::pattern('/^login_attempts:/'), [])
+            ->andReturn($attempts)
+        ;
 
         // Act
         $result = $this->service->isEmailBlocked($email);
 
         // Assert
-        $this->assertFalse($result);
+        self::assertFalse($result);
     }
 
-    public function test_handles_non_array_attempts_data()
+    public function testHandlesNonArrayAttemptsData()
     {
         // Arrange
         $email = 'test@example.com';
         $attempts = 'not_an_array';
 
         Cache::shouldReceive('get')
-            ->with(Mockery::pattern('/^login_attempts:/'), [])
-            ->andReturn($attempts);
+            ->with(\Mockery::pattern('/^login_attempts:/'), [])
+            ->andReturn($attempts)
+        ;
 
         // Act
         $result = $this->service->isEmailBlocked($email);
 
         // Assert
-        $this->assertFalse($result);
+        self::assertFalse($result);
     }
 
-    public function test_handles_missing_timestamp_in_attempt()
+    public function testHandlesMissingTimestampInAttempt()
     {
         // Arrange
         $email = 'test@example.com';
         $attempts = array_fill(0, 5, ['ip' => '127.0.0.1']); // Missing timestamp
 
         Cache::shouldReceive('get')
-            ->with(Mockery::pattern('/^login_attempts:/'), [])
-            ->andReturn($attempts);
+            ->with(\Mockery::pattern('/^login_attempts:/'), [])
+            ->andReturn($attempts)
+        ;
 
         // Act
         $result = $this->service->getLockoutTimeRemaining($email);
 
         // Assert
-        $this->assertNull($result);
+        self::assertNull($result);
     }
 
-    public function test_handles_non_string_timestamp()
+    public function testHandlesNonStringTimestamp()
     {
         // Arrange
         $email = 'test@example.com';
         $attempts = array_fill(0, 5, ['timestamp' => 1234567890]); // Non-string timestamp
 
         Cache::shouldReceive('get')
-            ->with(Mockery::pattern('/^login_attempts:/'), [])
-            ->andReturn($attempts);
+            ->with(\Mockery::pattern('/^login_attempts:/'), [])
+            ->andReturn($attempts)
+        ;
 
         // Act
         $result = $this->service->getLockoutTimeRemaining($email);
 
         // Assert
-        $this->assertNull($result);
+        self::assertNull($result);
     }
 
     // Helper method to mock functions
     private function mockFunction(string $functionName, callable $callback): void
     {
-        if (! function_exists($functionName)) {
+        if (! \function_exists($functionName)) {
             eval("function {$functionName}(\$arg) { return call_user_func_array('{$functionName}', func_get_args()); }");
         }
     }

@@ -12,6 +12,8 @@ return static function (Configuration $config): Configuration {
     $config->addNamedFilter(NamedFilter::fromString('spatie/laravel-backup'));
     $config->addNamedFilter(NamedFilter::fromString('doctrine/dbal'));
     $config->addNamedFilter(NamedFilter::fromString('spatie/laravel-permission'));
+    $config->addNamedFilter(NamedFilter::fromString('darkaonline/l5-swagger')); // Used for API documentation
+    $config->addNamedFilter(NamedFilter::fromString('sentry/sentry-laravel')); // Used for error monitoring and tracking
 
     return $config;
 };

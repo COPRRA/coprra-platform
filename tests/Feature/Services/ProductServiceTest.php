@@ -11,35 +11,50 @@ use App\Services\ProductService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Mockery;
+use Mockery\MockInterface;
 use Tests\TestCase;
 
-class ProductServiceTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class ProductServiceTest extends TestCase
 {
     use RefreshDatabase;
 
     private ProductService $service;
 
-    private \Mockery\MockInterface $repository;
+    private MockInterface $repository;
 
-    private \Mockery\MockInterface $cache;
+    private MockInterface $cache;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->repository = Mockery::mock(ProductRepository::class);
-        $this->cache = Mockery::mock(CacheServiceContract::class);
+        // Verify method existence for better test reliability
+        self::assertTrue(
+            method_exists(ProductRepository::class, 'getPaginatedActive'),
+            'ProductRepository must have getPaginatedActive method'
+        );
+        self::assertTrue(
+            method_exists(CacheServiceContract::class, 'remember'),
+            'CacheServiceContract must have remember method'
+        );
+
+        $this->repository = \Mockery::mock(ProductRepository::class);
+        $this->cache = \Mockery::mock(CacheServiceContract::class);
         $this->service = new ProductService($this->repository, $this->cache);
     }
 
     protected function tearDown(): void
     {
-        Mockery::close();
+        \Mockery::close();
         parent::tearDown();
     }
 
-    public function test_returns_paginated_products_from_cache(): void
+    public function testReturnsPaginatedProductsFromCache(): void
     {
         // Arrange
         $perPage = 15;
@@ -59,19 +74,20 @@ class ProductServiceTest extends TestCase
 
         $this->cache->shouldReceive('remember')
             ->once()
-            ->with('products.page.1', 3600, Mockery::type('Closure'), ['products'])
-            ->andReturn($paginator);
+            ->with('products.page.1', 3600, \Mockery::type('Closure'), ['products'])
+            ->andReturn($paginator)
+        ;
 
         // Act
         $result = $this->service->getPaginatedProducts($perPage);
 
         // Assert
-        $this->assertInstanceOf(LengthAwarePaginator::class, $result);
-        $this->assertEquals(2, $result->total());
-        $this->assertEquals($perPage, $result->perPage());
+        self::assertInstanceOf(LengthAwarePaginator::class, $result);
+        self::assertSame(2, $result->total());
+        self::assertSame($perPage, $result->perPage());
     }
 
-    public function test_returns_empty_paginator_when_cache_returns_null(): void
+    public function testReturnsEmptyPaginatorWhenCacheReturnsNull(): void
     {
         // Arrange
         $perPage = 15;
@@ -79,46 +95,44 @@ class ProductServiceTest extends TestCase
 
         $this->cache->shouldReceive('remember')
             ->once()
-            ->with('products.page.1', 3600, Mockery::type('Closure'), ['products'])
-            ->andReturn(null);
+            ->with('products.page.1', 3600, \Mockery::type('Closure'), ['products'])
+            ->andReturn(null)
+        ;
 
         // Act
         $result = $this->service->getPaginatedProducts($perPage);
 
         // Assert
-        $this->assertInstanceOf(LengthAwarePaginator::class, $result);
-        $this->assertEquals(0, $result->total());
-        $this->assertEquals($perPage, $result->perPage());
+        self::assertInstanceOf(LengthAwarePaginator::class, $result);
+        self::assertSame(0, $result->total());
+        self::assertSame($perPage, $result->perPage());
     }
 
-    public function test_handles_invalid_page_number(): void
+    public function testHandlesInvalidPageNumber(): void
     {
         // Arrange
         $perPage = 15;
         $invalidPage = 'invalid';
 
-        // Mock request to return invalid page
-        $request = Mockery::mock(Request::class);
-        $request->shouldReceive('get')->with('page', 1)->andReturn($invalidPage);
-        $request->shouldReceive('url')->andReturn('http://localhost');
-        // Allow framework to call setUserResolver on mocked request
-        $request->shouldReceive('setUserResolver')->andReturnNull();
+        // Use real request with invalid page parameter
+        $request = Request::create('http://localhost', 'GET', ['page' => $invalidPage]);
         $this->app->instance('request', $request);
 
         $this->cache->shouldReceive('remember')
             ->once()
-            ->with('products.page.1', 3600, Mockery::type('Closure'), ['products'])
-            ->andReturn(null);
+            ->with('products.page.1', 3600, \Mockery::type('Closure'), ['products'])
+            ->andReturn(null)
+        ;
 
         // Act
         $result = $this->service->getPaginatedProducts($perPage);
 
         // Assert
-        $this->assertInstanceOf(LengthAwarePaginator::class, $result);
-        $this->assertEquals(0, $result->total());
+        self::assertInstanceOf(LengthAwarePaginator::class, $result);
+        self::assertSame(0, $result->total());
     }
 
-    public function test_uses_default_per_page_when_not_specified(): void
+    public function testUsesDefaultPerPageWhenNotSpecified(): void
     {
         // Arrange
         $defaultPerPage = 15;
@@ -126,18 +140,19 @@ class ProductServiceTest extends TestCase
 
         $this->cache->shouldReceive('remember')
             ->once()
-            ->with('products.page.1', 3600, Mockery::type('Closure'), ['products'])
-            ->andReturn(null);
+            ->with('products.page.1', 3600, \Mockery::type('Closure'), ['products'])
+            ->andReturn(null)
+        ;
 
         // Act
         $result = $this->service->getPaginatedProducts();
 
         // Assert
-        $this->assertInstanceOf(LengthAwarePaginator::class, $result);
-        $this->assertEquals($defaultPerPage, $result->perPage());
+        self::assertInstanceOf(LengthAwarePaginator::class, $result);
+        self::assertSame($defaultPerPage, $result->perPage());
     }
 
-    public function test_calls_repository_when_cache_miss(): void
+    public function testCallsRepositoryWhenCacheMiss(): void
     {
         // Arrange
         $perPage = 15;
@@ -156,21 +171,23 @@ class ProductServiceTest extends TestCase
 
         $this->cache->shouldReceive('remember')
             ->once()
-            ->with('products.page.1', 3600, Mockery::type('Closure'), ['products'])
-            ->andReturnUsing(function ($key, $ttl, $callback) {
+            ->with('products.page.1', 3600, \Mockery::type('Closure'), ['products'])
+            ->andReturnUsing(static function ($key, $ttl, $callback) {
                 return $callback();
-            });
+            })
+        ;
 
         $this->repository->shouldReceive('getPaginatedActive')
             ->once()
             ->with($perPage)
-            ->andReturn($paginator);
+            ->andReturn($paginator)
+        ;
 
         // Act
         $result = $this->service->getPaginatedProducts($perPage);
 
         // Assert
-        $this->assertInstanceOf(LengthAwarePaginator::class, $result);
-        $this->assertEquals(1, $result->total());
+        self::assertInstanceOf(LengthAwarePaginator::class, $result);
+        self::assertSame(1, $result->total());
     }
 }

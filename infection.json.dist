@@ -1,29 +1,195 @@
 {
-    "timeout": 10,
+    "$schema": "https://raw.githubusercontent.com/infection/infection/master/resources/schema.json",
+    "timeout": 60,
     "source": {
         "directories": [
-            "app"
+            "app",
+            "config",
+            "database/factories",
+            "database/seeders",
+            "routes"
         ],
         "excludes": [
             "app/Console/Kernel.php",
-            "app/Exceptions",
+            "app/Exceptions/Handler.php",
             "app/Http/Kernel.php",
-            "app/Http/Middleware",
-            "app/Providers"
+            "app/Http/Middleware/Authenticate.php",
+            "app/Http/Middleware/EncryptCookies.php",
+            "app/Http/Middleware/PreventRequestsDuringMaintenance.php",
+            "app/Http/Middleware/RedirectIfAuthenticated.php",
+            "app/Http/Middleware/TrimStrings.php",
+            "app/Http/Middleware/TrustHosts.php",
+            "app/Http/Middleware/TrustProxies.php",
+            "app/Http/Middleware/ValidateSignature.php",
+            "app/Http/Middleware/VerifyCsrfToken.php",
+            "app/Providers/AppServiceProvider.php",
+            "app/Providers/AuthServiceProvider.php",
+            "app/Providers/BroadcastServiceProvider.php",
+            "app/Providers/EventServiceProvider.php",
+            "app/Providers/RouteServiceProvider.php",
+            "app/Models/User.php",
+            "app/Http/Controllers/Controller.php",
+            "config/app.php",
+            "config/auth.php",
+            "config/broadcasting.php",
+            "config/cache.php",
+            "config/cors.php",
+            "config/database.php",
+            "config/filesystems.php",
+            "config/hashing.php",
+            "config/logging.php",
+            "config/mail.php",
+            "config/queue.php",
+            "config/sanctum.php",
+            "config/services.php",
+            "config/session.php",
+            "config/view.php",
+            "routes/web.php",
+            "routes/api.php",
+            "routes/channels.php",
+            "routes/console.php"
         ]
     },
     "logs": {
-        "text": "infection.log",
-        "summary": "infection-summary.log",
-        "debug": "infection-debug.log"
+        "text": "reports/infection/infection.log",
+        "summary": "reports/infection/infection-summary.log",
+        "debug": "reports/infection/infection-debug.log",
+        "perMutator": "reports/infection/infection-per-mutator.log",
+        "json": "reports/infection/infection-report.json",
+        "gitlab": "reports/infection/infection-gitlab.json",
+        "github": "reports/infection/infection-github.json",
+        "badge": {
+            "branch": "main"
+        },
+        "strykerHtml": "reports/infection/infection-stryker.html",
+        "html": "reports/infection/infection-html-report"
     },
     "mutators": {
-        "@default": true
+        "@default": true,
+        "@function_signature": true,
+        "@number": true,
+        "@operator": true,
+        "@regex": true,
+        "@removal": true,
+        "@return_value": true,
+        "@sort": true,
+        "@zero_iteration": true,
+        "@cast": true,
+        "@conditional_boundary": true,
+        "@conditional_negotiation": true,
+        "@equal": true,
+        "@identical": true,
+        "@loop": true,
+        "@math": true,
+        "@unwrap": true,
+        "ArrayItemRemoval": {
+            "ignore": [
+                "App\\Models\\*::toArray",
+                "App\\Models\\*::toJson",
+                "App\\Models\\*::jsonSerialize",
+                "App\\Http\\Resources\\*::toArray"
+            ]
+        },
+        "FunctionCallRemoval": {
+            "ignore": [
+                "App\\*::log*",
+                "App\\*::dump",
+                "App\\*::dd",
+                "App\\*::var_dump",
+                "App\\*::print_r",
+                "App\\*::error_log",
+                "App\\*::abort",
+                "App\\*::exit",
+                "App\\*::die",
+                "App\\*::header",
+                "App\\*::setcookie",
+                "App\\*::session_start",
+                "App\\*::session_destroy"
+            ]
+        },
+        "MethodCallRemoval": {
+            "ignore": [
+                "App\\*::log*",
+                "App\\*::dump",
+                "App\\*::dd",
+                "App\\Models\\*::save",
+                "App\\Models\\*::delete",
+                "App\\Models\\*::forceDelete",
+                "App\\Models\\*::restore"
+            ]
+        },
+        "PublicVisibility": {
+            "ignore": [
+                "App\\Http\\Controllers\\*::*",
+                "App\\Http\\Middleware\\*::handle",
+                "App\\Console\\Commands\\*::handle",
+                "App\\Jobs\\*::handle",
+                "App\\Listeners\\*::handle",
+                "App\\Mail\\*::build",
+                "App\\Notifications\\*::via",
+                "App\\Notifications\\*::toMail",
+                "App\\Notifications\\*::toDatabase",
+                "App\\Providers\\*::register",
+                "App\\Providers\\*::boot"
+            ]
+        },
+        "ProtectedVisibility": {
+            "ignore": [
+                "App\\Models\\*::casts",
+                "App\\Models\\*::fillable",
+                "App\\Models\\*::guarded",
+                "App\\Models\\*::hidden",
+                "App\\Models\\*::dates",
+                "App\\Models\\*::appends"
+            ]
+        }
     },
     "testFramework": "phpunit",
-    "testFrameworkOptions": "--configuration=phpunit.xml",
-    "minMsi": 60,
-    "minCoveredMsi": 60,
-    "threads": 4,
-    "ignoreMsiWithNoMutations": true
+    "testFrameworkOptions": "--configuration=phpunit.xml --stop-on-failure --coverage-clover=reports/coverage/clover.xml",
+    "initialTestsPhpOptions": "-d memory_limit=4G -d max_execution_time=300",
+    "testFrameworkExtraOptions": "--verbose --colors=always --strict-coverage --strict-global-state --disallow-test-output",
+    "minMsi": 90,
+    "minCoveredMsi": 95,
+    "coverageBasePath": "reports/coverage",
+    "skipCoverage": false,
+    "skipInitialTests": false,
+    "threads": "max",
+    "ignoreMsiWithNoMutations": false,
+    "ignoreSourceCodeByRegex": [
+        ".*Test.*",
+        ".*Seeder.*",
+        ".*Factory.*",
+        ".*Migration.*",
+        ".*Kernel\\.php",
+        ".*Handler\\.php",
+        ".*ServiceProvider\\.php",
+        ".*Middleware.*",
+        ".*config/.*",
+        ".*routes/.*",
+        ".*bootstrap/.*",
+        ".*public/.*",
+        ".*storage/.*",
+        ".*vendor/.*",
+        ".*node_modules/.*",
+        ".*\\.blade\\.php"
+    ],
+    "noProgress": false,
+    "showMutations": true,
+    "onlyCovered": true,
+    "formatter": "progress",
+    "verbose": true,
+    "dryRun": false,
+    "noCoverage": false,
+    "useGitDiffFilter": false,
+    "useGitDiffBase": "origin/main",
+    "gitDiffLines": "all",
+    "tmpDir": "storage/tmp/infection",
+    "phpUnit": {
+        "configDir": ".",
+        "customPath": null
+    },
+    "bootstrap": null,
+    "initialTestsPhpOptions": "-d memory_limit=4G -d max_execution_time=300 -d xdebug.mode=coverage",
+    "mutateOnlyCoveredCode": true,
+    "testFrameworkExtraOptions": "--verbose --colors=always --strict-coverage --strict-global-state --disallow-test-output --enforce-time-limit"
 }

@@ -9,36 +9,42 @@ use App\Services\ProductService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Mockery;
+use Mockery\MockInterface;
 use Tests\TestCase;
 
-class ProductControllerTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class ProductControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    private \Mockery\MockInterface $productService;
+    private MockInterface $productService;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->productService = Mockery::mock(ProductService::class);
+        $this->productService = \Mockery::mock(ProductService::class);
         $this->app->instance(ProductService::class, $this->productService);
     }
 
     protected function tearDown(): void
     {
-        Mockery::close();
+        \Mockery::close();
         parent::tearDown();
     }
 
-    public function test_displays_index_page_with_products(): void
+    public function testDisplaysIndexPageWithProducts(): void
     {
         // Arrange
         $items = collect([Product::factory()->make()]);
         $products = new LengthAwarePaginator($items, 1, 15);
         $this->productService->shouldReceive('getPaginatedProducts')
             ->once()
-            ->andReturn($products);
+            ->andReturn($products)
+        ;
 
         // Act
         $response = $this->get(route('products.index'));
@@ -49,7 +55,7 @@ class ProductControllerTest extends TestCase
         $response->assertViewHas('products', $products);
     }
 
-    public function test_displays_search_results_when_search_parameters_present(): void
+    public function testDisplaysSearchResultsWhenSearchParametersPresent(): void
     {
         // Arrange
         $query = 'laptop';
@@ -57,10 +63,11 @@ class ProductControllerTest extends TestCase
         $items = collect([Product::factory()->make()]);
         $products = new LengthAwarePaginator($items, 1, 15);
         $this->productService->shouldReceive('searchProducts')
-            ->with($query, Mockery::on(function ($arg) {
-                return isset($arg['category_id']) && $arg['category_id'] === 'electronics';
+            ->with($query, \Mockery::on(static function ($arg) {
+                return isset($arg['category_id']) && 'electronics' === $arg['category_id'];
             }))
-            ->andReturn($products);
+            ->andReturn($products)
+        ;
 
         // Act
         $response = $this->get(route('products.index', ['search' => $query, 'category' => 'electronics']));
@@ -71,17 +78,19 @@ class ProductControllerTest extends TestCase
         $response->assertViewHas('products', $products);
     }
 
-    public function test_displays_product_show_page(): void
+    public function testDisplaysProductShowPage(): void
     {
         // Arrange
         $product = Product::factory()->create();
         $relatedProducts = new Collection([Product::factory()->make()]);
         $this->productService->shouldReceive('getBySlug')
             ->with($product->slug)
-            ->andReturn($product);
+            ->andReturn($product)
+        ;
         $this->productService->shouldReceive('getRelatedProducts')
             ->with($product)
-            ->andReturn($relatedProducts);
+            ->andReturn($relatedProducts)
+        ;
 
         // Act
         $response = $this->get(route('products.show', $product->slug));
@@ -93,12 +102,13 @@ class ProductControllerTest extends TestCase
         $response->assertViewHas('relatedProducts', $relatedProducts);
     }
 
-    public function test_returns_404_for_nonexistent_product(): void
+    public function testReturns404ForNonexistentProduct(): void
     {
         // Arrange
         $this->productService->shouldReceive('getBySlug')
             ->with('nonexistent')
-            ->andReturn(null);
+            ->andReturn(null)
+        ;
 
         // Act
         $response = $this->get(route('products.show', 'nonexistent'));
@@ -107,17 +117,18 @@ class ProductControllerTest extends TestCase
         $response->assertStatus(404);
     }
 
-    public function test_handles_search_with_sort_and_order(): void
+    public function testHandlesSearchWithSortAndOrder(): void
     {
         // Arrange
         $query = 'phone';
         $items = collect([Product::factory()->make()]);
         $products = new LengthAwarePaginator($items, 1, 15);
         $this->productService->shouldReceive('searchProducts')
-            ->with($query, Mockery::on(function ($arg) {
-                return isset($arg['sort_by']) && $arg['sort_by'] === 'price_asc';
+            ->with($query, \Mockery::on(static function ($arg) {
+                return isset($arg['sort_by']) && 'price_asc' === $arg['sort_by'];
             }))
-            ->andReturn($products);
+            ->andReturn($products)
+        ;
 
         // Act
         $response = $this->get(route('products.index', [

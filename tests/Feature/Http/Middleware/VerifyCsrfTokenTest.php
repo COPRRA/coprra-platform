@@ -4,18 +4,24 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Middleware;
 
+use App\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
+use Illuminate\Session\TokenMismatchException;
 use Tests\TestCase;
 
 /**
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class VerifyCsrfTokenTest extends TestCase
+final class VerifyCsrfTokenTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_verify_csrf_token_middleware_allows_valid_token(): void
+    public function testVerifyCsrfTokenMiddlewareAllowsValidToken(): void
     {
         $request = Request::create('/test', 'POST');
         $request->setLaravelSession(app('session.store'));
@@ -26,18 +32,18 @@ class VerifyCsrfTokenTest extends TestCase
         $request->headers->set('X-CSRF-TOKEN', $token);
         $request->merge(['_token' => $token]);
 
-        $middleware = $this->app->make(\App\Http\Middleware\VerifyCsrfToken::class);
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = $this->app->make(VerifyCsrfToken::class);
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('OK', $response->getContent());
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('OK', $response->getContent());
     }
 
-    public function test_verify_csrf_token_middleware_blocks_invalid_token(): void
+    public function testVerifyCsrfTokenMiddlewareBlocksInvalidToken(): void
     {
-        $this->expectException(\Illuminate\Session\TokenMismatchException::class);
+        $this->expectException(TokenMismatchException::class);
 
         $request = Request::create('/test', 'POST');
         $request->setLaravelSession(app('session.store'));
@@ -47,67 +53,67 @@ class VerifyCsrfTokenTest extends TestCase
         $request->headers->set('X-CSRF-TOKEN', 'invalid-token');
         $request->merge(['_token' => 'invalid-token']);
 
-        $middleware = $this->app->make(\App\Http\Middleware\VerifyCsrfToken::class);
+        $middleware = $this->app->make(VerifyCsrfToken::class);
 
-        $middleware->handle($request, function ($req) {
+        $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
     }
 
-    public function test_verify_csrf_token_middleware_allows_get_requests(): void
+    public function testVerifyCsrfTokenMiddlewareAllowsGetRequests(): void
     {
         $request = Request::create('/test', 'GET');
         $request->setLaravelSession(app('session.store'));
         app('session.store')->start();
 
-        $middleware = $this->app->make(\App\Http\Middleware\VerifyCsrfToken::class);
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = $this->app->make(VerifyCsrfToken::class);
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('OK', $response->getContent());
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('OK', $response->getContent());
     }
 
-    public function test_verify_csrf_token_middleware_allows_head_requests(): void
+    public function testVerifyCsrfTokenMiddlewareAllowsHeadRequests(): void
     {
         $request = Request::create('/test', 'HEAD');
         $request->setLaravelSession(app('session.store'));
         app('session.store')->start();
 
-        $middleware = $this->app->make(\App\Http\Middleware\VerifyCsrfToken::class);
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = $this->app->make(VerifyCsrfToken::class);
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
+        self::assertSame(200, $response->getStatusCode());
     }
 
-    public function test_verify_csrf_token_middleware_allows_options_requests(): void
+    public function testVerifyCsrfTokenMiddlewareAllowsOptionsRequests(): void
     {
         $request = Request::create('/test', 'OPTIONS');
         $request->setLaravelSession(app('session.store'));
         app('session.store')->start();
 
-        $middleware = $this->app->make(\App\Http\Middleware\VerifyCsrfToken::class);
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = $this->app->make(VerifyCsrfToken::class);
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
+        self::assertSame(200, $response->getStatusCode());
     }
 
-    public function test_verify_csrf_token_middleware_blocks_post_requests_without_token(): void
+    public function testVerifyCsrfTokenMiddlewareBlocksPostRequestsWithoutToken(): void
     {
-        $this->expectException(\Illuminate\Session\TokenMismatchException::class);
+        $this->expectException(TokenMismatchException::class);
 
         $request = Request::create('/test', 'POST');
         $request->setLaravelSession(app('session.store'));
         app('session.store')->start();
 
-        $middleware = $this->app->make(\App\Http\Middleware\VerifyCsrfToken::class);
+        $middleware = $this->app->make(VerifyCsrfToken::class);
 
-        $middleware->handle($request, function ($req) {
+        $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
     }

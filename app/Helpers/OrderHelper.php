@@ -17,17 +17,17 @@ final class OrderHelper
         $color = $status->color();
         $label = $status->label();
 
-        return sprintf(
+        return \sprintf(
             '<span class="badge badge-%s">%s</span>',
-            htmlspecialchars($color, ENT_QUOTES, 'UTF-8'),
-            htmlspecialchars($label, ENT_QUOTES, 'UTF-8')
+            htmlspecialchars($color, \ENT_QUOTES, 'UTF-8'),
+            htmlspecialchars($label, \ENT_QUOTES, 'UTF-8')
         );
     }
 
     /**
      * Calculate order total with tax and shipping.
      *
-     * @param  array<string, float|int|string>  $data
+     * @param array<string, float|int|string> $data
      */
     public static function calculateTotal(array $data): float
     {
@@ -62,7 +62,7 @@ final class OrderHelper
     {
         $status = $order->status_enum;
 
-        return in_array($status, [OrderStatus::PENDING, OrderStatus::PROCESSING], true);
+        return \in_array($status, [OrderStatus::PENDING, OrderStatus::PROCESSING], true);
     }
 
     /**
@@ -70,7 +70,7 @@ final class OrderHelper
      */
     public static function canBeRefunded(Order $order): bool
     {
-        return $order->status_enum === OrderStatus::DELIVERED;
+        return OrderStatus::DELIVERED === $order->status_enum;
     }
 
     /**
@@ -104,11 +104,11 @@ final class OrderHelper
     {
         $status = $order->status_enum;
 
-        if ($status === OrderStatus::SHIPPED && $order->shipped_at) {
+        if (OrderStatus::SHIPPED === $status && $order->shipped_at) {
             return $order->shipped_at->addDays(3);
         }
 
-        if ($status === OrderStatus::PROCESSING) {
+        if (OrderStatus::PROCESSING === $status) {
             return now()->addDays(5);
         }
 
@@ -120,7 +120,7 @@ final class OrderHelper
      */
     public static function isOverdue(Order $order): bool
     {
-        if ($order->status_enum !== OrderStatus::SHIPPED) {
+        if (OrderStatus::SHIPPED !== $order->status_enum) {
             return false;
         }
 
@@ -132,7 +132,7 @@ final class OrderHelper
     /**
      * Get numeric value from array with default.
      *
-     * @param  array<string, float|int|string>  $data
+     * @param array<string, float|int|string> $data
      */
     private static function getNumericValue(array $data, string $key, float $default = 0.0): float
     {

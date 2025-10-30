@@ -10,20 +10,25 @@ use App\Models\Order;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class OrderHelperTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class OrderHelperTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_get_status_badge_returns_correct_html(): void
+    public function testGetStatusBadgeReturnsCorrectHtml(): void
     {
         $badge = OrderHelper::getStatusBadge(OrderStatus::PENDING);
 
-        $this->assertStringContainsString('badge', $badge);
-        $this->assertStringContainsString('yellow', $badge);
-        $this->assertStringContainsString('قيد الانتظار', $badge);
+        self::assertStringContainsString('badge', $badge);
+        self::assertStringContainsString('yellow', $badge);
+        self::assertStringContainsString('قيد الانتظار', $badge);
     }
 
-    public function test_calculate_total_with_all_values(): void
+    public function testCalculateTotalWithAllValues(): void
     {
         $data = [
             'subtotal' => 100.00,
@@ -34,19 +39,19 @@ class OrderHelperTest extends TestCase
 
         $total = OrderHelper::calculateTotal($data);
 
-        $this->assertEquals(120.00, $total);
+        self::assertSame(120.00, $total);
     }
 
-    public function test_calculate_total_with_missing_values(): void
+    public function testCalculateTotalWithMissingValues(): void
     {
         $data = ['subtotal' => 100.00];
 
         $total = OrderHelper::calculateTotal($data);
 
-        $this->assertEquals(100.00, $total);
+        self::assertSame(100.00, $total);
     }
 
-    public function test_calculate_total_returns_zero_for_negative_result(): void
+    public function testCalculateTotalReturnsZeroForNegativeResult(): void
     {
         $data = [
             'subtotal' => 50.00,
@@ -55,95 +60,95 @@ class OrderHelperTest extends TestCase
 
         $total = OrderHelper::calculateTotal($data);
 
-        $this->assertEquals(0.00, $total);
+        self::assertSame(0.00, $total);
     }
 
-    public function test_calculate_tax_with_default_rate(): void
+    public function testCalculateTaxWithDefaultRate(): void
     {
         $tax = OrderHelper::calculateTax(100.00);
 
-        $this->assertEquals(15.00, $tax);
+        self::assertSame(15.00, $tax);
     }
 
-    public function test_calculate_tax_with_custom_rate(): void
+    public function testCalculateTaxWithCustomRate(): void
     {
         $tax = OrderHelper::calculateTax(100.00, 0.20);
 
-        $this->assertEquals(20.00, $tax);
+        self::assertSame(20.00, $tax);
     }
 
-    public function test_generate_order_number_is_unique(): void
+    public function testGenerateOrderNumberIsUnique(): void
     {
         $number1 = OrderHelper::generateOrderNumber();
         $number2 = OrderHelper::generateOrderNumber();
 
-        $this->assertNotEquals($number1, $number2);
-        $this->assertStringStartsWith('ORD-', $number1);
-        $this->assertStringStartsWith('ORD-', $number2);
+        self::assertNotSame($number1, $number2);
+        self::assertStringStartsWith('ORD-', $number1);
+        self::assertStringStartsWith('ORD-', $number2);
     }
 
-    public function test_can_be_cancelled_returns_true_for_pending(): void
+    public function testCanBeCancelledReturnsTrueForPending(): void
     {
         $order = Order::factory()->create(['status' => OrderStatus::PENDING]);
 
-        $this->assertTrue(OrderHelper::canBeCancelled($order));
+        self::assertTrue(OrderHelper::canBeCancelled($order));
     }
 
-    public function test_can_be_cancelled_returns_true_for_processing(): void
+    public function testCanBeCancelledReturnsTrueForProcessing(): void
     {
         $order = Order::factory()->create(['status' => OrderStatus::PROCESSING]);
 
-        $this->assertTrue(OrderHelper::canBeCancelled($order));
+        self::assertTrue(OrderHelper::canBeCancelled($order));
     }
 
-    public function test_can_be_cancelled_returns_false_for_shipped(): void
+    public function testCanBeCancelledReturnsFalseForShipped(): void
     {
         $order = Order::factory()->create(['status' => OrderStatus::SHIPPED]);
 
-        $this->assertFalse(OrderHelper::canBeCancelled($order));
+        self::assertFalse(OrderHelper::canBeCancelled($order));
     }
 
-    public function test_can_be_refunded_returns_true_for_delivered(): void
+    public function testCanBeRefundedReturnsTrueForDelivered(): void
     {
         $order = Order::factory()->create(['status' => OrderStatus::DELIVERED]);
 
-        $this->assertTrue(OrderHelper::canBeRefunded($order));
+        self::assertTrue(OrderHelper::canBeRefunded($order));
     }
 
-    public function test_can_be_refunded_returns_false_for_pending(): void
+    public function testCanBeRefundedReturnsFalseForPending(): void
     {
         $order = Order::factory()->create(['status' => OrderStatus::PENDING]);
 
-        $this->assertFalse(OrderHelper::canBeRefunded($order));
+        self::assertFalse(OrderHelper::canBeRefunded($order));
     }
 
-    public function test_get_progress_percentage_for_all_statuses(): void
+    public function testGetProgressPercentageForAllStatuses(): void
     {
-        $this->assertEquals(0, OrderHelper::getProgressPercentage(OrderStatus::PENDING));
-        $this->assertEquals(25, OrderHelper::getProgressPercentage(OrderStatus::PROCESSING));
-        $this->assertEquals(50, OrderHelper::getProgressPercentage(OrderStatus::SHIPPED));
-        $this->assertEquals(100, OrderHelper::getProgressPercentage(OrderStatus::DELIVERED));
-        $this->assertEquals(0, OrderHelper::getProgressPercentage(OrderStatus::CANCELLED));
-        $this->assertEquals(0, OrderHelper::getProgressPercentage(OrderStatus::REFUNDED));
+        self::assertSame(0, OrderHelper::getProgressPercentage(OrderStatus::PENDING));
+        self::assertSame(25, OrderHelper::getProgressPercentage(OrderStatus::PROCESSING));
+        self::assertSame(50, OrderHelper::getProgressPercentage(OrderStatus::SHIPPED));
+        self::assertSame(100, OrderHelper::getProgressPercentage(OrderStatus::DELIVERED));
+        self::assertSame(0, OrderHelper::getProgressPercentage(OrderStatus::CANCELLED));
+        self::assertSame(0, OrderHelper::getProgressPercentage(OrderStatus::REFUNDED));
     }
 
-    public function test_format_total_with_default_currency(): void
+    public function testFormatTotalWithDefaultCurrency(): void
     {
         $formatted = OrderHelper::formatTotal(150.50);
 
-        $this->assertStringContainsString('$', $formatted);
-        $this->assertStringContainsString('150.50', $formatted);
+        self::assertStringContainsString('$', $formatted);
+        self::assertStringContainsString('150.50', $formatted);
     }
 
-    public function test_format_total_with_sar_currency(): void
+    public function testFormatTotalWithSarCurrency(): void
     {
         $formatted = OrderHelper::formatTotal(150.50, 'SAR');
 
-        $this->assertStringContainsString('ر.س', $formatted);
-        $this->assertStringContainsString('150.50', $formatted);
+        self::assertStringContainsString('ر.س', $formatted);
+        self::assertStringContainsString('150.50', $formatted);
     }
 
-    public function test_get_estimated_delivery_date_for_shipped_order(): void
+    public function testGetEstimatedDeliveryDateForShippedOrder(): void
     {
         $order = Order::factory()->create([
             'status' => OrderStatus::SHIPPED,
@@ -152,43 +157,43 @@ class OrderHelperTest extends TestCase
 
         $estimatedDate = OrderHelper::getEstimatedDeliveryDate($order);
 
-        $this->assertNotNull($estimatedDate);
-        $this->assertEquals(now()->addDays(3)->format('Y-m-d'), $estimatedDate->format('Y-m-d'));
+        self::assertNotNull($estimatedDate);
+        self::assertSame(now()->addDays(3)->format('Y-m-d'), $estimatedDate->format('Y-m-d'));
     }
 
-    public function test_get_estimated_delivery_date_for_processing_order(): void
+    public function testGetEstimatedDeliveryDateForProcessingOrder(): void
     {
         $order = Order::factory()->create(['status' => OrderStatus::PROCESSING]);
 
         $estimatedDate = OrderHelper::getEstimatedDeliveryDate($order);
 
-        $this->assertNotNull($estimatedDate);
-        $this->assertEquals(now()->addDays(5)->format('Y-m-d'), $estimatedDate->format('Y-m-d'));
+        self::assertNotNull($estimatedDate);
+        self::assertSame(now()->addDays(5)->format('Y-m-d'), $estimatedDate->format('Y-m-d'));
     }
 
-    public function test_get_estimated_delivery_date_returns_null_for_pending(): void
+    public function testGetEstimatedDeliveryDateReturnsNullForPending(): void
     {
         $order = Order::factory()->create(['status' => OrderStatus::PENDING]);
 
         $estimatedDate = OrderHelper::getEstimatedDeliveryDate($order);
 
-        $this->assertNull($estimatedDate);
+        self::assertNull($estimatedDate);
     }
 
-    public function test_is_overdue_returns_false_for_non_shipped_order(): void
+    public function testIsOverdueReturnsFalseForNonShippedOrder(): void
     {
         $order = Order::factory()->create(['status' => OrderStatus::PENDING]);
 
-        $this->assertFalse(OrderHelper::isOverdue($order));
+        self::assertFalse(OrderHelper::isOverdue($order));
     }
 
-    public function test_is_overdue_returns_false_for_recent_shipment(): void
+    public function testIsOverdueReturnsFalseForRecentShipment(): void
     {
         $order = Order::factory()->create([
             'status' => OrderStatus::SHIPPED,
             'shipped_at' => now(),
         ]);
 
-        $this->assertFalse(OrderHelper::isOverdue($order));
+        self::assertFalse(OrderHelper::isOverdue($order));
     }
 }

@@ -12,7 +12,7 @@ class VirusScanner
 {
     public function isEnabled(): bool
     {
-        return (bool) (config('security.uploads.scan_for_viruses', true));
+        return (bool) config('security.uploads.scan_for_viruses', true);
     }
 
     /**
@@ -42,8 +42,8 @@ class VirusScanner
 
             // clamscan: 0 clean, 1 infected, 2 error; treat any non-zero as failure
             $exit = $process->getExitCode();
-            if ($exit !== 0) {
-                if ($exit === 1) {
+            if (0 !== $exit) {
+                if (1 === $exit) {
                     throw new \RuntimeException('File is infected (virus detected).');
                 }
                 Log::warning('Virus scan failed', [
@@ -60,21 +60,21 @@ class VirusScanner
     private function detectMime(string $path): string
     {
         $mime = '';
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        if ($finfo !== false) {
+        $finfo = finfo_open(\FILEINFO_MIME_TYPE);
+        if (false !== $finfo) {
             $tmp = finfo_file($finfo, $path);
-            if (is_string($tmp)) {
+            if (\is_string($tmp)) {
                 $mime = $tmp;
             }
             finfo_close($finfo);
         }
 
-        return $mime !== '' ? $mime : 'application/octet-stream';
+        return '' !== $mime ? $mime : 'application/octet-stream';
     }
 
     private function isPhpMime(string $mime): bool
     {
-        return in_array($mime, [
+        return \in_array($mime, [
             'text/x-php',
             'application/x-httpd-php',
             'application/php',
@@ -84,14 +84,14 @@ class VirusScanner
     private function containsPhpCode(string $path): bool
     {
         // Read a small chunk to look for PHP open tags
-        $fp = fopen($path, 'rb');
-        if ($fp === false) {
+        $fp = fopen($path, 'r');
+        if (false === $fp) {
             return false;
         }
         $chunk = fread($fp, 8192);
         fclose($fp);
 
-        if (! is_string($chunk) || $chunk === '') {
+        if (! \is_string($chunk) || '' === $chunk) {
             return false;
         }
 

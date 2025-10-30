@@ -10,21 +10,27 @@ use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class ProductApiTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class ProductApiTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_guest_can_list_products(): void
+    public function testGuestCanListProducts(): void
     {
         Product::factory()->count(5)->create(['is_active' => true]);
 
         $response = $this->getJson('/api/products');
 
         $response->assertStatus(200)
-            ->assertJsonCount(5, 'data');
+            ->assertJsonCount(5, 'data')
+        ;
     }
 
-    public function test_can_search_products_by_name(): void
+    public function testCanSearchProductsByName(): void
     {
         Product::factory()->create(['name' => 'iPhone 15 Pro', 'is_active' => true]);
         Product::factory()->create(['name' => 'Samsung Galaxy', 'is_active' => true]);
@@ -33,10 +39,11 @@ class ProductApiTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonCount(1, 'data')
-            ->assertJsonPath('data.0.name', 'iPhone 15 Pro');
+            ->assertJsonPath('data.0.name', 'iPhone 15 Pro')
+        ;
     }
 
-    public function test_can_filter_products_by_category(): void
+    public function testCanFilterProductsByCategory(): void
     {
         $category = Category::factory()->create();
         Product::factory()->count(3)->create([
@@ -48,10 +55,11 @@ class ProductApiTest extends TestCase
         $response = $this->getJson("/api/products?category_id={$category->id}");
 
         $response->assertStatus(200)
-            ->assertJsonCount(3, 'data');
+            ->assertJsonCount(3, 'data')
+        ;
     }
 
-    public function test_can_filter_products_by_brand(): void
+    public function testCanFilterProductsByBrand(): void
     {
         $brand = Brand::factory()->create();
         Product::factory()->count(2)->create([
@@ -63,10 +71,11 @@ class ProductApiTest extends TestCase
         $response = $this->getJson("/api/products?brand_id={$brand->id}");
 
         $response->assertStatus(200)
-            ->assertJsonCount(2, 'data');
+            ->assertJsonCount(2, 'data')
+        ;
     }
 
-    public function test_can_filter_products_by_price_range(): void
+    public function testCanFilterProductsByPriceRange(): void
     {
         Product::factory()->create(['price' => 50.00, 'is_active' => true]);
         Product::factory()->create(['price' => 150.00, 'is_active' => true]);
@@ -75,10 +84,11 @@ class ProductApiTest extends TestCase
         $response = $this->getJson('/api/products?min_price=100&max_price=200');
 
         $response->assertStatus(200)
-            ->assertJsonCount(1, 'data');
+            ->assertJsonCount(1, 'data')
+        ;
     }
 
-    public function test_can_filter_featured_products(): void
+    public function testCanFilterFeaturedProducts(): void
     {
         Product::factory()->count(3)->create([
             'is_featured' => true,
@@ -92,10 +102,11 @@ class ProductApiTest extends TestCase
         $response = $this->getJson('/api/products?is_featured=1');
 
         $response->assertStatus(200)
-            ->assertJsonCount(3, 'data');
+            ->assertJsonCount(3, 'data')
+        ;
     }
 
-    public function test_can_sort_products_by_price_ascending(): void
+    public function testCanSortProductsByPriceAscending(): void
     {
         Product::factory()->create(['price' => 300.00, 'is_active' => true]);
         Product::factory()->create(['price' => 100.00, 'is_active' => true]);
@@ -105,12 +116,12 @@ class ProductApiTest extends TestCase
 
         $response->assertStatus(200);
         $data = $response->json('data');
-        $this->assertEquals(100.00, $data[0]['price']);
-        $this->assertEquals(200.00, $data[1]['price']);
-        $this->assertEquals(300.00, $data[2]['price']);
+        self::assertSame(100.00, $data[0]['price']);
+        self::assertSame(200.00, $data[1]['price']);
+        self::assertSame(300.00, $data[2]['price']);
     }
 
-    public function test_can_sort_products_by_price_descending(): void
+    public function testCanSortProductsByPriceDescending(): void
     {
         Product::factory()->create(['price' => 100.00, 'is_active' => true]);
         Product::factory()->create(['price' => 300.00, 'is_active' => true]);
@@ -120,12 +131,12 @@ class ProductApiTest extends TestCase
 
         $response->assertStatus(200);
         $data = $response->json('data');
-        $this->assertEquals(300.00, $data[0]['price']);
-        $this->assertEquals(200.00, $data[1]['price']);
-        $this->assertEquals(100.00, $data[2]['price']);
+        self::assertSame(300.00, $data[0]['price']);
+        self::assertSame(200.00, $data[1]['price']);
+        self::assertSame(100.00, $data[2]['price']);
     }
 
-    public function test_inactive_products_are_not_listed(): void
+    public function testInactiveProductsAreNotListed(): void
     {
         Product::factory()->count(3)->create(['is_active' => true]);
         Product::factory()->count(2)->create(['is_active' => false]);
@@ -133,10 +144,11 @@ class ProductApiTest extends TestCase
         $response = $this->getJson('/api/products');
 
         $response->assertStatus(200)
-            ->assertJsonCount(3, 'data');
+            ->assertJsonCount(3, 'data')
+        ;
     }
 
-    public function test_product_list_is_paginated(): void
+    public function testProductListIsPaginated(): void
     {
         Product::factory()->count(25)->create(['is_active' => true]);
 
@@ -144,10 +156,11 @@ class ProductApiTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonCount(10, 'data')
-            ->assertJsonStructure(['data', 'meta']);
+            ->assertJsonStructure(['data', 'meta'])
+        ;
     }
 
-    public function test_can_view_single_product(): void
+    public function testCanViewSingleProduct(): void
     {
         $product = Product::factory()->create(['is_active' => true]);
 
@@ -155,10 +168,11 @@ class ProductApiTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonPath('data.id', $product->id)
-            ->assertJsonPath('data.name', $product->name);
+            ->assertJsonPath('data.name', $product->name)
+        ;
     }
 
-    public function test_product_response_includes_relationships(): void
+    public function testProductResponseIncludesRelationships(): void
     {
         $category = Category::factory()->create();
         $brand = Brand::factory()->create();
@@ -179,16 +193,17 @@ class ProductApiTest extends TestCase
                     'category' => ['id', 'name'],
                     'brand' => ['id', 'name'],
                 ],
-            ]);
+            ])
+        ;
     }
 
-    public function test_per_page_is_limited_to_100(): void
+    public function testPerPageIsLimitedTo100(): void
     {
         Product::factory()->count(150)->create(['is_active' => true]);
 
         $response = $this->getJson('/api/products?per_page=200');
 
         $response->assertStatus(200);
-        $this->assertLessThanOrEqual(100, count($response->json('data')));
+        self::assertLessThanOrEqual(100, \count($response->json('data')));
     }
 }

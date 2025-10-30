@@ -12,13 +12,17 @@ use Tests\TestCase;
 
 /**
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class AuthControllerTest extends TestCase
+final class AuthControllerTest extends TestCase
 {
     use RefreshDatabase;
     use WithFaker;
 
-    public function test_can_login_with_valid_credentials()
+    public function testCanLoginWithValidCredentials()
     {
         $user = User::factory()->create([
             'email' => 'test@example.com',
@@ -46,10 +50,11 @@ class AuthControllerTest extends TestCase
                     'name' => $user->name,
                     'email' => $user->email,
                 ],
-            ]);
+            ])
+        ;
     }
 
-    public function test_validates_login_request()
+    public function testValidatesLoginRequest()
     {
         $response = $this->postJson('/api/login', [
             'email' => 'invalid-email',
@@ -57,10 +62,11 @@ class AuthControllerTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['email', 'password']);
+            ->assertJsonValidationErrors(['email', 'password'])
+        ;
     }
 
-    public function test_returns_validation_error_for_invalid_credentials()
+    public function testReturnsValidationErrorForInvalidCredentials()
     {
         User::factory()->create([
             'email' => 'test@example.com',
@@ -73,10 +79,11 @@ class AuthControllerTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['email']);
+            ->assertJsonValidationErrors(['email'])
+        ;
     }
 
-    public function test_returns_validation_error_for_nonexistent_user()
+    public function testReturnsValidationErrorForNonexistentUser()
     {
         $response = $this->postJson('/api/login', [
             'email' => 'nonexistent@example.com',
@@ -84,10 +91,11 @@ class AuthControllerTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['email']);
+            ->assertJsonValidationErrors(['email'])
+        ;
     }
 
-    public function test_can_logout_authenticated_user()
+    public function testCanLogoutAuthenticatedUser()
     {
         $user = User::factory()->create();
         $token = $user->createToken('api-token')->plainTextToken;
@@ -99,17 +107,18 @@ class AuthControllerTest extends TestCase
         $response->assertStatus(200)
             ->assertJson([
                 'message' => __('auth.logout_success'),
-            ]);
+            ])
+        ;
     }
 
-    public function test_can_logout_unauthenticated_user()
+    public function testCanLogoutUnauthenticatedUser()
     {
         $response = $this->postJson('/api/logout');
 
         $response->assertStatus(401);
     }
 
-    public function test_can_get_authenticated_user_info()
+    public function testCanGetAuthenticatedUserInfo()
     {
         $user = User::factory()->create();
         $token = $user->createToken('api-token')->plainTextToken;
@@ -128,20 +137,22 @@ class AuthControllerTest extends TestCase
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
-            ]);
+            ])
+        ;
     }
 
-    public function test_returns_401_for_unauthenticated_me_request()
+    public function testReturns401ForUnauthenticatedMeRequest()
     {
         $response = $this->getJson('/api/me');
 
         $response->assertStatus(401)
             ->assertJson([
                 'message' => 'Unauthenticated.',
-            ]);
+            ])
+        ;
     }
 
-    public function test_returns_401_for_invalid_token()
+    public function testReturns401ForInvalidToken()
     {
         $response = $this->withHeaders([
             'Authorization' => 'Bearer invalid-token',
@@ -150,10 +161,11 @@ class AuthControllerTest extends TestCase
         $response->assertStatus(401)
             ->assertJson([
                 'message' => 'Unauthenticated.',
-            ]);
+            ])
+        ;
     }
 
-    public function test_creates_token_on_successful_login()
+    public function testCreatesTokenOnSuccessfulLogin()
     {
         $user = User::factory()->create([
             'email' => 'test@example.com',
@@ -168,11 +180,11 @@ class AuthControllerTest extends TestCase
         $response->assertStatus(200);
 
         $token = $response->json('token');
-        $this->assertIsString($token);
-        $this->assertNotEmpty($token);
+        self::assertIsString($token);
+        self::assertNotEmpty($token);
     }
 
-    public function test_deletes_token_on_logout()
+    public function testDeletesTokenOnLogout()
     {
         $user = User::factory()->create();
         $token = $user->createToken('api-token')->plainTextToken;
@@ -196,15 +208,16 @@ class AuthControllerTest extends TestCase
         ]);
     }
 
-    public function test_handles_login_with_missing_credentials()
+    public function testHandlesLoginWithMissingCredentials()
     {
         $response = $this->postJson('/api/login', []);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['email', 'password']);
+            ->assertJsonValidationErrors(['email', 'password'])
+        ;
     }
 
-    public function test_handles_login_with_empty_credentials()
+    public function testHandlesLoginWithEmptyCredentials()
     {
         $response = $this->postJson('/api/login', [
             'email' => '',
@@ -212,10 +225,11 @@ class AuthControllerTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['email', 'password']);
+            ->assertJsonValidationErrors(['email', 'password'])
+        ;
     }
 
-    public function test_handles_login_with_invalid_email_format()
+    public function testHandlesLoginWithInvalidEmailFormat()
     {
         $response = $this->postJson('/api/login', [
             'email' => 'not-an-email',
@@ -223,10 +237,11 @@ class AuthControllerTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['email']);
+            ->assertJsonValidationErrors(['email'])
+        ;
     }
 
-    public function test_handles_login_with_very_long_password()
+    public function testHandlesLoginWithVeryLongPassword()
     {
         $response = $this->postJson('/api/login', [
             'email' => 'test@example.com',
@@ -234,10 +249,11 @@ class AuthControllerTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['email']);
+            ->assertJsonValidationErrors(['email'])
+        ;
     }
 
-    public function test_handles_login_with_sql_injection_attempt()
+    public function testHandlesLoginWithSqlInjectionAttempt()
     {
         $response = $this->postJson('/api/login', [
             'email' => "'; DROP TABLE users; --",
@@ -245,10 +261,11 @@ class AuthControllerTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['email']);
+            ->assertJsonValidationErrors(['email'])
+        ;
     }
 
-    public function test_handles_login_with_xss_attempt()
+    public function testHandlesLoginWithXssAttempt()
     {
         $response = $this->postJson('/api/login', [
             'email' => '<script>alert("xss")</script>@example.com',
@@ -256,10 +273,11 @@ class AuthControllerTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['email']);
+            ->assertJsonValidationErrors(['email'])
+        ;
     }
 
-    public function test_handles_multiple_concurrent_logins()
+    public function testHandlesMultipleConcurrentLogins()
     {
         $user = User::factory()->create([
             'email' => 'test@example.com',
@@ -288,14 +306,14 @@ class AuthControllerTest extends TestCase
         ]);
     }
 
-    public function test_handles_logout_without_authorization_header()
+    public function testHandlesLogoutWithoutAuthorizationHeader()
     {
         $response = $this->postJson('/api/logout');
 
         $response->assertStatus(401);
     }
 
-    public function test_handles_me_request_without_authorization_header()
+    public function testHandlesMeRequestWithoutAuthorizationHeader()
     {
         $response = $this->getJson('/api/me');
 

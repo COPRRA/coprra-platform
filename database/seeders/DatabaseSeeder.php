@@ -17,8 +17,8 @@ class DatabaseSeeder extends Seeder
             LanguagesAndCurrenciesSeeder::class,
             CategorySeeder::class,
             BrandSeeder::class,
-            ProductSeeder::class,
             StoreSeeder::class,
+            ProductSeeder::class,
             PriceOfferSeeder::class,
         ]);
     }

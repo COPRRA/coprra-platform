@@ -8,9 +8,10 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Throwable;
 
 class Handler extends ExceptionHandler
 {
@@ -27,13 +28,13 @@ class Handler extends ExceptionHandler
     #[\Override]
     public function register(): void
     {
-        $this->reportable(function (Throwable $e): void {
+        $this->reportable(function (\Throwable $e): void {
             if ($this->isSecurityException($e)) {
                 $this->logSecurityException($e);
             }
         });
 
-        $this->renderable(function (Throwable $e, \Illuminate\Http\Request $request) {
+        $this->renderable(function (\Throwable $e, Request $request) {
             if ($request->is('api/*') || $request->expectsJson()) {
                 return $this->handleApiExceptions($e);
             }
@@ -43,18 +44,18 @@ class Handler extends ExceptionHandler
     /**
      * Check if the exception is a security-related exception.
      */
-    private function isSecurityException(Throwable $e): bool
+    private function isSecurityException(\Throwable $e): bool
     {
-        return $e instanceof AuthenticationException ||
-            $e instanceof AuthorizationException ||
-            $e instanceof ValidationException ||
-            $e instanceof QueryException;
+        return $e instanceof AuthenticationException
+            || $e instanceof AuthorizationException
+            || $e instanceof ValidationException
+            || $e instanceof QueryException;
     }
 
     /**
      * Log security-related exceptions.
      */
-    private function logSecurityException(Throwable $e): void
+    private function logSecurityException(\Throwable $e): void
     {
         logger()->warning('Security-related exception occurred', [
             'exception_type' => $e::class,
@@ -69,7 +70,7 @@ class Handler extends ExceptionHandler
     /**
      * Handle API exceptions.
      */
-    private function handleApiExceptions(Throwable $e): \Illuminate\Http\JsonResponse
+    private function handleApiExceptions(\Throwable $e): JsonResponse
     {
         return match (true) {
             $e instanceof ValidationException => response()->json([

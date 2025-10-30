@@ -4,25 +4,28 @@ declare(strict_types=1);
 
 namespace App\Services\Api;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Collection;
 
 /**
- * Service for building API responses with consistent structure
+ * Service for building API responses with consistent structure.
  */
 class ResponseBuilderService
 {
     /**
-     * Build API response with common structure
+     * Build API response with common structure.
      *
-     * @param  array<string|int|float|bool|array|object|null>  $meta
-     * @return array<array<array|mixed|object|scalar|null>|bool|int|object|string|null>
+     * @param  array<string|int|float|bool|array|object|* @method static \App\Models\Brand create(array<string, string|bool|null>  $meta
      *
-     * @psalm-return array{success: bool, message: string, version: '2.0', timestamp: string|null, data?: array|int|object|string, meta?: array<array|object|scalar|null>}
+     * @return array<array<array|mixed|object|scalar|* @method static \App\Models\Brand create(array<string, string|bool|null>|bool|int|object|string|* @method static \App\Models\Brand create(array<string, string|bool|null>
+     *
+     * @psalm-return array{success: bool, message: string, version: '2.0', timestamp: string|null, data?: array|int|object|string, meta?: array<array|object|scalar|* @method static \App\Models\Brand create(array<string, string|bool|null>}
      */
     public function buildApiResponse(
         bool $success,
         string $message,
-        array|object|string|int|null $data = null,
+        array|int|object|string|null $data = null,
         array $meta = []
     ): array {
         $response = [
@@ -32,11 +35,11 @@ class ResponseBuilderService
             'timestamp' => now()->toISOString(),
         ];
 
-        if ($data !== null) {
+        if (null !== $data) {
             $response['data'] = $data;
         }
 
-        if ($meta !== []) {
+        if ([] !== $meta) {
             $response['meta'] = $meta;
         }
 
@@ -44,12 +47,12 @@ class ResponseBuilderService
     }
 
     /**
-     * Enhanced success response with v2 features
+     * Enhanced success response with v2 features.
      *
-     * @param  array<string|int|float|bool|array|object|null>  $meta
+     * @param  array<string|int|float|bool|array|object|* @method static \App\Models\Brand create(array<string, string|bool|null>  $meta
      */
     public function successResponse(
-        array|object|string|int|null $data = null,
+        array|int|object|string|null $data = null,
         string $message = 'Success',
         int $statusCode = 200,
         array $meta = []
@@ -60,9 +63,9 @@ class ResponseBuilderService
     }
 
     /**
-     * Enhanced error response with v2 features
+     * Enhanced error response with v2 features.
      *
-     * @param  array<string|int|float|bool|array|null>  $meta
+     * @param  array<string|int|float|bool|array|* @method static \App\Models\Brand create(array<string, string|bool|null>  $meta
      */
     public function errorResponse(
         string $message = 'Error',
@@ -72,11 +75,11 @@ class ResponseBuilderService
     ): JsonResponse {
         $response = $this->buildApiResponse(false, $message, null, $meta);
 
-        if ($errors !== null) {
+        if (null !== $errors) {
             $response['errors'] = $errors;
         }
 
-        if ($meta !== []) {
+        if ([] !== $meta) {
             $response['meta'] = $meta;
         }
 
@@ -84,12 +87,12 @@ class ResponseBuilderService
     }
 
     /**
-     * Enhanced paginated response with v2 features
+     * Enhanced paginated response with v2 features.
      *
-     * @param  array<string|int|float|bool|array|null>  $meta
+     * @param  array<string|int|float|bool|array|* @method static \App\Models\Brand create(array<string, string|bool|null>  $meta
      */
     public function paginatedResponse(
-        \Illuminate\Contracts\Pagination\LengthAwarePaginator|\Illuminate\Support\Collection|array $data,
+        array|Collection|LengthAwarePaginator $data,
         string $message = 'Success',
         array $meta = []
     ): JsonResponse {
@@ -99,13 +102,13 @@ class ResponseBuilderService
         $response = [
             'success' => true,
             'message' => $message,
-            'data' => is_object($data) && method_exists($data, 'items') ? $data->items() : [],
+            'data' => \is_object($data) && method_exists($data, 'items') ? $data->items() : [],
             'pagination' => $pagination,
             'version' => '2.0',
             'timestamp' => now()->toISOString(),
         ];
 
-        if ($meta !== []) {
+        if ([] !== $meta) {
             $response['meta'] = $meta;
         }
 
@@ -113,7 +116,7 @@ class ResponseBuilderService
     }
 
     /**
-     * Add deprecation headers to response
+     * Add deprecation headers to response.
      */
     public function addDeprecationHeaders(JsonResponse $response): JsonResponse
     {

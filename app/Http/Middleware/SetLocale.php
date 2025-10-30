@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
@@ -12,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SetLocale
 {
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, \Closure $next): Response
     {
         $locale = $this->determineLocale($request);
         $validatedLocale = $this->validateLocale($locale);
@@ -21,7 +20,7 @@ class SetLocale
         Session::put('locale', $validatedLocale);
 
         $response = $next($request);
-        if (! ($response instanceof Response)) {
+        if (! $response instanceof Response) {
             throw new \RuntimeException('Middleware must return Response instance');
         }
 
@@ -35,7 +34,7 @@ class SetLocale
             ?? $request->header('Accept-Language')
             ?? config('app.locale');
 
-        $locale = is_string($locale) ? $locale : 'en';
+        $locale = \is_string($locale) ? $locale : 'en';
 
         return $this->extractPrimaryLanguage($locale);
     }
@@ -56,7 +55,7 @@ class SetLocale
     {
         $supportedLocales = ['en', 'ar', 'fr', 'es', 'de'];
 
-        if (! in_array($locale, $supportedLocales)) {
+        if (! \in_array($locale, $supportedLocales, true)) {
             return config('app.fallback_locale', 'en');
         }
 

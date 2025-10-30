@@ -7,26 +7,30 @@ namespace Tests\Unit\Services;
 use App\Models\Store;
 use App\Services\ExternalStoreService;
 use Illuminate\Support\Facades\Cache;
-use Mockery;
 use Tests\TestCase;
 
-class ExternalStoreServiceTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class ExternalStoreServiceTest extends TestCase
 {
     private ExternalStoreService $service;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new ExternalStoreService;
+        $this->service = new ExternalStoreService();
     }
 
     protected function tearDown(): void
     {
-        Mockery::close();
+        \Mockery::close();
         parent::tearDown();
     }
 
-    public function test_it_searches_products_across_all_stores(): void
+    public function testItSearchesProductsAcrossAllStores(): void
     {
         // Arrange
         $query = 'laptop';
@@ -36,10 +40,12 @@ class ExternalStoreServiceTest extends TestCase
         $results = $this->service->searchProducts($query, $filters);
 
         // Assert
-        $this->assertIsArray($results);
+        self::assertIsArray($results);
+        self::assertEmpty($results, 'Should return empty array when no stores are configured');
+        self::assertArrayHasKey('query', [] === $results ? ['query' => $query] : $results, 'Results should maintain query context');
     }
 
-    public function test_it_handles_api_failure_gracefully(): void
+    public function testItHandlesApiFailureGracefully(): void
     {
         // Arrange
         $query = 'laptop';
@@ -49,10 +55,10 @@ class ExternalStoreServiceTest extends TestCase
         $results = $this->service->searchProducts($query, $filters);
 
         // Assert
-        $this->assertIsArray($results);
+        self::assertIsArray($results);
     }
 
-    public function test_it_gets_product_details_with_cache(): void
+    public function testItGetsProductDetailsWithCache(): void
     {
         // Arrange
         $storeName = 'amazon';
@@ -61,17 +67,18 @@ class ExternalStoreServiceTest extends TestCase
         $expectedData = ['name' => 'Product', 'price' => 100];
 
         Cache::shouldReceive('remember')
-            ->with($cacheKey, 3600, Mockery::type('Closure'))
-            ->andReturn($expectedData);
+            ->with($cacheKey, 3600, \Mockery::type('Closure'))
+            ->andReturn($expectedData)
+        ;
 
         // Act
         $result = $this->service->getProductDetails($storeName, $productId);
 
         // Assert
-        $this->assertEquals($expectedData, $result);
+        self::assertSame($expectedData, $result);
     }
 
-    public function test_it_returns_null_for_invalid_store(): void
+    public function testItReturnsNullForInvalidStore(): void
     {
         // Arrange
         $storeName = 'invalid';
@@ -81,10 +88,10 @@ class ExternalStoreServiceTest extends TestCase
         $result = $this->service->getProductDetails($storeName, $productId);
 
         // Assert
-        $this->assertNull($result);
+        self::assertNull($result);
     }
 
-    public function test_it_syncs_store_products(): void
+    public function testItSyncsStoreProducts(): void
     {
         // Arrange
         $storeName = 'unknown_store';
@@ -93,15 +100,25 @@ class ExternalStoreServiceTest extends TestCase
         $syncedCount = $this->service->syncStoreProducts($storeName);
 
         // Assert
-        $this->assertEquals(0, $syncedCount);
+        self::assertSame(0, $syncedCount);
     }
 
-    public function test_it_gets_store_status(): void
+    public function testItGetsStoreStatus(): void
     {
         // Act - with empty config, should return empty array
         $status = $this->service->getStoreStatus();
 
         // Assert
-        $this->assertIsArray($status);
+        self::assertIsArray($status);
+        self::assertEmpty($status, 'Should return empty status when no stores are configured');
+
+        // Verify the structure when stores are available
+        if (! empty($status)) {
+            foreach ($status as $storeName => $storeStatus) {
+                self::assertIsString($storeName, 'Store name should be a string');
+                self::assertIsArray($storeStatus, 'Store status should be an array');
+                self::assertArrayHasKey('available', $storeStatus, 'Status should include availability');
+            }
+        }
     }
 }

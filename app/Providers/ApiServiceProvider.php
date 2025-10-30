@@ -11,7 +11,7 @@ use App\Services\Api\ResponseBuilderService;
 use Illuminate\Support\ServiceProvider;
 
 /**
- * Service provider for API services
+ * Service provider for API services.
  */
 class ApiServiceProvider extends ServiceProvider
 {
@@ -26,9 +26,4 @@ class ApiServiceProvider extends ServiceProvider
         $this->app->singleton(RequestParameterService::class);
         $this->app->singleton(ApiInfoService::class);
     }
-
-    /**
-     * Bootstrap services.
-     */
-    public function boot(): void {}
 }

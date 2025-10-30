@@ -4,15 +4,23 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Middleware;
 
+use App\Http\Middleware\Authenticate;
+use App\Models\User;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\TestCase;
 
 /**
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class AuthenticateTest extends TestCase
+final class AuthenticateTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -26,56 +34,56 @@ class AuthenticateTest extends TestCase
         $this->app->instance(AuthFactory::class, $authFactoryMock);
     }
 
-    public function test_authenticate_middleware_redirects_web_requests_to_login(): void
+    public function testAuthenticateMiddlewareRedirectsWebRequestsToLogin(): void
     {
         $request = Request::create('/dashboard', 'GET');
         $request->headers->set('Accept', 'text/html');
 
-        $middleware = new \App\Http\Middleware\Authenticate($this->app[AuthFactory::class]);
+        $middleware = new Authenticate($this->app[AuthFactory::class]);
 
         // Mock the unauthenticated method to avoid actual redirect
-        $this->expectException(\Symfony\Component\HttpKernel\Exception\HttpException::class);
+        $this->expectException(HttpException::class);
 
-        $middleware->handle($request, function ($req) {
+        $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
     }
 
-    public function test_authenticate_middleware_returns_json_for_api_requests(): void
+    public function testAuthenticateMiddlewareReturnsJsonForApiRequests(): void
     {
         $request = Request::create('/api/user', 'GET');
         $request->headers->set('Accept', 'application/json');
 
-        $middleware = new \App\Http\Middleware\Authenticate($this->app[AuthFactory::class]);
+        $middleware = new Authenticate($this->app[AuthFactory::class]);
 
-        $this->expectException(\Symfony\Component\HttpKernel\Exception\HttpException::class);
+        $this->expectException(HttpException::class);
 
-        $middleware->handle($request, function ($req) {
+        $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
     }
 
-    public function test_authenticate_middleware_handles_api_route_pattern(): void
+    public function testAuthenticateMiddlewareHandlesApiRoutePattern(): void
     {
         $request = Request::create('/api/v1/users', 'GET');
         $request->headers->set('Accept', 'application/json');
 
-        $middleware = new \App\Http\Middleware\Authenticate($this->app[AuthFactory::class]);
+        $middleware = new Authenticate($this->app[AuthFactory::class]);
 
-        $this->expectException(\Symfony\Component\HttpKernel\Exception\HttpException::class);
+        $this->expectException(HttpException::class);
 
-        $middleware->handle($request, function ($req) {
+        $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
     }
 
-    public function test_authenticate_middleware_passes_authenticated_requests(): void
+    public function testAuthenticateMiddlewarePassesAuthenticatedRequests(): void
     {
-        $user = \App\Models\User::factory()->create();
+        $user = User::factory()->create();
         $this->actingAs($user);
 
         // Mock the auth factory to return a guard that checks as authenticated
-        $guardMock = $this->mock(\Illuminate\Contracts\Auth\Guard::class);
+        $guardMock = $this->mock(Guard::class);
         $guardMock->shouldReceive('check')->andReturn(true);
         $guardMock->shouldReceive('user')->andReturn($user);
 
@@ -84,27 +92,27 @@ class AuthenticateTest extends TestCase
         $authFactoryMock->shouldReceive('shouldUse')->andReturn($guardMock);
 
         $request = Request::create('/dashboard', 'GET');
-        $request->setUserResolver(fn () => $user);
+        $request->setUserResolver(static fn () => $user);
 
-        $middleware = new \App\Http\Middleware\Authenticate($authFactoryMock);
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new Authenticate($authFactoryMock);
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('OK', $response->getContent());
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('OK', $response->getContent());
     }
 
-    public function test_authenticate_middleware_handles_different_request_types(): void
+    public function testAuthenticateMiddlewareHandlesDifferentRequestTypes(): void
     {
         $request = Request::create('/dashboard', 'GET');
         $request->headers->set('Accept', 'text/html');
 
-        $middleware = new \App\Http\Middleware\Authenticate($this->app[AuthFactory::class]);
+        $middleware = new Authenticate($this->app[AuthFactory::class]);
 
-        $this->expectException(\Symfony\Component\HttpKernel\Exception\HttpException::class);
+        $this->expectException(HttpException::class);
 
-        $middleware->handle($request, function ($req) {
+        $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
     }

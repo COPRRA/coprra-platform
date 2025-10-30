@@ -8,36 +8,41 @@ use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 #[PreserveGlobalState(false)]
-class PerformanceBenchmark extends TestCase
+final class PerformanceBenchmark extends TestCase
 {
     #[Test]
-    public function database_query_performance(): void
+    public function databaseQueryPerformance(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function api_response_time(): void
+    public function apiResponseTime(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function memory_usage(): void
+    public function memoryUsage(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function concurrent_requests(): void
+    public function concurrentRequests(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function cache_performance(): void
+    public function cachePerformance(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 }

@@ -9,19 +9,19 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
 /**
- * @property int $id
- * @property string $event_type
- * @property string $event_name
+ * @property int      $id
+ * @property string   $event_type
+ * @property string   $event_name
  * @property int|null $user_id
  * @property int|null $product_id
  * @property int|null $category_id
  * @property int|null $store_id
- * @property array<string, string|int|null>|null $metadata
+ ** @property array<string, string|int|* @method static \App\Models\Brand create(array<string, string|bool|null>|null $metadata
  * @property string|null $ip_address
  * @property string|null $user_agent
  * @property string|null $session_id
- * @property Carbon $created_at
- * @property Carbon $updated_at
+ * @property Carbon      $created_at
+ * @property Carbon      $updated_at
  */
 class AnalyticsEvent extends Model
 {
@@ -71,60 +71,4 @@ class AnalyticsEvent extends Model
     protected $casts = [
         'metadata' => 'array',
     ];
-
-    /**
-     * Relationships.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<Product, AnalyticsEvent>
-     */
-    public function product(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(Product::class);
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<User, AnalyticsEvent>
-     */
-    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<Category, AnalyticsEvent>
-     */
-    public function category(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(Category::class);
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<Store, AnalyticsEvent>
-     */
-    public function store(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(Store::class);
-    }
-
-    /**
-     * Scopes.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder<AnalyticsEvent>  $query
-     *
-     * @psalm-return \Illuminate\Database\Eloquent\Builder<self>
-     */
-    public function scopeOfType(\Illuminate\Database\Eloquent\Builder $query, string $type): \Illuminate\Database\Eloquent\Builder
-    {
-        return $query->where('event_type', $type);
-    }
-
-    /**
-     * @param  \Illuminate\Database\Eloquent\Builder<AnalyticsEvent>  $query
-     *
-     * @psalm-return \Illuminate\Database\Eloquent\Builder<self>
-     */
-    public function scopeRecent(\Illuminate\Database\Eloquent\Builder $query, int $days): \Illuminate\Database\Eloquent\Builder
-    {
-        return $query->where('created_at', '>=', now()->subDays($days));
-    }
 }

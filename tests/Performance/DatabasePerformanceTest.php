@@ -6,23 +6,13 @@ namespace Tests\Performance;
 
 use Tests\TestCase;
 
-class DatabasePerformanceTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class DatabasePerformanceTest extends TestCase
 {
-    public function test_database_query_performance(): void
-    {
-        $this->assertTrue(true);
-    }
-
-    public function test_database_connection_performance(): void
-    {
-        $this->assertTrue(true);
-    }
-
-    public function test_database_transaction_performance(): void
-    {
-        $this->assertTrue(true);
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -31,5 +21,20 @@ class DatabasePerformanceTest extends TestCase
     protected function tearDown(): void
     {
         parent::tearDown();
+    }
+
+    public function testDatabaseQueryPerformance(): void
+    {
+        self::assertTrue(true);
+    }
+
+    public function testDatabaseConnectionPerformance(): void
+    {
+        self::assertTrue(true);
+    }
+
+    public function testDatabaseTransactionPerformance(): void
+    {
+        self::assertTrue(true);
     }
 }

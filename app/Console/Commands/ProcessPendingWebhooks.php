@@ -7,6 +7,7 @@ namespace App\Console\Commands;
 use App\Models\Webhook;
 use App\Services\WebhookService;
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * @property string $signature
@@ -45,7 +46,10 @@ final class ProcessPendingWebhooks extends Command
         return self::SUCCESS;
     }
 
-    private function getWebhooksToProcess(int $limit, bool $retryFailed): \Illuminate\Database\Eloquent\Collection
+    /**
+     * @return Collection<int, Webhook>
+     */
+    private function getWebhooksToProcess(int $limit, bool $retryFailed): Collection
     {
         $query = Webhook::where('status', Webhook::STATUS_PENDING)->orderBy('created_at');
 
@@ -56,7 +60,10 @@ final class ProcessPendingWebhooks extends Command
         return $query->limit($limit)->get();
     }
 
-    private function handleEmptyWebhooks(\Illuminate\Database\Eloquent\Collection $webhooks): bool
+    /**
+     * @param Collection<int, Webhook> $webhooks
+     */
+    private function handleEmptyWebhooks(Collection $webhooks): bool
     {
         if ($webhooks->isEmpty()) {
             $this->info('✅ No pending webhooks to process.');
@@ -69,8 +76,10 @@ final class ProcessPendingWebhooks extends Command
 
     /**
      * Process the given webhooks.
+     *
+     * @param Collection<int, Webhook> $webhooks
      */
-    private function processWebhooks(\Illuminate\Database\Eloquent\Collection $webhooks, WebhookService $webhookService): void
+    private function processWebhooks(Collection $webhooks, WebhookService $webhookService): void
     {
         $webhookCount = $webhooks->count();
         $this->info("Found {$webhookCount} webhooks to process.");
@@ -84,9 +93,9 @@ final class ProcessPendingWebhooks extends Command
         foreach ($webhooks as $webhook) {
             try {
                 $webhookService->processWebhook($webhook);
-                $processed++;
+                ++$processed;
             } catch (\Throwable $exception) {
-                $failed++;
+                ++$failed;
                 $this->error("\nFailed to process webhook {$webhook->id}: {$exception->getMessage()}");
             }
 

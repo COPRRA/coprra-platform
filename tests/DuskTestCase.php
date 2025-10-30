@@ -11,7 +11,12 @@ use Illuminate\Support\Collection;
 use Laravel\Dusk\TestCase as BaseTestCase;
 use PHPUnit\Framework\Attributes\BeforeClass;
 
-class DuskTestCase extends BaseTestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class DuskTestCase extends BaseTestCase
 {
     use CreatesApplication;
 
@@ -23,12 +28,12 @@ class DuskTestCase extends BaseTestCase
     {
         // Skip starting local ChromeDriver if an external driver URL is provided
         $driverUrl = $_ENV['DUSK_DRIVER_URL'] ?? ($_SERVER['DUSK_DRIVER_URL'] ?? null);
-        if (is_string($driverUrl) && $driverUrl !== '') {
+        if (\is_string($driverUrl) && '' !== $driverUrl) {
             return;
         }
 
-        if (! static::runningInSail()) {
-            static::startChromeDriver(['--port=9515']);
+        if (! self::runningInSail()) {
+            self::startChromeDriver(['--port=9515']);
         }
     }
 
@@ -37,7 +42,7 @@ class DuskTestCase extends BaseTestCase
      */
     protected function driver(): RemoteWebDriver
     {
-        $options = (new ChromeOptions)->addArguments(collect([
+        $options = (new ChromeOptions())->addArguments(collect([
             $this->shouldStartMaximized() ? '--start-maximized' : '--window-size=1920,1080',
             '--disable-search-engine-choice-screen',
             '--disable-smooth-scrolling',
@@ -45,7 +50,7 @@ class DuskTestCase extends BaseTestCase
             '--ignore-ssl-errors',
             '--ignore-certificate-errors-spki-list',
             '--disable-web-security',
-        ])->unless($this->hasHeadlessDisabled(), function (Collection $items) {
+        ])->unless($this->hasHeadlessDisabled(), static function (Collection $items) {
             return $items->merge([
                 '--disable-gpu',
                 '--headless=new',
@@ -53,7 +58,7 @@ class DuskTestCase extends BaseTestCase
         })->all());
 
         $driverUrl = $_ENV['DUSK_DRIVER_URL'] ?? config('dusk.driver_url') ?? 'http://localhost:9515';
-        $driverUrl = is_string($driverUrl) ? $driverUrl : 'http://localhost:9515';
+        $driverUrl = \is_string($driverUrl) ? $driverUrl : 'http://localhost:9515';
 
         return RemoteWebDriver::create(
             $driverUrl,

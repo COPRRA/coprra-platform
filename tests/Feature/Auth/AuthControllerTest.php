@@ -10,11 +10,16 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Tests\TestCase;
 
-class AuthControllerTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class AuthControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_user_can_login_with_valid_credentials(): void
+    public function testUserCanLoginWithValidCredentials(): void
     {
         $user = User::factory()->create([
             'email' => 'test@example.com',
@@ -30,7 +35,7 @@ class AuthControllerTest extends TestCase
         $this->assertAuthenticatedAs($user);
     }
 
-    public function test_user_cannot_login_with_invalid_credentials(): void
+    public function testUserCannotLoginWithInvalidCredentials(): void
     {
         User::factory()->create([
             'email' => 'test@example.com',
@@ -46,7 +51,7 @@ class AuthControllerTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_user_can_register_with_valid_data(): void
+    public function testUserCanRegisterWithValidData(): void
     {
         $response = $this->post('/register', [
             'name' => 'Test User',
@@ -63,7 +68,7 @@ class AuthControllerTest extends TestCase
         $this->assertAuthenticated();
     }
 
-    public function test_user_cannot_register_with_weak_password(): void
+    public function testUserCannotRegisterWithWeakPassword(): void
     {
         $response = $this->post('/register', [
             'name' => 'Test User',
@@ -76,7 +81,7 @@ class AuthControllerTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_user_cannot_register_with_existing_email(): void
+    public function testUserCannotRegisterWithExistingEmail(): void
     {
         User::factory()->create(['email' => 'existing@example.com']);
 
@@ -91,7 +96,7 @@ class AuthControllerTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_user_can_logout(): void
+    public function testUserCanLogout(): void
     {
         $user = User::factory()->create();
         $this->actingAs($user);
@@ -102,7 +107,7 @@ class AuthControllerTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_user_can_request_password_reset(): void
+    public function testUserCanRequestPasswordReset(): void
     {
         $user = User::factory()->create(['email' => 'test@example.com']);
 
@@ -111,10 +116,10 @@ class AuthControllerTest extends TestCase
         ]);
 
         // Accept either success status or redirect as valid responses
-        $this->assertContains($response->status(), [200, 302, 422]);
+        self::assertContains($response->status(), [200, 302, 422]);
     }
 
-    public function test_user_can_reset_password_with_valid_token(): void
+    public function testUserCanResetPasswordWithValidToken(): void
     {
         $user = User::factory()->create(['email' => 'test@example.com']);
         $token = Password::createToken($user);
@@ -127,10 +132,10 @@ class AuthControllerTest extends TestCase
         ]);
 
         $response->assertRedirect('/login');
-        $this->assertTrue(Hash::check('NewPassword123!', $user->fresh()->password));
+        self::assertTrue(Hash::check('NewPassword123!', $user->fresh()->password));
     }
 
-    public function test_login_is_rate_limited(): void
+    public function testLoginIsRateLimited(): void
     {
         $user = User::factory()->create([
             'email' => 'test@example.com',
@@ -138,7 +143,7 @@ class AuthControllerTest extends TestCase
         ]);
 
         // Attempt login 6 times (limit is 5)
-        for ($i = 0; $i < 6; $i++) {
+        for ($i = 0; $i < 6; ++$i) {
             $this->post('/login', [
                 'email' => 'test@example.com',
                 'password' => 'wrong-password',
@@ -153,10 +158,10 @@ class AuthControllerTest extends TestCase
         $response->assertStatus(429); // Too Many Requests
     }
 
-    public function test_register_is_rate_limited(): void
+    public function testRegisterIsRateLimited(): void
     {
         // Attempt register 4 times (limit is 3)
-        for ($i = 0; $i < 4; $i++) {
+        for ($i = 0; $i < 4; ++$i) {
             $this->post('/register', [
                 'name' => "User {$i}",
                 'email' => "user{$i}@example.com",
@@ -175,7 +180,7 @@ class AuthControllerTest extends TestCase
         $response->assertStatus(429); // Too Many Requests
     }
 
-    public function test_password_uses_hash_make_not_bcrypt(): void
+    public function testPasswordUsesHashMakeNotBcrypt(): void
     {
         $response = $this->post('/register', [
             'name' => 'Test User',
@@ -185,10 +190,10 @@ class AuthControllerTest extends TestCase
         ]);
 
         $user = User::where('email', 'test@example.com')->first();
-        $this->assertNotNull($user);
+        self::assertNotNull($user);
 
         // Verify password is hashed correctly
-        $this->assertTrue(Hash::check('Password123!', $user->password));
-        $this->assertStringStartsWith('$2y$', $user->password); // Bcrypt format
+        self::assertTrue(Hash::check('Password123!', $user->password));
+        self::assertStringStartsWith('$2y$', $user->password); // Bcrypt format
     }
 }

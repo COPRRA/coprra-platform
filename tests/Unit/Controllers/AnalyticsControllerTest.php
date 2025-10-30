@@ -7,13 +7,10 @@ namespace Tests\Unit\Controllers;
 use App\Http\Controllers\AnalyticsController;
 use App\Models\User;
 use App\Services\BehaviorAnalysisService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-use Mockery;
-use Mockery\LegacyMockInterface;
 use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversMethod;
@@ -21,7 +18,7 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use Tests\TestCase;
 
 /**
- * Analytics Controller Test Suite
+ * Analytics Controller Test Suite.
  *
  * Tests the AnalyticsController functionality including:
  * - User analytics retrieval
@@ -29,6 +26,8 @@ use Tests\TestCase;
  * - Behavior tracking
  * - Authentication checks
  * - Error handling and exceptions
+ *
+ * @internal
  */
 #[CoversClass(AnalyticsController::class)]
 #[UsesClass(BehaviorAnalysisService::class)]
@@ -36,195 +35,196 @@ use Tests\TestCase;
 #[CoversMethod(AnalyticsController::class, 'userAnalytics')]
 #[CoversMethod(AnalyticsController::class, 'siteAnalytics')]
 #[CoversMethod(AnalyticsController::class, 'trackBehavior')]
-class AnalyticsControllerTest extends TestCase
+final class AnalyticsControllerTest extends TestCase
 {
-    use RefreshDatabase;
-
     private AnalyticsController $controller;
-
     private BehaviorAnalysisService|MockInterface $serviceMock;
-
     private User $user;
-
-    private Request|LegacyMockInterface $requestMock;
+    private MockInterface|Request $requestMock;
 
     /**
-     * Set up test environment before each test
+     * Set up test environment before each test.
      */
     protected function setUp(): void
     {
         parent::setUp();
 
-        /** @var BehaviorAnalysisService&MockInterface */
-        $this->serviceMock = Mockery::mock(BehaviorAnalysisService::class);
+        // Create service mock with proper type annotation
+        $this->serviceMock = \Mockery::mock(BehaviorAnalysisService::class);
         $this->controller = new AnalyticsController($this->serviceMock);
-        $this->user = User::factory()->create();
 
-        /** @var Request&LegacyMockInterface $requestMock */
-        $requestMock = Mockery::mock(Request::class)->makePartial();
-        $this->requestMock = $requestMock;
+        // Create a real User instance for testing (no database needed for unit tests)
+        $this->user = new User([
+            'id' => 1,
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+        ]);
+        $this->user->id = 1; // Set ID explicitly for testing
+
+        // Create request mock with proper type annotation
+        $this->requestMock = \Mockery::mock(Request::class);
     }
 
     /**
-     * Clean up test environment after each test
+     * Clean up test environment after each test.
      */
     protected function tearDown(): void
     {
-        Mockery::close();
+        \Mockery::close();
         parent::tearDown();
     }
 
     /**
-     * Test that userAnalytics returns analytics for authenticated user
+     * Test that userAnalytics returns analytics for authenticated user.
      */
-    public function test_user_analytics_returns_analytics_for_authenticated_user(): void
+    public function testUserAnalyticsReturnsAnalyticsForAuthenticatedUser(): void
     {
         // Arrange
         $analyticsData = ['key' => 'value'];
 
-        /** @phpstan-ignore method.nonObject */
         $this->serviceMock->shouldReceive('getUserAnalytics')
             ->with($this->user)
             ->once()
-            ->andReturn($analyticsData);
+            ->andReturn($analyticsData)
+        ;
 
-        /** @phpstan-ignore method.nonObject */
         $this->requestMock->shouldReceive('user')
-            ->andReturn($this->user);
+            ->andReturn($this->user)
+        ;
 
         // Act
         $response = $this->controller->userAnalytics($this->requestMock);
 
         // Assert
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals(['analytics' => $analyticsData], $response->getData(true));
+        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(['analytics' => $analyticsData], $response->getData(true));
     }
 
     /**
-     * Test that userAnalytics returns unauthorized for unauthenticated user
+     * Test that userAnalytics returns unauthorized for unauthenticated user.
      */
-    public function test_user_analytics_returns_unauthorized_for_unauthenticated_user(): void
+    public function testUserAnalyticsReturnsUnauthorizedForUnauthenticatedUser(): void
     {
         // Arrange
-        /** @phpstan-ignore method.nonObject */
         $this->requestMock->shouldReceive('user')
-            ->andReturn(null);
+            ->andReturn(null)
+        ;
 
         // Act
         $response = $this->controller->userAnalytics($this->requestMock);
 
         // Assert
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals(401, $response->getStatusCode());
-        $this->assertEquals(['error' => 'Unauthorized'], $response->getData(true));
+        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertSame(401, $response->getStatusCode());
+        self::assertSame(['error' => 'Unauthorized'], $response->getData(true));
     }
 
     /**
-     * Test that siteAnalytics returns site analytics data
+     * Test that siteAnalytics returns site analytics data.
      */
-    public function test_site_analytics_returns_site_analytics(): void
+    public function testSiteAnalyticsReturnsSiteAnalytics(): void
     {
         // Arrange
         $analyticsData = ['site_key' => 'site_value'];
 
-        /** @phpstan-ignore method.nonObject */
         $this->serviceMock->shouldReceive('getSiteAnalytics')
             ->once()
-            ->andReturn($analyticsData);
+            ->andReturn($analyticsData)
+        ;
 
         // Act
         $response = $this->controller->siteAnalytics();
 
         // Assert
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals(['analytics' => $analyticsData], $response->getData(true));
+        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(['analytics' => $analyticsData], $response->getData(true));
     }
 
     /**
-     * Test that trackBehavior returns success for valid authenticated request
+     * Test that trackBehavior returns success for valid authenticated request.
      */
-    public function test_track_behavior_returns_success_for_valid_authenticated_request(): void
+    public function testTrackBehaviorReturnsSuccessForValidAuthenticatedRequest(): void
     {
         // Arrange
         $action = 'test_action';
         $data = ['key' => 'value'];
         $validated = ['action' => $action, 'data' => $data];
 
-        /** @phpstan-ignore method.nonObject */
         $this->requestMock->shouldReceive('validate')
             ->with([
                 'action' => 'required|string|max:50',
                 'data' => 'nullable|array',
             ])
-            ->andReturn($validated);
+            ->andReturn($validated)
+        ;
 
-        /** @phpstan-ignore method.nonObject */
         $this->requestMock->shouldReceive('user')
-            ->andReturn($this->user);
+            ->andReturn($this->user)
+        ;
 
-        /** @phpstan-ignore method.nonObject */
         $this->serviceMock->shouldReceive('trackUserBehavior')
             ->with($this->user, $action, $data)
-            ->once();
+            ->once()
+        ;
 
         // Act
         $response = $this->controller->trackBehavior($this->requestMock);
 
         // Assert
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals([
+        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame([
             'success' => true,
             'message' => 'تم تسجيل السلوك بنجاح',
         ], $response->getData(true));
     }
 
     /**
-     * Test that trackBehavior returns unauthorized for unauthenticated user
+     * Test that trackBehavior returns unauthorized for unauthenticated user.
      */
-    public function test_track_behavior_returns_unauthorized_for_unauthenticated_user(): void
+    public function testTrackBehaviorReturnsUnauthorizedForUnauthenticatedUser(): void
     {
         // Arrange
         $validated = ['action' => 'test', 'data' => []];
 
-        /** @phpstan-ignore method.nonObject */
         $this->requestMock->shouldReceive('validate')
             ->with([
                 'action' => 'required|string|max:50',
                 'data' => 'nullable|array',
             ])
-            ->andReturn($validated);
+            ->andReturn($validated)
+        ;
 
-        /** @phpstan-ignore method.nonObject */
         $this->requestMock->shouldReceive('user')
-            ->andReturn(null);
+            ->andReturn(null)
+        ;
 
         // Act
         $response = $this->controller->trackBehavior($this->requestMock);
 
         // Assert
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals(401, $response->getStatusCode());
-        $this->assertEquals(['error' => 'Unauthorized'], $response->getData(true));
+        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertSame(401, $response->getStatusCode());
+        self::assertSame(['error' => 'Unauthorized'], $response->getData(true));
     }
 
     /**
-     * Test that trackBehavior fails validation for invalid action
+     * Test that trackBehavior fails validation for invalid action.
      */
-    public function test_track_behavior_fails_validation_for_invalid_action(): void
+    public function testTrackBehaviorFailsValidationForInvalidAction(): void
     {
         // Arrange
         $validator = Validator::make([], ['action' => 'required']);
 
-        /** @phpstan-ignore method.nonObject */
         $this->requestMock->shouldReceive('validate')
             ->with([
                 'action' => 'required|string|max:50',
                 'data' => 'nullable|array',
             ])
-            ->andThrow(new ValidationException($validator));
+            ->andThrow(new ValidationException($validator))
+        ;
 
         // Act & Assert
         $this->expectException(ValidationException::class);
@@ -232,20 +232,20 @@ class AnalyticsControllerTest extends TestCase
     }
 
     /**
-     * Test that userAnalytics throws exception when service fails
+     * Test that userAnalytics throws exception when service fails.
      */
-    public function test_user_analytics_throws_exception_when_service_fails(): void
+    public function testUserAnalyticsThrowsExceptionWhenServiceFails(): void
     {
         // Arrange
-        /** @phpstan-ignore method.nonObject */
         $this->serviceMock->shouldReceive('getUserAnalytics')
             ->with($this->user)
             ->once()
-            ->andThrow(new \Exception('Service error'));
+            ->andThrow(new \Exception('Service error'))
+        ;
 
-        /** @phpstan-ignore method.nonObject */
         $this->requestMock->shouldReceive('user')
-            ->andReturn($this->user);
+            ->andReturn($this->user)
+        ;
 
         // Act & Assert
         $this->expectException(\Exception::class);
@@ -253,15 +253,15 @@ class AnalyticsControllerTest extends TestCase
     }
 
     /**
-     * Test that siteAnalytics throws exception when service fails
+     * Test that siteAnalytics throws exception when service fails.
      */
-    public function test_site_analytics_throws_exception_when_service_fails(): void
+    public function testSiteAnalyticsThrowsExceptionWhenServiceFails(): void
     {
         // Arrange
-        /** @phpstan-ignore method.nonObject */
         $this->serviceMock->shouldReceive('getSiteAnalytics')
             ->once()
-            ->andThrow(new \Exception('Service error'));
+            ->andThrow(new \Exception('Service error'))
+        ;
 
         // Act & Assert
         $this->expectException(\Exception::class);
@@ -269,28 +269,27 @@ class AnalyticsControllerTest extends TestCase
     }
 
     /**
-     * Test that trackBehavior throws exception when service fails
+     * Test that trackBehavior throws exception when service fails.
      */
-    public function test_track_behavior_throws_exception_when_service_fails(): void
+    public function testTrackBehaviorThrowsExceptionWhenServiceFails(): void
     {
         // Arrange
         $action = 'test_action';
         $data = ['key' => 'value'];
         $validated = ['action' => $action, 'data' => $data];
 
-        /** @phpstan-ignore method.nonObject */
         $this->requestMock->shouldReceive('validate')
             ->with([
                 'action' => 'required|string|max:50',
                 'data' => 'nullable|array',
             ])
-            ->andReturn($validated);
+            ->andReturn($validated)
+        ;
 
-        /** @phpstan-ignore method.nonObject */
         $this->requestMock->shouldReceive('user')
-            ->andReturn($this->user);
+            ->andReturn($this->user)
+        ;
 
-        /** @phpstan-ignore method.nonObject */
         $this->serviceMock->shouldReceive('trackUserBehavior')
             ->with($this->user, $action, $data)
             ->once()

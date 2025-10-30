@@ -7,12 +7,12 @@ namespace App\Services\Api;
 use Illuminate\Http\Request;
 
 /**
- * Service for handling API utilities and information
+ * Service for handling API utilities and information.
  */
 class ApiInfoService
 {
     /**
-     * Get API version from request
+     * Get API version from request.
      *
      * @psalm-return '2.0'
      */
@@ -22,7 +22,7 @@ class ApiInfoService
     }
 
     /**
-     * Check API version compatibility
+     * Check API version compatibility.
      */
     public function checkApiVersion(): bool
     {
@@ -30,7 +30,7 @@ class ApiInfoService
     }
 
     /**
-     * Enhanced API documentation URL for v2
+     * Enhanced API documentation URL for v2.
      */
     public function getApiDocumentationUrl(): string
     {
@@ -38,7 +38,7 @@ class ApiInfoService
     }
 
     /**
-     * Get API changelog URL for v2
+     * Get API changelog URL for v2.
      */
     public function getApiChangelogUrl(): string
     {
@@ -46,7 +46,7 @@ class ApiInfoService
     }
 
     /**
-     * Get API migration guide URL
+     * Get API migration guide URL.
      */
     public function getApiMigrationGuideUrl(): string
     {
@@ -54,7 +54,7 @@ class ApiInfoService
     }
 
     /**
-     * Get API deprecation notices
+     * Get API deprecation notices.
      *
      * @return array<string>
      *
@@ -69,7 +69,7 @@ class ApiInfoService
     }
 
     /**
-     * Enhanced logging for v2
+     * Enhanced logging for v2.
      */
     public function logApiRequest(Request $request): void
     {

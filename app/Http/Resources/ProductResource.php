@@ -6,6 +6,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\MissingValue;
 
 /**
  * @mixin \App\Models\Product
@@ -15,9 +16,9 @@ class ProductResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @return array<\Illuminate\Http\Resources\MissingValue|array|int|mixed|string|null>
+     * @return array<\Illuminate\Http\Resources\MissingValue|array|int|mixed|string|* @method static \App\Models\Brand create(array<string, string|bool|null>
      *
-     * @psalm-return array{id: int, name: string, slug: string, description: string, price: string, compare_price: mixed|null, cost_price: mixed|null, barcode: mixed|null, quantity: int, is_featured: mixed|null, images: array<never, never>|mixed, rating: mixed|null, reviews_count: mixed, category: \Illuminate\Http\Resources\MissingValue|mixed}
+     * @psalm-return array{id: int, name: string, slug: string, description: string, price: string, compare_price: mixed|null, cost_price: mixed|null, barcode: mixed|null, quantity: int, is_featured: mixed|null, images: array<never, never>|mixed, rating: mixed|null, reviews_count: mixed, category: MissingValue|mixed}
      *
      * @SuppressWarnings("UnusedFormalParameter")
      */

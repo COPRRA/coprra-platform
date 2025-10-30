@@ -1,0 +1,9 @@
+C:\Users\Gaser\Desktop\COPRRA\app\Models\AuditLog.php:65       UnusedPrivateMethod  Avoid unused private methods such as 'normalizeAttributeToArray'.
+C:\Users\Gaser\Desktop\COPRRA\app\Models\AuditLog.php:101      UnusedPrivateMethod  Avoid unused private methods such as 'restoreEnumsInAttributes'.
+C:\Users\Gaser\Desktop\COPRRA\app\Models\Category.php:106      UnusedPrivateMethod  Avoid unused private methods such as 'handleCreatingEvent'.
+C:\Users\Gaser\Desktop\COPRRA\app\Models\Category.php:117      UnusedPrivateMethod  Avoid unused private methods such as 'handleUpdatingEvent'.
+C:\Users\Gaser\Desktop\COPRRA\app\Models\Notification.php:166  UnusedPrivateMethod  Avoid unused private methods such as 'processTags'.
+C:\Users\Gaser\Desktop\COPRRA\app\Models\OrderItem.php:116     UndefinedVariable    Avoid using undefined variables such as '$connName' which will lead to PHP notices.
+C:\Users\Gaser\Desktop\COPRRA\app\Models\OrderItem.php:127     UndefinedVariable    Avoid using undefined variables such as '$connName' which will lead to PHP notices.
+C:\Users\Gaser\Desktop\COPRRA\app\Models\OrderItem.php:139     UndefinedVariable    Avoid using undefined variables such as '$connName' which will lead to PHP notices.
+C:\Users\Gaser\Desktop\COPRRA\app\Models\OrderItem.php:150     UndefinedVariable    Avoid using undefined variables such as '$connName' which will lead to PHP notices.

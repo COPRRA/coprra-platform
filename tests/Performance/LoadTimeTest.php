@@ -6,23 +6,13 @@ namespace Tests\Performance;
 
 use Tests\TestCase;
 
-class LoadTimeTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class LoadTimeTest extends TestCase
 {
-    public function test_page_load_time(): void
-    {
-        $this->assertTrue(true);
-    }
-
-    public function test_asset_load_time(): void
-    {
-        $this->assertTrue(true);
-    }
-
-    public function test_api_load_time(): void
-    {
-        $this->assertTrue(true);
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -31,5 +21,20 @@ class LoadTimeTest extends TestCase
     protected function tearDown(): void
     {
         parent::tearDown();
+    }
+
+    public function testPageLoadTime(): void
+    {
+        self::assertTrue(true);
+    }
+
+    public function testAssetLoadTime(): void
+    {
+        self::assertTrue(true);
+    }
+
+    public function testApiLoadTime(): void
+    {
+        self::assertTrue(true);
     }
 }

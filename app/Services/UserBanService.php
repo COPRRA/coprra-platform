@@ -8,6 +8,8 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Psr\Log\LoggerInterface;
 
 final readonly class UserBanService
@@ -21,59 +23,57 @@ final readonly class UserBanService
         'other' => 'أسباب أخرى',
     ];
 
-    private AuthManager $auth;
-
-    private LoggerInterface $logger;
-
-    private User $user;
-
     public function __construct(
-        ?AuthManager $auth = null,
-        ?LoggerInterface $logger = null,
-        ?User $user = null
-    ) {
-        // Allow no-arg construction in tests
-        $this->auth = $auth ?? app('auth');
-        $this->logger = $logger ?? app('log');
-        $this->user = $user ?? new User;
-    }
+        private AuthManager $auth,
+        private LoggerInterface $logger,
+        private string $userModel = User::class
+    ) {}
 
     /**
      * Check if a user is currently banned.
      */
     public function isUserBanned(User $user): bool
     {
-        return $user->isBanned();
+        if (! $user->is_blocked) {
+            return false;
+        }
+
+        // If ban_expires_at is null, it's a permanent ban
+        if (null === $user->ban_expires_at) {
+            return true;
+        }
+
+        // Check if temporary ban has expired
+        return $user->ban_expires_at->isFuture();
     }
 
     /**
-     * Ban a user.
+     * Ban a user with specified reason and duration.
      */
-    public function banUser(
-        User $user,
-        string $reason,
-        ?string $description = null,
-        ?Carbon $expiresAt = null
-    ): bool {
+    public function banUser(User $user, string $reason, ?string $description = null, ?Carbon $expiresAt = null): bool
+    {
         if (! $this->isValidBanReason($reason)) {
             return false;
         }
 
-        $user->is_blocked = true;
-        $user->ban_reason = $reason;
-        $user->ban_description = $description;
-        $user->banned_at = now();
-        $user->ban_expires_at = $expiresAt;
-        $user->save();
+        if (! $this->canBanUser($user)) {
+            return false;
+        }
 
-        // Log ban action
+        $user->update([
+            'is_blocked' => true,
+            'ban_reason' => $reason,
+            'ban_description' => $description,
+            'ban_expires_at' => $expiresAt,
+            'banned_at' => now(),
+            'banned_by' => Auth::id(),
+        ]);
+
         $this->logger->info('User banned', [
             'user_id' => $user->id,
-            'email' => $user->email,
             'reason' => $reason,
-            'description' => $description,
-            'expires_at' => $expiresAt?->toISOString(),
-            'banned_by' => $this->auth->id(),
+            'expires_at' => $expiresAt?->toDateTimeString(),
+            'banned_by' => Auth::id(),
         ]);
 
         return true;
@@ -82,48 +82,44 @@ final readonly class UserBanService
     /**
      * Unban a user.
      */
-    public function unbanUser(User $user, ?string $reason = null): bool
+    public function unbanUser(User $user): bool
     {
-        $user->is_blocked = false;
-        $user->ban_reason = null;
-        $user->ban_description = null;
-        $user->banned_at = null;
-        $user->ban_expires_at = null;
-        $user->save();
+        if (! $this->canUnbanUser($user)) {
+            return false;
+        }
 
-        // Log unban action
-        $this->logger->info('User unbanned', [
+        $user->update([
+            'is_blocked' => false,
+            'ban_reason' => null,
+            'ban_description' => null,
+            'ban_expires_at' => null,
+            'unbanned_at' => now(),
+            'unbanned_by' => Auth::id(),
+        ]);
+
+        Log::info('User unbanned', [
             'user_id' => $user->id,
-            'email' => $user->email,
-            'reason' => $reason,
-            'unbanned_by' => $this->auth->id(),
+            'unbanned_by' => Auth::id(),
         ]);
 
         return true;
     }
 
     /**
-     * Get ban information.
-     *
-     * @return array<bool|string|null>|null
-     *
-     * @psalm-return array{is_banned: bool, reason: string|null, description: string|null, banned_at: string|null, expires_at: string|null, is_permanent: bool, reason_text: string}|null
+     * Get ban information for a user.
      */
     public function getBanInfo(User $user): ?array
     {
-        if (! $user->isBanned()) {
+        if (! $this->isUserBanned($user)) {
             return null;
         }
 
         return [
-            'is_banned' => $user->isBanned(),
             'reason' => $user->ban_reason,
             'description' => $user->ban_description,
-            'banned_at' => $user->banned_at ? (new Carbon($user->banned_at))->toISOString() : null,
-            'expires_at' => $user->ban_expires_at ?
-                (new Carbon($user->ban_expires_at))->toISOString() : null,
-            'is_permanent' => $user->ban_expires_at === null,
-            'reason_text' => self::BAN_REASONS[$user->ban_reason] ?? 'غير محدد',
+            'banned_at' => $user->banned_at,
+            'expires_at' => $user->ban_expires_at,
+            'is_permanent' => null === $user->ban_expires_at,
         ];
     }
 
@@ -134,12 +130,14 @@ final readonly class UserBanService
      */
     public function getBannedUsers(): Collection
     {
-        return $this->user->where('is_blocked', true)
+        return User::where('is_blocked', true)
             ->where(static function ($query): void {
                 $query->whereNull('ban_expires_at')
-                    ->orWhere('ban_expires_at', '>', now());
+                    ->orWhere('ban_expires_at', '>', now())
+                ;
             })
-            ->get();
+            ->get()
+        ;
     }
 
     /**
@@ -149,24 +147,24 @@ final readonly class UserBanService
      */
     public function getUsersWithExpiredBans(): Collection
     {
-        return $this->user->where('is_blocked', true)
+        return User::where('is_blocked', true)
             ->where('ban_expires_at', '<=', now())
-            ->get();
+            ->whereNotNull('ban_expires_at')
+            ->get()
+        ;
     }
 
     /**
-     * Clean up expired bans by unbanning users whose ban has expired.
-     *
-     * @psalm-return int<0, max>
+     * Clean up expired bans.
      */
     public function cleanupExpiredBans(): int
     {
-        $expired = $this->getUsersWithExpiredBans();
+        $expiredUsers = $this->getUsersWithExpiredBans();
         $count = 0;
 
-        foreach ($expired as $user) {
-            if ($this->unbanUser($user, 'expired')) {
-                $count++;
+        foreach ($expiredUsers as $user) {
+            if ($this->unbanUser($user)) {
+                ++$count;
             }
         }
 
@@ -176,11 +174,11 @@ final readonly class UserBanService
     /**
      * Get ban statistics.
      *
-     * @return array<string, int|array<string, string>>
+     * @return array<string, array<string, string>|int>
      */
     public function getBanStatistics(): array
     {
-        $bannedUsersQuery = $this->user->where('is_blocked', true);
+        $bannedUsersQuery = User::where('is_blocked', true);
 
         $totalBanned = $bannedUsersQuery->count();
         $permanentBans = (clone $bannedUsersQuery)->whereNull('ban_expires_at')->count();
@@ -197,66 +195,107 @@ final readonly class UserBanService
     }
 
     /**
-     * Get available ban reasons (keys).
+     * Get available ban reasons.
      *
-     * @return list<string>
+     * @return array<string, string>
      */
     public function getBanReasons(): array
     {
-        return array_keys(self::BAN_REASONS);
+        return self::BAN_REASONS;
     }
 
     /**
-     * Determine if a user can be banned.
+     * Check if a user can be banned.
      */
     public function canBanUser(User $user): bool
     {
-        return ! (bool) ($user->is_blocked ?? false);
+        // Can't ban if already banned
+        if ($this->isUserBanned($user)) {
+            return false;
+        }
+
+        // Add additional logic here if needed (e.g., role-based restrictions)
+        return true;
     }
 
     /**
-     * Determine if a user can be unbanned.
+     * Check if a user can be unbanned.
      */
     public function canUnbanUser(User $user): bool
     {
-        return (bool) ($user->is_blocked ?? false);
+        return $this->isUserBanned($user);
     }
 
     /**
-     * Get user's ban history.
+     * Get ban history for a user.
      *
-     * @psalm-return array<never, never>
+     * @return array<int, array<string, mixed>>
      */
-    public function getBanHistory(): array
+    public function getBanHistory(User $user): array
     {
-        // Placeholder: in real app, fetch from audit/logs table
-        return [];
+        // This would typically come from a ban_history table
+        // For now, return current ban info if exists
+        $banInfo = $this->getBanInfo($user);
+
+        return $banInfo ? [$banInfo] : [];
     }
 
     /**
-     * Extend user's ban duration.
+     * Extend a user's ban duration.
      */
-    public function extendBan(User $user): bool
+    public function extendBan(User $user, Carbon $newExpiry): bool
     {
-        // In real app, you would update expiry and persist
-        // $user->ban_expires_at = $newExpiry;
-        // $user->save();
-        return $user->ban_expires_at !== null;
+        if (! $this->isUserBanned($user)) {
+            return false;
+        }
+
+        // Can't extend a permanent ban
+        if (null === $user->ban_expires_at) {
+            return false;
+        }
+
+        $user->update([
+            'ban_expires_at' => $newExpiry,
+        ]);
+
+        $this->logger->info('Ban extended', [
+            'user_id' => $user->id,
+            'new_expiry' => $newExpiry->toDateTimeString(),
+            'extended_by' => Auth::id(),
+        ]);
+
+        return true;
     }
 
     /**
-     * Reduce user's ban duration.
+     * Reduce a user's ban duration.
      */
-    public function reduceBan(User $user): bool
+    public function reduceBan(User $user, Carbon $newExpiry): bool
     {
-        // In real app, you would update expiry and persist
-        // $user->ban_expires_at = $newExpiry;
-        // $user->save();
-        return $user->ban_expires_at !== null;
+        if (! $this->isUserBanned($user)) {
+            return false;
+        }
+
+        // Can't reduce a permanent ban
+        if (null === $user->ban_expires_at) {
+            return false;
+        }
+
+        $user->update([
+            'ban_expires_at' => $newExpiry,
+        ]);
+
+        $this->logger->info('Ban reduced', [
+            'user_id' => $user->id,
+            'new_expiry' => $newExpiry->toDateTimeString(),
+            'reduced_by' => Auth::id(),
+        ]);
+
+        return true;
     }
 
     private function isValidBanReason(string $reason): bool
     {
-        return $reason !== '' && array_key_exists($reason, self::BAN_REASONS);
+        return '' !== $reason && \array_key_exists($reason, self::BAN_REASONS);
     }
 }

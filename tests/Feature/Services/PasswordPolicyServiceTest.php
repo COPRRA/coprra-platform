@@ -8,10 +8,14 @@ use App\Services\PasswordPolicyService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Mockery;
 use Tests\TestCase;
 
-class PasswordPolicyServiceTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class PasswordPolicyServiceTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -20,16 +24,16 @@ class PasswordPolicyServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new PasswordPolicyService;
+        $this->service = new PasswordPolicyService();
     }
 
     protected function tearDown(): void
     {
-        Mockery::close();
+        \Mockery::close();
         parent::tearDown();
     }
 
-    public function test_validates_strong_password()
+    public function testValidatesStrongPassword()
     {
         // Arrange
         $password = 'MySecure123!Pass';
@@ -38,12 +42,12 @@ class PasswordPolicyServiceTest extends TestCase
         $result = $this->service->validatePassword($password);
 
         // Assert
-        $this->assertTrue($result['valid']);
-        $this->assertEmpty($result['errors']);
-        $this->assertArrayHasKey('strength', $result);
+        self::assertTrue($result['valid']);
+        self::assertEmpty($result['errors']);
+        self::assertArrayHasKey('strength', $result);
     }
 
-    public function test_validates_weak_password()
+    public function testValidatesWeakPassword()
     {
         // Arrange
         $password = 'weak';
@@ -52,12 +56,12 @@ class PasswordPolicyServiceTest extends TestCase
         $result = $this->service->validatePassword($password);
 
         // Assert
-        $this->assertFalse($result['valid']);
-        $this->assertNotEmpty($result['errors']);
-        $this->assertContains('Password must be at least 10 characters long', $result['errors']);
+        self::assertFalse($result['valid']);
+        self::assertNotEmpty($result['errors']);
+        self::assertContains('Password must be at least 10 characters long', $result['errors']);
     }
 
-    public function test_validates_password_without_uppercase()
+    public function testValidatesPasswordWithoutUppercase()
     {
         // Arrange
         $password = 'lowercase123!';
@@ -66,11 +70,11 @@ class PasswordPolicyServiceTest extends TestCase
         $result = $this->service->validatePassword($password);
 
         // Assert
-        $this->assertFalse($result['valid']);
-        $this->assertContains('Password must contain at least one uppercase letter', $result['errors']);
+        self::assertFalse($result['valid']);
+        self::assertContains('Password must contain at least one uppercase letter', $result['errors']);
     }
 
-    public function test_validates_password_without_lowercase()
+    public function testValidatesPasswordWithoutLowercase()
     {
         // Arrange
         $password = 'UPPERCASE123!';
@@ -79,11 +83,11 @@ class PasswordPolicyServiceTest extends TestCase
         $result = $this->service->validatePassword($password);
 
         // Assert
-        $this->assertFalse($result['valid']);
-        $this->assertContains('Password must contain at least one lowercase letter', $result['errors']);
+        self::assertFalse($result['valid']);
+        self::assertContains('Password must contain at least one lowercase letter', $result['errors']);
     }
 
-    public function test_validates_password_without_numbers()
+    public function testValidatesPasswordWithoutNumbers()
     {
         // Arrange
         $password = 'NoNumbers!';
@@ -92,11 +96,11 @@ class PasswordPolicyServiceTest extends TestCase
         $result = $this->service->validatePassword($password);
 
         // Assert
-        $this->assertFalse($result['valid']);
-        $this->assertContains('Password must contain at least one number', $result['errors']);
+        self::assertFalse($result['valid']);
+        self::assertContains('Password must contain at least one number', $result['errors']);
     }
 
-    public function test_validates_password_without_symbols()
+    public function testValidatesPasswordWithoutSymbols()
     {
         // Arrange
         $password = 'NoSymbols123';
@@ -105,11 +109,11 @@ class PasswordPolicyServiceTest extends TestCase
         $result = $this->service->validatePassword($password);
 
         // Assert
-        $this->assertTrue($result['valid']);
-        $this->assertEmpty($result['errors']);
+        self::assertTrue($result['valid']);
+        self::assertEmpty($result['errors']);
     }
 
-    public function test_validates_forbidden_password()
+    public function testValidatesForbiddenPassword()
     {
         // Arrange
         $password = 'password';
@@ -118,11 +122,11 @@ class PasswordPolicyServiceTest extends TestCase
         $result = $this->service->validatePassword($password);
 
         // Assert
-        $this->assertFalse($result['valid']);
-        $this->assertContains('Password is too common and not allowed', $result['errors']);
+        self::assertFalse($result['valid']);
+        self::assertContains('Password is too common and not allowed', $result['errors']);
     }
 
-    public function test_validates_password_with_repeated_characters()
+    public function testValidatesPasswordWithRepeatedCharacters()
     {
         // Arrange
         $password = 'aaa123!@#';
@@ -131,11 +135,11 @@ class PasswordPolicyServiceTest extends TestCase
         $result = $this->service->validatePassword($password);
 
         // Assert
-        $this->assertFalse($result['valid']);
-        $this->assertContains('Password contains repeated characters', $result['errors']);
+        self::assertFalse($result['valid']);
+        self::assertContains('Password contains repeated characters', $result['errors']);
     }
 
-    public function test_validates_password_with_keyboard_patterns()
+    public function testValidatesPasswordWithKeyboardPatterns()
     {
         // Arrange
         $password = 'qwerty123!';
@@ -144,11 +148,11 @@ class PasswordPolicyServiceTest extends TestCase
         $result = $this->service->validatePassword($password);
 
         // Assert
-        $this->assertFalse($result['valid']);
-        $this->assertContains('Password contains keyboard patterns', $result['errors']);
+        self::assertFalse($result['valid']);
+        self::assertContains('Password contains keyboard patterns', $result['errors']);
     }
 
-    public function test_validates_password_with_common_substitutions()
+    public function testValidatesPasswordWithCommonSubstitutions()
     {
         // Arrange
         $password = 'p@ssw0rd123!';
@@ -157,11 +161,11 @@ class PasswordPolicyServiceTest extends TestCase
         $result = $this->service->validatePassword($password);
 
         // Assert
-        $this->assertFalse($result['valid']);
-        $this->assertContains('Password contains common character substitutions', $result['errors']);
+        self::assertFalse($result['valid']);
+        self::assertContains('Password contains common character substitutions', $result['errors']);
     }
 
-    public function test_calculates_password_strength_weak()
+    public function testCalculatesPasswordStrengthWeak()
     {
         // Arrange
         $password = 'weak';
@@ -170,10 +174,10 @@ class PasswordPolicyServiceTest extends TestCase
         $result = $this->service->validatePassword($password);
 
         // Assert
-        $this->assertEquals('weak', $result['strength']);
+        self::assertSame('weak', $result['strength']);
     }
 
-    public function test_calculates_password_strength_medium()
+    public function testCalculatesPasswordStrengthMedium()
     {
         // Arrange
         $password = 'Medium123';
@@ -182,10 +186,10 @@ class PasswordPolicyServiceTest extends TestCase
         $result = $this->service->validatePassword($password);
 
         // Assert
-        $this->assertEquals('medium', $result['strength']);
+        self::assertSame('medium', $result['strength']);
     }
 
-    public function test_calculates_password_strength_strong()
+    public function testCalculatesPasswordStrengthStrong()
     {
         // Arrange
         $password = 'StrongP@ss123';
@@ -194,10 +198,10 @@ class PasswordPolicyServiceTest extends TestCase
         $result = $this->service->validatePassword($password);
 
         // Assert
-        $this->assertEquals('strong', $result['strength']);
+        self::assertSame('strong', $result['strength']);
     }
 
-    public function test_calculates_password_strength_very_strong()
+    public function testCalculatesPasswordStrengthVeryStrong()
     {
         // Arrange
         $password = 'VeryStrongP@ssw0rd123!@#';
@@ -206,10 +210,10 @@ class PasswordPolicyServiceTest extends TestCase
         $result = $this->service->validatePassword($password);
 
         // Assert
-        $this->assertEquals('very_strong', $result['strength']);
+        self::assertSame('very_strong', $result['strength']);
     }
 
-    public function test_checks_password_not_in_history()
+    public function testChecksPasswordNotInHistory()
     {
         // Arrange
         $userId = 1;
@@ -219,26 +223,27 @@ class PasswordPolicyServiceTest extends TestCase
         $result = $this->service->validatePassword($password, $userId);
 
         // Assert
-        $this->assertTrue($result['valid']);
+        self::assertTrue($result['valid']);
     }
 
-    public function test_saves_password_to_history()
+    public function testSavesPasswordToHistory()
     {
         // Arrange
         $userId = 1;
         $password = 'NewPassword123!';
 
         Log::shouldReceive('info')
-            ->with('Password saved to history', Mockery::type('array'));
+            ->with('Password saved to history', \Mockery::type('array'))
+        ;
 
         // Act
         $result = $this->service->savePasswordToHistory($userId, $password);
 
         // Assert
-        $this->assertTrue($result);
+        self::assertTrue($result);
     }
 
-    public function test_handles_save_password_history_exception()
+    public function testHandlesSavePasswordHistoryException()
     {
         // Arrange
         $userId = 1;
@@ -246,19 +251,21 @@ class PasswordPolicyServiceTest extends TestCase
 
         // Mock Hash::make to throw exception
         Hash::shouldReceive('make')
-            ->andThrow(new \Exception('Hash error'));
+            ->andThrow(new \Exception('Hash error'))
+        ;
 
         Log::shouldReceive('error')
-            ->with('Failed to save password to history', Mockery::type('array'));
+            ->with('Failed to save password to history', \Mockery::type('array'))
+        ;
 
         // Act
         $result = $this->service->savePasswordToHistory($userId, $password);
 
         // Assert
-        $this->assertFalse($result);
+        self::assertFalse($result);
     }
 
-    public function test_checks_password_expired()
+    public function testChecksPasswordExpired()
     {
         // Arrange
         $userId = 1;
@@ -267,26 +274,27 @@ class PasswordPolicyServiceTest extends TestCase
         $result = $this->service->isPasswordExpired($userId);
 
         // Assert
-        $this->assertTrue($result);
+        self::assertTrue($result);
     }
 
-    public function test_handles_password_expiry_check_exception()
+    public function testHandlesPasswordExpiryCheckException()
     {
         // Arrange
         $userId = 999;
 
         // Test with invalid user ID to trigger exception handling
         Log::shouldReceive('error')
-            ->with('Password expiry check failed', Mockery::type('array'));
+            ->with('Password expiry check failed', \Mockery::type('array'))
+        ;
 
         // Act
         $result = $this->service->isPasswordExpired($userId);
 
         // Assert
-        $this->assertFalse($result);
+        self::assertFalse($result);
     }
 
-    public function test_checks_account_not_locked()
+    public function testChecksAccountNotLocked()
     {
         // Arrange
         $userId = 1;
@@ -295,119 +303,137 @@ class PasswordPolicyServiceTest extends TestCase
         $result = $this->service->isAccountLocked($userId);
 
         // Assert
-        $this->assertFalse($result);
+        self::assertFalse($result);
     }
 
-    public function test_handles_account_lock_check_exception()
+    public function testHandlesAccountLockCheckException()
     {
         // Arrange
         $userId = 1;
 
         // Test with invalid user ID to trigger exception handling
         Log::shouldReceive('error')
-            ->with('Account lock check failed', Mockery::type('array'));
+            ->with('Account lock check failed', \Mockery::type('array'))
+        ;
 
         // Act
         $result = $this->service->isAccountLocked($userId);
 
         // Assert
-        $this->assertFalse($result);
+        self::assertFalse($result);
     }
 
-    public function test_records_failed_attempt()
+    public function testRecordsFailedAttempt()
     {
         // Arrange
         $userId = 1;
         $ipAddress = '127.0.0.1';
 
         Log::shouldReceive('info')
-            ->with('Failed login attempt recorded', Mockery::type('array'));
+            ->with('Failed login attempt recorded', \Mockery::type('array'))
+            ->once()
+        ;
 
         // Act
         $this->service->recordFailedAttempt($userId, $ipAddress);
 
         // Assert
-        $this->assertTrue(true);
+        $this->assertDatabaseHas('failed_login_attempts', [
+            'user_id' => $userId,
+            'ip_address' => $ipAddress,
+        ]);
     }
 
-    public function test_handles_record_failed_attempt_exception()
+    public function testHandlesRecordFailedAttemptException()
     {
         // Arrange
         $userId = 1;
         $ipAddress = '127.0.0.1';
 
         // Mock now() to throw exception
-        $this->mockFunction('now', function () {
+        $this->mockFunction('now', static function () {
             throw new \Exception('Time error');
         });
 
         Log::shouldReceive('error')
-            ->with('Failed to record failed attempt', Mockery::type('array'));
+            ->with('Failed to record failed attempt', \Mockery::type('array'))
+            ->once()
+        ;
 
         // Act
         $this->service->recordFailedAttempt($userId, $ipAddress);
 
         // Assert
-        $this->assertTrue(true);
+        $this->assertDatabaseMissing('failed_login_attempts', [
+            'user_id' => $userId,
+            'ip_address' => $ipAddress,
+        ]);
     }
 
-    public function test_clears_failed_attempts()
+    public function testClearsFailedAttempts()
     {
         // Arrange
         $userId = 1;
 
+        // First create a failed attempt to clear
+        $this->service->recordFailedAttempt($userId, '127.0.0.1');
+
         Log::shouldReceive('info')
-            ->with('Failed attempts cleared', Mockery::type('array'));
+            ->with('Failed attempts cleared', \Mockery::type('array'))
+            ->once()
+        ;
 
         // Act
         $this->service->clearFailedAttempts($userId);
 
         // Assert
-        $this->assertTrue(true);
+        $this->assertDatabaseMissing('failed_login_attempts', [
+            'user_id' => $userId,
+        ]);
     }
 
-    public function test_generates_secure_password()
+    public function testGeneratesSecurePassword()
     {
         // Act
         $password = $this->service->generateSecurePassword(12);
 
         // Assert
-        $this->assertIsString($password);
-        $this->assertEquals(12, strlen($password));
-        $this->assertMatchesRegularExpression('/[A-Z]/', $password);
-        $this->assertMatchesRegularExpression('/[a-z]/', $password);
-        $this->assertMatchesRegularExpression('/[0-9]/', $password);
-        $this->assertMatchesRegularExpression('/[^A-Za-z0-9]/', $password);
+        self::assertIsString($password);
+        self::assertSame(12, \strlen($password));
+        self::assertMatchesRegularExpression('/[A-Z]/', $password);
+        self::assertMatchesRegularExpression('/[a-z]/', $password);
+        self::assertMatchesRegularExpression('/[0-9]/', $password);
+        self::assertMatchesRegularExpression('/[^A-Za-z0-9]/', $password);
     }
 
-    public function test_generates_secure_password_with_default_length()
+    public function testGeneratesSecurePasswordWithDefaultLength()
     {
         // Act
         $password = $this->service->generateSecurePassword();
 
         // Assert
-        $this->assertIsString($password);
-        $this->assertEquals(12, strlen($password));
+        self::assertIsString($password);
+        self::assertSame(12, \strlen($password));
     }
 
-    public function test_gets_policy_requirements()
+    public function testGetsPolicyRequirements()
     {
         // Act
         $requirements = $this->service->getPolicyRequirements();
 
         // Assert
-        $this->assertIsArray($requirements);
-        $this->assertArrayHasKey('min_length', $requirements);
-        $this->assertArrayHasKey('max_length', $requirements);
-        $this->assertArrayHasKey('require_uppercase', $requirements);
-        $this->assertArrayHasKey('require_lowercase', $requirements);
-        $this->assertArrayHasKey('require_numbers', $requirements);
-        $this->assertArrayHasKey('require_symbols', $requirements);
-        $this->assertArrayHasKey('expiry_days', $requirements);
-        $this->assertArrayHasKey('history_count', $requirements);
+        self::assertIsArray($requirements);
+        self::assertArrayHasKey('min_length', $requirements);
+        self::assertArrayHasKey('max_length', $requirements);
+        self::assertArrayHasKey('require_uppercase', $requirements);
+        self::assertArrayHasKey('require_lowercase', $requirements);
+        self::assertArrayHasKey('require_numbers', $requirements);
+        self::assertArrayHasKey('require_symbols', $requirements);
+        self::assertArrayHasKey('expiry_days', $requirements);
+        self::assertArrayHasKey('history_count', $requirements);
     }
 
-    public function test_updates_policy()
+    public function testUpdatesPolicy()
     {
         // Arrange
         $newPolicy = [
@@ -416,21 +442,22 @@ class PasswordPolicyServiceTest extends TestCase
         ];
 
         Log::shouldReceive('info')
-            ->with('Password policy updated', $newPolicy);
+            ->with('Password policy updated', $newPolicy)
+        ;
 
         // Mock file_put_contents
-        $this->mockFunction('file_put_contents', function ($path, $content) {
-            return strlen($content);
+        $this->mockFunction('file_put_contents', static function ($path, $content) {
+            return \strlen($content);
         });
 
         // Act
         $result = $this->service->updatePolicy($newPolicy);
 
         // Assert
-        $this->assertTrue($result);
+        self::assertTrue($result);
     }
 
-    public function test_handles_update_policy_exception()
+    public function testHandlesUpdatePolicyException()
     {
         // Arrange
         $newPolicy = [
@@ -438,21 +465,22 @@ class PasswordPolicyServiceTest extends TestCase
         ];
 
         // Mock file_put_contents to throw exception
-        $this->mockFunction('file_put_contents', function ($path, $content) {
+        $this->mockFunction('file_put_contents', static function ($path, $content) {
             throw new \Exception('File write error');
         });
 
         Log::shouldReceive('error')
-            ->with('Failed to update password policy', Mockery::type('array'));
+            ->with('Failed to update password policy', \Mockery::type('array'))
+        ;
 
         // Act
         $result = $this->service->updatePolicy($newPolicy);
 
         // Assert
-        $this->assertFalse($result);
+        self::assertFalse($result);
     }
 
-    public function test_validates_password_with_maximum_length()
+    public function testValidatesPasswordWithMaximumLength()
     {
         // Arrange
         $password = str_repeat('a', 129); // Exceeds max length
@@ -461,11 +489,11 @@ class PasswordPolicyServiceTest extends TestCase
         $result = $this->service->validatePassword($password);
 
         // Assert
-        $this->assertFalse($result['valid']);
-        $this->assertContains('Password must not exceed 128 characters', $result['errors']);
+        self::assertFalse($result['valid']);
+        self::assertContains('Password must not exceed 128 characters', $result['errors']);
     }
 
-    public function test_validates_password_with_case_insensitive_forbidden()
+    public function testValidatesPasswordWithCaseInsensitiveForbidden()
     {
         // Arrange
         $password = 'PASSWORD123!';
@@ -474,14 +502,14 @@ class PasswordPolicyServiceTest extends TestCase
         $result = $this->service->validatePassword($password);
 
         // Assert
-        $this->assertFalse($result['valid']);
-        $this->assertContains('Password is too common and not allowed', $result['errors']);
+        self::assertFalse($result['valid']);
+        self::assertContains('Password is too common and not allowed', $result['errors']);
     }
 
     // Helper method to mock functions
     private function mockFunction(string $functionName, callable $callback): void
     {
-        if (! function_exists($functionName)) {
+        if (! \function_exists($functionName)) {
             eval("function {$functionName}(\$arg) { return call_user_func_array('{$functionName}', func_get_args()); }");
         }
     }

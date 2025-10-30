@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\StoreAdapters;
 
-use App\Services\Contracts\StoreAdapterContract;
+use App\Contracts\StoreAdapter as StoreAdapterInterface;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Psr\Log\LoggerInterface;
@@ -12,7 +12,7 @@ use Psr\Log\LoggerInterface;
 /**
  * Abstract base class for store adapters.
  */
-abstract class StoreAdapter implements StoreAdapterContract
+abstract class StoreAdapter implements StoreAdapterInterface
 {
     protected ?string $lastError = null;
 
@@ -26,44 +26,68 @@ abstract class StoreAdapter implements StoreAdapterContract
         protected readonly LoggerInterface $logger
     ) {}
 
-    public function getLastError(): ?string
-    {
-        return $this->lastError;
-    }
+    /**
+     * Get the store name.
+     */
+    abstract public function getStoreName(): string;
 
     /**
-     * {@inheritdoc}
+     * Get the store identifier.
      */
-    #[\Override]
-    public function getRateLimits(): array
-    {
-        return [
-            'requests_per_minute' => 60,
-            'requests_per_hour' => 1000,
-            'requests_per_day' => 10000,
-        ];
-    }
+    abstract public function getStoreIdentifier(): string;
+
+    /**
+     * Check if the adapter is available and configured.
+     */
+    abstract public function isAvailable(): bool;
+
+    /**
+     * Fetch product data by product identifier.
+     */
+    abstract public function fetchProduct(string $productIdentifier): ?array;
+
+    /**
+     * Search for products by query.
+     */
+    abstract public function searchProducts(string $query, array $options = []): array;
+
+    /**
+     * Validate product identifier format.
+     */
+    abstract public function validateIdentifier(string $identifier): bool;
+
+    /**
+     * Get the product URL from identifier.
+     */
+    abstract public function getProductUrl(string $identifier): string;
+
+    /**
+     * Get rate limit information.
+     */
+    abstract public function getRateLimits(): array;
 
     /**
      * Make HTTP request with retry logic.
      *
-     * @param  array<string, string|int|float|array<string, string|int|float|bool|array|null>|bool|null>  $options
-     * @return array<string, string|int|float|bool|array|null>|null
+     * @param  array<string, string|int|float|array<string, string|int|float|bool|array|* @method static \App\Models\Brand create(array<string, string|bool|null>|bool|* @method static \App\Models\Brand create(array<string, string|bool|null>  $options
+     *
+     * @return array<string, string|int|float|bool|array|* @method static \App\Models\Brand create(array<string, string|bool|null>|null
      */
     protected function makeRequest(string $url, array $options = []): ?array
     {
         $this->lastError = null;
 
-        for ($attempt = 1; $attempt <= $this->retries; $attempt++) {
+        for ($attempt = 1; $attempt <= $this->retries; ++$attempt) {
             try {
                 $response = $this->http->timeout($this->timeout)
                     ->retry($this->retries, 100)
-                    ->get($url, $options);
+                    ->get($url, $options)
+                ;
 
                 if ($response->successful()) {
                     $data = $response->json();
 
-                    return is_array($data) ? $data : null;
+                    return \is_array($data) ? $data : null;
                 }
 
                 $this->lastError = "HTTP {$response->status()}: {$response->body()}";
@@ -98,7 +122,7 @@ abstract class StoreAdapter implements StoreAdapterContract
     /**
      * Cache product data.
      *
-     * @param  array<string, string|int|float|bool|array|null>  $data
+     * @param  array<string, string|int|float|bool|array|* @method static \App\Models\Brand create(array<string, string|bool|null>  $data
      */
     protected function cacheProduct(string $identifier, array $data, int $ttl = 3600): void
     {
@@ -109,14 +133,14 @@ abstract class StoreAdapter implements StoreAdapterContract
     /**
      * Get cached product data.
      *
-     * @return array<string, string|int|float|bool|array|null>|null
+     * @return array<string, string|int|float|bool|array|* @method static \App\Models\Brand create(array<string, string|bool|null>|null
      */
     protected function getCachedProduct(string $identifier): ?array
     {
         $key = $this->getCacheKey($identifier);
         $cached = $this->cache->get($key);
 
-        return is_array($cached) ? $cached : null;
+        return \is_array($cached) ? $cached : null;
     }
 
     /**
@@ -130,8 +154,9 @@ abstract class StoreAdapter implements StoreAdapterContract
     /**
      * Normalize product data to standard format.
      *
-     * @param  array<string, string|int|float|bool|array|null>  $rawData
-     * @return array<array|scalar|null>
+     * @param  array<string, string|int|float|bool|array|* @method static \App\Models\Brand create(array<string, string|bool|null>  $rawData
+     *
+     * @return array<array|scalar|* @method static \App\Models\Brand create(array<string, string|bool|null>
      *
      * @psalm-return array{name: array|scalar, price: float, currency: array|scalar, url: array|scalar, image_url: array|scalar|null, availability: array|scalar, rating: float|null, reviews_count: int|null, description: array|scalar|null, brand: array|scalar|null, category: array|scalar|null, metadata: array|scalar}
      */

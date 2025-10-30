@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Exceptions\ValidationException;
 use App\Models\PriceOffer;
 use App\Models\Product;
-use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -16,8 +16,8 @@ final readonly class FinancialTransactionService
 
     public function updateProductPrice(Product $product, float $newPrice, ?string $reason = null): bool
     {
-        /** @var bool $result */
-        $result = DB::transaction(function () use ($product, $newPrice, $reason): bool {
+        // @var bool $result
+        return DB::transaction(function () use ($product, $newPrice, $reason): bool {
             $oldPrice = (float) $product->price;
             $this->validatePrice($newPrice);
 
@@ -29,8 +29,6 @@ final readonly class FinancialTransactionService
 
             return true;
         });
-
-        return $result;
     }
 
     /**
@@ -38,8 +36,8 @@ final readonly class FinancialTransactionService
      */
     public function createPriceOffer(array $offerData): PriceOffer
     {
-        /** @var PriceOffer $priceOffer */
-        $priceOffer = DB::transaction(function () use ($offerData): PriceOffer {
+        // @var PriceOffer $priceOffer
+        return DB::transaction(function () use ($offerData): PriceOffer {
             $this->validateOfferData($offerData);
 
             // Map new_price to actual persisted price column
@@ -60,17 +58,15 @@ final readonly class FinancialTransactionService
 
             return $newOffer;
         });
-
-        return $priceOffer;
     }
 
     /**
-     * @param  array<string, mixed>  $updateData
+     * @param array<string, mixed> $updateData
      */
     public function updatePriceOffer(PriceOffer $priceOffer, array $updateData): PriceOffer
     {
-        /** @var PriceOffer $updated */
-        $updated = DB::transaction(function () use ($priceOffer, $updateData): PriceOffer {
+        // @var PriceOffer $updated
+        return DB::transaction(function () use ($priceOffer, $updateData): PriceOffer {
             $this->validateOfferUpdateData($updateData);
 
             // Map new_price to actual persisted price column on updates
@@ -88,32 +84,28 @@ final readonly class FinancialTransactionService
 
             return $priceOffer;
         });
-
-        return $updated;
     }
 
     public function deletePriceOffer(PriceOffer $priceOffer): bool
     {
-        /** @var bool $deleted */
-        $deleted = DB::transaction(function () use ($priceOffer): bool {
+        // @var bool $deleted
+        return DB::transaction(function () use ($priceOffer): bool {
             $priceOffer->delete();
 
             $this->logOfferDeletion($priceOffer);
 
             return true;
         });
-
-        return $deleted;
     }
 
     private function validatePrice(float $price): void
     {
         if ($price < 0) {
-            throw new Exception('Price cannot be negative');
+            throw ValidationException::invalidField('price', $price, 'Price cannot be negative');
         }
 
         if ($price > 1000000) {
-            throw new Exception('Price exceeds maximum allowed value');
+            throw ValidationException::invalidField('price', $price, 'Price exceeds maximum allowed value of 1,000,000');
         }
     }
 
@@ -137,16 +129,20 @@ final readonly class FinancialTransactionService
 
     private function validateOfferData(array $offerData): void
     {
-        if (! isset($offerData['product_id']) || ! isset($offerData['new_price'])) {
-            throw new Exception('Missing required offer data');
+        if (! isset($offerData['product_id'])) {
+            throw ValidationException::missingField('product_id');
+        }
+
+        if (! isset($offerData['new_price'])) {
+            throw ValidationException::missingField('new_price');
         }
 
         if (! is_numeric($offerData['new_price']) || $offerData['new_price'] < 0) {
-            throw new Exception('Invalid price for offer');
+            throw ValidationException::invalidField('new_price', $offerData['new_price'], 'Must be a positive number');
         }
 
         if (isset($offerData['expires_at']) && ! strtotime($offerData['expires_at'])) {
-            throw new Exception('Invalid expiration date for offer');
+            throw ValidationException::invalidFormat('expires_at', 'valid date string');
         }
     }
 
@@ -160,11 +156,11 @@ final readonly class FinancialTransactionService
     private function validateOfferUpdateData(array $updateData): void
     {
         if (isset($updateData['new_price']) && (! is_numeric($updateData['new_price']) || $updateData['new_price'] < 0)) {
-            throw new Exception('Invalid price for offer');
+            throw ValidationException::invalidField('new_price', $updateData['new_price'], 'Must be a positive number');
         }
 
         if (isset($updateData['expires_at']) && ! strtotime($updateData['expires_at'])) {
-            throw new Exception('Invalid expiration date for offer');
+            throw ValidationException::invalidFormat('expires_at', 'valid date string');
         }
     }
 
@@ -192,10 +188,16 @@ final readonly class FinancialTransactionService
         $lowestOffer = PriceOffer::where('product_id', $product->id)
             ->where('is_available', true)
             ->orderBy('price')
-            ->first();
+            ->first()
+        ;
 
         if ($lowestOffer && $product->price !== $lowestOffer->price) {
-            $this->updateProductPrice($product, (float) $lowestOffer->price, 'Updated from price offer');
+            // Direct update to avoid infinite recursion - we're already in a transaction
+            $oldPrice = (float) $product->price;
+            $newPrice = (float) $lowestOffer->price;
+
+            $product->update(['price' => $newPrice]);
+            $this->logPriceUpdate($product, $oldPrice, $newPrice, 'Updated from price offer');
         }
     }
 

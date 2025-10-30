@@ -7,20 +7,19 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
         // Add phone column if missing
         if (! Schema::hasColumn('users', 'phone')) {
-            Schema::table('users', function (Blueprint $table): void {
+            Schema::table('users', static function (Blueprint $table): void {
                 $table->string('phone', 20)->nullable()->after('is_admin');
             });
         }
 
         // For SQLite testing environment, add triggers to enforce validation
         $driver = DB::getDriverName();
-        if ($driver === 'sqlite') {
+        if ('sqlite' === $driver) {
             // Email format validation: must contain '@'
             DB::unprepared(<<<'SQL'
                     CREATE TRIGGER IF NOT EXISTS trg_users_email_validate_insert
@@ -68,7 +67,7 @@ return new class extends Migration
     public function down(): void
     {
         $driver = DB::getDriverName();
-        if ($driver === 'sqlite') {
+        if ('sqlite' === $driver) {
             DB::unprepared('DROP TRIGGER IF EXISTS trg_users_email_validate_insert;');
             DB::unprepared('DROP TRIGGER IF EXISTS trg_users_email_validate_update;');
             DB::unprepared('DROP TRIGGER IF EXISTS trg_users_phone_validate_insert;');
@@ -76,7 +75,7 @@ return new class extends Migration
         }
 
         if (Schema::hasColumn('users', 'phone')) {
-            Schema::table('users', function (Blueprint $table): void {
+            Schema::table('users', static function (Blueprint $table): void {
                 $table->dropColumn('phone');
             });
         }

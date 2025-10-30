@@ -5,30 +5,15 @@ declare(strict_types=1);
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\ValidationException;
 
 class LoginRequest extends FormRequest
 {
     /**
      * @property string $email
      * @property string $password
-     * @property bool $remember
+     * @property bool   $remember
      */
-
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string>
-     *
-     * @psalm-return array{email: 'required|email|max:255', password: 'required|string|min:8', remember: 'boolean'}
-     */
-    public function rules(): array
-    {
-        return [
-            'email' => 'required|email|max:255',
-            'password' => 'required|string|min:8',
-            'remember' => 'boolean',
-        ];
-    }
 
     /**
      * Get custom messages for validator errors.
@@ -70,12 +55,12 @@ class LoginRequest extends FormRequest
     /**
      * Attempt to authenticate the user.
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
     public function authenticate(): void
     {
         if (! auth()->attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            throw \Illuminate\Validation\ValidationException::withMessages([
+            throw ValidationException::withMessages([
                 'email' => __('auth.failed'),
             ]);
         }

@@ -9,12 +9,16 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 /**
- * AI Error Handling Tests
+ * AI Error Handling Tests.
  *
  * Tests AIService error handling using pure PHPUnit (not Laravel TestCase)
  * to avoid PHPUnit risky warnings about error handler manipulation.
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class AIErrorHandlingTest extends TestCase
+final class AIErrorHandlingTest extends TestCase
 {
     use AITestTrait;
 
@@ -28,84 +32,115 @@ class AIErrorHandlingTest extends TestCase
 
     protected function tearDown(): void
     {
-        unset($this->aiService);
         parent::tearDown();
     }
 
     #[Test]
-    public function ai_handles_invalid_input_gracefully(): void
+    public function aiHandlesInvalidInputGracefully(): void
     {
         try {
             // Empty string should be handled gracefully
             $result = $this->aiService->analyzeText('', 'sentiment');
-            $this->assertIsArray($result);
+            self::assertIsArray($result);
         } catch (\Exception $e) {
             // Exception is acceptable for invalid input
-            $this->assertNotEmpty($e->getMessage());
+            self::assertNotEmpty($e->getMessage());
         }
     }
 
     #[Test]
-    public function ai_handles_malformed_json(): void
+    public function aiHandlesMalformedJson(): void
     {
         try {
             // Very short text that might cause issues
             $result = $this->aiService->analyzeText('x', 'sentiment');
-            $this->assertIsArray($result);
+            self::assertIsArray($result);
+
+            // If successful, verify it has proper structure
+            if (isset($result['error'])) {
+                self::assertArrayHasKey('error', $result);
+                self::assertIsString($result['error']);
+            } else {
+                self::assertArrayHasKey('result', $result);
+            }
         } catch (\Exception $e) {
-            // Exception is acceptable
-            $this->assertTrue(true);
+            // Exception should have meaningful message
+            self::assertNotEmpty($e->getMessage());
+            self::assertIsString($e->getMessage());
         }
     }
 
     #[Test]
-    public function ai_handles_network_timeout(): void
+    public function aiHandlesNetworkTimeout(): void
     {
+        // Test with extremely long text that might cause timeout
+        $longText = str_repeat('This is a very long text that might cause timeout issues. ', 1000);
+
         try {
-            // Normal text analysis
-            $result = $this->aiService->analyzeText('Test timeout scenario', 'sentiment');
-            $this->assertIsArray($result);
+            $result = $this->aiService->analyzeText($longText, 'sentiment');
+            self::assertIsArray($result);
+
+            // Verify response structure
+            self::assertTrue(
+                isset($result['result']) || isset($result['error']),
+                'Response should have either result or error key'
+            );
         } catch (\Exception $e) {
-            // Timeout or network exceptions are acceptable
-            $this->assertTrue(true);
+            // Verify timeout exceptions are properly handled
+            self::assertNotEmpty($e->getMessage());
+            self::assertContainsAny(
+                ['timeout', 'connection', 'network', 'curl'],
+                strtolower($e->getMessage()),
+                'Exception message should indicate network/timeout issue'
+            );
         }
     }
 
     #[Test]
-    public function ai_logs_errors_properly(): void
+    public function aiLogsErrorsProperly(): void
     {
+        $errorOccurred = false;
+
         try {
-            // Attempt analysis that might trigger logging
-            $this->aiService->analyzeText('Test error logging', 'sentiment');
+            // Test with invalid analysis type to trigger error
+            $result = $this->aiService->analyzeText('Test error logging', 'invalid_analysis_type');
+
+            // If no exception, check for error in result
+            if (isset($result['error'])) {
+                $errorOccurred = true;
+                self::assertIsString($result['error']);
+                self::assertNotEmpty($result['error']);
+            }
         } catch (\Exception $e) {
-            // Error logging tested - exception is acceptable
+            $errorOccurred = true;
+            self::assertNotEmpty($e->getMessage());
         }
 
-        // Test passes - error handling mechanism exists
-        $this->assertTrue(true);
+        // Ensure some form of error handling occurred
+        self::assertTrue($errorOccurred, 'Error handling should be triggered for invalid input');
     }
 
     #[Test]
-    public function ai_returns_meaningful_error_messages(): void
+    public function aiReturnsMeaningfulErrorMessages(): void
     {
         try {
             $result = $this->aiService->analyzeText('Test meaningful errors', 'sentiment');
-            $this->assertIsArray($result);
+            self::assertIsArray($result);
         } catch (\Exception $e) {
             // Exception should have meaningful message
             $message = $e->getMessage();
-            $this->assertNotEmpty($message);
-            $this->assertIsString($message);
+            self::assertNotEmpty($message);
+            self::assertIsString($message);
         }
     }
 
     #[Test]
-    public function ai_handles_concurrent_requests(): void
+    public function aiHandlesConcurrentRequests(): void
     {
         $results = [];
 
         // Simulate 5 concurrent-like requests
-        for ($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 5; ++$i) {
             try {
                 $results[] = $this->aiService->analyzeText("Concurrent request {$i}", 'sentiment');
             } catch (\Exception $e) {
@@ -115,6 +150,26 @@ class AIErrorHandlingTest extends TestCase
         }
 
         // All 5 requests attempted
-        $this->assertCount(5, $results);
+        self::assertCount(5, $results);
+    }
+
+    /**
+     * Helper method to assert that a string contains any of the given substrings.
+     */
+    private function assertContainsAny(array $needles, string $haystack, string $message = ''): void
+    {
+        foreach ($needles as $needle) {
+            if (str_contains($haystack, $needle)) {
+                self::assertTrue(true);
+
+                return;
+            }
+        }
+
+        self::fail($message ?: \sprintf(
+            'Failed asserting that "%s" contains any of [%s]',
+            $haystack,
+            implode(', ', $needles)
+        ));
     }
 }

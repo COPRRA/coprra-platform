@@ -8,36 +8,41 @@ use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\DuskTestCase;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 #[PreserveGlobalState(false)]
-class E2ETest extends DuskTestCase
+final class E2ETest extends DuskTestCase
 {
     #[Test]
-    public function can_load_homepage(): void
+    public function canLoadHomepage(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function can_navigate_to_products(): void
+    public function canNavigateToProducts(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function can_search_products(): void
+    public function canSearchProducts(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function can_add_to_cart(): void
+    public function canAddToCart(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function can_checkout(): void
+    public function canCheckout(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 }

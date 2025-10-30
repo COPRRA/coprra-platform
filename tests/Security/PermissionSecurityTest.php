@@ -6,23 +6,13 @@ namespace Tests\Security;
 
 use Tests\TestCase;
 
-class PermissionSecurityTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class PermissionSecurityTest extends TestCase
 {
-    public function test_permission_security(): void
-    {
-        $this->assertTrue(true);
-    }
-
-    public function test_role_security(): void
-    {
-        $this->assertTrue(true);
-    }
-
-    public function test_access_control(): void
-    {
-        $this->assertTrue(true);
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -31,5 +21,20 @@ class PermissionSecurityTest extends TestCase
     protected function tearDown(): void
     {
         parent::tearDown();
+    }
+
+    public function testPermissionSecurity(): void
+    {
+        self::assertTrue(true);
+    }
+
+    public function testRoleSecurity(): void
+    {
+        self::assertTrue(true);
+    }
+
+    public function testAccessControl(): void
+    {
+        self::assertTrue(true);
     }
 }

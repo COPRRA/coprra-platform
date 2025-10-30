@@ -8,30 +8,35 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class UpdatePricesCommandTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class UpdatePricesCommandTest extends TestCase
 {
     use RefreshDatabase;
 
     #[Test]
-    public function update_prices_command_runs_successfully(): void
+    public function updatePricesCommandRunsSuccessfully(): void
     {
         $this->artisan('prices:update')->assertExitCode(0);
     }
 
     #[Test]
-    public function update_prices_command_runs_in_dry_run_mode(): void
+    public function updatePricesCommandRunsInDryRunMode(): void
     {
         $this->artisan('prices:update', ['--dry-run' => true])->assertExitCode(0);
     }
 
     #[Test]
-    public function update_prices_command_filters_by_store(): void
+    public function updatePricesCommandFiltersByStore(): void
     {
         $this->artisan('prices:update', ['--store' => 1])->assertExitCode(0);
     }
 
     #[Test]
-    public function update_prices_command_filters_by_product(): void
+    public function updatePricesCommandFiltersByProduct(): void
     {
         $this->artisan('prices:update', ['--product' => 1])->assertExitCode(0);
     }

@@ -12,16 +12,6 @@ use Illuminate\Support\Facades\Storage;
 
 class DocumentationController extends BaseApiController
 {
-    public function index(): JsonResponse
-    {
-        return response()->json([
-            'status' => 'success',
-            'message' => 'COPRRA API is running',
-            'version' => '1.0.0',
-            'timestamp' => Date::now()->toISOString(),
-        ]);
-    }
-
     public function health(): JsonResponse
     {
         $timestamp = Date::now()->toISOString();
@@ -45,7 +35,7 @@ class DocumentationController extends BaseApiController
         try {
             Cache::put('health_check', 'ok', 60);
             $cacheValue = Cache::get('health_check');
-            if ($cacheValue !== 'ok') {
+            if ('ok' !== $cacheValue) {
                 $cache = 'not_working';
             }
         } catch (\Throwable $e) {
@@ -61,10 +51,10 @@ class DocumentationController extends BaseApiController
             $storage = 'not_writable';
         }
 
-        $isHealthy = $database === 'connected' && $cache === 'working' && $storage === 'writable';
+        $isHealthy = 'connected' === $database && 'working' === $cache && 'writable' === $storage;
         $statusCode = $isHealthy ? 200 : 503;
 
-        return response()->json([
+        $data = [
             'status' => $isHealthy ? 'healthy' : 'unhealthy',
             'timestamp' => $timestamp,
             'version' => $version,
@@ -72,6 +62,10 @@ class DocumentationController extends BaseApiController
             'database' => $database,
             'cache' => $cache,
             'storage' => $storage,
-        ], $statusCode);
+        ];
+
+        return $isHealthy
+            ? $this->success($data, 'System is healthy')
+            : $this->error('System is unhealthy', $data, 503);
     }
 }

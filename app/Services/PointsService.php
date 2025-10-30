@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Exceptions\BusinessLogicException;
+use App\Exceptions\ValidationException;
 use App\Models\Order;
 use App\Models\Reward;
 use App\Models\User;
 use App\Models\UserPoint;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 /**
- * Points Service
+ * Points Service.
  *
  * Manages user loyalty points including earning, redemption, and rewards.
  * Not marked as final to allow mocking in unit tests while maintaining production integrity.
@@ -20,14 +22,14 @@ use Illuminate\Support\Facades\Log;
 class PointsService
 {
     /**
-     * Add points to user account
+     * Add points to user account.
      *
-     * @param  User  $user  The user to receive points
-     * @param  int  $points  Number of points (positive for earning, negative for spending)
-     * @param  string  $type  Type of transaction (earned, redeemed, expired)
-     * @param  string  $source  Source of points (purchase, manual, reward, etc.)
-     * @param  int|null  $orderId  Related order ID if applicable
-     * @param  string|null  $description  Optional description
+     * @param User        $user        The user to receive points
+     * @param int         $points      Number of points (positive for earning, negative for spending)
+     * @param string      $type        Type of transaction (earned, redeemed, expired)
+     * @param string      $source      Source of points (purchase, manual, reward, etc.)
+     * @param int|null    $orderId     Related order ID if applicable
+     * @param string|null $description Optional description
      *
      * @throws \InvalidArgumentException If points is zero
      */
@@ -39,35 +41,42 @@ class PointsService
         ?int $orderId = null,
         ?string $description = null
     ): UserPoint {
-        if ($points === 0) {
-            throw new \InvalidArgumentException('Points cannot be zero.');
+        if (0 === $points) {
+            throw ValidationException::invalidField('points', $points, 'Points cannot be zero.');
         }
 
-        return UserPoint::create([
-            'user_id' => $user->id,
-            'points' => $points,
-            'type' => $type,
-            'source' => $source,
-            'order_id' => $orderId,
-            'description' => $description,
-            'expires_at' => $this->calculateExpirationDate($type),
-        ]);
+        // @var UserPoint $userPoint
+        return DB::transaction(function () use ($user, $points, $type, $source, $orderId, $description): UserPoint {
+            return UserPoint::create([
+                'user_id' => $user->id,
+                'points' => $points,
+                'type' => $type,
+                'source' => $source,
+                'order_id' => $orderId,
+                'description' => $description,
+                'expires_at' => $this->calculateExpirationDate($type),
+            ]);
+        });
     }
 
     /**
-     * Redeem points from user account
+     * Redeem points from user account.
      *
-     * @param  User  $user  The user redeeming points
-     * @param  int  $points  Number of points to redeem
-     * @param  string|null  $description  Optional description
+     * @param User $user   The user redeeming points
+     * @param int  $points Number of points to redeem
+     *
      * @return bool True if redemption successful, false if insufficient points
      */
-    public function redeemPoints(User $user, int $points, ?string $description = null): bool
+    public function redeemPoints(User $user, int $points, string $reason = 'Manual redemption'): bool
     {
-        $availablePoints = $this->getAvailablePoints($user->id);
+        if ($points <= 0) {
+            throw ValidationException::invalidField('points', $points, 'Points must be positive');
+        }
+
+        $availablePoints = $this->getAvailablePoints($user);
 
         if ($availablePoints < $points) {
-            return false;
+            throw BusinessLogicException::insufficientResources('points', $availablePoints, $points);
         }
 
         DB::transaction(function () use ($user, $points, $description): void {
@@ -78,41 +87,28 @@ class PointsService
     }
 
     /**
-     * Get total available points for user
+     * Get total available points for user.
      *
-     * @param  int  $userId  User ID
+     * @param int $userId User ID
+     *
      * @return int Total available points (excluding expired)
      */
     public function getAvailablePoints(int $userId): int
     {
         $sum = UserPoint::where('user_id', $userId)
             ->valid()
-            ->sum('points');
+            ->sum('points')
+        ;
 
         return is_numeric($sum) ? (int) $sum : 0;
     }
 
     /**
-     * Get points transaction history for user
-     *
-     * @param  int  $userId  User ID
-     * @param  int  $limit  Number of records to return
-     * @return \Illuminate\Database\Eloquent\Collection<int, UserPoint>
-     */
-    public function getPointsHistory(int $userId, int $limit = 20): \Illuminate\Database\Eloquent\Collection
-    {
-        return UserPoint::where('user_id', $userId)
-            ->orderBy('created_at', 'desc')
-            ->limit($limit)
-            ->get();
-    }
-
-    /**
-     * Award points for a purchase
+     * Award points for a purchase.
      *
      * Awards 1 point per dollar spent on the order.
      *
-     * @param  Order  $order  The order to award points for
+     * @param Order $order The order to award points for
      */
     public function awardPurchasePoints(Order $order): void
     {
@@ -140,88 +136,15 @@ class PointsService
     }
 
     /**
-     * Get available rewards for user based on points
+     * Calculate expiration date for points.
      *
-     * @param  int  $userId  User ID
-     * @return array<int, array<string, int|string>> Available rewards
-     */
-    public function getAvailableRewards(int $userId): array
-    {
-        $availablePoints = $this->getAvailablePoints($userId);
-
-        return Reward::availableForPoints($availablePoints)
-            ->orderBy('points_required')
-            ->get()
-            ->toArray();
-    }
-
-    /**
-     * Redeem a reward using points
+     * @param string $type Transaction type
      *
-     * @param  User  $user  The user redeeming the reward
-     * @param  int  $rewardId  Reward ID to redeem
-     * @return bool True if redemption successful, false if insufficient points
+     * @return Carbon|null Expiration date or null if points don't expire
      */
-    public function redeemReward(User $user, int $rewardId): bool
+    private function calculateExpirationDate(string $type): ?Carbon
     {
-        $reward = Reward::findOrFail($rewardId);
-        $availablePoints = $this->getAvailablePoints($user->id);
-
-        if ($availablePoints < $reward->points_required) {
-            return false;
-        }
-
-        return DB::transaction(function () use ($user, $reward): true {
-            $this->redeemPoints($user, $reward->points_required, "Redeemed reward: {$reward->name}");
-
-            // Apply reward benefits
-            $this->applyReward($user, $reward);
-
-            return true;
-        });
-    }
-
-    /**
-     * Apply reward benefits to user
-     *
-     * @param  User  $user  The user receiving the reward
-     * @param  Reward  $reward  The reward to apply
-     */
-    private function applyReward(User $user, Reward $reward): void
-    {
-        switch ($reward->type) {
-            case 'discount':
-                Log::info("Applying discount reward for user {$user->id}: {$reward->name}");
-
-                // Store discount in user session or create discount code
-                break;
-            case 'free_shipping':
-                Log::info("Applying free shipping reward for user {$user->id}: {$reward->name}");
-
-                // Apply free shipping flag
-                break;
-            case 'gift':
-                Log::info("Applying gift reward for user {$user->id}: {$reward->name}");
-
-                // Add gift to cart or send notification
-                break;
-            case 'cashback':
-                Log::info("Applying cashback reward for user {$user->id}: {$reward->name}");
-
-                // Add cashback to user account
-                break;
-        }
-    }
-
-    /**
-     * Calculate expiration date for points
-     *
-     * @param  string  $type  Transaction type
-     * @return \Illuminate\Support\Carbon|null Expiration date or null if points don't expire
-     */
-    private function calculateExpirationDate(string $type): ?\Illuminate\Support\Carbon
-    {
-        if ($type === 'earned') {
+        if ('earned' === $type) {
             return now()->addYear(); // Points expire after 1 year
         }
 

@@ -8,47 +8,14 @@ use App\Models\Product;
 use Tests\DatabaseSetup;
 use Tests\TestCase;
 
-class DiscountCalculationTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class DiscountCalculationTest extends TestCase
 {
     use DatabaseSetup;
-
-    // \[\PHPUnit\Framework\Attributes\Test]
-    public function test_percentage_discount(): void
-    {
-        $product = Product::factory()->create([
-            'price' => 200.00,
-        ]);
-        $discount = 0.20;
-        $discountType = 'percentage';
-
-        $this->assertEquals(160.00, $product->price * (1 - $discount));
-    }
-
-    // \[\PHPUnit\Framework\Attributes\Test]
-    public function test_fixed_amount_discount(): void
-    {
-        $product = Product::factory()->create([
-            'price' => 150.00,
-        ]);
-        $discount = 30.00;
-        $discountType = 'fixed';
-
-        $this->assertEquals(120.00, $product->price - $discount);
-    }
-
-    // \[\PHPUnit\Framework\Attributes\Test]
-    public function test_discount_expiration(): void
-    {
-        $product = Product::factory()->create([
-            'price' => 100.00,
-        ]);
-        $discount = 0.25;
-        $discountExpiresAt = now()->subDay();
-
-        // Since the product model doesn't have activeDiscount method,
-        // we test if the discount has expired
-        $this->assertTrue($discountExpiresAt->isPast());
-    }
 
     protected function setUp(): void
     {
@@ -60,5 +27,43 @@ class DiscountCalculationTest extends TestCase
     {
         $this->tearDownDatabase();
         parent::tearDown();
+    }
+
+    // \[\PHPUnit\Framework\Attributes\Test]
+    public function testPercentageDiscount(): void
+    {
+        $product = Product::factory()->create([
+            'price' => 200.00,
+        ]);
+        $discount = 0.20;
+        $discountType = 'percentage';
+
+        self::assertSame(160.00, $product->price * (1 - $discount));
+    }
+
+    // \[\PHPUnit\Framework\Attributes\Test]
+    public function testFixedAmountDiscount(): void
+    {
+        $product = Product::factory()->create([
+            'price' => 150.00,
+        ]);
+        $discount = 30.00;
+        $discountType = 'fixed';
+
+        self::assertSame(120.00, $product->price - $discount);
+    }
+
+    // \[\PHPUnit\Framework\Attributes\Test]
+    public function testDiscountExpiration(): void
+    {
+        $product = Product::factory()->create([
+            'price' => 100.00,
+        ]);
+        $discount = 0.25;
+        $discountExpiresAt = now()->subDay();
+
+        // Since the product model doesn't have activeDiscount method,
+        // we test if the discount has expired
+        self::assertTrue($discountExpiresAt->isPast());
     }
 }

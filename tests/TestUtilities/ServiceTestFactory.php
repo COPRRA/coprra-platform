@@ -10,12 +10,14 @@ use App\Services\CacheService;
 use App\Services\FinancialTransactionService;
 use App\Services\PasswordPolicyService;
 use App\Services\ProductService;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Mockery;
 
 /**
  * Service Test Factory for creating comprehensive service tests.
@@ -31,7 +33,7 @@ class ServiceTestFactory
 
     public function __construct()
     {
-        $this->testHelper = new AdvancedTestHelper;
+        $this->testHelper = new AdvancedTestHelper();
     }
 
     /**
@@ -49,7 +51,7 @@ class ServiceTestFactory
                         ], 200),
                     ]);
 
-                    $service = new AIService;
+                    $service = new AIService();
                     $result = $service->analyzeText('Great product!', 'sentiment');
 
                     $this->assertIsArray($result);
@@ -60,7 +62,7 @@ class ServiceTestFactory
                         'api.openai.com/*' => Http::response(['error' => 'API Error'], 500),
                     ]);
 
-                    $service = new AIService;
+                    $service = new AIService();
                     $result = $service->analyzeText('Test', 'sentiment');
 
                     $this->assertArrayHasKey('error', $result);
@@ -72,7 +74,7 @@ class ServiceTestFactory
                         ], 200),
                     ]);
 
-                    $service = new AIService;
+                    $service = new AIService();
                     $result = $service->classifyProduct('Wireless headphones');
 
                     $this->assertEquals('Electronics', $result);
@@ -84,7 +86,7 @@ class ServiceTestFactory
                         ], 200),
                     ]);
 
-                    $service = new AIService;
+                    $service = new AIService();
                     $result = $service->generateRecommendations(['category' => 'electronics'], []);
 
                     $this->assertIsArray($result);
@@ -97,7 +99,7 @@ class ServiceTestFactory
                         ], 200),
                     ]);
 
-                    $service = new AIService;
+                    $service = new AIService();
                     $result = $service->analyzeImage('base64_image_data');
 
                     $this->assertIsArray($result);
@@ -110,7 +112,7 @@ class ServiceTestFactory
 
                     Log::shouldReceive('error')->once();
 
-                    $service = new AIService;
+                    $service = new AIService();
                     $this->assertInstanceOf(AIService::class, $service);
                 },
             ],
@@ -135,61 +137,91 @@ class ServiceTestFactory
             'service_class' => AuditService::class,
             'test_methods' => [
                 'test_log_auth_event_with_user' => function () {
-                    $user = Mockery::mock();
+                    $user = \Mockery::mock();
                     $user->shouldReceive('getAttribute')->with('id')->andReturn(1);
-                    \Illuminate\Support\Facades\Auth::shouldReceive('user')->andReturn($user);
+                    Auth::shouldReceive('user')->andReturn($user);
 
-                    $service = new AuditService;
+                    $service = new AuditService();
                     $service->logAuthEvent('login', 1, ['ip' => '127.0.0.1']);
 
-                    $this->assertTrue(true); // Method returns void
+                    // Verify audit log was created
+                    $this->assertDatabaseHas('audit_logs', [
+                        'event_type' => 'auth',
+                        'action' => 'login',
+                        'user_id' => 1,
+                    ]);
                 },
                 'test_log_auth_event_without_user' => function () {
-                    \Illuminate\Support\Facades\Auth::shouldReceive('user')->andReturn(null);
+                    Auth::shouldReceive('user')->andReturn(null);
 
-                    $service = new AuditService;
+                    $service = new AuditService();
                     $service->logAuthEvent('logout', null, ['ip' => '127.0.0.1']);
 
-                    $this->assertTrue(true); // Method returns void
+                    // Verify audit log was created without user
+                    $this->assertDatabaseHas('audit_logs', [
+                        'event_type' => 'auth',
+                        'action' => 'logout',
+                        'user_id' => null,
+                    ]);
                 },
                 'test_log_api_access' => function () {
-                    $user = Mockery::mock();
+                    $user = \Mockery::mock();
                     $user->shouldReceive('getAttribute')->with('id')->andReturn(1);
-                    \Illuminate\Support\Facades\Auth::shouldReceive('user')->andReturn($user);
+                    Auth::shouldReceive('user')->andReturn($user);
 
-                    $service = new AuditService;
+                    $service = new AuditService();
                     $service->logApiAccess('/api/test', 'GET', 1, ['response_time' => 150]);
 
-                    $this->assertTrue(true); // Method returns void
+                    // Verify API access log was created
+                    $this->assertDatabaseHas('audit_logs', [
+                        'event_type' => 'api_access',
+                        'action' => 'GET',
+                        'user_id' => 1,
+                        'resource' => '/api/test',
+                    ]);
                 },
                 'test_log_sensitive_operation' => function () {
-                    $user = Mockery::mock();
+                    $user = \Mockery::mock();
                     $user->shouldReceive('getAttribute')->with('id')->andReturn(1);
-                    \Illuminate\Support\Facades\Auth::shouldReceive('user')->andReturn($user);
+                    Auth::shouldReceive('user')->andReturn($user);
 
-                    $model = Mockery::mock(\Illuminate\Database\Eloquent\Model::class);
+                    $model = \Mockery::mock(Model::class);
                     $model->shouldReceive('getKey')->andReturn(1);
                     $model->shouldReceive('getMorphClass')->andReturn('User');
 
-                    $service = new AuditService;
+                    $service = new AuditService();
                     $service->logSensitiveOperation('password_change', $model, ['field' => 'password']);
 
-                    $this->assertTrue(true); // Method returns void
+                    // Verify sensitive operation log was created
+                    $this->assertDatabaseHas('audit_logs', [
+                        'event_type' => 'sensitive_operation',
+                        'action' => 'password_change',
+                        'user_id' => 1,
+                        'auditable_type' => 'User',
+                        'auditable_id' => 1,
+                    ]);
                 },
                 'test_log_created_event' => function () {
-                    $user = Mockery::mock();
+                    $user = \Mockery::mock();
                     $user->shouldReceive('getAttribute')->with('id')->andReturn(1);
-                    \Illuminate\Support\Facades\Auth::shouldReceive('user')->andReturn($user);
+                    Auth::shouldReceive('user')->andReturn($user);
 
-                    $model = Mockery::mock(\Illuminate\Database\Eloquent\Model::class);
+                    $model = \Mockery::mock(Model::class);
                     $model->shouldReceive('getKey')->andReturn(1);
                     $model->shouldReceive('getMorphClass')->andReturn('Product');
                     $model->shouldReceive('getAttributes')->andReturn(['name' => 'Test']);
 
-                    $service = new AuditService;
+                    $service = new AuditService();
                     $service->logCreated($model, ['name' => 'Test']);
 
-                    $this->assertTrue(true); // Method returns void
+                    // Verify creation audit log was created
+                    $this->assertDatabaseHas('audit_logs', [
+                        'event_type' => 'model_created',
+                        'action' => 'created',
+                        'user_id' => 1,
+                        'auditable_type' => 'Product',
+                        'auditable_id' => 1,
+                    ]);
                 },
             ],
             'performance_requirements' => [
@@ -215,8 +247,8 @@ class ServiceTestFactory
                 'test_remember_with_cache_hit' => function () {
                     Cache::shouldReceive('get')->with('test_key')->andReturn('cached_data');
 
-                    $service = new CacheService;
-                    $result = $service->remember('test_key', fn () => 'new_data', 3600);
+                    $service = new CacheService();
+                    $result = $service->remember('test_key', static fn () => 'new_data', 3600);
 
                     $this->assertEquals('cached_data', $result);
                 },
@@ -224,15 +256,15 @@ class ServiceTestFactory
                     Cache::shouldReceive('get')->with('test_key')->andReturn(null);
                     Cache::shouldReceive('put')->with('test_key', 'new_data', 3600)->andReturn(true);
 
-                    $service = new CacheService;
-                    $result = $service->remember('test_key', fn () => 'new_data', 3600);
+                    $service = new CacheService();
+                    $result = $service->remember('test_key', static fn () => 'new_data', 3600);
 
                     $this->assertEquals('new_data', $result);
                 },
                 'test_forget_cache_by_key' => function () {
                     Cache::shouldReceive('forget')->with('test_key')->andReturn(true);
 
-                    $service = new CacheService;
+                    $service = new CacheService();
                     $result = $service->forget('test_key');
 
                     $this->assertTrue($result);
@@ -241,7 +273,7 @@ class ServiceTestFactory
                     Cache::shouldReceive('tags')->with(['tag1', 'tag2'])->andReturnSelf();
                     Cache::shouldReceive('flush')->andReturn(true);
 
-                    $service = new CacheService;
+                    $service = new CacheService();
                     $result = $service->forgetByTags(['tag1', 'tag2']);
 
                     $this->assertTrue($result);
@@ -249,8 +281,8 @@ class ServiceTestFactory
                 'test_handles_cache_exception' => function () {
                     Cache::shouldReceive('get')->andThrow(new \Exception('Cache error'));
 
-                    $service = new CacheService;
-                    $result = $service->remember('test_key', fn () => 'data', 3600);
+                    $service = new CacheService();
+                    $result = $service->remember('test_key', static fn () => 'data', 3600);
 
                     $this->assertEquals('data', $result); // Should fallback to callback
                 },
@@ -275,7 +307,7 @@ class ServiceTestFactory
             'service_class' => ProductService::class,
             'test_methods' => [
                 'test_get_paginated_products_from_cache' => function () {
-                    $paginatedData = new \Illuminate\Pagination\LengthAwarePaginator(
+                    $paginatedData = new LengthAwarePaginator(
                         [['id' => 1, 'name' => 'Product 1']],
                         1,
                         15
@@ -283,31 +315,31 @@ class ServiceTestFactory
 
                     Cache::shouldReceive('get')->with('products_page_1_per_15')->andReturn($paginatedData);
 
-                    $service = new ProductService;
+                    $service = new ProductService();
                     $result = $service->getPaginatedProducts(1, 15);
 
-                    $this->assertInstanceOf(\Illuminate\Pagination\LengthAwarePaginator::class, $result);
+                    $this->assertInstanceOf(LengthAwarePaginator::class, $result);
                 },
                 'test_get_paginated_products_from_database' => function () {
                     Cache::shouldReceive('get')->andReturn(null);
                     Cache::shouldReceive('put')->andReturn(true);
 
                     // Mock repository
-                    $repository = Mockery::mock();
+                    $repository = \Mockery::mock();
                     $repository->shouldReceive('paginate')->andReturn(
-                        new \Illuminate\Pagination\LengthAwarePaginator([], 0, 15)
+                        new LengthAwarePaginator([], 0, 15)
                     );
 
                     $service = new ProductService($repository);
                     $result = $service->getPaginatedProducts(1, 15);
 
-                    $this->assertInstanceOf(\Illuminate\Pagination\LengthAwarePaginator::class, $result);
+                    $this->assertInstanceOf(LengthAwarePaginator::class, $result);
                 },
                 'test_handles_invalid_page_number' => function () {
-                    $service = new ProductService;
+                    $service = new ProductService();
                     $result = $service->getPaginatedProducts(0, 15);
 
-                    $this->assertInstanceOf(\Illuminate\Pagination\LengthAwarePaginator::class, $result);
+                    $this->assertInstanceOf(LengthAwarePaginator::class, $result);
                 },
             ],
             'performance_requirements' => [
@@ -330,21 +362,21 @@ class ServiceTestFactory
             'service_class' => PasswordPolicyService::class,
             'test_methods' => [
                 'test_validate_strong_password' => function () {
-                    $service = new PasswordPolicyService;
+                    $service = new PasswordPolicyService();
                     $result = $service->validatePassword('StrongPass123!');
 
                     $this->assertTrue($result['valid']);
                     $this->assertEmpty($result['errors']);
                 },
                 'test_validate_weak_password' => function () {
-                    $service = new PasswordPolicyService;
+                    $service = new PasswordPolicyService();
                     $result = $service->validatePassword('weak');
 
                     $this->assertFalse($result['valid']);
                     $this->assertNotEmpty($result['errors']);
                 },
                 'test_calculate_password_strength' => function () {
-                    $service = new PasswordPolicyService;
+                    $service = new PasswordPolicyService();
                     $strength = $service->calculatePasswordStrength('StrongPass123!');
 
                     $this->assertIsInt($strength);
@@ -352,11 +384,11 @@ class ServiceTestFactory
                     $this->assertLessThanOrEqual(100, $strength);
                 },
                 'test_generate_secure_password' => function () {
-                    $service = new PasswordPolicyService;
+                    $service = new PasswordPolicyService();
                     $password = $service->generateSecurePassword(12);
 
                     $this->assertIsString($password);
-                    $this->assertEquals(12, strlen($password));
+                    $this->assertEquals(12, \strlen($password));
 
                     $validation = $service->validatePassword($password);
                     $this->assertTrue($validation['valid']);
@@ -364,7 +396,7 @@ class ServiceTestFactory
                 'test_check_password_not_in_history' => function () {
                     Cache::shouldReceive('get')->andReturn([]);
 
-                    $service = new PasswordPolicyService;
+                    $service = new PasswordPolicyService();
                     $result = $service->checkPasswordHistory(1, 'newpassword');
 
                     $this->assertTrue($result);
@@ -395,7 +427,7 @@ class ServiceTestFactory
                     DB::shouldReceive('commit')->once();
                     Log::shouldReceive('info')->once();
 
-                    $service = new FinancialTransactionService;
+                    $service = new FinancialTransactionService();
                     $result = $service->processPayment([
                         'amount' => 100.00,
                         'currency' => 'USD',
@@ -411,7 +443,7 @@ class ServiceTestFactory
                     DB::shouldReceive('rollback')->once();
                     Log::shouldReceive('error')->once();
 
-                    $service = new FinancialTransactionService;
+                    $service = new FinancialTransactionService();
                     $result = $service->processPayment([
                         'amount' => -100.00, // Invalid amount
                         'currency' => 'USD',
@@ -427,13 +459,13 @@ class ServiceTestFactory
                     DB::shouldReceive('commit')->once();
                     Log::shouldReceive('info')->once();
 
-                    $service = new FinancialTransactionService;
+                    $service = new FinancialTransactionService();
                     $result = $service->refundTransaction('txn_123', 50.00, 'Partial refund');
 
                     $this->assertTrue($result['success']);
                 },
                 'test_calculate_tax' => function () {
-                    $service = new FinancialTransactionService;
+                    $service = new FinancialTransactionService();
                     $tax = $service->calculateTax(100.00, 'US', 'CA');
 
                     $this->assertIsFloat($tax);
@@ -483,6 +515,14 @@ class ServiceTestFactory
     }
 
     /**
+     * Clean up resources.
+     */
+    public function cleanup(): void
+    {
+        $this->testHelper->cleanup();
+    }
+
+    /**
      * Run tests for a specific service.
      */
     private function runServiceTests(array $testConfig): array
@@ -497,13 +537,13 @@ class ServiceTestFactory
 
         foreach ($testConfig['test_methods'] as $testName => $testMethod) {
             try {
-                $this->testHelper->withPerformanceTest(function () use ($testMethod) {
+                $this->testHelper->withPerformanceTest(static function () use ($testMethod) {
                     return $testMethod();
                 }, $testConfig['performance_requirements']['max_execution_time']);
 
-                $results['passed']++;
+                ++$results['passed'];
             } catch (\Exception $e) {
-                $results['failed']++;
+                ++$results['failed'];
                 $results['errors'][] = [
                     'test' => $testName,
                     'error' => $e->getMessage(),
@@ -515,13 +555,5 @@ class ServiceTestFactory
         $results['security_checks'] = $this->testHelper->getSecurityChecks();
 
         return $results;
-    }
-
-    /**
-     * Clean up resources.
-     */
-    public function cleanup(): void
-    {
-        $this->testHelper->cleanup();
     }
 }

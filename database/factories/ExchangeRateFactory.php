@@ -15,19 +15,18 @@ class ExchangeRateFactory extends Factory
     protected $model = ExchangeRate::class;
 
     /**
-     * @return (\Illuminate\Support\Carbon|float|string)[]
+     * Define the model's default state.
      *
-     * @psalm-return array{from_currency: string, to_currency: string, rate: float, source: 'test', fetched_at: \Illuminate\Support\Carbon}
+     * @return array<string, mixed>
      */
-    #[\Override]
-    public function definition()
+    public function definition(): array
     {
         return [
-            'from_currency' => $this->faker->currencyCode,
-            'to_currency' => $this->faker->currencyCode,
-            'rate' => $this->faker->randomFloat(4, 0.5, 1.5),
-            'source' => 'test',
-            'fetched_at' => now(),
+            'from_currency' => 'USD',
+            'to_currency' => $this->faker->randomElement(['EUR', 'GBP', 'EGP', 'SAR']),
+            'rate' => $this->faker->randomFloat(4, 0.5, 2.0),
+            'updated_at' => now(),
+            'created_at' => now(),
         ];
     }
 }

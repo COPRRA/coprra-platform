@@ -6,29 +6,34 @@ namespace Tests\Browser\Pages;
 
 use PHPUnit\Framework\TestCase;
 
-class HomePage extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class HomePage extends TestCase
 {
     /**
      * Test home page functionality.
      */
-    public function test_home_page_loads(): void
+    public function testHomePageLoads(): void
     {
         // Test that the home page class can be instantiated
-        $this->assertInstanceOf(self::class, $this);
+        self::assertInstanceOf(self::class, $this);
 
         // Test that the home page has required methods
-        $this->assertTrue(method_exists($this, 'test_home_page_loads'));
-        $this->assertTrue(method_exists($this, 'test_home_page_elements'));
-        $this->assertTrue(method_exists($this, 'test_home_page_navigation'));
+        self::assertTrue(method_exists($this, 'test_home_page_loads'));
+        self::assertTrue(method_exists($this, 'test_home_page_elements'));
+        self::assertTrue(method_exists($this, 'test_home_page_navigation'));
 
         // Test home page specific functionality
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     /**
      * Test home page elements.
      */
-    public function test_home_page_elements(): void
+    public function testHomePageElements(): void
     {
         // Test home page specific elements
         $homePageElements = [
@@ -38,25 +43,25 @@ class HomePage extends TestCase
             'footer' => 'Copyright 2024',
         ];
 
-        $this->assertIsArray($homePageElements);
-        $this->assertCount(4, $homePageElements);
-        $this->assertArrayHasKey('hero_section', $homePageElements);
-        $this->assertArrayHasKey('feature_cards', $homePageElements);
-        $this->assertArrayHasKey('call_to_action', $homePageElements);
-        $this->assertArrayHasKey('footer', $homePageElements);
+        self::assertIsArray($homePageElements);
+        self::assertCount(4, $homePageElements);
+        self::assertArrayHasKey('hero_section', $homePageElements);
+        self::assertArrayHasKey('feature_cards', $homePageElements);
+        self::assertArrayHasKey('call_to_action', $homePageElements);
+        self::assertArrayHasKey('footer', $homePageElements);
 
         // Test hero section content
-        $this->assertStringContainsString('Welcome', $homePageElements['hero_section']);
+        self::assertStringContainsString('Welcome', $homePageElements['hero_section']);
 
         // Test feature cards
-        $this->assertIsArray($homePageElements['feature_cards']);
-        $this->assertCount(3, $homePageElements['feature_cards']);
+        self::assertIsArray($homePageElements['feature_cards']);
+        self::assertCount(3, $homePageElements['feature_cards']);
     }
 
     /**
      * Test home page navigation.
      */
-    public function test_home_page_navigation(): void
+    public function testHomePageNavigation(): void
     {
         // Test home page navigation structure
         $navigation = [
@@ -73,18 +78,18 @@ class HomePage extends TestCase
             ],
         ];
 
-        $this->assertIsArray($navigation);
-        $this->assertArrayHasKey('main_menu', $navigation);
-        $this->assertArrayHasKey('user_menu', $navigation);
+        self::assertIsArray($navigation);
+        self::assertArrayHasKey('main_menu', $navigation);
+        self::assertArrayHasKey('user_menu', $navigation);
 
         // Test main menu
-        $this->assertIsArray($navigation['main_menu']);
-        $this->assertCount(4, $navigation['main_menu']);
-        $this->assertEquals('/', $navigation['main_menu']['home']);
+        self::assertIsArray($navigation['main_menu']);
+        self::assertCount(4, $navigation['main_menu']);
+        self::assertSame('/', $navigation['main_menu']['home']);
 
         // Test user menu
-        $this->assertIsArray($navigation['user_menu']);
-        $this->assertCount(3, $navigation['user_menu']);
-        $this->assertEquals('/login', $navigation['user_menu']['login']);
+        self::assertIsArray($navigation['user_menu']);
+        self::assertCount(3, $navigation['user_menu']);
+        self::assertSame('/login', $navigation['user_menu']['login']);
     }
 }

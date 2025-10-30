@@ -6,24 +6,29 @@ namespace Tests\Security;
 
 use Tests\TestCase;
 
-class SecurityAudit extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class SecurityAudit extends TestCase
 {
-    public function test_security_headers_present(): void
+    public function testSecurityHeadersPresent(): void
     {
         // Test that security headers are present in responses
         $response = $this->get('/');
 
         // Check for basic security headers
-        $this->assertTrue($response->headers->has('X-Content-Type-Options') ||
-                          $response->headers->get('X-Content-Type-Options') === null);
-        $this->assertTrue($response->headers->has('X-Frame-Options') ||
-                          $response->headers->get('X-Frame-Options') === null);
+        self::assertTrue($response->headers->has('X-Content-Type-Options')
+                          || null === $response->headers->get('X-Content-Type-Options'));
+        self::assertTrue($response->headers->has('X-Frame-Options')
+                          || null === $response->headers->get('X-Frame-Options'));
 
         // This test passes if headers are either present or not set (allowing for framework defaults)
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
-    public function test_api_endpoints_require_authentication_when_appropriate(): void
+    public function testApiEndpointsRequireAuthenticationWhenAppropriate(): void
     {
         // Test that protected API endpoints require authentication
         $protectedEndpoints = [
@@ -36,11 +41,11 @@ class SecurityAudit extends TestCase
             $response = $this->postJson($endpoint, []);
 
             // Should return 401 (unauthorized) or 405 (method not allowed) or 404 (not found)
-            $this->assertContains($response->status(), [401, 405, 404, 422]);
+            self::assertContains($response->status(), [401, 405, 404, 422]);
         }
     }
 
-    public function test_sensitive_data_not_exposed_in_responses(): void
+    public function testSensitiveDataNotExposedInResponses(): void
     {
         // Test that sensitive data like passwords, API keys, etc. are not exposed
         $response = $this->getJson('/api/products');
@@ -49,11 +54,11 @@ class SecurityAudit extends TestCase
         $content = $response->getContent();
 
         // Should not contain password fields, API keys, etc.
-        $this->assertStringNotContainsString('password', strtolower($content));
-        $this->assertStringNotContainsString('api_key', strtolower($content));
-        $this->assertStringNotContainsString('secret', strtolower($content));
+        self::assertStringNotContainsString('password', strtolower($content));
+        self::assertStringNotContainsString('api_key', strtolower($content));
+        self::assertStringNotContainsString('secret', strtolower($content));
 
         // Accept various status codes
-        $this->assertContains($response->status(), [200, 404, 500]);
+        self::assertContains($response->status(), [200, 404, 500]);
     }
 }

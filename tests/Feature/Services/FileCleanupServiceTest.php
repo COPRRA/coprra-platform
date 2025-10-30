@@ -10,10 +10,14 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Mockery;
 use Tests\TestCase;
 
-class FileCleanupServiceTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class FileCleanupServiceTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -22,16 +26,16 @@ class FileCleanupServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new FileCleanupService;
+        $this->service = new FileCleanupService();
     }
 
     protected function tearDown(): void
     {
-        Mockery::close();
+        \Mockery::close();
         parent::tearDown();
     }
 
-    public function test_cleans_up_temp_files()
+    public function testCleansUpTempFiles()
     {
         // Arrange
         $tempDirs = [
@@ -67,18 +71,19 @@ class FileCleanupServiceTest extends TestCase
         }
 
         Log::shouldReceive('info')
-            ->with('Temp files cleanup completed', Mockery::type('array'));
+            ->with('Temp files cleanup completed', \Mockery::type('array'))
+        ;
 
         // Act
         $result = $this->service->cleanupTempFiles();
 
         // Assert
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('temp_files', $result);
-        $this->assertArrayHasKey('deleted_size', $result);
-        $this->assertArrayHasKey('errors', $result);
-        $this->assertGreaterThan(0, $result['temp_files']);
-        $this->assertGreaterThan(0, $result['deleted_size']);
+        self::assertIsArray($result);
+        self::assertArrayHasKey('temp_files', $result);
+        self::assertArrayHasKey('deleted_size', $result);
+        self::assertArrayHasKey('errors', $result);
+        self::assertGreaterThan(0, $result['temp_files']);
+        self::assertGreaterThan(0, $result['deleted_size']);
 
         // Clean up
         foreach ($files as $file) {
@@ -88,25 +93,26 @@ class FileCleanupServiceTest extends TestCase
         }
     }
 
-    public function test_handles_temp_files_cleanup_exception()
+    public function testHandlesTempFilesCleanupException()
     {
         // Arrange
         $this->mockDirectoryExists(storage_path('app/temp'), true);
         $this->mockCleanupDirectoryException(storage_path('app/temp'));
 
         Log::shouldReceive('error')
-            ->with('Temp files cleanup failed', Mockery::type('array'));
+            ->with('Temp files cleanup failed', \Mockery::type('array'))
+        ;
 
         // Act
         $result = $this->service->cleanupTempFiles();
 
         // Assert
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('errors', $result);
-        $this->assertNotEmpty($result['errors']);
+        self::assertIsArray($result);
+        self::assertArrayHasKey('errors', $result);
+        self::assertNotEmpty($result['errors']);
     }
 
-    public function test_cleans_up_log_files()
+    public function testCleansUpLogFiles()
     {
         // Arrange
         $logDirectory = storage_path('logs');
@@ -131,18 +137,19 @@ class FileCleanupServiceTest extends TestCase
         }
 
         Log::shouldReceive('info')
-            ->with('Log files cleanup completed', Mockery::type('array'));
+            ->with('Log files cleanup completed', \Mockery::type('array'))
+        ;
 
         // Act
         $result = $this->service->cleanupLogFiles();
 
         // Assert
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('log_files', $result);
-        $this->assertArrayHasKey('deleted_size', $result);
-        $this->assertArrayHasKey('errors', $result);
-        $this->assertGreaterThan(0, $result['log_files']);
-        $this->assertGreaterThan(0, $result['deleted_size']);
+        self::assertIsArray($result);
+        self::assertArrayHasKey('log_files', $result);
+        self::assertArrayHasKey('deleted_size', $result);
+        self::assertArrayHasKey('errors', $result);
+        self::assertGreaterThan(0, $result['log_files']);
+        self::assertGreaterThan(0, $result['deleted_size']);
 
         // Clean up
         foreach ($files as $file) {
@@ -152,7 +159,7 @@ class FileCleanupServiceTest extends TestCase
         }
     }
 
-    public function test_handles_log_files_cleanup_exception()
+    public function testHandlesLogFilesCleanupException()
     {
         // Arrange
         $logDirectory = storage_path('logs');
@@ -163,17 +170,18 @@ class FileCleanupServiceTest extends TestCase
         }
 
         Log::shouldReceive('info')
-            ->with('Log files cleanup completed', Mockery::type('array'));
+            ->with('Log files cleanup completed', \Mockery::type('array'))
+        ;
 
         // Act
         $result = $this->service->cleanupLogFiles();
 
         // Assert
-        $this->assertIsArray($result);
-        $this->assertEquals(0, $result['log_files']);
+        self::assertIsArray($result);
+        self::assertSame(0, $result['log_files']);
     }
 
-    public function test_cleans_up_cache_files()
+    public function testCleansUpCacheFiles()
     {
         // Arrange
         $cacheDirs = [
@@ -192,7 +200,7 @@ class FileCleanupServiceTest extends TestCase
             }
 
             // Create cache files
-            for ($i = 1; $i <= 3; $i++) {
+            for ($i = 1; $i <= 3; ++$i) {
                 $file = $dir.'/cache_file'.$i.'.php';
                 file_put_contents($file, 'cache content');
                 touch($file, $oldTime);
@@ -202,27 +210,31 @@ class FileCleanupServiceTest extends TestCase
 
         Artisan::shouldReceive('call')
             ->with('cache:clear')
-            ->andReturn(0);
+            ->andReturn(0)
+        ;
         Artisan::shouldReceive('call')
             ->with('view:clear')
-            ->andReturn(0);
+            ->andReturn(0)
+        ;
         Artisan::shouldReceive('call')
             ->with('config:clear')
-            ->andReturn(0);
+            ->andReturn(0)
+        ;
 
         Log::shouldReceive('info')
-            ->with('Cache files cleanup completed', Mockery::type('array'));
+            ->with('Cache files cleanup completed', \Mockery::type('array'))
+        ;
 
         // Act
         $result = $this->service->cleanupCacheFiles();
 
         // Assert
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('cache_files', $result);
-        $this->assertArrayHasKey('deleted_size', $result);
-        $this->assertArrayHasKey('errors', $result);
-        $this->assertEquals(9, $result['cache_files']); // 3 dirs * 3 files each
-        $this->assertGreaterThan(0, $result['deleted_size']);
+        self::assertIsArray($result);
+        self::assertArrayHasKey('cache_files', $result);
+        self::assertArrayHasKey('deleted_size', $result);
+        self::assertArrayHasKey('errors', $result);
+        self::assertSame(9, $result['cache_files']); // 3 dirs * 3 files each
+        self::assertGreaterThan(0, $result['deleted_size']);
 
         // Clean up
         foreach ($files as $file) {
@@ -232,7 +244,7 @@ class FileCleanupServiceTest extends TestCase
         }
     }
 
-    public function test_cleans_up_backup_files()
+    public function testCleansUpBackupFiles()
     {
         // Arrange
         $backupDirectory = storage_path('backups');
@@ -257,18 +269,19 @@ class FileCleanupServiceTest extends TestCase
         }
 
         Log::shouldReceive('info')
-            ->with('Backup files cleanup completed', Mockery::type('array'));
+            ->with('Backup files cleanup completed', \Mockery::type('array'))
+        ;
 
         // Act
         $result = $this->service->cleanupBackupFiles();
 
         // Assert
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('backup_files', $result);
-        $this->assertArrayHasKey('deleted_size', $result);
-        $this->assertArrayHasKey('errors', $result);
-        $this->assertEquals(3, $result['backup_files']);
-        $this->assertGreaterThan(0, $result['deleted_size']);
+        self::assertIsArray($result);
+        self::assertArrayHasKey('backup_files', $result);
+        self::assertArrayHasKey('deleted_size', $result);
+        self::assertArrayHasKey('errors', $result);
+        self::assertSame(3, $result['backup_files']);
+        self::assertGreaterThan(0, $result['deleted_size']);
 
         // Clean up
         foreach ($files as $file) {
@@ -278,7 +291,7 @@ class FileCleanupServiceTest extends TestCase
         }
     }
 
-    public function test_cleans_up_uploaded_files()
+    public function testCleansUpUploadedFiles()
     {
         // Arrange
         $uploadDirs = [
@@ -295,7 +308,7 @@ class FileCleanupServiceTest extends TestCase
             }
 
             // Create uploaded files
-            for ($i = 1; $i <= 2; $i++) {
+            for ($i = 1; $i <= 2; ++$i) {
                 $file = $dir.'/upload'.$i.'.jpg';
                 file_put_contents($file, 'image content');
                 // Set old modification time
@@ -306,18 +319,19 @@ class FileCleanupServiceTest extends TestCase
         }
 
         Log::shouldReceive('info')
-            ->with('Uploaded files cleanup completed', Mockery::type('array'));
+            ->with('Uploaded files cleanup completed', \Mockery::type('array'))
+        ;
 
         // Act
         $result = $this->service->cleanupUploadedFiles();
 
         // Assert
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('uploaded_files', $result);
-        $this->assertArrayHasKey('deleted_size', $result);
-        $this->assertArrayHasKey('errors', $result);
-        $this->assertEquals(4, $result['uploaded_files']); // 2 dirs * 2 files each
-        $this->assertGreaterThan(0, $result['deleted_size']);
+        self::assertIsArray($result);
+        self::assertArrayHasKey('uploaded_files', $result);
+        self::assertArrayHasKey('deleted_size', $result);
+        self::assertArrayHasKey('errors', $result);
+        self::assertSame(4, $result['uploaded_files']); // 2 dirs * 2 files each
+        self::assertGreaterThan(0, $result['deleted_size']);
 
         // Clean up
         foreach ($files as $file) {
@@ -327,14 +341,15 @@ class FileCleanupServiceTest extends TestCase
         }
     }
 
-    public function test_performs_complete_cleanup()
+    public function testPerformsCompleteCleanup()
     {
         // Arrange
         // Create some test files for cleanup
         $this->createTestFilesForCleanup();
 
         Log::shouldReceive('info')
-            ->with('Complete file cleanup performed', Mockery::type('array'));
+            ->with('Complete file cleanup performed', \Mockery::type('array'))
+        ;
 
         Log::shouldReceive('error')->andReturn(true);
 
@@ -342,17 +357,17 @@ class FileCleanupServiceTest extends TestCase
         $result = $this->service->performCompleteCleanup();
 
         // Assert
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('temp_files', $result);
-        $this->assertArrayHasKey('log_files', $result);
-        $this->assertArrayHasKey('cache_files', $result);
-        $this->assertArrayHasKey('backup_files', $result);
-        $this->assertArrayHasKey('uploaded_files', $result);
-        $this->assertArrayHasKey('total_files_deleted', $result);
-        $this->assertArrayHasKey('total_size_deleted', $result);
+        self::assertIsArray($result);
+        self::assertArrayHasKey('temp_files', $result);
+        self::assertArrayHasKey('log_files', $result);
+        self::assertArrayHasKey('cache_files', $result);
+        self::assertArrayHasKey('backup_files', $result);
+        self::assertArrayHasKey('uploaded_files', $result);
+        self::assertArrayHasKey('total_files_deleted', $result);
+        self::assertArrayHasKey('total_size_deleted', $result);
     }
 
-    public function test_checks_storage_usage()
+    public function testChecksStorageUsage()
     {
         // Arrange
         // Create some test files to calculate size
@@ -372,15 +387,15 @@ class FileCleanupServiceTest extends TestCase
         $result = $this->service->checkStorageUsage();
 
         // Assert
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('current_size_mb', $result);
-        $this->assertArrayHasKey('max_size_mb', $result);
-        $this->assertArrayHasKey('usage_percentage', $result);
-        $this->assertArrayHasKey('needs_cleanup', $result);
-        $this->assertGreaterThan(0, $result['current_size_mb']);
-        $this->assertEquals(1024, $result['max_size_mb']);
-        $this->assertGreaterThan(0, $result['usage_percentage']);
-        $this->assertFalse($result['needs_cleanup']);
+        self::assertIsArray($result);
+        self::assertArrayHasKey('current_size_mb', $result);
+        self::assertArrayHasKey('max_size_mb', $result);
+        self::assertArrayHasKey('usage_percentage', $result);
+        self::assertArrayHasKey('needs_cleanup', $result);
+        self::assertGreaterThan(0, $result['current_size_mb']);
+        self::assertSame(1024, $result['max_size_mb']);
+        self::assertGreaterThan(0, $result['usage_percentage']);
+        self::assertFalse($result['needs_cleanup']);
 
         // Clean up
         if (is_dir($testDir)) {
@@ -389,7 +404,7 @@ class FileCleanupServiceTest extends TestCase
         }
     }
 
-    public function test_checks_storage_usage_over_limit()
+    public function testChecksStorageUsageOverLimit()
     {
         // Arrange
         Storage::fake('local');
@@ -401,10 +416,10 @@ class FileCleanupServiceTest extends TestCase
         }
 
         // Create multiple large files to exceed 1GB limit
-        for ($i = 1; $i <= 21; $i++) {
+        for ($i = 1; $i <= 21; ++$i) {
             $file = $testDir.'/large_file_'.$i.'.txt';
             $fp = fopen($file, 'w');
-            for ($j = 0; $j < 5; $j++) { // 5 * 10MB = 50MB
+            for ($j = 0; $j < 5; ++$j) { // 5 * 10MB = 50MB
                 fwrite($fp, str_repeat('x', 1024 * 1024 * 10)); // 10MB
             }
             fclose($fp);
@@ -414,8 +429,8 @@ class FileCleanupServiceTest extends TestCase
         $result = $this->service->checkStorageUsage();
 
         // Assert
-        $this->assertTrue($result['needs_cleanup']);
-        $this->assertGreaterThan(100, $result['usage_percentage']);
+        self::assertTrue($result['needs_cleanup']);
+        self::assertGreaterThan(100, $result['usage_percentage']);
 
         // Clean up
         if (is_dir($testDir)) {
@@ -424,7 +439,7 @@ class FileCleanupServiceTest extends TestCase
         }
     }
 
-    public function test_gets_cleanup_statistics()
+    public function testGetsCleanupStatistics()
     {
         // Arrange
         // Mock the getDirectorySize method to return 512MB
@@ -437,36 +452,43 @@ class FileCleanupServiceTest extends TestCase
         $result = $this->service->getCleanupStatistics();
 
         // Assert
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('storage_usage', $result);
-        $this->assertArrayHasKey('config', $result);
-        $this->assertArrayHasKey('last_cleanup', $result);
-        $this->assertArrayHasKey('next_cleanup', $result);
+        self::assertIsArray($result);
+        self::assertArrayHasKey('storage_usage', $result);
+        self::assertArrayHasKey('config', $result);
+        self::assertArrayHasKey('last_cleanup', $result);
+        self::assertArrayHasKey('next_cleanup', $result);
     }
 
-    public function test_schedules_cleanup_daily()
+    public function testSchedulesCleanupDaily()
     {
         // Arrange
         Artisan::shouldReceive('call')
             ->with('schedule:run')
-            ->andReturn(0);
+            ->once()
+            ->andReturn(0)
+        ;
 
         // Act
-        $this->service->scheduleCleanup();
+        $result = $this->service->scheduleCleanup();
 
         // Assert
-        $this->assertTrue(true);
+        self::assertTrue($result);
+        $this->assertDatabaseHas('scheduled_tasks', [
+            'task_type' => 'file_cleanup',
+            'frequency' => 'daily',
+            'status' => 'scheduled',
+        ]);
     }
 
-    public function test_schedules_cleanup_weekly_on_sunday()
+    public function testSchedulesCleanupWeeklyOnSunday()
     {
         // Arrange
-        $service = Mockery::mock(FileCleanupService::class)->makePartial();
+        $service = \Mockery::mock(FileCleanupService::class)->makePartial();
         $service->config = ['cleanup_schedule' => 'weekly'];
 
         // Mock Carbon::now()->isSunday() to return true
-        $this->mockFunction('now', function () {
-            $mock = Mockery::mock();
+        $this->mockFunction('now', static function () {
+            $mock = \Mockery::mock();
             $mock->shouldReceive('isSunday')->andReturn(true);
 
             return $mock;
@@ -474,20 +496,28 @@ class FileCleanupServiceTest extends TestCase
 
         Artisan::shouldReceive('call')
             ->with('schedule:run')
-            ->andReturn(0);
+            ->once()
+            ->andReturn(0)
+        ;
 
         // Act
-        $service->scheduleCleanup();
+        $result = $service->scheduleCleanup();
 
         // Assert
-        $this->assertTrue(true);
+        self::assertTrue($result);
+        $this->assertDatabaseHas('scheduled_tasks', [
+            'task_type' => 'file_cleanup',
+            'frequency' => 'weekly',
+            'day_of_week' => 'sunday',
+            'status' => 'scheduled',
+        ]);
     }
 
     // Helper methods for mocking
 
     private function mockDirectoryExists(string $path, bool $exists): void
     {
-        $this->mockFunction('is_dir', function ($dir) use ($path, $exists) {
+        $this->mockFunction('is_dir', static function ($dir) use ($path, $exists) {
             return $dir === $path ? $exists : false;
         });
     }
@@ -495,13 +525,13 @@ class FileCleanupServiceTest extends TestCase
     private function mockCleanupDirectory(string $path, int $filesDeleted, int $sizeDeleted): void
     {
         // Mock directory exists
-        $this->mockFunction('is_dir', function ($dir) use ($path) {
+        $this->mockFunction('is_dir', static function ($dir) use ($path) {
             return $dir === $path;
         });
 
         // Mock glob to return files
         $files = [];
-        for ($i = 0; $i < $filesDeleted; $i++) {
+        for ($i = 0; $i < $filesDeleted; ++$i) {
             $files[] = $path.'/file'.$i.'.tmp';
         }
         $this->mockGlob($path.'/*', $files);
@@ -510,7 +540,7 @@ class FileCleanupServiceTest extends TestCase
         $oldTimestamp = time() - (8 * 24 * 60 * 60); // 8 days ago
         foreach ($files as $file) {
             $this->mockFileMtime($file, $oldTimestamp);
-            $this->mockFileSize($file, intval($sizeDeleted / $filesDeleted));
+            $this->mockFileSize($file, (int) ($sizeDeleted / $filesDeleted));
         }
 
         // Mock unlink to return success
@@ -521,7 +551,7 @@ class FileCleanupServiceTest extends TestCase
 
     private function mockCleanupDirectoryException(string $path): void
     {
-        $this->mockFunction('is_dir', function ($dir) use ($path) {
+        $this->mockFunction('is_dir', static function ($dir) use ($path) {
             if ($dir === $path) {
                 throw new \Exception('Directory access error');
             }
@@ -532,28 +562,28 @@ class FileCleanupServiceTest extends TestCase
 
     private function mockGlob(string $pattern, $result): void
     {
-        $this->mockFunction('glob', function ($pat) use ($pattern, $result) {
+        $this->mockFunction('glob', static function ($pat) use ($pattern, $result) {
             return $pat === $pattern ? $result : [];
         });
     }
 
     private function mockFileMtime(string $file, int $timestamp): void
     {
-        $this->mockFunction('filemtime', function ($f) use ($file, $timestamp) {
+        $this->mockFunction('filemtime', static function ($f) use ($file, $timestamp) {
             return $f === $file ? $timestamp : 0;
         });
     }
 
     private function mockFileSize(string $file, int $size): void
     {
-        $this->mockFunction('filesize', function ($f) use ($file, $size) {
+        $this->mockFunction('filesize', static function ($f) use ($file, $size) {
             return $f === $file ? $size : 0;
         });
     }
 
     private function mockUnlink(string $file, bool $success): void
     {
-        $this->mockFunction('unlink', function ($f) use ($file, $success) {
+        $this->mockFunction('unlink', static function ($f) use ($file, $success) {
             return $f === $file ? $success : false;
         });
     }
@@ -561,11 +591,11 @@ class FileCleanupServiceTest extends TestCase
     private function mockGetDirectorySize(string $path, int $size): void
     {
         // Mock the getDirectorySize method by mocking the underlying functions
-        $this->mockFunction('is_dir', function ($dir) use ($path) {
+        $this->mockFunction('is_dir', static function ($dir) use ($path) {
             return $dir === $path;
         });
 
-        $this->mockFunction('scandir', function ($dir) use ($path) {
+        $this->mockFunction('scandir', static function ($dir) use ($path) {
             if ($dir === $path) {
                 return ['.', '..', 'file1.txt', 'file2.txt', 'subdir'];
             }
@@ -573,12 +603,12 @@ class FileCleanupServiceTest extends TestCase
             return [];
         });
 
-        $this->mockFunction('is_file', function ($file) {
+        $this->mockFunction('is_file', static function ($file) {
             return ! str_contains($file, 'subdir');
         });
 
-        $this->mockFunction('filesize', function ($file) use ($size) {
-            return intval($size / 3); // Distribute size across files
+        $this->mockFunction('filesize', static function ($file) use ($size) {
+            return (int) ($size / 3); // Distribute size across files
         });
     }
 
@@ -638,7 +668,7 @@ class FileCleanupServiceTest extends TestCase
 
     private function mockFileExists(string $file, bool $exists): void
     {
-        $this->mockFunction('file_exists', function ($f) use ($file, $exists) {
+        $this->mockFunction('file_exists', static function ($f) use ($file, $exists) {
             return $f === $file ? $exists : false;
         });
     }
@@ -676,7 +706,7 @@ class FileCleanupServiceTest extends TestCase
 
     private function mockFunction(string $functionName, callable $callback): void
     {
-        if (! function_exists($functionName)) {
+        if (! \function_exists($functionName)) {
             eval("function {$functionName}(\$arg) { return call_user_func_array('{$functionName}', func_get_args()); }");
         }
     }

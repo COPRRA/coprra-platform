@@ -18,7 +18,7 @@ class BackupFileService
     /**
      * Delete backup file and log the operation.
      *
-     * @param  array<string, string|int|null>  $backup
+     * @param  array<string, string|int|* @method static \App\Models\Brand create(array<string, string|bool|null>  $backup
      */
     public function deleteBackupFile(array $backup, string $backupId): void
     {
@@ -34,11 +34,11 @@ class BackupFileService
     /**
      * Get backup file path.
      *
-     * @param  array<string, string|int|null>  $backup
+     * @param  array<string, string|int|* @method static \App\Models\Brand create(array<string, string|bool|null>  $backup
      */
     public function getBackupFilePath(array $backup): string
     {
-        $filename = is_string($backup['filename'] ?? '') ? $backup['filename'] ?? '' : '';
+        $filename = \is_string($backup['filename'] ?? '') ? $backup['filename'] ?? '' : '';
 
         return $this->backupPath.'/'.$filename;
     }
@@ -46,7 +46,7 @@ class BackupFileService
     /**
      * Check if backup file exists.
      *
-     * @param  array<string, string|int|null>  $backup
+     * @param  array<string, string|int|* @method static \App\Models\Brand create(array<string, string|bool|null>  $backup
      */
     public function backupFileExists(array $backup): bool
     {
@@ -58,7 +58,7 @@ class BackupFileService
     /**
      * Get backup file size.
      *
-     * @param  array<string, string|int|null>  $backup
+     * @param  array<string, string|int|* @method static \App\Models\Brand create(array<string, string|bool|null>  $backup
      */
     public function getBackupFileSize(array $backup): int
     {
@@ -70,23 +70,6 @@ class BackupFileService
 
         $fileSize = filesize($filePath);
 
-        return $fileSize !== false ? $fileSize : 0;
-    }
-
-    /**
-     * Remove directory recursively.
-     */
-    public function removeDirectory(string $dir): void
-    {
-        if (! is_dir($dir)) {
-            return;
-        }
-
-        $files = array_diff(scandir($dir), ['.', '..']);
-        foreach ($files as $file) {
-            $path = $dir.'/'.$file;
-            is_dir($path) ? $this->removeDirectory($path) : unlink($path);
-        }
-        rmdir($dir);
+        return false !== $fileSize ? $fileSize : 0;
     }
 }

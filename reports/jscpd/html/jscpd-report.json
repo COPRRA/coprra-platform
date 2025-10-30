@@ -1,0 +1,194 @@
+{
+  "statistics": {
+    "detectionDate": "2025-10-28T23:56:20.898Z",
+    "formats": {
+      "javascript": {
+        "sources": {
+          "resources/js/utils/error-tracker.js": {
+            "lines": 5,
+            "tokens": 42,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "resources/js/tests/image-effects.test.js": {
+            "lines": 176,
+            "tokens": 1297,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "resources/js/tests/image-effects-module.test.js": {
+            "lines": 55,
+            "tokens": 379,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "resources/js/tests/error-tracker.test.js": {
+            "lines": 93,
+            "tokens": 712,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "resources/js/tests/bootstrap.test.js": {
+            "lines": 112,
+            "tokens": 893,
+            "sources": 1,
+            "clones": 2,
+            "duplicatedLines": 10,
+            "duplicatedTokens": 122,
+            "percentage": 8.93,
+            "percentageTokens": 13.66,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "resources/js/tests/app.test.js": {
+            "lines": 82,
+            "tokens": 732,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "resources/js/state/Store.js": {
+            "lines": 15,
+            "tokens": 127,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "resources/js/animations/image-effects.js": {
+            "lines": 39,
+            "tokens": 259,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "resources/js/bootstrap.js": {
+            "lines": 15,
+            "tokens": 41,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "resources/js/app.js": {
+            "lines": 4,
+            "tokens": 35,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 596,
+          "tokens": 4517,
+          "sources": 10,
+          "clones": 1,
+          "duplicatedLines": 5,
+          "duplicatedTokens": 61,
+          "percentage": 0.84,
+          "percentageTokens": 1.35,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      }
+    },
+    "total": {
+      "lines": 596,
+      "tokens": 4517,
+      "sources": 10,
+      "clones": 1,
+      "duplicatedLines": 5,
+      "duplicatedTokens": 61,
+      "percentage": 0.84,
+      "percentageTokens": 1.35,
+      "newDuplicatedLines": 0,
+      "newClones": 0
+    }
+  },
+  "duplicates": [
+    {
+      "format": "javascript",
+      "lines": 6,
+      "fragment": "globalThis.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';\n\n      expect(globalThis.axios).toBeDefined();\n      expect(globalThis.axios.defaults.headers.common['X-Requested-With']).toBe('XMLHttpRequest');\n    });\n  }",
+      "tokens": 0,
+      "firstFile": {
+        "name": "resources\\js\\tests\\bootstrap.test.js",
+        "start": 107,
+        "end": 112,
+        "startLoc": {
+          "line": 107,
+          "column": 7,
+          "position": 826
+        },
+        "endLoc": {
+          "line": 112,
+          "column": 2,
+          "position": 887
+        }
+      },
+      "secondFile": {
+        "name": "resources\\js\\tests\\bootstrap.test.js",
+        "start": 95,
+        "end": 101,
+        "startLoc": {
+          "line": 95,
+          "column": 7,
+          "position": 715
+        },
+        "endLoc": {
+          "line": 101,
+          "column": 3,
+          "position": 777
+        }
+      }
+    }
+  ],
+  "filename": "C:\\Users\\Gaser\\Desktop\\COPRRA\\node_modules\\@jscpd\\html-reporter\\dist\\templates\\main.pug"
+}

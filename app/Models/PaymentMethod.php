@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PaymentMethod extends Model
 {
@@ -45,10 +47,14 @@ class PaymentMethod extends Model
         return $this->casts;
     }
 
+    // --- Relationships ---
+
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<Payment, PaymentMethod>
+     * Get the payments for this payment method.
+     *
+     * @return HasMany<Payment>
      */
-    public function payments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
     }
@@ -56,21 +62,25 @@ class PaymentMethod extends Model
     // --- Scopes ---
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Builder<PaymentMethod>  $query
+     * Scope a query to only include active payment methods.
      *
-     * @psalm-return \Illuminate\Database\Eloquent\Builder<self>
+     * @param Builder<PaymentMethod> $query
+     *
+     * @return Builder<PaymentMethod>
      */
-    public function scopeActive(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Builder<PaymentMethod>  $query
+     * Scope a query to only include default payment methods.
      *
-     * @psalm-return \Illuminate\Database\Eloquent\Builder<self>
+     * @param Builder<PaymentMethod> $query
+     *
+     * @return Builder<PaymentMethod>
      */
-    public function scopeDefault(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    public function scopeDefault(Builder $query): Builder
     {
         return $query->where('is_default', true);
     }

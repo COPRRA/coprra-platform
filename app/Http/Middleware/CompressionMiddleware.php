@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Middleware;
 
 use App\Services\Compression\CompressionResponseService;
-use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -18,7 +17,7 @@ class CompressionMiddleware
         $this->compressionResponseService = $compressionResponseService;
     }
 
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, \Closure $next): Response
     {
         $response = $next($request);
 

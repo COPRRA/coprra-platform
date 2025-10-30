@@ -45,7 +45,7 @@ final readonly class ProcessResult
      */
     public function successful(): bool
     {
-        return $this->exitCode === 0;
+        return 0 === $this->exitCode;
     }
 
     /**

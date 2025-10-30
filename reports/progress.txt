@@ -1,0 +1,12 @@
+{
+  "total_items": 413,
+  "items_completed": 420,
+  "items_passed": 6,
+  "items_failed": 414,
+  "items_skipped": 0,
+  "progress_percent": 101,
+  "current_batch": 42,
+  "total_batches": 42,
+  "start_time": 1761471064,
+  "current_time": 1761473251
+}

@@ -7,11 +7,16 @@ namespace Tests\Browser;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\DuskTestCase;
 
-class ExampleTest extends DuskTestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class ExampleTest extends DuskTestCase
 {
     #[Test]
-    public function example_browser_test(): void
+    public function exampleBrowserTest(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 }

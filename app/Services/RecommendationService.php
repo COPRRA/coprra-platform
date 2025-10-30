@@ -7,14 +7,20 @@ namespace App\Services;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\User;
+use App\Repositories\RecommendationRepository;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 final class RecommendationService
 {
+    public function __construct(
+        private readonly RecommendationRepository $recommendationRepository
+    ) {}
+
     /**
-     * @return array<int, \App\Models\Product>
+     * @return array<int, Product>
      *
      * @psalm-suppress PossiblyUnusedMethod
      */
@@ -23,49 +29,47 @@ final class RecommendationService
         $cacheKey = "recommendations_user_{$user->id}";
         $cacheTtl = (int) config('coprra.cache.durations.default', 3600);
 
-        return Cache::remember($cacheKey, $cacheTtl, /**
-         * @psalm-return array<int, mixed>
-         */
+        return Cache::remember(
+            $cacheKey,
+            $cacheTtl, /**
+            * @psalm-return array<int, mixed>
+            */
             function () use ($user, $limit): array {
                 $recommendations = $this->collectRecommendations($user, $limit);
 
                 return $this->filterAndLimitRecommendations($recommendations, $user, $limit);
-            });
+            }
+        );
     }
 
     /**
-     * @return array<int, \App\Models\Product>
+     * @return array<int, Product>
      */
     public function getSimilarProducts(Product $product, int $limit = 5): array
     {
-        return Product::where('category_id', $product->category_id)
-            ->where('id', '!=', $product->id)
-            ->where('is_active', true)
-            ->orderBy('rating', 'desc')
-            ->limit($limit)
-            ->get()
-            ->all();
+        return $this->recommendationRepository
+            ->getSimilarProducts($product, $limit)
+            ->all()
+        ;
     }
 
     /**
-     * @return array<int, \App\Models\Product>
+     * @return array<int, Product>
      */
     public function getFrequentlyBoughtTogether(Product $product, int $limit = 5): array
     {
-        $productIds = $this->getFrequentlyBoughtProductIds($product, $limit);
-
-        return Product::whereIn('id', $productIds)
-            ->where('is_active', true)
-            ->get()
-            ->all();
+        return $this->recommendationRepository
+            ->getFrequentlyBoughtTogether($product, $limit)
+            ->all()
+        ;
     }
 
     /**
-     * Collect recommendations from different sources
+     * Collect recommendations from different sources.
      *
-     * @psalm-return \Illuminate\Support\Collection<never, never>
+     * @psalm-return Collection<never, never>
      */
-    private function collectRecommendations(User $user, int $limit): \Illuminate\Support\Collection
+    private function collectRecommendations(User $user, int $limit): Collection
     {
         $recommendations = collect();
 
@@ -84,62 +88,37 @@ final class RecommendationService
     }
 
     /**
-     * Filter recommendations and apply limit
+     * Filter recommendations and apply limit.
      *
      * @return array<int, mixed>
      */
-    private function filterAndLimitRecommendations(\Illuminate\Support\Collection $recommendations, User $user, int $limit): array
+    private function filterAndLimitRecommendations(Collection $recommendations, User $user, int $limit): array
     {
         $purchasedProductIds = $this->getPurchasedProductIds($user);
 
         return $recommendations
             ->unique('id')
             ->reject(static function (mixed $product) use ($purchasedProductIds): bool {
-                if (! is_object($product) || ! property_exists($product, 'id')) {
+                if (! \is_object($product) || ! property_exists($product, 'id')) {
                     return true;
                 }
 
-                return in_array($product->id, $purchasedProductIds);
+                return \in_array($product->id, $purchasedProductIds, true);
             })
             ->take($limit)
             ->values()
-            ->toArray();
+            ->toArray()
+        ;
     }
 
     /**
-     * Get product IDs that are frequently bought together with the given product
+     * Get user preferences based on purchase history.
      *
-     * @return array<int, int>
-     */
-    private function getFrequentlyBoughtProductIds(Product $product, int $limit): array
-    {
-        return OrderItem::whereHas('order', function ($query) use ($product): void {
-            $query->whereHas('items', function ($q) use ($product): void {
-                $q->where('product_id', $product->id);
-            });
-        })
-            ->where('product_id', '!=', $product->id)
-            ->select('product_id')
-            ->selectRaw('COUNT(*) as frequency')
-            ->groupBy('product_id')
-            ->orderBy('frequency', 'desc')
-            ->limit($limit)
-            ->pluck('product_id')
-            ->toArray();
-    }
-
-    /**
-     * Get user preferences based on purchase history
-     *
-     * @return array<string, array<int, int>|array<string, float|null>>
+     * @return array<string, array<int, int>|array<string, float|* @method static \App\Models\Brand create(array<string, string|bool|null>>
      */
     private function getUserPreferences(User $user): array
     {
-        $purchases = OrderItem::whereHas('order', static function ($query) use ($user): void {
-            $query->where('user_id', $user->id);
-        })
-            ->with('product')
-            ->get();
+        $purchases = $this->recommendationRepository->getUserPurchaseHistory($user);
 
         if ($purchases->isEmpty()) {
             return [];
@@ -157,53 +136,55 @@ final class RecommendationService
     }
 
     /**
-     * Extract category preferences from purchases
+     * Extract category preferences from purchases.
      *
-     * @psalm-return \Illuminate\Support\Collection<int, int>
+     * @psalm-return Collection<int, int>
      */
-    private function extractCategoryPreferences(\Illuminate\Support\Collection $purchases): \Illuminate\Support\Collection
+    private function extractCategoryPreferences(Collection $purchases): Collection
     {
-        return $purchases->groupBy(function (OrderItem $item): int {
+        return $purchases->groupBy(static function (OrderItem $item): int {
             $product = $item->product;
 
             return $product && $product->category_id ? $product->category_id : 0;
         })
-            ->map(function ($items): int {
+            ->map(static function ($items): int {
                 return $items->sum('quantity');
             })
             ->sortDesc()
-            ->take(5);
+            ->take(5)
+        ;
     }
 
     /**
-     * Extract brand preferences from purchases
+     * Extract brand preferences from purchases.
      *
-     * @psalm-return \Illuminate\Support\Collection<int, int>
+     * @psalm-return Collection<int, int>
      */
-    private function extractBrandPreferences(\Illuminate\Support\Collection $purchases): \Illuminate\Support\Collection
+    private function extractBrandPreferences(Collection $purchases): Collection
     {
-        return $purchases->groupBy(function (OrderItem $item): int {
+        return $purchases->groupBy(static function (OrderItem $item): int {
             $product = $item->product;
 
             return $product && $product->brand_id ? $product->brand_id : 0;
         })
-            ->map(function ($items): int {
+            ->map(static function ($items): int {
                 return $items->sum('quantity');
             })
             ->sortDesc()
-            ->take(5);
+            ->take(5)
+        ;
     }
 
     /**
-     * Extract price range from purchases
+     * Extract price range from purchases.
      *
-     * @return array<float|int|mixed|null>
+     * @return array<float|int|mixed|* @method static \App\Models\Brand create(array<string, string|bool|null>
      *
      * @psalm-return array{min: mixed, max: mixed, average: float|int|null}
      */
-    private function extractPriceRange(\Illuminate\Support\Collection $purchases): array
+    private function extractPriceRange(Collection $purchases): array
     {
-        $prices = $purchases->map(function (OrderItem $item): float {
+        $prices = $purchases->map(static function (OrderItem $item): float {
             $product = $item->product;
 
             return $product ? $product->price : 0.0;
@@ -217,7 +198,7 @@ final class RecommendationService
     }
 
     /**
-     * @return array<int, \App\Models\Product>
+     * @return array<int, Product>
      */
     private function getCollaborativeRecommendations(User $user, int $limit): array
     {
@@ -237,21 +218,22 @@ final class RecommendationService
     }
 
     /**
-     * Get products purchased by similar users but not by current user
+     * Get products purchased by similar users but not by current user.
      *
-     * @param  array<int, int>  $similarUserIds
-     * @param  array<int, int>  $purchasedProductIds
-     * @return array<int, \App\Models\Product>
+     * @param array<int, int> $similarUserIds
+     * @param array<int, int> $purchasedProductIds
+     *
+     * @return array<int, Product>
      */
     private function getProductsBySimilarUsers(array $similarUserIds, array $purchasedProductIds, int $limit): array
     {
-        return Product::whereHas('orderItems.order', function ($query) use ($similarUserIds): void {
+        return Product::whereHas('orderItems.order', static function ($query) use ($similarUserIds): void {
             $query->whereIn('user_id', $similarUserIds);
         })
             ->whereNotIn('id', $purchasedProductIds)
             ->withCount([
-                'orderItems as purchase_count' => function ($q) use ($similarUserIds): void {
-                    $q->whereHas('order', function ($o) use ($similarUserIds): void {
+                'orderItems as purchase_count' => static function ($q) use ($similarUserIds): void {
+                    $q->whereHas('order', static function ($o) use ($similarUserIds): void {
                         $o->whereIn('user_id', $similarUserIds);
                     });
                 },
@@ -259,17 +241,18 @@ final class RecommendationService
             ->orderByDesc('purchase_count')
             ->limit($limit)
             ->get()
-            ->all();
+            ->all()
+        ;
     }
 
     /**
-     * @return array<int, \App\Models\Product>
+     * @return array<int, Product>
      */
     private function getContentBasedRecommendations(User $user, int $limit): array
     {
         $userPreferences = $this->getUserPreferences($user);
 
-        if (count($userPreferences) === 0) {
+        if (0 === \count($userPreferences)) {
             return [];
         }
 
@@ -285,54 +268,55 @@ final class RecommendationService
             ->orderBy('rating', 'desc')
             ->limit($limit)
             ->get()
-            ->all();
+            ->all()
+        ;
     }
 
     /**
-     * Apply category filter to query
+     * Apply category filter to query.
      *
-     * @param  array<string, array<int, int>|array<string, float|null>>  $userPreferences
+     * @param  array<string, array<int, int>|array<string, float|* @method static \App\Models\Brand create(array<string, string|bool|null>>  $userPreferences
      */
-    private function applyCategoryFilter(\Illuminate\Database\Eloquent\Builder $query, array $userPreferences): void
+    private function applyCategoryFilter(Builder $query, array $userPreferences): void
     {
         $categories = $userPreferences['categories'] ?? null;
-        if (is_array($categories) && count($categories) > 0) {
+        if (\is_array($categories) && \count($categories) > 0) {
             $query->whereIn('category_id', $categories);
         }
     }
 
     /**
-     * Apply price range filter to query
+     * Apply price range filter to query.
      *
-     * @param  array<string, array<int, int>|array<string, float|null>>  $userPreferences
+     * @param  array<string, array<int, int>|array<string, float|* @method static \App\Models\Brand create(array<string, string|bool|null>>  $userPreferences
      */
-    private function applyPriceRangeFilter(\Illuminate\Database\Eloquent\Builder $query, array $userPreferences): void
+    private function applyPriceRangeFilter(Builder $query, array $userPreferences): void
     {
-        if (isset($userPreferences['price_range']) && is_array($userPreferences['price_range'])) {
+        if (isset($userPreferences['price_range']) && \is_array($userPreferences['price_range'])) {
             $minPrice = $userPreferences['price_range']['min'] ?? null;
             $maxPrice = $userPreferences['price_range']['max'] ?? null;
 
-            if ($minPrice !== null && $maxPrice !== null) {
+            if (null !== $minPrice && null !== $maxPrice) {
                 $query->whereBetween('price', [$minPrice, $maxPrice]);
             }
         }
     }
 
     /**
-     * Apply brand filter to query
+     * Apply brand filter to query.
      *
-     * @param  array<string, array<int, int>|array<string, float|null>>  $userPreferences
+     * @param  array<string, array<int, int>|array<string, float|* @method static \App\Models\Brand create(array<string, string|bool|null>>  $userPreferences
      */
-    private function applyBrandFilter(\Illuminate\Database\Eloquent\Builder $query, array $userPreferences): void
+    private function applyBrandFilter(Builder $query, array $userPreferences): void
     {
         $brands = $userPreferences['brands'] ?? null;
-        if (is_array($brands) && count($brands) > 0) {
+        if (\is_array($brands) && \count($brands) > 0) {
             $query->whereIn('brand_id', $brands);
         }
     }
 
     /**
-     * @return array<int, \App\Models\Product>
+     * @return array<int, Product>
      */
     private function getTrendingRecommendations(int $limit): array
     {
@@ -344,32 +328,33 @@ final class RecommendationService
             ->orderBy('rating', 'desc')
             ->limit($limit)
             ->get()
-            ->all();
+            ->all()
+        ;
     }
 
     /**
-     * Get query for recent purchases (last 7 days)
+     * Get query for recent purchases (last 7 days).
      *
-     * @psalm-return \Closure(\Illuminate\Database\Eloquent\Builder):void
+     * @psalm-return \Closure(Builder):void
      */
     private function getRecentPurchasesQuery(): \Closure
     {
-        return static function (\Illuminate\Database\Eloquent\Builder $query): void {
-            $query->whereHas('order', static function (\Illuminate\Database\Eloquent\Builder $q): void {
+        return static function (Builder $query): void {
+            $query->whereHas('order', static function (Builder $q): void {
                 $q->where('created_at', '>=', now()->subDays(7));
             });
         };
     }
 
     /**
-     * @return \Illuminate\Support\Collection<int, \stdClass>
+     * @return Collection<int, \stdClass>
      */
-    private function findSimilarUsers(User $user): \Illuminate\Support\Collection
+    private function findSimilarUsers(User $user): Collection
     {
         $userPurchases = $this->getUserPurchaseHistory($user);
 
         if ($userPurchases->isEmpty()) {
-            return new Collection;
+            return new Collection();
         }
 
         $userProductIds = $userPurchases->pluck('product_id')->toArray();
@@ -378,11 +363,11 @@ final class RecommendationService
     }
 
     /**
-     * Query for finding similar users based on common products
+     * Query for finding similar users based on common products.
      *
-     * @psalm-return \Illuminate\Support\Collection<int, \stdClass>
+     * @psalm-return Collection<int, \stdClass>
      */
-    private function querySimilarUsers(int $userId, array $productIds): \Illuminate\Support\Collection
+    private function querySimilarUsers(int $userId, array $productIds): Collection
     {
         return DB::table('order_items')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
@@ -394,20 +379,22 @@ final class RecommendationService
             ->having('common_products', '>=', 2)
             ->orderBy('common_products', 'desc')
             ->limit(10)
-            ->get();
+            ->get()
+        ;
     }
 
     /**
-     * @return \Illuminate\Support\Collection<int, OrderItem>
+     * @return Collection<int, OrderItem>
      */
-    private function getUserPurchaseHistory(User $user): \Illuminate\Support\Collection
+    private function getUserPurchaseHistory(User $user): Collection
     {
-        return OrderItem::whereHas('order', function ($query) use ($user): void {
+        return OrderItem::whereHas('order', static function ($query) use ($user): void {
             $query->where('user_id', $user->id);
         })
             ->select('product_id')
             ->distinct()
-            ->get();
+            ->get()
+        ;
     }
 
     /**
@@ -415,8 +402,6 @@ final class RecommendationService
      */
     private function getPurchasedProductIds(User $user): array
     {
-        return OrderItem::whereHas('order', function ($query) use ($user): void {
-            $query->where('user_id', $user->id);
-        })->pluck('product_id')->toArray();
+        return $this->recommendationRepository->getPurchasedProductIds($user);
     }
 }

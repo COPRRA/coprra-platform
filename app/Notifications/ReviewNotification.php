@@ -6,6 +6,8 @@ declare(strict_types=1);
 
 namespace App\Notifications;
 
+use App\Models\Product;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -14,18 +16,16 @@ class ReviewNotification extends Mailable implements ShouldQueue
 {
     use Queueable;
 
-    protected \App\Models\Product $product;
+    protected Product $product;
 
-    protected \App\Models\User $reviewer;
+    protected User $reviewer;
 
-    protected int|float $rating;
+    protected float|int $rating;
 
     /**
      * Create a new notification instance.
-     *
-     * @return void
      */
-    public function __construct(\App\Models\Product $product, \App\Models\User $reviewer, int|float $rating)
+    public function __construct(Product $product, User $reviewer, float|int $rating)
     {
         $this->product = $product;
         $this->reviewer = $reviewer;

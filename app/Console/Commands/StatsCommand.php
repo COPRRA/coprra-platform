@@ -76,7 +76,7 @@ final class StatsCommand extends Command
             ['Active Alerts', (float) PriceAlert::query()->where('is_active', true)->count()],
         ];
 
-        $this->table($stats[0], array_slice($stats, 1));
+        $this->table($stats[0], \array_slice($stats, 1));
     }
 
     private function displayDetailedStats(): void
@@ -116,7 +116,8 @@ final class StatsCommand extends Command
         $topCategories = Category::query()->withCount('products')
             ->orderBy('products_count', 'desc')
             ->take(5)
-            ->get();
+            ->get()
+        ;
 
         if ($topCategories->isNotEmpty()) {
             $this->info('🏆 Top 5 Categories by Product Count');
@@ -137,7 +138,8 @@ final class StatsCommand extends Command
         $topBrands = Brand::query()->withCount('products')
             ->orderBy('products_count', 'desc')
             ->take(5)
-            ->get();
+            ->get()
+        ;
 
         if ($topBrands->isNotEmpty()) {
             $this->info('🏆 Top 5 Brands by Product Count');
@@ -158,7 +160,8 @@ final class StatsCommand extends Command
         $storeStats = Store::query()->withCount('priceOffers')
             ->orderBy('price_offers_count', 'desc')
             ->take(5)
-            ->get();
+            ->get()
+        ;
 
         if ($storeStats->isNotEmpty()) {
             $this->info('🏪 Top 5 Stores by Price Offers');
@@ -192,9 +195,9 @@ final class StatsCommand extends Command
     private function displayDatabaseInfo(): void
     {
         $this->info('💾 Database Information');
-        $totalRecords = (float) (Product::query()->count() + Store::query()->count() + Brand::query()->count() +
-            Category::query()->count() + PriceOffer::query()->count() + Review::query()->count() +
-            User::query()->count() + PriceAlert::query()->count());
+        $totalRecords = (float) (Product::query()->count() + Store::query()->count() + Brand::query()->count()
+            + Category::query()->count() + PriceOffer::query()->count() + Review::query()->count()
+            + User::query()->count() + PriceAlert::query()->count());
 
         $this->table(['Database Metric', 'Value'], [
             ['Total Records', number_format($totalRecords)],
@@ -207,8 +210,8 @@ final class StatsCommand extends Command
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
         $bytesPerKb = (int) config('coprra.constants.bytes_per_kb', 1024);
 
-        $unitsCount = count($units) - 1;
-        for ($i = 0; $size > $bytesPerKb && $i < $unitsCount; $i++) {
+        $unitsCount = \count($units) - 1;
+        for ($i = 0; $size > $bytesPerKb && $i < $unitsCount; ++$i) {
             $size /= $bytesPerKb;
         }
 

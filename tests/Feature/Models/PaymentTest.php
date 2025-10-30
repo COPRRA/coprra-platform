@@ -7,18 +7,24 @@ namespace Tests\Feature\Models;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\PaymentMethod;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /**
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class PaymentTest extends TestCase
+final class PaymentTest extends TestCase
 {
     use RefreshDatabase;
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_create_a_payment(): void
+    #[Test]
+    public function testItCanCreateAPayment(): void
     {
         // Arrange
         $order = Order::factory()->create();
@@ -38,17 +44,17 @@ class PaymentTest extends TestCase
         $payment = Payment::create($attributes);
 
         // Assert
-        $this->assertInstanceOf(Payment::class, $payment);
-        $this->assertEquals('TXN-12345', $payment->transaction_id);
-        $this->assertEquals('completed', $payment->status);
-        $this->assertEquals(100.00, $payment->amount);
-        $this->assertEquals('USD', $payment->currency);
-        $this->assertIsArray($payment->gateway_response);
-        $this->assertInstanceOf(\Carbon\Carbon::class, $payment->processed_at);
+        self::assertInstanceOf(Payment::class, $payment);
+        self::assertSame('TXN-12345', $payment->transaction_id);
+        self::assertSame('completed', $payment->status);
+        self::assertSame(100.00, $payment->amount);
+        self::assertSame('USD', $payment->currency);
+        self::assertIsArray($payment->gateway_response);
+        self::assertInstanceOf(Carbon::class, $payment->processed_at);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_payment_relationships(): void
+    #[Test]
+    public function testPaymentRelationships(): void
     {
         // Arrange
         $order = Order::factory()->create();
@@ -62,14 +68,14 @@ class PaymentTest extends TestCase
         $payment->refresh();
 
         // Assert
-        $this->assertInstanceOf(Order::class, $payment->order);
-        $this->assertEquals($order->id, $payment->order->id);
-        $this->assertInstanceOf(PaymentMethod::class, $payment->paymentMethod);
-        $this->assertEquals($paymentMethod->id, $payment->paymentMethod->id);
+        self::assertInstanceOf(Order::class, $payment->order);
+        self::assertSame($order->id, $payment->order->id);
+        self::assertInstanceOf(PaymentMethod::class, $payment->paymentMethod);
+        self::assertSame($paymentMethod->id, $payment->paymentMethod->id);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_payment_casts_attributes_correctly(): void
+    #[Test]
+    public function testPaymentCastsAttributesCorrectly(): void
     {
         // Arrange
         $payment = Payment::factory()->create([
@@ -78,13 +84,13 @@ class PaymentTest extends TestCase
         ]);
 
         // Act & Assert
-        $this->assertIsArray($payment->gateway_response);
-        $this->assertEquals(200, $payment->gateway_response['code']);
-        $this->assertInstanceOf(\Carbon\Carbon::class, $payment->processed_at);
+        self::assertIsArray($payment->gateway_response);
+        self::assertSame(200, $payment->gateway_response['code']);
+        self::assertInstanceOf(Carbon::class, $payment->processed_at);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_scope_by_status(): void
+    #[Test]
+    public function testScopeByStatus(): void
     {
         // Arrange
         Payment::factory()->create(['status' => 'pending']);
@@ -97,15 +103,15 @@ class PaymentTest extends TestCase
         $completedPayments = Payment::byStatus('completed')->get();
 
         // Assert
-        $this->assertCount(2, $pendingPayments);
-        $this->assertCount(1, $completedPayments);
+        self::assertCount(2, $pendingPayments);
+        self::assertCount(1, $completedPayments);
         $pendingPayments->each(function ($payment) {
-            $this->assertEquals('pending', $payment->status);
+            $this->assertSame('pending', $payment->status);
         });
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_payment_fillable_attributes(): void
+    #[Test]
+    public function testPaymentFillableAttributes(): void
     {
         // Arrange
         $fillable = [
@@ -120,14 +126,14 @@ class PaymentTest extends TestCase
         ];
 
         // Act
-        $payment = new Payment;
+        $payment = new Payment();
 
         // Assert
-        $this->assertEquals($fillable, $payment->getFillable());
+        self::assertSame($fillable, $payment->getFillable());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_payment_status_transitions(): void
+    #[Test]
+    public function testPaymentStatusTransitions(): void
     {
         // Arrange
         $payment = Payment::factory()->create(['status' => 'pending']);
@@ -137,12 +143,12 @@ class PaymentTest extends TestCase
         $payment->update(['status' => 'completed', 'processed_at' => now()]);
 
         // Assert
-        $this->assertEquals('completed', $payment->status);
-        $this->assertNotNull($payment->processed_at);
+        self::assertSame('completed', $payment->status);
+        self::assertNotNull($payment->processed_at);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_payment_amount_and_currency(): void
+    #[Test]
+    public function testPaymentAmountAndCurrency(): void
     {
         // Arrange
         $payment = Payment::factory()->create([
@@ -151,12 +157,12 @@ class PaymentTest extends TestCase
         ]);
 
         // Act & Assert
-        $this->assertEquals(250.75, $payment->amount);
-        $this->assertEquals('EUR', $payment->currency);
+        self::assertSame(250.75, $payment->amount);
+        self::assertSame('EUR', $payment->currency);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_payment_gateway_response_storage(): void
+    #[Test]
+    public function testPaymentGatewayResponseStorage(): void
     {
         // Arrange
         $response = [
@@ -170,7 +176,7 @@ class PaymentTest extends TestCase
         $payment = Payment::factory()->create(['gateway_response' => $response]);
 
         // Assert
-        $this->assertEquals($response, $payment->gateway_response);
-        $this->assertEquals('ext-123', $payment->gateway_response['transaction_id']);
+        self::assertSame($response, $payment->gateway_response);
+        self::assertSame('ext-123', $payment->gateway_response['transaction_id']);
     }
 }

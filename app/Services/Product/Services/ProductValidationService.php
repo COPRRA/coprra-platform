@@ -6,23 +6,23 @@ namespace App\Services\Product\Services;
 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-use InvalidArgumentException;
 
 /**
- * Service for validating product-related data
+ * Service for validating product-related data.
  */
 final class ProductValidationService
 {
     /**
-     * Validate search query and filters
+     * Validate search query and filters.
      *
-     * @param  array<string, string|int|float>  $filters
+     * @param array<string, float|int|string> $filters
+     *
      * @return array<array<float|int|string>|int|string>
      *
      * @psalm-return array{query: string, filters: array<string, float|int|string>, perPage: int<1, 50>}
      *
      * @throws ValidationException
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function validateSearchParameters(string $query, array $filters, int $perPage): array
     {
@@ -53,52 +53,34 @@ final class ProductValidationService
     }
 
     /**
-     * Validate slug format
+     * Validate slug format.
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function validateSlug(string $slug): void
     {
         if (! preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $slug)) {
-            throw new InvalidArgumentException('Invalid slug format');
+            throw new \InvalidArgumentException('Invalid slug format');
         }
     }
 
     /**
-     * Validate related products limit
+     * Validate related products limit.
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function validateRelatedLimit(int $limit): void
     {
         if ($limit < 1 || $limit > 20) {
-            throw new InvalidArgumentException('Limit must be between 1 and 20');
+            throw new \InvalidArgumentException('Limit must be between 1 and 20');
         }
     }
 
     /**
-     * Validate product price
+     * Sanitize filter values.
      *
-     * @throws ValidationException
-     */
-    public function validatePrice(float $price): float
-    {
-        $validator = Validator::make(
-            ['price' => $price],
-            ['price' => 'required|numeric|min:0']
-        );
-
-        if ($validator->fails()) {
-            throw new ValidationException($validator);
-        }
-
-        return round($price, 2);
-    }
-
-    /**
-     * Sanitize filter values
+     * @param array<string, float|int|string> $filters
      *
-     * @param  array<string, string|int|float>  $filters
      * @return array<float|int|string>
      *
      * @psalm-return array<string, float|int|string>
@@ -108,18 +90,18 @@ final class ProductValidationService
         $sanitized = [];
 
         foreach ($filters as $key => $value) {
-            if ($value === null || $value === '') {
+            if (null === $value || '' === $value) {
                 continue;
             }
 
             $sanitized[$key] = match ($key) {
                 'category_id', 'brand_id' => is_numeric($value) ? (int) $value : null,
                 'min_price', 'max_price' => is_numeric($value) ? (float) $value : null,
-                'sort_by' => is_string($value) ? $value : null,
+                'sort_by' => \is_string($value) ? $value : null,
                 default => $value,
             };
         }
 
-        return array_filter($sanitized, fn ($value): bool => $value !== null);
+        return array_filter($sanitized, static fn ($value): bool => null !== $value);
     }
 }

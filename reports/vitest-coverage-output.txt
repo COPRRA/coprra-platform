@@ -1,0 +1,9 @@
+
+> coprra@0.0.0 test:coverage
+> vitest run --coverage --reporter=verbose
+
+[1m[43m DEPRECATED [49m[22m [33m"cache.dir" is deprecated, use Vite's "cacheDir" instead if you want to change the cache director. Note caches will be written to "cacheDir/vitest"[39m
+
+[1m[46m RUN [49m[22m [36mv4.0.4 [39m[90mC:/Users/Gaser/Desktop/COPRRA[39m
+      [2mCoverage enabled with [22m[33mv8[39m
+

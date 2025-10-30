@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Database\Factories\CurrencyFactory;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * @property int $id
+ * @property int    $id
  * @property string $code
- * @property string $name
- * @property string $symbol
- * @property \Illuminate\Database\Eloquent\Collection<int, Store> $stores
- * @property \Illuminate\Database\Eloquent\Collection<int, Language> $languages
+ ** @property $name
+ * @property string                    $symbol
+ * @property Collection<int, Store>    $stores
+ * @property Collection<int, Language> $languages
  *
  * @method static CurrencyFactory factory(...$parameters)
  *
@@ -28,34 +28,30 @@ class Currency extends Model
     use HasFactory;
 
     /**
-     * @var class-string<\Illuminate\Database\Eloquent\Factories\Factory<Currency>>
+     * @var class-string<Factory<Currency>>
      */
-    protected static $factory = \Database\Factories\CurrencyFactory::class;
+    protected static $factory = CurrencyFactory::class;
 
     /**
      * @var array<int, string>
      */
     protected $guarded = [];
 
+    // --- Relationships ---
+
     /**
-     * Stores using this currency.
-     *
-     * @return HasMany<Store, Currency>
+     * Get the stores for the currency.
      */
-    public function stores(): HasMany
+    public function stores()
     {
-        return $this->hasMany(Store::class, 'currency_id');
+        return $this->hasMany(Store::class);
     }
 
     /**
-     * Languages associated with this currency.
-     *
-     * @return BelongsToMany<Language, Currency>
+     * Get the languages that use this currency.
      */
-    public function languages(): BelongsToMany
+    public function languages()
     {
-        return $this->belongsToMany(Language::class, 'currency_language')
-            ->withPivot('is_default')
-            ->withTimestamps();
+        return $this->belongsToMany(Language::class, 'currency_language');
     }
 }

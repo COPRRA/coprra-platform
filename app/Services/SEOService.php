@@ -7,17 +7,20 @@ namespace App\Services;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Store;
-use Illuminate\Contracts\Config\Repository;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
+/**
+ * Service for generating SEO meta data and structured data.
+ */
 final readonly class SEOService
 {
     public function __construct(
         private UrlGenerator $urlGenerator,
-        private Repository $configRepository,
+        private ConfigRepository $configRepository,
         private Str $str
     ) {}
 
@@ -30,7 +33,7 @@ final readonly class SEOService
      */
     public function generateMetaData(Model $model, ?string $type = null): array
     {
-        $type = $type !== null ? $type : class_basename($model);
+        $type = null !== $type ? $type : class_basename($model);
 
         return match ($type) {
             'Product' => $model instanceof Product ? $this->generateProductMeta($model) : $this->generateDefaultMeta(),
@@ -45,7 +48,8 @@ final readonly class SEOService
     /**
      * Validate SEO meta data.
      *
-     * @param  array<string, string|null>  $metaData
+     * @param  array<string, string|* @method static \App\Models\Brand create(array<string, string|bool|null>  $metaData
+     *
      * @return array<string>
      *
      * @psalm-return array<int, string>
@@ -63,67 +67,22 @@ final readonly class SEOService
     }
 
     /**
-     * Generate JSON-LD structured data for a product.
-     *
-     * @return array<string, mixed>
-     */
-    public function generateStructuredData(Product $product): array
-    {
-        $url = $this->urlGenerator->route('products.show', $product->slug);
-
-        return [
-            '@context' => 'https://schema.org/',
-            '@type' => 'Product',
-            'name' => $this->safeCastToString($product->name),
-            'offers' => [
-                '@type' => 'Offer',
-                'url' => $this->safeCastToString($url),
-            ],
-        ];
-    }
-
-    /**
-     * Generate JSON-LD breadcrumb structured data.
-     *
-     * @param  array<int, array{name: string, url: string}>  $breadcrumbs
-     * @return array<string, mixed>
-     */
-    public function generateBreadcrumbData(array $breadcrumbs): array
-    {
-        $items = [];
-        foreach ($breadcrumbs as $index => $crumb) {
-            $items[] = [
-                '@type' => 'ListItem',
-                'position' => $index + 1,
-                'name' => $crumb['name'],
-                'item' => $crumb['url'],
-            ];
-        }
-
-        return [
-            '@context' => 'https://schema.org/',
-            '@type' => 'BreadcrumbList',
-            'itemListElement' => $items,
-        ];
-    }
-
-    /**
      * Generate meta data for a product.
      *
      * @return array<string>
      *
      * @psalm-return array{title: string, description: string, keywords: string, og_title: string, og_description: string, og_image: string, og_type: 'product', og_url: string, canonical: string, robots: 'index, follow'}
      */
-    protected function generateProductMeta(Product $product): array
+    private function generateProductMeta(Product $product): array
     {
         $title = $this->generateTitle($this->safeCastToString($product->name));
-        $productDescription = $product->description && $product->description !== ''
+        $productDescription = $product->description && '' !== $product->description
             ? $product->description
             : $product->name;
         $description = $this->generateDescription($this->safeCastToString($productDescription));
         $keywords = $this->generateKeywords($product);
 
-        $imageUrl = $product->image_url && $product->image_url !== ''
+        $imageUrl = $product->image_url && '' !== $product->image_url
             ? $product->image_url
             : $this->urlGenerator->asset('images/default-product.png');
 
@@ -152,15 +111,15 @@ final readonly class SEOService
      *
      * @psalm-return array{title: string, description: string, keywords: string, og_title: string, og_description: string, og_image: string, og_type: 'website', og_url: string, canonical: string, robots: 'index, follow'}
      */
-    protected function generateCategoryMeta(Category $category): array
+    private function generateCategoryMeta(Category $category): array
     {
         $title = $this->generateTitle($this->safeCastToString($category->name).' - Products');
-        $categoryDescription = $category->description && $category->description !== ''
+        $categoryDescription = $category->description && '' !== $category->description
             ? $category->description
             : 'Browse '.$this->safeCastToString($category->name).' products and compare prices';
         $description = $this->generateDescription($this->safeCastToString($categoryDescription));
 
-        $imageUrl = $category->image_url && $category->image_url !== ''
+        $imageUrl = $category->image_url && '' !== $category->image_url
             ? $category->image_url
             : $this->urlGenerator->asset('images/default-category.png');
 
@@ -189,15 +148,15 @@ final readonly class SEOService
      *
      * @psalm-return array{title: string, description: string, keywords: string, og_title: string, og_description: string, og_image: string, og_type: 'website', og_url: string, canonical: string, robots: 'index, follow'}
      */
-    protected function generateStoreMeta(Store $store): array
+    private function generateStoreMeta(Store $store): array
     {
         $title = $this->generateTitle($this->safeCastToString($store->name).' - Store');
-        $storeDescription = $store->description && $store->description !== ''
+        $storeDescription = $store->description && '' !== $store->description
             ? $store->description
             : 'Shop at '.$this->safeCastToString($store->name).' and compare prices';
         $description = $this->generateDescription($this->safeCastToString($storeDescription));
 
-        $imageUrl = $store->logo_url && $store->logo_url !== ''
+        $imageUrl = $store->logo_url && '' !== $store->logo_url
             ? $store->logo_url
             : $this->urlGenerator->asset('images/default-store.png');
 
@@ -226,7 +185,7 @@ final readonly class SEOService
      *
      * @psalm-return array{title: string, description: 'Compare prices across multiple stores and find the best deals', keywords: 'price comparison, shopping, deals, best prices, online shopping', og_title: string, og_description: 'Compare prices across multiple stores and find the best deals', og_image: string, og_type: 'website', og_url: string, canonical: string, robots: 'index, follow'}
      */
-    protected function generateDefaultMeta(): array
+    private function generateDefaultMeta(): array
     {
         $appName = $this->safeCastToString($this->configRepository->get('app.name', 'COPRRA'));
         $description = 'Compare prices across multiple stores and find the best deals';
@@ -250,16 +209,16 @@ final readonly class SEOService
     /**
      * Generate optimized title (50-60 characters).
      */
-    protected function generateTitle(string $title): string
+    private function generateTitle(string $title): string
     {
         $appName = $this->safeCastToString($this->configRepository->get('app.name', 'COPRRA'));
         $maxLength = 60;
 
         // If title is too long, truncate it
-        if (strlen($title) > ($maxLength - strlen($appName) - 3)) {
+        if (\strlen($title) > ($maxLength - \strlen($appName) - 3)) {
             $title = $this->str->limit(
                 $title,
-                $maxLength - strlen($appName) - 6,
+                $maxLength - \strlen($appName) - 6,
                 ''
             );
         }
@@ -270,7 +229,7 @@ final readonly class SEOService
     /**
      * Generate optimized description (150-160 characters).
      */
-    protected function generateDescription(string $description): string
+    private function generateDescription(string $description): string
     {
         $maxLength = 160;
 
@@ -278,7 +237,7 @@ final readonly class SEOService
         $description = strip_tags($description);
 
         // Truncate if too long
-        if (strlen($description) > $maxLength) {
+        if (\strlen($description) > $maxLength) {
             $description = $this->str->limit($description, $maxLength - 3, '...');
         }
 
@@ -288,7 +247,7 @@ final readonly class SEOService
     /**
      * Generate keywords from model.
      */
-    protected function generateKeywords(Model $model): string
+    private function generateKeywords(Model $model): string
     {
         $keywords = [];
 
@@ -300,23 +259,10 @@ final readonly class SEOService
     }
 
     /**
-     * Generate product structured data.
-     *
-     * @return array<string, array<string, string|float>|string>
-     */
-    protected function generateProductStructuredData(Product $product): array
-    {
-        $data = $this->generateBasicProductData($product);
-        $data = $this->addProductOffersData($product, $data);
-
-        return $this->addProductRatingData($product, $data);
-    }
-
-    /**
      * Validate title field.
      *
-     * @param  array<string,?string>  $metaData
-     * @param  array<int,string>  $issues
+     * @param array<string,?string> $metaData
+     * @param array<int,string>     $issues
      */
     private function validateTitle(array $metaData, array &$issues): void
     {
@@ -338,8 +284,8 @@ final readonly class SEOService
     /**
      * Validate description field.
      *
-     * @param  array<string,?string>  $metaData
-     * @param  array<int,string>  $issues
+     * @param array<string,?string> $metaData
+     * @param array<int,string>     $issues
      */
     private function validateDescription(array $metaData, array &$issues): void
     {
@@ -361,8 +307,8 @@ final readonly class SEOService
     /**
      * Validate keywords field.
      *
-     * @param  array<string,?string>  $metaData
-     * @param  array<int,string>  $issues
+     * @param array<string,?string> $metaData
+     * @param array<int,string>     $issues
      */
     private function validateKeywords(array $metaData, array &$issues): void
     {
@@ -374,8 +320,8 @@ final readonly class SEOService
     /**
      * Validate canonical URL field.
      *
-     * @param  array<string,?string>  $metaData
-     * @param  array<int,string>  $issues
+     * @param array<string,?string> $metaData
+     * @param array<int,string>     $issues
      */
     private function validateCanonical(array $metaData, array &$issues): void
     {
@@ -387,7 +333,7 @@ final readonly class SEOService
     /**
      * Add model name to keywords.
      *
-     * @param  array<int,string>  $keywords
+     * @param array<int,string> $keywords
      */
     private function addModelNameToKeywords(Model $model, array &$keywords): void
     {
@@ -399,7 +345,7 @@ final readonly class SEOService
     /**
      * Add product-specific keywords if model is a Product.
      *
-     * @param  array<int,string>  $keywords
+     * @param array<int,string> $keywords
      */
     private function addProductSpecificKeywords(Model $model, array &$keywords): void
     {
@@ -414,7 +360,7 @@ final readonly class SEOService
     /**
      * Add category keyword if available.
      *
-     * @param  array<int,string>  $keywords
+     * @param array<int,string> $keywords
      */
     private function addCategoryKeyword(Product $product, array &$keywords): void
     {
@@ -426,7 +372,7 @@ final readonly class SEOService
     /**
      * Add brand keyword if available.
      *
-     * @param  array<int,string>  $keywords
+     * @param array<int,string> $keywords
      */
     private function addBrandKeyword(Product $product, array &$keywords): void
     {
@@ -438,7 +384,7 @@ final readonly class SEOService
     /**
      * Add generic keywords.
      *
-     * @param  array<int,string>  $keywords
+     * @param array<int,string> $keywords
      */
     private function addGenericKeywords(array &$keywords): void
     {
@@ -450,7 +396,7 @@ final readonly class SEOService
     /**
      * Format and clean keywords array.
      *
-     * @param  array<int,string>  $keywords
+     * @param array<int,string> $keywords
      */
     private function formatKeywords(array $keywords): string
     {
@@ -460,138 +406,15 @@ final readonly class SEOService
     }
 
     /**
-     * Generate basic product data.
-     *
-     * @return array<string>
-     *
-     * @psalm-return array{'@context': 'https://schema.org/', '@type': 'Product', name: string, description: string, image: string, url: string}
-     */
-    private function generateBasicProductData(Product $product): array
-    {
-        $productDescription = $this->getProductDescription($product);
-        $imageUrl = $this->getProductImageUrl($product);
-
-        return [
-            '@context' => 'https://schema.org/',
-            '@type' => 'Product',
-            'name' => $this->safeCastToString($product->name),
-            'description' => $this->safeCastToString($productDescription),
-            'image' => $this->safeCastToString($imageUrl),
-            'url' => $this->safeCastToString(
-                $this->urlGenerator->route('products.show', $product->slug)
-            ),
-        ];
-    }
-
-    /**
-     * Get product description with fallback.
-     */
-    private function getProductDescription(Product $product): string
-    {
-        return $product->description && $product->description !== ''
-            ? $product->description
-            : $product->name;
-    }
-
-    /**
-     * Get product image URL with fallback.
-     */
-    private function getProductImageUrl(Product $product): string
-    {
-        return $product->image_url && $product->image_url !== ''
-            ? $product->image_url
-            : $this->urlGenerator->asset('images/default-product.png');
-    }
-
-    /**
-     * Add offers data if product has price.
-     */
-    private function addProductOffersData(Product $product, array $data): array
-    {
-        if ($product->price) {
-            $data['offers'] = $this->generateProductOffers($product);
-        }
-
-        return $data;
-    }
-
-    /**
-     * Add rating data if product has rating.
-     */
-    private function addProductRatingData(Product $product, array $data): array
-    {
-        if (isset($product->rating)) {
-            $data['aggregateRating'] = $this->generateProductRating($product);
-        }
-
-        return $data;
-    }
-
-    /**
-     * @return array<float|string>
-     *
-     * @psalm-return array{'@type': 'AggregateOffer', lowPrice: float|string, priceCurrency: string, availability: 'https://schema.org/InStock'}
-     */
-    private function generateProductOffers(Product $product): array
-    {
-        $currency = $this->getProductCurrency($product);
-
-        return [
-            '@type' => 'AggregateOffer',
-            'lowPrice' => $product->price ?? 0.0,
-            'priceCurrency' => $currency,
-            'availability' => 'https://schema.org/InStock',
-        ];
-    }
-
-    /**
-     * Get product currency with fallback.
-     */
-    private function getProductCurrency(Product $product): string
-    {
-        if ($product->store->currency && $product->store->currency !== '') {
-            return $product->store->currency;
-        }
-
-        return 'USD';
-    }
-
-    /**
-     * @return array<string, string|int|float>
-     */
-    private function generateProductRating(Product $product): array
-    {
-        $reviewCount = $this->getReviewCount($product);
-
-        return [
-            '@type' => 'AggregateRating',
-            'ratingValue' => $product->rating ?? 0,
-            'reviewCount' => $reviewCount,
-        ];
-    }
-
-    /**
-     * Get review count with fallback.
-     */
-    private function getReviewCount(Product $product): int
-    {
-        if ($product->reviews_count && $product->reviews_count !== '') {
-            return (int) $product->reviews_count;
-        }
-
-        return 0;
-    }
-
-    /**
      * Safely cast a value to a string.
      */
-    private function safeCastToString(string|int|float|object|null $value): string
+    private function safeCastToString(float|int|object|string|null $value): string
     {
-        if (is_string($value) || is_numeric($value)) {
+        if (\is_string($value) || is_numeric($value)) {
             return (string) $value;
         }
 
-        if (is_object($value) && method_exists($value, '__toString')) {
+        if (\is_object($value) && method_exists($value, '__toString')) {
             return (string) $value;
         }
 

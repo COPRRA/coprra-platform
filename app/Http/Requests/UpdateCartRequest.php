@@ -9,30 +9,6 @@ use Illuminate\Foundation\Http\FormRequest;
 class UpdateCartRequest extends FormRequest
 {
     /**
-     * Authorize the request.
-     */
-    public function authorize(): bool
-    {
-        return true;
-    }
-
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<array<string>>
-     *
-     * @psalm-return array{id: list{'required'}, quantity: list{'required', 'integer', 'min:1', 'max:999'}}
-     */
-    public function rules(): array
-    {
-        return [
-            // Cart item ID may be numeric or string depending on package usage
-            'id' => ['required'],
-            'quantity' => ['required', 'integer', 'min:1', 'max:999'],
-        ];
-    }
-
-    /**
      * Get custom messages for validator errors.
      *
      * @return array<string>

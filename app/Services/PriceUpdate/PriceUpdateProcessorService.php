@@ -21,7 +21,8 @@ final readonly class PriceUpdateProcessorService
     /**
      * Process an individual price offer.
      *
-     * @param  array{updatedCount: int, errorCount: int}  $results
+     * @param array{updatedCount: int, errorCount: int} $results
+     *
      * @return array{updatedCount: int, errorCount: int}
      */
     public function processIndividualOffer(PriceOffer $priceOffer, bool $dryRun, array $results): array
@@ -31,7 +32,7 @@ final readonly class PriceUpdateProcessorService
             $results['updatedCount'] += $result['updated'] ? 1 : 0;
             $results['errorCount'] += $result['error'] ? 1 : 0;
         } catch (\Exception $e) {
-            $results['errorCount']++;
+            ++$results['errorCount'];
             $this->displayService->displayError($priceOffer, $e);
         }
 
@@ -61,10 +62,10 @@ final readonly class PriceUpdateProcessorService
      */
     private function attemptPriceUpdate(PriceOffer $priceOffer, bool $dryRun): array
     {
-        $priceFetcher = new PriceFetcherService;
+        $priceFetcher = new PriceFetcherService();
         $newPrice = $this->getNewPriceIfChanged($priceOffer, $priceFetcher);
 
-        if ($newPrice !== null) {
+        if (null !== $newPrice) {
             $this->handlePriceUpdate($priceOffer, $newPrice, $dryRun);
 
             return ['updated' => true, 'error' => false];

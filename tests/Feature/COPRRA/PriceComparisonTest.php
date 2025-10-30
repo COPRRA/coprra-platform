@@ -14,8 +14,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\TestCase;
 
-#[CoversClass(\App\Helpers\PriceHelper::class)]
-class PriceComparisonTest extends TestCase
+/**
+ * @internal
+ */
+#[CoversClass(PriceHelper::class)]
+final class PriceComparisonTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -86,7 +89,7 @@ class PriceComparisonTest extends TestCase
         ]);
     }
 
-    public function test_compares_prices_across_multiple_stores(): void
+    public function testComparesPricesAcrossMultipleStores(): void
     {
         // Create price entries for different stores
         $this->product->stores()->attach($this->store1->id, [
@@ -105,17 +108,18 @@ class PriceComparisonTest extends TestCase
             ->wherePivot('is_available', true)
             ->get()
             ->pluck('pivot.price')
-            ->toArray();
+            ->toArray()
+        ;
 
-        $this->assertCount(2, $prices);
-        $this->assertContains(100.00, $prices);
-        $this->assertContains(95.00, $prices);
+        self::assertCount(2, $prices);
+        self::assertContains(100.00, $prices);
+        self::assertContains(95.00, $prices);
 
         $bestPrice = PriceHelper::getBestPrice($prices);
-        $this->assertEquals(95.00, $bestPrice);
+        self::assertSame(95.00, $bestPrice);
     }
 
-    public function test_identifies_best_deal_among_stores(): void
+    public function testIdentifiesBestDealAmongStores(): void
     {
         $this->product->stores()->attach($this->store1->id, [
             'price' => 100.00,
@@ -133,53 +137,54 @@ class PriceComparisonTest extends TestCase
             ->wherePivot('is_available', true)
             ->get()
             ->pluck('pivot.price')
-            ->toArray();
+            ->toArray()
+        ;
 
         $isGoodDeal = PriceHelper::isGoodDeal(85.00, $prices);
-        $this->assertTrue($isGoodDeal);
+        self::assertTrue($isGoodDeal);
 
         $isNotGoodDeal = PriceHelper::isGoodDeal(100.00, $prices);
-        $this->assertFalse($isNotGoodDeal);
+        self::assertFalse($isNotGoodDeal);
     }
 
-    public function test_calculates_savings_percentage(): void
+    public function testCalculatesSavingsPercentage(): void
     {
         $originalPrice = 100.00;
         $salePrice = 80.00;
 
         $difference = PriceHelper::calculatePriceDifference($originalPrice, $salePrice);
 
-        $this->assertEquals(-20.0, $difference);
+        self::assertSame(-20.0, $difference);
 
         $differenceString = PriceHelper::getPriceDifferenceString($originalPrice, $salePrice);
-        $this->assertStringContainsString('-20.0', $differenceString);
-        $this->assertStringContainsString('%', $differenceString);
+        self::assertStringContainsString('-20.0', $differenceString);
+        self::assertStringContainsString('%', $differenceString);
     }
 
-    public function test_formats_price_with_correct_currency_symbol(): void
+    public function testFormatsPriceWithCorrectCurrencySymbol(): void
     {
         $formattedUSD = PriceHelper::formatPrice(100.00, 'USD');
-        $this->assertStringContainsString('$', $formattedUSD);
-        $this->assertStringContainsString('100.00', $formattedUSD);
+        self::assertStringContainsString('$', $formattedUSD);
+        self::assertStringContainsString('100.00', $formattedUSD);
 
         $formattedSAR = PriceHelper::formatPrice(375.00, 'SAR');
-        $this->assertStringContainsString('Ø±.Ø³', $formattedSAR);
-        $this->assertStringContainsString('375.00', $formattedSAR);
+        self::assertStringContainsString('Ø±.Ø³', $formattedSAR);
+        self::assertStringContainsString('375.00', $formattedSAR);
     }
 
-    public function test_converts_prices_between_currencies(): void
+    public function testConvertsPricesBetweenCurrencies(): void
     {
         $usdPrice = 100.00;
         $sarPrice = PriceHelper::convertCurrency($usdPrice, 'USD', 'SAR');
 
         // USD to SAR: 100 / 1.0 * 3.75 = 375.0
-        $this->assertEquals(375.0, $sarPrice);
+        self::assertSame(375.0, $sarPrice);
 
         $convertedBack = PriceHelper::convertCurrency($sarPrice, 'SAR', 'USD');
-        $this->assertEquals($usdPrice, $convertedBack);
+        self::assertSame($usdPrice, $convertedBack);
     }
 
-    public function test_displays_price_range_for_product(): void
+    public function testDisplaysPriceRangeForProduct(): void
     {
         $this->product->stores()->attach($this->store1->id, [
             'price' => 100.00,
@@ -197,19 +202,20 @@ class PriceComparisonTest extends TestCase
             ->wherePivot('is_available', true)
             ->get()
             ->pluck('pivot.price')
-            ->toArray();
+            ->toArray()
+        ;
 
         $minPrice = min($prices);
         $maxPrice = max($prices);
 
         $priceRange = PriceHelper::formatPriceRange($minPrice, $maxPrice, 'USD');
 
-        $this->assertStringContainsString('100.00', $priceRange);
-        $this->assertStringContainsString('120.00', $priceRange);
-        $this->assertStringContainsString('-', $priceRange);
+        self::assertStringContainsString('100.00', $priceRange);
+        self::assertStringContainsString('120.00', $priceRange);
+        self::assertStringContainsString('-', $priceRange);
     }
 
-    public function test_handles_unavailable_products_in_stores(): void
+    public function testHandlesUnavailableProductsInStores(): void
     {
         $this->product->stores()->attach($this->store1->id, [
             'price' => 100.00,
@@ -227,22 +233,23 @@ class PriceComparisonTest extends TestCase
             ->wherePivot('is_available', true)
             ->get()
             ->pluck('pivot.price')
-            ->toArray();
+            ->toArray()
+        ;
 
-        $this->assertCount(1, $availablePrices);
-        $this->assertContains(100.00, $availablePrices);
-        $this->assertNotContains(80.00, $availablePrices);
+        self::assertCount(1, $availablePrices);
+        self::assertContains(100.00, $availablePrices);
+        self::assertNotContains(80.00, $availablePrices);
     }
 
-    public function test_respects_max_stores_per_product_configuration(): void
+    public function testRespectsMaxStoresPerProductConfiguration(): void
     {
         $maxStores = config('coprra.price_comparison.max_stores_per_product', 10);
 
-        $this->assertIsNumeric($maxStores);
-        $this->assertGreaterThan(0, $maxStores);
+        self::assertIsNumeric($maxStores);
+        self::assertGreaterThan(0, $maxStores);
 
         // Create more stores than the limit
-        for ($i = 0; $i < $maxStores + 5; $i++) {
+        for ($i = 0; $i < $maxStores + 5; ++$i) {
             $store = Store::factory()->create([
                 'name' => "Store {$i}",
                 'slug' => "store-{$i}",
@@ -260,43 +267,44 @@ class PriceComparisonTest extends TestCase
         $limitedStores = $this->product->stores()
             ->wherePivot('is_available', true)
             ->limit($maxStores)
-            ->get();
+            ->get()
+        ;
 
-        $this->assertCount($maxStores, $limitedStores);
+        self::assertCount($maxStores, $limitedStores);
     }
 
-    public function test_caches_price_comparison_results(): void
+    public function testCachesPriceComparisonResults(): void
     {
         $cacheKey = "price_comparison_{$this->product->id}";
         $cacheDuration = config('coprra.price_comparison.cache_duration', 3600);
 
-        $this->assertIsNumeric($cacheDuration);
-        $this->assertGreaterThan(0, $cacheDuration);
+        self::assertIsNumeric($cacheDuration);
+        self::assertGreaterThan(0, $cacheDuration);
 
         // Simulate caching
         cache()->put($cacheKey, ['prices' => [100.00, 95.00]], $cacheDuration);
 
         $cached = cache()->get($cacheKey);
-        $this->assertNotNull($cached);
-        $this->assertArrayHasKey('prices', $cached);
-        $this->assertCount(2, $cached['prices']);
+        self::assertNotNull($cached);
+        self::assertArrayHasKey('prices', $cached);
+        self::assertCount(2, $cached['prices']);
     }
 
-    public function test_tracks_price_comparison_analytics(): void
+    public function testTracksPriceComparisonAnalytics(): void
     {
         $trackBehavior = config('coprra.analytics.track_user_behavior', true);
         $trackClicks = config('coprra.analytics.track_price_clicks', true);
 
-        $this->assertIsBool($trackBehavior);
-        $this->assertIsBool($trackClicks);
+        self::assertIsBool($trackBehavior);
+        self::assertIsBool($trackClicks);
 
         if ($trackBehavior) {
             // Simulate tracking
-            $this->assertTrue(true);
+            self::assertTrue(true);
         }
     }
 
-    public function test_handles_multiple_currencies_in_comparison(): void
+    public function testHandlesMultipleCurrenciesInComparison(): void
     {
         $this->product->stores()->attach($this->store1->id, [
             'price' => 100.00,
@@ -313,14 +321,14 @@ class PriceComparisonTest extends TestCase
         // Convert SAR to USD for comparison
         $sarPriceInUSD = PriceHelper::convertCurrency(375.00, 'SAR', 'USD');
 
-        $this->assertEquals(100.00, $sarPriceInUSD);
+        self::assertSame(100.00, $sarPriceInUSD);
     }
 
-    public function test_validates_price_update_interval(): void
+    public function testValidatesPriceUpdateInterval(): void
     {
         $updateInterval = config('coprra.price_comparison.price_update_interval', 6);
 
-        $this->assertIsNumeric($updateInterval);
-        $this->assertGreaterThan(0, $updateInterval);
+        self::assertIsNumeric($updateInterval);
+        self::assertGreaterThan(0, $updateInterval);
     }
 }

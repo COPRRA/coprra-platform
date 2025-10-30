@@ -19,13 +19,12 @@ final class EbayAdapter extends StoreAdapter
     {
         parent::__construct($http, $cache, $logger);
         $appId = config('services.ebay.app_id', '');
-        $this->appId = is_string($appId) ? $appId : '';
+        $this->appId = \is_string($appId) ? $appId : '';
     }
 
     /**
      * @psalm-return 'eBay'
      */
-    #[\Override]
     public function getStoreName(): string
     {
         return 'eBay';
@@ -43,12 +42,9 @@ final class EbayAdapter extends StoreAdapter
     #[\Override]
     public function isAvailable(): bool
     {
-        return $this->appId !== null && $this->appId !== '';
+        return null !== $this->appId && '' !== $this->appId;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     #[\Override]
     public function fetchProduct(string $productIdentifier): ?array
     {
@@ -72,12 +68,13 @@ final class EbayAdapter extends StoreAdapter
 
         if ($response && isset($response['Item'])) {
             $item = $response['Item'];
-            if (! is_array($item)) {
+            if (! \is_array($item)) {
                 return null;
             }
-            if (! is_array($item)) {
+            if (! \is_array($item)) {
                 return null;
             }
+
             /** @var array<string, mixed> $item */
             $normalized = $this->normalizeEbayData($item);
             $this->cacheProduct($productIdentifier, $normalized, 3600);
@@ -89,13 +86,10 @@ final class EbayAdapter extends StoreAdapter
     }
 
     /**
-     * {@inheritdoc}
+     * @return array<int, array<string, scalar|array|* @method static \App\Models\Brand create(array<string, string|bool|null>>
      *
-     * @return array<int, array<string, scalar|array|null>>
-     *
-     * @psalm-return list<non-empty-array<string, scalar|array|null>>
+     * @psalm-return list<non-empty-array<string, scalar|array|* @method static \App\Models\Brand create(array<string, string|bool|null>>
      */
-    #[\Override]
     public function searchProducts(string $query, array $options = []): array
     {
         if (! $this->isAvailable()) {
@@ -116,20 +110,20 @@ final class EbayAdapter extends StoreAdapter
         $response = $this->makeRequest($url, $params);
 
         $searchResult = data_get($response, 'findItemsAdvancedResponse.0.searchResult.0');
-        if (is_array($searchResult) && isset($searchResult['item'])) {
+        if (\is_array($searchResult) && isset($searchResult['item'])) {
             $items = $searchResult['item'];
 
-            if (! is_array($items)) {
+            if (! \is_array($items)) {
                 return [];
             }
 
             return array_values(array_filter(array_map(
                 function ($item): ?array {
-                    if (! is_array($item)) {
+                    if (! \is_array($item)) {
                         return null;
                     }
 
-                    /** @var array<string, array> $item */
+                    // @var array<string, array> $item
                     return $this->normalizeEbaySearchResult($item);
                 },
                 $items
@@ -139,11 +133,10 @@ final class EbayAdapter extends StoreAdapter
         return [];
     }
 
-    #[\Override]
     public function validateIdentifier(string $identifier): bool
     {
         // eBay item ID is numeric, typically 12 digits
-        return preg_match('/^\d{10,15}$/', $identifier) === 1;
+        return 1 === preg_match('/^\d{10,15}$/', $identifier);
     }
 
     #[\Override]
@@ -152,10 +145,6 @@ final class EbayAdapter extends StoreAdapter
         return "https://www.ebay.com/itm/{$identifier}";
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    #[\Override]
     public function getRateLimits(): array
     {
         return [
@@ -178,8 +167,9 @@ final class EbayAdapter extends StoreAdapter
     /**
      * Normalize eBay product data.
      *
-     * @param  array<string, array>  $item
-     * @return array<array|scalar|null>
+     * @param array<string, array> $item
+     *
+     * @return array<array|scalar|* @method static \App\Models\Brand create(array<string, string|bool|null>
      *
      * @phpstan-ignore-next-line
      *
@@ -230,8 +220,9 @@ final class EbayAdapter extends StoreAdapter
     /**
      * Normalize eBay search result item.
      *
-     * @param  array<string, array>  $item
-     * @return array<array|scalar|null>
+     * @param array<string, array> $item
+     *
+     * @return array<array|scalar|* @method static \App\Models\Brand create(array<string, string|bool|null>
      *
      * @phpstan-ignore-next-line
      *

@@ -1,20 +1,25 @@
 <?php
 
-/** @psalm-suppress UnusedClass */
-
 declare(strict_types=1);
 
 namespace App\Providers;
 
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
-final class AuthServiceProvider extends ServiceProvider
+/**
+ * AuthServiceProvider handles authentication and authorization services.
+ *
+ * In Laravel 12, policies are auto-discovered from app/Policies directory.
+ * No need to manually register them in $policies array.
+ */
+class AuthServiceProvider extends ServiceProvider
 {
     /**
      * Register any authentication / authorization services.
      */
     public function boot(): void
     {
-        $this->registerPolicies();
+        // Policies are auto-discovered in Laravel 12
+        // No need to call $this->registerPolicies()
     }
 }

@@ -19,12 +19,6 @@ class StandardSecurityHeaderStrategy implements SecurityHeaderStrategyInterface
     }
 
     #[\Override]
-    public function getHeaderName(): string
-    {
-        return $this->headerName;
-    }
-
-    #[\Override]
     public function getValue(Request $request, array $config): ?string
     {
         // Check for route-specific overrides
@@ -59,14 +53,10 @@ class StandardSecurityHeaderStrategy implements SecurityHeaderStrategyInterface
         return true;
     }
 
-    #[\Override]
-    public function supportsDynamicValues(): bool
-    {
-        return false;
-    }
-
     /**
      * Check a condition for header application.
+     *
+     * @param mixed $required
      */
     private function checkCondition(string $condition, $required, Request $request): bool
     {
@@ -80,22 +70,26 @@ class StandardSecurityHeaderStrategy implements SecurityHeaderStrategyInterface
 
     /**
      * Check environment condition.
+     *
+     * @param mixed $environments
      */
     private function checkEnvironmentCondition($environments): bool
     {
-        if (! is_array($environments)) {
+        if (! \is_array($environments)) {
             $environments = [$environments];
         }
 
-        return in_array(app()->environment(), $environments, true);
+        return \in_array(app()->environment(), $environments, true);
     }
 
     /**
      * Check route pattern condition.
+     *
+     * @param mixed $patterns
      */
     private function checkRoutePattern($patterns, Request $request): bool
     {
-        if (! is_array($patterns)) {
+        if (! \is_array($patterns)) {
             $patterns = [$patterns];
         }
 

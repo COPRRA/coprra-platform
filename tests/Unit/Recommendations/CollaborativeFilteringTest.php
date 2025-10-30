@@ -7,10 +7,15 @@ namespace Tests\Unit\Recommendations;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-class CollaborativeFilteringTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class CollaborativeFilteringTest extends TestCase
 {
     #[Test]
-    public function it_finds_similar_users(): void
+    public function itFindsSimilarUsers(): void
     {
         $userRatings = [
             'user1' => ['item1' => 5, 'item2' => 3, 'item3' => 4],
@@ -22,24 +27,24 @@ class CollaborativeFilteringTest extends TestCase
         $targetUser = 'user1';
         $similarUsers = $this->findSimilarUsers($userRatings, $targetUser, 2);
 
-        $this->assertContains('user4', $similarUsers);
-        $this->assertContains('user2', $similarUsers);
-        $this->assertCount(2, $similarUsers);
+        self::assertContains('user4', $similarUsers);
+        self::assertContains('user2', $similarUsers);
+        self::assertCount(2, $similarUsers);
     }
 
     #[Test]
-    public function it_calculates_cosine_similarity(): void
+    public function itCalculatesCosineSimilarity(): void
     {
         $user1 = ['item1' => 5, 'item2' => 3, 'item3' => 4];
         $user2 = ['item1' => 4, 'item2' => 2, 'item3' => 5];
 
         $similarity = $this->calculateCosineSimilarity($user1, $user2);
 
-        $this->assertGreaterThan(0.8, $similarity);
+        self::assertGreaterThan(0.8, $similarity);
     }
 
     #[Test]
-    public function it_predicts_ratings_for_items(): void
+    public function itPredictsRatingsForItems(): void
     {
         $userRatings = [
             'user1' => ['item1' => 5, 'item2' => 3, 'item3' => 4],
@@ -53,12 +58,12 @@ class CollaborativeFilteringTest extends TestCase
 
         $predictedRating = $this->predictRating($userRatings, $targetUser, $itemToPredict, $similarUsers);
 
-        $this->assertGreaterThan(0, $predictedRating);
-        $this->assertLessThanOrEqual(5, $predictedRating);
+        self::assertGreaterThan(0, $predictedRating);
+        self::assertLessThanOrEqual(5, $predictedRating);
     }
 
     #[Test]
-    public function it_handles_cold_start_problem(): void
+    public function itHandlesColdStartProblem(): void
     {
         $newUser = [];
         $popularItems = [
@@ -70,25 +75,25 @@ class CollaborativeFilteringTest extends TestCase
 
         $recommendations = $this->handleColdStart($newUser, $popularItems, 3);
 
-        $this->assertContains('item1', $recommendations);
-        $this->assertContains('item2', $recommendations);
-        $this->assertContains('item3', $recommendations);
-        $this->assertCount(3, $recommendations);
+        self::assertContains('item1', $recommendations);
+        self::assertContains('item2', $recommendations);
+        self::assertContains('item3', $recommendations);
+        self::assertCount(3, $recommendations);
     }
 
     #[Test]
-    public function it_calculates_pearson_correlation(): void
+    public function itCalculatesPearsonCorrelation(): void
     {
         $user1 = ['item1' => 5, 'item2' => 3, 'item3' => 4, 'item4' => 2];
         $user2 = ['item1' => 4, 'item2' => 2, 'item3' => 5, 'item4' => 1];
 
         $correlation = $this->calculatePearsonCorrelation($user1, $user2);
 
-        $this->assertGreaterThan(0.7, $correlation);
+        self::assertGreaterThan(0.7, $correlation);
     }
 
     #[Test]
-    public function it_filters_items_by_user_preferences(): void
+    public function itFiltersItemsByUserPreferences(): void
     {
         $allItems = ['item1', 'item2', 'item3', 'item4', 'item5'];
         $userPreferences = ['item1', 'item3'];
@@ -96,15 +101,15 @@ class CollaborativeFilteringTest extends TestCase
 
         $filteredItems = $this->filterItemsByPreferences($allItems, $userPreferences, $userRatings);
 
-        $this->assertNotContains('item1', $filteredItems);
-        $this->assertNotContains('item3', $filteredItems);
-        $this->assertContains('item2', $filteredItems);
-        $this->assertContains('item4', $filteredItems);
-        $this->assertContains('item5', $filteredItems);
+        self::assertNotContains('item1', $filteredItems);
+        self::assertNotContains('item3', $filteredItems);
+        self::assertContains('item2', $filteredItems);
+        self::assertContains('item4', $filteredItems);
+        self::assertContains('item5', $filteredItems);
     }
 
     #[Test]
-    public function it_calculates_item_based_similarity(): void
+    public function itCalculatesItemBasedSimilarity(): void
     {
         $itemRatings = [
             'item1' => ['user1' => 5, 'user2' => 4, 'user3' => 3],
@@ -114,11 +119,11 @@ class CollaborativeFilteringTest extends TestCase
 
         $similarity = $this->calculateItemBasedSimilarity($itemRatings, 'item1', 'item2');
 
-        $this->assertGreaterThan(0.8, $similarity);
+        self::assertGreaterThan(0.8, $similarity);
     }
 
     #[Test]
-    public function it_handles_sparse_data(): void
+    public function itHandlesSparseData(): void
     {
         $sparseRatings = [
             'user1' => ['item1' => 5],
@@ -132,11 +137,11 @@ class CollaborativeFilteringTest extends TestCase
 
         $similarUsers = $this->findSimilarUsersWithMinCommonItems($sparseRatings, $targetUser, $minCommonItems);
 
-        $this->assertContains('user4', $similarUsers);
+        self::assertContains('user4', $similarUsers);
     }
 
     #[Test]
-    public function it_calculates_confidence_scores(): void
+    public function itCalculatesConfidenceScores(): void
     {
         $userRatings = [
             'user1' => ['item1' => 5, 'item2' => 3],
@@ -150,12 +155,12 @@ class CollaborativeFilteringTest extends TestCase
 
         $confidence = $this->calculatePredictionConfidence($userRatings, $targetUser, $itemToPredict, $similarUsers);
 
-        $this->assertGreaterThan(0, $confidence);
-        $this->assertLessThanOrEqual(1, $confidence);
+        self::assertGreaterThan(0, $confidence);
+        self::assertLessThanOrEqual(1, $confidence);
     }
 
     #[Test]
-    public function it_handles_matrix_factorization(): void
+    public function itHandlesMatrixFactorization(): void
     {
         $ratingsMatrix = [
             [5, 3, 0, 1],
@@ -167,18 +172,20 @@ class CollaborativeFilteringTest extends TestCase
 
         $factors = $this->performMatrixFactorization($ratingsMatrix, 2);
 
-        $this->assertCount(2, $factors);
-        $this->assertArrayHasKey('user_factors', $factors);
-        $this->assertArrayHasKey('item_factors', $factors);
+        self::assertCount(2, $factors);
+        self::assertArrayHasKey('user_factors', $factors);
+        self::assertArrayHasKey('item_factors', $factors);
     }
 
     /**
-     * @param  array<string, mixed>  $userRatings
+     * @param array<string, mixed> $userRatings
+     *
      * @return array<int, array<string, mixed>>
      */
 
     /**
-     * @param  array<string, array<string, mixed>>  $userRatings
+     * @param array<string, array<string, mixed>> $userRatings
+     *
      * @return list<string>
      */
     private function findSimilarUsers(array $userRatings, string $targetUser, int $limit): array
@@ -197,12 +204,12 @@ class CollaborativeFilteringTest extends TestCase
 
         arsort($similarities);
 
-        return array_slice(array_keys($similarities), 0, $limit);
+        return \array_slice(array_keys($similarities), 0, $limit);
     }
 
     /**
-     * @param  array<string, mixed>  $user1
-     * @param  array<string, mixed>  $user2
+     * @param array<string, mixed> $user1
+     * @param array<string, mixed> $user2
      */
     private function calculateCosineSimilarity(array $user1, array $user2): float
     {
@@ -225,7 +232,7 @@ class CollaborativeFilteringTest extends TestCase
             $norm2 += $rating2Float * $rating2Float;
         }
 
-        if ($norm1 == 0 || $norm2 == 0) {
+        if (0 === $norm1 || 0 === $norm2) {
             return 0;
         }
 
@@ -233,13 +240,13 @@ class CollaborativeFilteringTest extends TestCase
     }
 
     /**
-     * @param  array<string, array<string, mixed>>  $userRatings
-     * @param  list<string>  $similarUsers
+     * @param array<string, array<string, mixed>> $userRatings
+     * @param list<string>                        $similarUsers
      */
     private function predictRating(array $userRatings, string $targetUser, string $item, array $similarUsers): float
     {
         $targetRatings = $userRatings[$targetUser] ?? [];
-        $targetAverage = empty($targetRatings) ? 0 : array_sum($targetRatings) / count($targetRatings);
+        $targetAverage = empty($targetRatings) ? 0 : array_sum($targetRatings) / \count($targetRatings);
 
         $weightedSum = 0;
         $totalWeight = 0;
@@ -252,14 +259,14 @@ class CollaborativeFilteringTest extends TestCase
             $similarity = $this->calculateCosineSimilarity($targetRatings, $userRatings[$similarUser]);
             $rating = $userRatings[$similarUser][$item] ?? 0;
             $ratingFloat = is_numeric($rating) ? (float) $rating : 0.0;
-            $similarAverage = array_sum($userRatings[$similarUser]) / count($userRatings[$similarUser]);
+            $similarAverage = array_sum($userRatings[$similarUser]) / \count($userRatings[$similarUser]);
             $similarAverageFloat = (float) $similarAverage;
 
             $weightedSum += $similarity * ($ratingFloat - $similarAverageFloat);
             $totalWeight += abs($similarity);
         }
 
-        if ($totalWeight == 0) {
+        if (0 === $totalWeight) {
             return $targetAverage;
         }
 
@@ -267,51 +274,53 @@ class CollaborativeFilteringTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $newUser
+     * @param array<string, mixed> $newUser
+     *
      * @return array<int, array<string, mixed>>
      */
 
     /**
-     * @param  array<string, mixed>  $newUser
-     * @param  array<string, int>  $popularItems
+     * @param array<string, mixed> $newUser
+     * @param array<string, int>   $popularItems
+     *
      * @return list<(int|string)>
      */
     private function handleColdStart(array $newUser, array $popularItems, int $limit): array
     {
         arsort($popularItems);
 
-        return array_slice(array_keys($popularItems), 0, $limit);
+        return \array_slice(array_keys($popularItems), 0, $limit);
     }
 
     /**
-     * @param  array<string, mixed>  $user1
-     * @param  array<string, mixed>  $user2
+     * @param array<string, mixed> $user1
+     * @param array<string, mixed> $user2
      */
     private function calculatePearsonCorrelation(array $user1, array $user2): float
     {
         $commonItems = array_intersect_key($user1, $user2);
 
-        if (count($commonItems) < 2) {
+        if (\count($commonItems) < 2) {
             return 0;
         }
 
         $ratings1 = array_values($commonItems);
         $ratings2 = array_values(array_intersect_key($user2, $commonItems));
 
-        $n = count($ratings1);
+        $n = \count($ratings1);
         $sum1 = array_sum($ratings1);
         $sum2 = array_sum($ratings2);
-        $sum1Sq = array_sum(array_map(function ($x) {
+        $sum1Sq = array_sum(array_map(static function ($x) {
             $xFloat = is_numeric($x) ? (float) $x : 0.0;
 
             return $xFloat * $xFloat;
         }, $ratings1));
-        $sum2Sq = array_sum(array_map(function ($x) {
+        $sum2Sq = array_sum(array_map(static function ($x) {
             $xFloat = is_numeric($x) ? (float) $x : 0.0;
 
             return $xFloat * $xFloat;
         }, $ratings2));
-        $pSum = array_sum(array_map(function ($x, $y) {
+        $pSum = array_sum(array_map(static function ($x, $y) {
             $xFloat = is_numeric($x) ? (float) $x : 0.0;
             $yFloat = is_numeric($y) ? (float) $y : 0.0;
 
@@ -321,7 +330,7 @@ class CollaborativeFilteringTest extends TestCase
         $num = $pSum - ($sum1 * $sum2 / $n);
         $den = sqrt(($sum1Sq - $sum1 * $sum1 / $n) * ($sum2Sq - $sum2 * $sum2 / $n));
 
-        if ($den == 0) {
+        if (0 === $den) {
             return 0;
         }
 
@@ -329,14 +338,16 @@ class CollaborativeFilteringTest extends TestCase
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $allItems
+     * @param array<int, array<string, mixed>> $allItems
+     *
      * @return array<int, array<string, mixed>>
      */
 
     /**
-     * @param  list<string>  $allItems
-     * @param  list<string>  $userPreferences
-     * @param  array<string, mixed>  $userRatings
+     * @param list<string>         $allItems
+     * @param list<string>         $userPreferences
+     * @param array<string, mixed> $userRatings
+     *
      * @return array<int, string>
      */
     private function filterItemsByPreferences(array $allItems, array $userPreferences, array $userRatings): array
@@ -345,7 +356,7 @@ class CollaborativeFilteringTest extends TestCase
     }
 
     /**
-     * @param  array<string, array<string, mixed>>  $itemRatings
+     * @param array<string, array<string, mixed>> $itemRatings
      */
     private function calculateItemBasedSimilarity(array $itemRatings, string $item1, string $item2): float
     {
@@ -356,7 +367,7 @@ class CollaborativeFilteringTest extends TestCase
         $ratings1 = $itemRatings[$item1];
         $ratings2 = $itemRatings[$item2];
 
-        if (is_array($ratings1) && is_array($ratings2)) {
+        if (\is_array($ratings1) && \is_array($ratings2)) {
             return $this->calculateCosineSimilarity($ratings1, $ratings2);
         }
 
@@ -364,12 +375,14 @@ class CollaborativeFilteringTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $userRatings
+     * @param array<string, mixed> $userRatings
+     *
      * @return array<int, array<string, mixed>>
      */
 
     /**
-     * @param  array<string, array<string, mixed>>  $userRatings
+     * @param array<string, array<string, mixed>> $userRatings
+     *
      * @return list<string>
      */
     private function findSimilarUsersWithMinCommonItems(array $userRatings, string $targetUser, int $minCommonItems): array
@@ -384,7 +397,7 @@ class CollaborativeFilteringTest extends TestCase
 
             $commonItems = array_intersect_key($targetRatings, $ratings);
 
-            if (count($commonItems) >= $minCommonItems) {
+            if (\count($commonItems) >= $minCommonItems) {
                 $similarity = $this->calculateCosineSimilarity($targetRatings, $ratings);
                 $similarUsers[$user] = $similarity;
             }
@@ -396,8 +409,8 @@ class CollaborativeFilteringTest extends TestCase
     }
 
     /**
-     * @param  array<string, array<string, mixed>>  $userRatings
-     * @param  list<string>  $similarUsers
+     * @param array<string, array<string, mixed>> $userRatings
+     * @param list<string>                        $similarUsers
      */
     private function calculatePredictionConfidence(array $userRatings, string $targetUser, string $item, array $similarUsers): float
     {
@@ -407,13 +420,13 @@ class CollaborativeFilteringTest extends TestCase
 
         foreach ($similarUsers as $similarUser) {
             if (isset($userRatings[$similarUser][$item])) {
-                $commonItems++;
+                ++$commonItems;
                 $similarity = $this->calculateCosineSimilarity($targetRatings, $userRatings[$similarUser]);
                 $totalSimilarity += abs($similarity);
             }
         }
 
-        if ($commonItems == 0) {
+        if (0 === $commonItems) {
             return 0;
         }
 
@@ -421,32 +434,34 @@ class CollaborativeFilteringTest extends TestCase
     }
 
     /**
-     * @param  array<int, array<int, mixed>>  $ratingsMatrix
+     * @param array<int, array<int, mixed>> $ratingsMatrix
+     *
      * @return array<int, array<string, mixed>>
      */
 
     /**
-     * @param  array<int, list<int>>  $ratingsMatrix
+     * @param array<int, list<int>> $ratingsMatrix
+     *
      * @return array<string, array<int, array<int, float|int>>>
      */
     private function performMatrixFactorization(array $ratingsMatrix, int $numFactors): array
     {
-        $numUsers = count($ratingsMatrix);
+        $numUsers = \count($ratingsMatrix);
         $firstRow = reset($ratingsMatrix);
-        $numItems = is_array($firstRow) ? count($firstRow) : 0;
+        $numItems = \is_array($firstRow) ? \count($firstRow) : 0;
 
         // Initialize random factors
         $userFactors = [];
         $itemFactors = [];
 
-        for ($i = 0; $i < $numUsers; $i++) {
-            for ($f = 0; $f < $numFactors; $f++) {
+        for ($i = 0; $i < $numUsers; ++$i) {
+            for ($f = 0; $f < $numFactors; ++$f) {
                 $userFactors[$i][$f] = rand(0, 100) / 100;
             }
         }
 
-        for ($j = 0; $j < $numItems; $j++) {
-            for ($f = 0; $f < $numFactors; $f++) {
+        for ($j = 0; $j < $numItems; ++$j) {
+            for ($f = 0; $f < $numFactors; ++$f) {
                 $itemFactors[$j][$f] = rand(0, 100) / 100;
             }
         }

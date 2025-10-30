@@ -21,7 +21,7 @@ return [
         'Permissions-Policy' => 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
         // HSTS is environment-driven to avoid preloading in non-production.
         'Strict-Transport-Security' => [
-            'enabled' => env('HSTS_ENABLED', env('APP_ENV') === 'production'),
+            'enabled' => env('HSTS_ENABLED', 'production' === env('APP_ENV')),
             'value' => 'max-age='.env('HSTS_MAX_AGE', 31536000)
                 .(env('HSTS_INCLUDE_SUBDOMAINS', true) ? '; includeSubDomains' : '')
                 .(env('HSTS_PRELOAD', false) ? '; preload' : ''),

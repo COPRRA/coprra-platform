@@ -6,12 +6,11 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
         if (! Schema::hasTable('notifications')) {
-            Schema::create('notifications', function (Blueprint $table): void {
+            Schema::create('notifications', static function (Blueprint $table): void {
                 $table->uuid('id')->primary();
                 $table->string('type');
                 // Some tests expect a direct user_id column in addition to the morphs
@@ -24,7 +23,7 @@ return new class extends Migration
         } else {
             // Ensure user_id column exists for tests that rely on it
             if (! Schema::hasColumn('notifications', 'user_id')) {
-                Schema::table('notifications', function (Blueprint $table): void {
+                Schema::table('notifications', static function (Blueprint $table): void {
                     $table->unsignedBigInteger('user_id')->nullable()->index();
                 });
             }

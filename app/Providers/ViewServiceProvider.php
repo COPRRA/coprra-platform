@@ -70,7 +70,7 @@ class ViewServiceProvider extends ServiceProvider
     /**
      * Get breadcrumbs for the current page.
      *
-     * @return array<int, array<string, string|null>>
+     * @return array<int, array<string, string|* @method static \App\Models\Brand create(array<string, string|bool|null>>
      */
     private function getBreadcrumbs(): array
     {
@@ -96,8 +96,8 @@ class ViewServiceProvider extends ServiceProvider
     /**
      * Add breadcrumbs based on the route configuration.
      *
-     * @param  array<int, array<string, string|null>>  $breadcrumbs
-     * @param  array<string, string>  $config
+     * @param  array<int, array<string, string|* @method static \App\Models\Brand create(array<string, string|bool|null>>  $breadcrumbs
+     * @param array<string, string> $config
      */
     private function addConfiguredBreadcrumbs(array &$breadcrumbs, Route $route, array $config): void
     {

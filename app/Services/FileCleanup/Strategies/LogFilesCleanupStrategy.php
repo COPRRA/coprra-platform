@@ -22,7 +22,7 @@ final readonly class LogFilesCleanupStrategy implements CleanupStrategy
     }
 
     /**
-     * @return array<string, int|string|array<string>>
+     * @return array<string, array<string>|int|string>
      *
      * @psalm-return array<string, int|string|list<string>>
      */

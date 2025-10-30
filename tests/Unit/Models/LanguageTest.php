@@ -14,14 +14,16 @@ use Tests\TestCase;
 
 /**
  * Unit tests for the Language model.
+ *
+ * @internal
  */
 #[CoversClass(Language::class)]
-class LanguageTest extends TestCase
+final class LanguageTest extends TestCase
 {
     /**
      * Test fillable attributes.
      */
-    public function test_fillable_attributes(): void
+    public function testFillableAttributes(): void
     {
         $fillable = [
             'code',
@@ -32,100 +34,100 @@ class LanguageTest extends TestCase
             'sort_order',
         ];
 
-        $this->assertEquals($fillable, (new Language)->getFillable());
+        self::assertSame($fillable, (new Language())->getFillable());
     }
 
     /**
      * Test casts.
      */
-    public function test_casts(): void
+    public function testCasts(): void
     {
         $casts = [
             'is_active' => 'boolean',
             'sort_order' => 'integer',
         ];
 
-        $this->assertEquals($casts, (new Language)->getCasts());
+        self::assertSame($casts, (new Language())->getCasts());
     }
 
     /**
      * Test currencies relation is a BelongsToMany instance.
      */
-    public function test_currencies_relation(): void
+    public function testCurrenciesRelation(): void
     {
-        $language = new Language;
+        $language = new Language();
 
         $relation = $language->currencies();
 
-        $this->assertInstanceOf(BelongsToMany::class, $relation);
-        $this->assertEquals(Currency::class, $relation->getRelated()::class);
-        $this->assertEquals('language_currency', $relation->getTable());
+        self::assertInstanceOf(BelongsToMany::class, $relation);
+        self::assertSame(Currency::class, $relation->getRelated()::class);
+        self::assertSame('language_currency', $relation->getTable());
     }
 
     /**
      * Test userLocaleSettings relation is a HasMany instance.
      */
-    public function test_user_locale_settings_relation(): void
+    public function testUserLocaleSettingsRelation(): void
     {
-        $language = new Language;
+        $language = new Language();
 
         $relation = $language->userLocaleSettings();
 
-        $this->assertInstanceOf(HasMany::class, $relation);
-        $this->assertEquals(UserLocaleSetting::class, $relation->getRelated()::class);
+        self::assertInstanceOf(HasMany::class, $relation);
+        self::assertSame(UserLocaleSetting::class, $relation->getRelated()::class);
     }
 
     /**
      * Test scopeActive applies correct where clause.
      */
-    public function test_scope_active(): void
+    public function testScopeActive(): void
     {
         $query = Language::query()->active();
 
-        $this->assertEquals('select * from "languages" where "is_active" = ?', $query->toSql());
-        $this->assertEquals([true], $query->getBindings());
+        self::assertSame('select * from "languages" where "is_active" = ?', $query->toSql());
+        self::assertSame([true], $query->getBindings());
     }
 
     /**
      * Test scopeOrdered applies correct order by clause.
      */
-    public function test_scope_ordered(): void
+    public function testScopeOrdered(): void
     {
         $query = Language::query()->ordered();
 
-        $this->assertEquals('select * from "languages" order by "sort_order" asc, "name" asc', $query->toSql());
+        self::assertSame('select * from "languages" order by "sort_order" asc, "name" asc', $query->toSql());
     }
 
     /**
      * Test isRtl returns true when direction is rtl.
      */
-    public function test_is_rtl_returns_true_when_direction_rtl(): void
+    public function testIsRtlReturnsTrueWhenDirectionRtl(): void
     {
         $language = new Language(['direction' => 'rtl']);
 
-        $this->assertTrue($language->isRtl());
+        self::assertTrue($language->isRtl());
     }
 
     /**
      * Test isRtl returns false when direction is ltr.
      */
-    public function test_is_rtl_returns_false_when_direction_ltr(): void
+    public function testIsRtlReturnsFalseWhenDirectionLtr(): void
     {
         $language = new Language(['direction' => 'ltr']);
 
-        $this->assertFalse($language->isRtl());
+        self::assertFalse($language->isRtl());
     }
 
     /**
      * Test findByCode returns language by code.
      */
-    public function test_find_by_code(): void
+    public function testFindByCode(): void
     {
         // Since it's a static method, we can test the query it builds
         $query = Language::where('code', 'en');
 
-        $this->assertEquals('select * from "languages" where "code" = ?', $query->toSql());
-        $this->assertEquals(['en'], $query->getBindings());
+        self::assertSame('select * from "languages" where "code" = ?', $query->toSql());
+        self::assertSame(['en'], $query->getBindings());
     }
 
     /**
@@ -133,10 +135,10 @@ class LanguageTest extends TestCase
      * Note: This method requires database, so in unit test we can mock or skip if needed.
      * For pure unit, perhaps test the logic, but since it queries, it's more integration.
      */
-    public function test_default_currency_method_exists(): void
+    public function testDefaultCurrencyMethodExists(): void
     {
-        $language = new Language;
+        $language = new Language();
 
-        $this->assertTrue(method_exists($language, 'defaultCurrency'));
+        self::assertTrue(method_exists($language, 'defaultCurrency'));
     }
 }

@@ -15,7 +15,8 @@ final class PriceQueryBuilderService
     /**
      * Build the query for price offers.
      *
-     * @param  array{storeId: int|string|null, productId: int|string|null, dryRun: bool}  $options
+     * @param array{storeId: int|string|null, productId: int|string|null, dryRun: bool} $options
+     *
      * @return Builder<PriceOffer>
      */
     public function buildQuery(array $options): Builder
@@ -33,8 +34,8 @@ final class PriceQueryBuilderService
     /**
      * Apply multiple filters to query.
      *
-     * @param  Builder<PriceOffer>  $query
-     * @param  array<string, int|string|null>  $filters
+     * @param Builder<PriceOffer> $query
+     * @param  array<string, int|string|* @method static \App\Models\Brand create(array<string, string|bool|null>  $filters
      */
     private function applyFilters(Builder $query, array $filters): void
     {
@@ -46,16 +47,16 @@ final class PriceQueryBuilderService
     /**
      * Apply a single filter to the query.
      *
-     * @param  Builder<PriceOffer>  $query
+     * @param Builder<PriceOffer> $query
      */
     private function applyFilter(Builder $query, string $relation, int|string|null $relationId): void
     {
-        if ($relationId === null) {
+        if (null === $relationId) {
             return;
         }
 
         $numericId = $this->parseNumericId($relationId);
-        if ($numericId === null) {
+        if (null === $numericId) {
             return;
         }
 
@@ -67,6 +68,6 @@ final class PriceQueryBuilderService
      */
     private function parseNumericId(int|string $rawId): ?int
     {
-        return is_int($rawId) ? $rawId : (is_numeric($rawId) ? (int) $rawId : null);
+        return \is_int($rawId) ? $rawId : (is_numeric($rawId) ? (int) $rawId : null);
     }
 }

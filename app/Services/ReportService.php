@@ -4,30 +4,38 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\PriceAlert;
-use App\Models\PriceOffer;
-use App\Models\Product;
-use App\Models\Review;
-use App\Models\User;
-use App\Models\Wishlist;
+use App\Services\Reports\PriceAnalysisReportGenerator;
+use App\Services\Reports\ProductPerformanceReportGenerator;
+use App\Services\Reports\SalesReportGenerator;
+use App\Services\Reports\UserActivityReportGenerator;
 use Carbon\Carbon;
-use Illuminate\Database\DatabaseManager;
 
+/**
+ * Main report service that coordinates different report generators.
+ * Acts as a facade for various specialized report generation services.
+ */
 final readonly class ReportService
 {
     public function __construct(
-        private Product $productModel,
-        private PriceOffer $priceOfferModel,
-        private DatabaseManager $dbManager,
-        private User $userModel
+        private ProductPerformanceReportGenerator $productPerformanceGenerator,
+        private UserActivityReportGenerator $userActivityGenerator,
+        private SalesReportGenerator $salesGenerator,
+        private PriceAnalysisReportGenerator $priceAnalysisGenerator
     ) {}
 
     /**
-     * Generate a comprehensive performance report for a single product.
+     * Generate product performance report.
      *
-     * @return array<string, mixed>
-     *
-     * @psalm-return array{product: array{id: mixed, name: mixed, current_price: mixed, category: 'N/A'|mixed, brand: 'N/A'|mixed}, period: array{start_date: string, end_date: string}, price_analysis: array<string, array<string, float|int>|float|int>, offer_analysis: array<string, array<int, int>|int>, user_engagement: array{wishlist_adds: int, price_alerts: int, reviews: int, total_engagement: int}, reviews_analysis: array<string, array<int, int>|int>}
+     * @return array{
+     *     product_id: int,
+     *     name: string,
+     *     price_stats: array<string, mixed>,
+     *     offer_availability: array<string, mixed>,
+     *     review_analysis: array<string, mixed>,
+     *     engagement_metrics: array<string, mixed>,
+     *     price_trends: array<int, array<string, mixed>>,
+     *     top_products: array<int, array<string, mixed>>
+     * }
      */
     public function generateProductPerformanceReport(
         int $productId,
@@ -37,69 +45,39 @@ final readonly class ReportService
         $endDate ??= Carbon::now();
         $startDate ??= $endDate->copy()->subDays(30);
 
-        $product = $this->productModel->findOrFail($productId);
-
-        return [
-            'product' => [
-                'id' => $product->id,
-                'name' => $product->name,
-                'current_price' => $product->price,
-                'category' => $product->category->name ?? 'N/A',
-                'brand' => $product->brand->name ?? 'N/A',
-            ],
-            'period' => [
-                'start_date' => $startDate->format('Y-m-d'),
-                'end_date' => $endDate->format('Y-m-d'),
-            ],
-            'price_analysis' => $this->getPriceAnalysis($productId, $startDate, $endDate),
-            'offer_analysis' => $this->getOfferAnalysis($productId, $startDate, $endDate),
-            'user_engagement' => $this->getUserEngagement($productId, $startDate, $endDate),
-            'reviews_analysis' => $this->getReviewsAnalysis($productId, $startDate, $endDate),
-        ];
+        return $this->productPerformanceGenerator->generateReport($productId, $startDate, $endDate);
     }
 
     /**
      * Generate user activity report.
      *
-     * @return array<string, mixed>
-     *
-     * @psalm-return array{user: array{id: mixed, name: mixed, email: mixed, created_at: 'N/A'|mixed}, period: array{start_date: string, end_date: string}, activity_summary: array{wishlist_adds: int, price_alerts_created: int, reviews_written: int, total_activity: int}, wishlist_activity: array<int, array<string, int|string|null>>, price_alerts: array<int, array<string, float|int|string|null>>, reviews_activity: array<int, array<string, int|string|null>>}
+     * @return array{
+     *     total_users_active: int,
+     *     wishlist_activity: array<int, array<string, mixed>>,
+     *     price_alerts_activity: array<int, array<string, mixed>>,
+     *     reviews_activity: array<int, array<string, mixed>>,
+     *     engagement_summary: array<string, mixed>
+     * }
      */
-    public function generateUserActivityReport(int $userId, ?Carbon $startDate = null, ?Carbon $endDate = null): array
+    public function generateUserActivityReport(?Carbon $startDate = null, ?Carbon $endDate = null): array
     {
         $startDate ??= now()->subMonth();
         $endDate ??= now();
 
-        $user = $this->userModel->findOrFail($userId);
-
-        return [
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'created_at' => $user->created_at?->format('Y-m-d H:i:s') ?? 'N/A',
-            ],
-            'period' => [
-                'start_date' => $startDate->format('Y-m-d'),
-                'end_date' => $endDate->format('Y-m-d'),
-            ],
-            'activity_summary' => $this->getUserActivitySummary($userId, $startDate, $endDate),
-            'wishlist_activity' => $this->getWishlistActivity($startDate, $endDate),
-            'price_alerts' => $this->getPriceAlertsActivity($startDate, $endDate),
-            'reviews_activity' => $this->getReviewsActivity($startDate, $endDate),
-        ];
+        return $this->userActivityGenerator->generateReport($startDate, $endDate);
     }
 
     /**
      * Generate sales report.
      *
      * @return array{
-     *     period: array<string, string>,
-     *     total_offers: int,
-     *     price_changes: array<string, float|int>,
-     *     top_products: array<int, array<string, int|string|null>>,
-     *     top_stores: array<int, int>,
-     *     price_trends: array<int, array<string, string|float>>
+     *     total_orders: int,
+     *     total_revenue: float,
+     *     average_order_value: float,
+     *     top_selling_products: array<int, array<string, mixed>>,
+     *     sales_by_period: array<string, array<string, mixed>>,
+     *     order_status_breakdown: array<string, int>,
+     *     revenue_trends: array<string, float>
      * }
      */
     public function generateSalesReport(?Carbon $startDate = null, ?Carbon $endDate = null): array
@@ -107,454 +85,88 @@ final readonly class ReportService
         $startDate ??= now()->subMonth();
         $endDate ??= now();
 
+        return $this->salesGenerator->generateReport($startDate, $endDate);
+    }
+
+    /**
+     * Generate price analysis report.
+     *
+     * @return array{
+     *     price_changes_summary: array<string, mixed>,
+     *     trending_products: array<int, array<string, mixed>>,
+     *     price_volatility_analysis: array<int, array<string, mixed>>,
+     *     market_trends: array<string, mixed>,
+     *     price_alerts_triggered: int
+     * }
+     */
+    public function generatePriceAnalysisReport(?Carbon $startDate = null, ?Carbon $endDate = null): array
+    {
+        $startDate ??= now()->subMonth();
+        $endDate ??= now();
+
+        return $this->priceAnalysisGenerator->generateReport($startDate, $endDate);
+    }
+
+    /**
+     * Generate comprehensive dashboard report combining all report types.
+     *
+     * @return array{
+     *     sales_summary: array<string, mixed>,
+     *     user_activity_summary: array<string, mixed>,
+     *     price_analysis_summary: array<string, mixed>,
+     *     generated_at: string
+     * }
+     */
+    public function generateDashboardReport(?Carbon $startDate = null, ?Carbon $endDate = null): array
+    {
+        $startDate ??= now()->subMonth();
+        $endDate ??= now();
+
         return [
-            'period' => [
-                'start_date' => $startDate->format('Y-m-d'),
-                'end_date' => $endDate->format('Y-m-d'),
-            ],
-            'total_offers' => PriceOffer::whereBetween('created_at', [$startDate, $endDate])->count(),
-            'price_changes' => $this->getPriceChanges($startDate, $endDate),
-            'top_products' => $this->getTopProducts($startDate, $endDate),
-            'top_stores' => $this->getTopStores($startDate, $endDate),
-            'price_trends' => $this->getPriceTrends($startDate, $endDate),
+            'sales_summary' => $this->salesGenerator->generateReport($startDate, $endDate),
+            'user_activity_summary' => $this->userActivityGenerator->generateReport($startDate, $endDate),
+            'price_analysis_summary' => $this->priceAnalysisGenerator->generateReport($startDate, $endDate),
+            'generated_at' => now()->toDateTimeString(),
         ];
     }
 
     /**
-     * Get price analysis for a product.
-     *
-     * @return array<array<float|int>|float|int>
-     *
-     * @psalm-return array{total_offers: int<0, max>, price_range: array{min: 0|float, max: 0|float}, average_price: 0|float, price_volatility: 0|float}
+     * Get daily sales summary.
      */
-    private function getPriceAnalysis(int $productId, Carbon $startDate, Carbon $endDate): array
+    public function getDailySalesSummary(Carbon $date): array
     {
-        $offers = PriceOffer::where('product_id', $productId)
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->orderBy('created_at')
-            ->get();
-
-        if ($offers->isEmpty()) {
-            return [
-                'total_offers' => 0,
-                'price_range' => ['min' => 0, 'max' => 0],
-                'average_price' => 0,
-                'price_volatility' => 0,
-            ];
-        }
-
-        return $this->calculatePriceStatistics($offers);
+        return $this->salesGenerator->getDailySalesSummary($date);
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Collection<int, \App\Models\PriceOffer>  $offers
-     * @return array<array<float|int>|float|int>
-     *
-     * @psalm-return array{total_offers: int<0, max>, price_range: array{min: 0|float, max: 0|float}, average_price: 0|float, price_volatility: 0|float}
+     * Get user activity summary for a specific user.
      */
-    private function calculatePriceStatistics(
-        \Illuminate\Database\Eloquent\Collection $offers
-    ): array {
-        /** @var array<float> $prices */
-        $prices = $offers->pluck('price')->map(static function ($price): float {
-            return is_numeric($price) ? (float) $price : 0.0;
-        })->toArray();
-        if ($prices === []) {
-            return [
-                'total_offers' => 0,
-                'price_range' => ['min' => 0, 'max' => 0],
-                'average_price' => 0,
-                'price_volatility' => 0,
-            ];
-        }
-
-        $totalOffers = count($prices);
-        $priceRange = ['min' => min($prices), 'max' => max($prices)];
-        $averagePrice = array_sum($prices) / $totalOffers;
-        $priceVolatility = $this->calculatePriceVolatility($prices, $averagePrice);
-
-        return [
-            'total_offers' => $totalOffers,
-            'price_range' => $priceRange,
-            'average_price' => round($averagePrice, 2),
-            'price_volatility' => round($priceVolatility, 2),
-        ];
+    public function getUserActivitySummary(int $userId, Carbon $startDate, Carbon $endDate): array
+    {
+        return $this->userActivityGenerator->getUserActivitySummary($userId, $startDate, $endDate);
     }
 
     /**
-     * @param  array<float>  $prices
+     * Get price trends for a specific product.
      */
-    private function calculatePriceVolatility(array $prices, float $averagePrice): float
+    public function getProductPriceTrends(int $productId, Carbon $startDate, Carbon $endDate): array
     {
-        $pricesCount = count($prices);
-        if ($pricesCount === 0) {
-            return 0.0;
-        }
-
-        $variance = array_reduce(
-            $prices,
-            static function (float $carry, float $price) use ($averagePrice): float {
-                return $carry + ($price - $averagePrice) ** 2;
-            },
-            0.0
-        ) / $pricesCount;
-
-        return sqrt($variance);
+        return $this->priceAnalysisGenerator->getProductPriceTrends($productId, $startDate, $endDate);
     }
 
     /**
-     * @return array<string, int|array<int, int>>
+     * Get top selling products.
      */
-    private function getOfferAnalysis(int $productId, Carbon $startDate, Carbon $endDate): array
+    public function getTopSellingProducts(Carbon $startDate, Carbon $endDate, int $limit = 10): array
     {
-        $offers = PriceOffer::where('product_id', $productId)
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->with('store')
-            ->get();
-
-        $storeCounts = $offers->groupBy('store_id')->map->count();
-        $availabilityCounts = $offers->groupBy('is_available')->map->count();
-
-        return [
-            'total_offers' => $offers->count(),
-            'unique_stores' => $storeCounts->count(),
-            'available_offers' => $availabilityCounts->get('1', 0),
-            'unavailable_offers' => $availabilityCounts->get('0', 0),
-            'top_stores' => $storeCounts->sortDesc()->take(5)->toArray(),
-        ];
+        return $this->salesGenerator->getTopSellingProducts($startDate, $endDate, $limit);
     }
 
     /**
-     * Get user engagement for a product.
-     *
-     * @return array<int>
-     *
-     * @psalm-return array{wishlist_adds: int, price_alerts: int, reviews: int, total_engagement: int}
+     * Get customer analysis.
      */
-    private function getUserEngagement(int $productId, Carbon $startDate, Carbon $endDate): array
+    public function getCustomerAnalysis(Carbon $startDate, Carbon $endDate): array
     {
-        $wishlists = $this->countProductActivity(Wishlist::class, $productId, $startDate, $endDate);
-        $priceAlerts = $this->countProductActivity(PriceAlert::class, $productId, $startDate, $endDate);
-        $reviews = $this->countProductActivity(Review::class, $productId, $startDate, $endDate);
-
-        return [
-            'wishlist_adds' => $wishlists,
-            'price_alerts' => $priceAlerts,
-            'reviews' => $reviews,
-            'total_engagement' => $wishlists + $priceAlerts + $reviews,
-        ];
-    }
-
-    /**
-     * Count product activity for a given model.
-     */
-    private function countProductActivity(string $modelClass, int $productId, Carbon $startDate, Carbon $endDate): int
-    {
-        return $modelClass::where('product_id', $productId)
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->count();
-    }
-
-    /**
-     * Get reviews analysis for a product.
-     *
-     * @return array<string, int|array<int, int>>
-     */
-    private function getReviewsAnalysis(int $productId, Carbon $startDate, Carbon $endDate): array
-    {
-        $reviews = Review::where('product_id', $productId)
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->get();
-
-        if ($reviews->isEmpty()) {
-            return [
-                'total_reviews' => 0,
-                'average_rating' => 0,
-                'rating_distribution' => [],
-                'approved_reviews' => 0,
-                'pending_reviews' => 0,
-            ];
-        }
-
-        return $this->calculateReviewStats($reviews);
-    }
-
-    /**
-     * Calculate review statistics.
-     *
-     * @param  \Illuminate\Database\Eloquent\Collection<int, \App\Models\Review>  $reviews
-     * @return array<string, int|array<int, int>>
-     */
-    private function calculateReviewStats(\Illuminate\Database\Eloquent\Collection $reviews): array
-    {
-        $ratings = $reviews->pluck('rating')->toArray();
-        $ratingDistribution = array_count_values($ratings);
-
-        return [
-            'total_reviews' => $reviews->count(),
-            'average_rating' => array_sum($ratings) / count($ratings),
-            'rating_distribution' => $ratingDistribution,
-            'approved_reviews' => $reviews->where('is_approved', true)->count(),
-            'pending_reviews' => $reviews->where('is_approved', false)->count(),
-        ];
-    }
-
-    /**
-     * Get user activity summary.
-     *
-     * @return array<int>
-     *
-     * @psalm-return array{wishlist_adds: int, price_alerts_created: int, reviews_written: int, total_activity: int}
-     */
-    private function getUserActivitySummary(int $userId, Carbon $startDate, Carbon $endDate): array
-    {
-        $wishlists = $this->countUserActivity(Wishlist::class, $userId, $startDate, $endDate);
-        $priceAlerts = $this->countUserActivity(PriceAlert::class, $userId, $startDate, $endDate);
-        $reviews = $this->countUserActivity(Review::class, $userId, $startDate, $endDate);
-
-        return [
-            'wishlist_adds' => $wishlists,
-            'price_alerts_created' => $priceAlerts,
-            'reviews_written' => $reviews,
-            'total_activity' => $wishlists + $priceAlerts + $reviews,
-        ];
-    }
-
-    /**
-     * Count user activity for a given model.
-     */
-    private function countUserActivity(string $modelClass, int $userId, Carbon $startDate, Carbon $endDate): int
-    {
-        return $modelClass::where('user_id', $userId)
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->count();
-    }
-
-    /**
-     * Get wishlist activity.
-     *
-     * @return array<int, array<string, int|string|null>>
-     */
-    private function getWishlistActivity(Carbon $startDate, Carbon $endDate): array
-    {
-        $wishlists = Wishlist::with('product')
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->get();
-
-        /** @var array<int, array<string, int|string|null>> $result */
-        $result = $wishlists->map(/**
-         * @return array<int|string|null>
-         *
-         * @psalm-return array{user_id: int, product_id: int, product_name: string, created_at: string|null}
-         */
-            static function (Wishlist $wishlist): array {
-                $createdAt = $wishlist->created_at;
-
-                return [
-                    'user_id' => $wishlist->user_id,
-                    'product_id' => $wishlist->product_id,
-                    'product_name' => $wishlist->product->name,
-                    'created_at' => $createdAt ? $createdAt->toDateTimeString() : null,
-                ];
-            }
-        )->toArray();
-
-        return $result;
-    }
-
-    /**
-     * Get price alerts activity.
-     *
-     * @return array<int, array<string, float|int|string|null>>
-     */
-    private function getPriceAlertsActivity(Carbon $startDate, Carbon $endDate): array
-    {
-        $alerts = PriceAlert::with('product')
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->get();
-
-        /** @var array<int, array<string, float|int|string|null>> $result */
-        $result = $alerts->map(/**
-         * @return array<float|int|string|null>
-         *
-         * @psalm-return array{user_id: int, product_id: int, product_name: string, target_price: float, created_at: string|null}
-         */
-            static function (PriceAlert $alert): array {
-                $createdAt = $alert->created_at;
-
-                return [
-                    'user_id' => $alert->user_id,
-                    'product_id' => $alert->product_id,
-                    'product_name' => $alert->product->name,
-                    'target_price' => $alert->target_price,
-                    'created_at' => $createdAt ? $createdAt->toDateTimeString() : null,
-                ];
-            }
-        )->toArray();
-
-        return $result;
-    }
-
-    /**
-     * Get reviews activity.
-     *
-     * @return array<int, array<string, int|string|null>>
-     */
-    private function getReviewsActivity(Carbon $startDate, Carbon $endDate): array
-    {
-        $reviews = Review::with('product')
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->get();
-
-        /** @var array<int, array<string, int|string|null>> $result */
-        $result = $reviews->map(/**
-         * @return array<int|mixed|string|null>
-         *
-         * @psalm-return array{user_id: int, product_id: int, product_name: string, rating: int, comment: string, created_at: mixed|null}
-         */
-            static function (Review $review): array {
-                $createdAt = $review->created_at;
-
-                return [
-                    'user_id' => $review->user_id,
-                    'product_id' => $review->product_id,
-                    'product_name' => $review->product->name,
-                    'rating' => $review->rating,
-                    'comment' => $review->content,
-                    'created_at' => $createdAt ? $createdAt->toDateTimeString() : null,
-                ];
-            }
-        )->toArray();
-
-        return $result;
-    }
-
-    /**
-     * Get price changes.
-     *
-     * @return array<float|int>
-     *
-     * @psalm-return array{total_changes: int<0, max>, average_daily_changes: float}
-     */
-    private function getPriceChanges(Carbon $startDate, Carbon $endDate): array
-    {
-        $priceChanges = $this->countPriceChanges($startDate, $endDate);
-
-        return [
-            'total_changes' => $priceChanges,
-            'average_daily_changes' => $priceChanges / $startDate->diffInDays($endDate),
-        ];
-    }
-
-    /**
-     * Count price changes from audit logs.
-     *
-     * @psalm-return int<0, max>
-     */
-    private function countPriceChanges(Carbon $startDate, Carbon $endDate): int
-    {
-        return $this->dbManager->table('audit_logs')
-            ->where('event', 'updated')
-            ->where('auditable_type', \App\Models\Product::class)
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->whereJsonContains('metadata->reason', 'Updated from lowest price offer')
-            ->count();
-    }
-
-    /**
-     * Get top products.
-     *
-     * @return array<int, array<string, int|string|null>>
-     */
-    private function getTopProducts(Carbon $startDate, Carbon $endDate): array
-    {
-        /** @var array<int, array<string, int|string|null>> $products */
-        $products = Product::withCount(['wishlists', 'priceAlerts', 'reviews'])
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->orderBy('wishlists_count', 'desc')
-            ->orderBy('price_alerts_count', 'desc')
-            ->orderBy('reviews_count', 'desc')
-            ->take(10)
-            ->get();
-
-        return $products->map(/**
-         * @return array<int|string|null>
-         *
-         * @psalm-return array<string, int|string|null>
-         */
-            function (Product $product): array {
-                return $this->formatTopProduct($product);
-            }
-        )->toArray();
-    }
-
-    /**
-     * Format top product data.
-     *
-     * @return array<string, int|string|null>
-     */
-    private function formatTopProduct(Product $product): array
-    {
-        return [
-            'id' => $product->id,
-            'name' => $product->name,
-            'wishlists_count' => $product->wishlists_count,
-            'price_alerts_count' => $product->price_alerts_count,
-            'reviews_count' => $product->reviews_count,
-        ];
-    }
-
-    /**
-     * Get price trends.
-     *
-     * @return array<int, array<string, string|float>>
-     */
-    private function getPriceTrends(Carbon $startDate, Carbon $endDate): array
-    {
-        $trends = $this->priceOfferModel
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->orderBy('created_at')
-            ->select(
-                $this->dbManager->raw('DATE(created_at) as date'),
-                $this->dbManager->raw('AVG(price) as average_price')
-            )
-            ->groupBy('date')
-            ->get();
-
-        return $trends->map(/**
-         * @return array<float|string>
-         *
-         * @psalm-return array<string, float|string>
-         */
-            /**
-             * @return array<float|string>
-             *
-             * @psalm-return array{date: string, average_price: float}
-             */
-            function ($trend): array {
-                return $this->formatTrendData($trend);
-            }
-        )->toArray();
-    }
-
-    /**
-     * Format trend data.
-     *
-     * @param  object{trend: string|null, average_price: float|null, date: string|null}  $trend
-     * @return array<float|string>
-     *
-     * @psalm-return array{date: string, average_price: float}
-     */
-    private function formatTrendData(object $trend): array
-    {
-        $avgPrice = property_exists($trend, 'average_price') &&
-            is_numeric($trend->average_price)
-            ? (float) $trend->average_price
-            : 0.0;
-
-        return [
-            'date' => property_exists($trend, 'date') && is_string($trend->date) ? $trend->date : '',
-            'average_price' => round($avgPrice, 2),
-        ];
+        return $this->salesGenerator->getCustomerAnalysis($startDate, $endDate);
     }
 }

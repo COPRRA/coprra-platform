@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
 use App\Services\PasswordPolicyService;
 use App\Services\UserBanService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -55,9 +56,12 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user): JsonResponse
     {
+        $this->authorize('update', $user);
+
         $validated = $request->validated();
-        /** @var array<string, string|bool> $validatedData */
-        $validatedData = is_array($validated) ? $validated : [];
+
+        /** @var array<string, bool|string> $validatedData */
+        $validatedData = \is_array($validated) ? $validated : [];
         $user->update($validatedData);
 
         return response()->json([
@@ -72,9 +76,11 @@ class UserController extends Controller
      */
     public function changePassword(ChangePasswordRequest $request, User $user): JsonResponse
     {
+        $this->authorize('update', $user);
+
         // Verify current password
         $currentPassword = $request->input('current_password');
-        if (! Hash::check(is_string($currentPassword) ? $currentPassword : '', $user->password)) {
+        if (! Hash::check(\is_string($currentPassword) ? $currentPassword : '', $user->password)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Current password is incorrect',
@@ -84,7 +90,7 @@ class UserController extends Controller
         // Validate new password against policy
         $newPassword = $request->input('new_password');
         $emptyString = '';
-        $passwordValidation = $this->passwordPolicyService->validatePassword(is_string($newPassword) ? $newPassword : $emptyString, $user->id);
+        $passwordValidation = $this->passwordPolicyService->validatePassword(\is_string($newPassword) ? $newPassword : $emptyString, $user->id);
         if (! isset($passwordValidation['valid']) || ! $passwordValidation['valid']) {
             return response()->json([
                 'success' => false,
@@ -95,12 +101,12 @@ class UserController extends Controller
 
         // Update password
         $user->update([
-            'password' => Hash::make(is_string($newPassword) ? $newPassword : ''),
+            'password' => Hash::make(\is_string($newPassword) ? $newPassword : ''),
         ]);
 
         // Save password to history
         $passwordValue = $request->input('password');
-        $password = is_string($passwordValue) ? $passwordValue : '';
+        $password = \is_string($passwordValue) ? $passwordValue : '';
         $this->passwordPolicyService->savePasswordToHistory($user->id, $password);
 
         return response()->json(['message' => 'Password updated successfully']);
@@ -111,13 +117,7 @@ class UserController extends Controller
      */
     public function destroy(User $user): JsonResponse
     {
-        // Prevent deletion of admin users
-        if ($user->isAdmin()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Cannot delete admin users',
-            ], 400);
-        }
+        $this->authorize('delete', $user);
 
         // Soft delete user and related data
         $user->wishlists()->delete();
@@ -201,22 +201,23 @@ class UserController extends Controller
         ]);
     }
 
-    private function applyUserFilters(Request $request, \Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    private function applyUserFilters(Request $request, Builder $query): Builder
     {
         // Search by name or email
         if ($request->has('search')) {
             $searchInput = $request->get('search');
-            $search = is_string($searchInput) ? $searchInput : '';
+            $search = \is_string($searchInput) ? $searchInput : '';
             $query->where(static function ($q) use ($search): void {
                 $q->where('name', 'like', '%'.$search.'%')
-                    ->orWhere('email', 'like', '%'.$search.'%');
+                    ->orWhere('email', 'like', '%'.$search.'%')
+                ;
             });
         }
 
         // Filter by role (if role column exists) - Fixed SQL Injection vulnerability
         if ($request->has('role')) {
             $role = $request->get('role');
-            if (is_string($role)) {
+            if (\is_string($role)) {
                 $query->where('role', $role);
             }
         }
@@ -224,9 +225,9 @@ class UserController extends Controller
         // Filter by status
         if ($request->has('status')) {
             $status = $request->get('status');
-            if ($status === 'active') {
+            if ('active' === $status) {
                 $query->where('is_blocked', false);
-            } elseif ($status === 'blocked') {
+            } elseif ('blocked' === $status) {
                 $query->where('is_blocked', true);
             }
         }

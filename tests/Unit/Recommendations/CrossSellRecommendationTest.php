@@ -7,10 +7,15 @@ namespace Tests\Unit\Recommendations;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-class CrossSellRecommendationTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class CrossSellRecommendationTest extends TestCase
 {
     #[Test]
-    public function it_recommends_cross_sell_products(): void
+    public function itRecommendsCrossSellProducts(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -21,14 +26,14 @@ class CrossSellRecommendationTest extends TestCase
 
         $recommendations = $this->getCrossSellRecommendations($currentProduct);
 
-        $this->assertGreaterThan(0, count($recommendations));
-        $this->assertArrayHasKey('product_id', $recommendations[0]);
-        $this->assertArrayHasKey('name', $recommendations[0]);
-        $this->assertArrayHasKey('confidence_score', $recommendations[0]);
+        self::assertGreaterThan(0, \count($recommendations));
+        self::assertArrayHasKey('product_id', $recommendations[0]);
+        self::assertArrayHasKey('name', $recommendations[0]);
+        self::assertArrayHasKey('confidence_score', $recommendations[0]);
     }
 
     #[Test]
-    public function it_recommends_complementary_products(): void
+    public function itRecommendsComplementaryProducts(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -39,16 +44,16 @@ class CrossSellRecommendationTest extends TestCase
 
         $recommendations = $this->getComplementaryProducts($currentProduct);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products are complementary
         foreach ($recommendations as $recommendation) {
-            $this->assertArrayHasKey('product_id', $recommendation);
+            self::assertArrayHasKey('product_id', $recommendation);
         }
     }
 
     #[Test]
-    public function it_recommends_related_accessories(): void
+    public function itRecommendsRelatedAccessories(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -59,16 +64,16 @@ class CrossSellRecommendationTest extends TestCase
 
         $recommendations = $this->getRelatedAccessories($currentProduct);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products are accessories
         foreach ($recommendations as $recommendation) {
-            $this->assertTrue($this->isAccessory($recommendation));
+            self::assertTrue($this->isAccessory($recommendation));
         }
     }
 
     #[Test]
-    public function it_recommends_bundled_products(): void
+    public function itRecommendsBundledProducts(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -79,16 +84,16 @@ class CrossSellRecommendationTest extends TestCase
 
         $recommendations = $this->getBundledProducts($currentProduct);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products can be bundled
         foreach ($recommendations as $recommendation) {
-            $this->assertTrue($this->canBeBundled($currentProduct, $recommendation));
+            self::assertTrue($this->canBeBundled($currentProduct, $recommendation));
         }
     }
 
     #[Test]
-    public function it_recommends_products_based_on_purchase_history(): void
+    public function itRecommendsProductsBasedOnPurchaseHistory(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -105,11 +110,11 @@ class CrossSellRecommendationTest extends TestCase
 
         $recommendations = $this->getRecommendationsBasedOnHistory($currentProduct, $purchaseHistory);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
     }
 
     #[Test]
-    public function it_recommends_products_based_on_user_behavior(): void
+    public function itRecommendsProductsBasedOnUserBehavior(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -126,11 +131,11 @@ class CrossSellRecommendationTest extends TestCase
 
         $recommendations = $this->getRecommendationsBasedOnBehavior($currentProduct, $userBehavior);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
     }
 
     #[Test]
-    public function it_recommends_products_based_on_season(): void
+    public function itRecommendsProductsBasedOnSeason(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -142,16 +147,16 @@ class CrossSellRecommendationTest extends TestCase
         $season = 'winter';
         $recommendations = $this->getSeasonalRecommendations($currentProduct, $season);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products are seasonal
         foreach ($recommendations as $recommendation) {
-            $this->assertTrue($this->isSeasonalProduct($recommendation, $season));
+            self::assertTrue($this->isSeasonalProduct($recommendation, $season));
         }
     }
 
     #[Test]
-    public function it_recommends_products_based_on_price_range(): void
+    public function itRecommendsProductsBasedOnPriceRange(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -162,16 +167,16 @@ class CrossSellRecommendationTest extends TestCase
 
         $recommendations = $this->getRecommendationsByPriceRange($currentProduct);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products are in similar price range
         foreach ($recommendations as $recommendation) {
-            $this->assertTrue($this->isInSimilarPriceRange($currentProduct, $recommendation));
+            self::assertTrue($this->isInSimilarPriceRange($currentProduct, $recommendation));
         }
     }
 
     #[Test]
-    public function it_recommends_products_based_on_brand_preference(): void
+    public function itRecommendsProductsBasedOnBrandPreference(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -184,17 +189,17 @@ class CrossSellRecommendationTest extends TestCase
         $brandPreferences = ['Apple', 'Samsung', 'Google'];
         $recommendations = $this->getRecommendationsByBrand($currentProduct, $brandPreferences);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products match brand preferences
         foreach ($recommendations as $recommendation) {
-            $this->assertArrayHasKey('brand', $recommendation);
-            $this->assertTrue(in_array($recommendation['brand'], $brandPreferences));
+            self::assertArrayHasKey('brand', $recommendation);
+            self::assertTrue(\in_array($recommendation['brand'], $brandPreferences, true));
         }
     }
 
     #[Test]
-    public function it_recommends_products_based_on_ratings(): void
+    public function itRecommendsProductsBasedOnRatings(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -206,17 +211,17 @@ class CrossSellRecommendationTest extends TestCase
 
         $recommendations = $this->getRecommendationsByRatings($currentProduct);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products have good ratings
         foreach ($recommendations as $recommendation) {
-            $this->assertArrayHasKey('rating', $recommendation);
-            $this->assertGreaterThanOrEqual(4.0, $recommendation['rating']);
+            self::assertArrayHasKey('rating', $recommendation);
+            self::assertGreaterThanOrEqual(4.0, $recommendation['rating']);
         }
     }
 
     #[Test]
-    public function it_recommends_products_based_on_availability(): void
+    public function itRecommendsProductsBasedOnAvailability(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -227,17 +232,17 @@ class CrossSellRecommendationTest extends TestCase
 
         $recommendations = $this->getRecommendationsByAvailability($currentProduct);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products are available
         foreach ($recommendations as $recommendation) {
-            $this->assertArrayHasKey('in_stock', $recommendation);
-            $this->assertTrue($recommendation['in_stock']);
+            self::assertArrayHasKey('in_stock', $recommendation);
+            self::assertTrue($recommendation['in_stock']);
         }
     }
 
     #[Test]
-    public function it_recommends_products_based_on_popularity(): void
+    public function itRecommendsProductsBasedOnPopularity(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -248,17 +253,17 @@ class CrossSellRecommendationTest extends TestCase
 
         $recommendations = $this->getRecommendationsByPopularity($currentProduct);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products are popular
         foreach ($recommendations as $recommendation) {
-            $this->assertArrayHasKey('sales_count', $recommendation);
-            $this->assertGreaterThan(100, $recommendation['sales_count']);
+            self::assertArrayHasKey('sales_count', $recommendation);
+            self::assertGreaterThan(100, $recommendation['sales_count']);
         }
     }
 
     #[Test]
-    public function it_recommends_products_based_on_customer_segments(): void
+    public function itRecommendsProductsBasedOnCustomerSegments(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -270,16 +275,16 @@ class CrossSellRecommendationTest extends TestCase
         $customerSegment = 'professional';
         $recommendations = $this->getRecommendationsBySegment($currentProduct, $customerSegment);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products match customer segment
         foreach ($recommendations as $recommendation) {
-            $this->assertTrue($this->matchesCustomerSegment($recommendation, $customerSegment));
+            self::assertTrue($this->matchesCustomerSegment($recommendation, $customerSegment));
         }
     }
 
     #[Test]
-    public function it_recommends_products_based_on_geographic_location(): void
+    public function itRecommendsProductsBasedOnGeographicLocation(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -291,20 +296,20 @@ class CrossSellRecommendationTest extends TestCase
         $location = 'US';
         $recommendations = $this->getRecommendationsByLocation($currentProduct, $location);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products are available in location
         foreach ($recommendations as $recommendation) {
-            $this->assertArrayHasKey('available_locations', $recommendation);
+            self::assertArrayHasKey('available_locations', $recommendation);
             $availableLocations = $recommendation['available_locations'];
-            if (is_array($availableLocations)) {
-                $this->assertTrue(in_array($location, $availableLocations));
+            if (\is_array($availableLocations)) {
+                self::assertTrue(\in_array($location, $availableLocations, true));
             }
         }
     }
 
     #[Test]
-    public function it_recommends_products_based_on_time_of_day(): void
+    public function itRecommendsProductsBasedOnTimeOfDay(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -316,16 +321,16 @@ class CrossSellRecommendationTest extends TestCase
         $timeOfDay = 'morning';
         $recommendations = $this->getRecommendationsByTimeOfDay($currentProduct, $timeOfDay);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products are relevant to time of day
         foreach ($recommendations as $recommendation) {
-            $this->assertTrue($this->isRelevantToTimeOfDay($recommendation, $timeOfDay));
+            self::assertTrue($this->isRelevantToTimeOfDay($recommendation, $timeOfDay));
         }
     }
 
     #[Test]
-    public function it_recommends_products_based_on_weather(): void
+    public function itRecommendsProductsBasedOnWeather(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -337,16 +342,16 @@ class CrossSellRecommendationTest extends TestCase
         $weather = 'rainy';
         $recommendations = $this->getRecommendationsByWeather($currentProduct, $weather);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products are relevant to weather
         foreach ($recommendations as $recommendation) {
-            $this->assertTrue($this->isRelevantToWeather($recommendation, $weather));
+            self::assertTrue($this->isRelevantToWeather($recommendation, $weather));
         }
     }
 
     #[Test]
-    public function it_recommends_products_based_on_events(): void
+    public function itRecommendsProductsBasedOnEvents(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -358,16 +363,16 @@ class CrossSellRecommendationTest extends TestCase
         $event = 'birthday';
         $recommendations = $this->getRecommendationsByEvent($currentProduct, $event);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products are relevant to event
         foreach ($recommendations as $recommendation) {
-            $this->assertTrue($this->isRelevantToEvent($recommendation, $event));
+            self::assertTrue($this->isRelevantToEvent($recommendation, $event));
         }
     }
 
     #[Test]
-    public function it_calculates_recommendation_confidence(): void
+    public function itCalculatesRecommendationConfidence(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -385,12 +390,12 @@ class CrossSellRecommendationTest extends TestCase
 
         $confidence = $this->calculateRecommendationConfidence($currentProduct, $recommendedProduct);
 
-        $this->assertGreaterThanOrEqual(0.0, $confidence);
-        $this->assertLessThanOrEqual(1.0, $confidence);
+        self::assertGreaterThanOrEqual(0.0, $confidence);
+        self::assertLessThanOrEqual(1.0, $confidence);
     }
 
     #[Test]
-    public function it_generates_cross_sell_report(): void
+    public function itGeneratesCrossSellReport(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -401,15 +406,16 @@ class CrossSellRecommendationTest extends TestCase
 
         $report = $this->generateCrossSellReport($currentProduct);
 
-        $this->assertArrayHasKey('product_id', $report);
-        $this->assertArrayHasKey('recommendations', $report);
-        $this->assertArrayHasKey('total_recommendations', $report);
-        $this->assertArrayHasKey('average_confidence', $report);
-        $this->assertArrayHasKey('generated_at', $report);
+        self::assertArrayHasKey('product_id', $report);
+        self::assertArrayHasKey('recommendations', $report);
+        self::assertArrayHasKey('total_recommendations', $report);
+        self::assertArrayHasKey('average_confidence', $report);
+        self::assertArrayHasKey('generated_at', $report);
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getCrossSellRecommendations(array $currentProduct): array
@@ -444,7 +450,8 @@ class CrossSellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getComplementaryProducts(array $currentProduct): array
@@ -460,7 +467,7 @@ class CrossSellRecommendationTest extends TestCase
         $recommendations = [];
 
         foreach ($complementaryProducts as $product => $complements) {
-            if (is_string($productName) && stripos($productName, $product) !== false) {
+            if (\is_string($productName) && false !== stripos($productName, $product)) {
                 foreach ($complements as $complement) {
                     $recommendations[] = [
                         'product_id' => rand(100, 999),
@@ -470,6 +477,7 @@ class CrossSellRecommendationTest extends TestCase
                         'confidence_score' => rand(70, 95) / 100,
                     ];
                 }
+
                 break;
             }
         }
@@ -478,7 +486,8 @@ class CrossSellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getRelatedAccessories(array $currentProduct): array
@@ -504,7 +513,8 @@ class CrossSellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getBundledProducts(array $currentProduct): array
@@ -530,8 +540,9 @@ class CrossSellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
-     * @param  array<int, array<string, mixed>>  $purchaseHistory
+     * @param array<string, mixed>             $currentProduct
+     * @param array<int, array<string, mixed>> $purchaseHistory
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getRecommendationsBasedOnHistory(array $currentProduct, array $purchaseHistory): array
@@ -539,7 +550,7 @@ class CrossSellRecommendationTest extends TestCase
         $recommendations = [];
 
         foreach ($purchaseHistory as $item) {
-            if ($item['category'] === 'Accessories') {
+            if ('Accessories' === $item['category']) {
                 $recommendations[] = [
                     'product_id' => $item['product_id'],
                     'name' => $item['name'],
@@ -555,15 +566,16 @@ class CrossSellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
-     * @param  array<string, mixed>  $userBehavior
+     * @param array<string, mixed> $currentProduct
+     * @param array<string, mixed> $userBehavior
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getRecommendationsBasedOnBehavior(array $currentProduct, array $userBehavior): array
     {
         $recommendations = [];
 
-        if (isset($userBehavior['viewed_products']) && is_array($userBehavior['viewed_products'])) {
+        if (isset($userBehavior['viewed_products']) && \is_array($userBehavior['viewed_products'])) {
             foreach ($userBehavior['viewed_products'] as $product) {
                 $recommendations[] = [
                     'product_id' => rand(100, 999),
@@ -580,7 +592,8 @@ class CrossSellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getSeasonalRecommendations(array $currentProduct, string $season): array
@@ -610,7 +623,8 @@ class CrossSellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getRecommendationsByPriceRange(array $currentProduct): array
@@ -640,8 +654,9 @@ class CrossSellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
-     * @param  array<int, string>  $brandPreferences
+     * @param array<string, mixed> $currentProduct
+     * @param array<int, string>   $brandPreferences
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getRecommendationsByBrand(array $currentProduct, array $brandPreferences): array
@@ -669,7 +684,8 @@ class CrossSellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getRecommendationsByRatings(array $currentProduct): array
@@ -695,7 +711,8 @@ class CrossSellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getRecommendationsByAvailability(array $currentProduct): array
@@ -721,7 +738,8 @@ class CrossSellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getRecommendationsByPopularity(array $currentProduct): array
@@ -747,7 +765,8 @@ class CrossSellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getRecommendationsBySegment(array $currentProduct, string $customerSegment): array
@@ -765,7 +784,8 @@ class CrossSellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getRecommendationsByLocation(array $currentProduct, string $location): array
@@ -783,7 +803,8 @@ class CrossSellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getRecommendationsByTimeOfDay(array $currentProduct, string $timeOfDay): array
@@ -801,7 +822,8 @@ class CrossSellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getRecommendationsByWeather(array $currentProduct, string $weather): array
@@ -819,7 +841,8 @@ class CrossSellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getRecommendationsByEvent(array $currentProduct, string $event): array
@@ -837,8 +860,8 @@ class CrossSellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
-     * @param  array<string, mixed>  $recommendedProduct
+     * @param array<string, mixed> $currentProduct
+     * @param array<string, mixed> $recommendedProduct
      */
     private function calculateRecommendationConfidence(array $currentProduct, array $recommendedProduct): float
     {
@@ -846,7 +869,7 @@ class CrossSellRecommendationTest extends TestCase
         $currentCategory = $currentProduct['category'] ?? '';
         $recommendedCategory = $recommendedProduct['category'] ?? '';
 
-        if ($currentCategory === 'Electronics' && $recommendedCategory === 'Accessories') {
+        if ('Electronics' === $currentCategory && 'Accessories' === $recommendedCategory) {
             return 0.85;
         }
 
@@ -854,13 +877,14 @@ class CrossSellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<string, mixed>
      */
     private function generateCrossSellReport(array $currentProduct): array
     {
         $recommendations = $this->getCrossSellRecommendations($currentProduct);
-        $totalRecommendations = count($recommendations);
+        $totalRecommendations = \count($recommendations);
         $averageConfidence = array_sum(array_column($recommendations, 'confidence_score')) / $totalRecommendations;
 
         return [
@@ -875,7 +899,7 @@ class CrossSellRecommendationTest extends TestCase
     // Helper methods for validation
 
     /**
-     * @param  array<string, mixed>  $product
+     * @param array<string, mixed> $product
      */
     private function isAccessory(array $product): bool
     {
@@ -883,8 +907,8 @@ class CrossSellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
-     * @param  array<string, mixed>  $recommendedProduct
+     * @param array<string, mixed> $currentProduct
+     * @param array<string, mixed> $recommendedProduct
      */
     private function canBeBundled(array $currentProduct, array $recommendedProduct): bool
     {
@@ -892,7 +916,7 @@ class CrossSellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $product
+     * @param array<string, mixed> $product
      */
     private function isSeasonalProduct(array $product, string $season): bool
     {
@@ -900,8 +924,8 @@ class CrossSellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
-     * @param  array<string, mixed>  $recommendedProduct
+     * @param array<string, mixed> $currentProduct
+     * @param array<string, mixed> $recommendedProduct
      */
     private function isInSimilarPriceRange(array $currentProduct, array $recommendedProduct): bool
     {
@@ -914,7 +938,7 @@ class CrossSellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $product
+     * @param array<string, mixed> $product
      */
     private function matchesCustomerSegment(array $product, string $segment): bool
     {
@@ -922,7 +946,7 @@ class CrossSellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $product
+     * @param array<string, mixed> $product
      */
     private function isRelevantToTimeOfDay(array $product, string $timeOfDay): bool
     {
@@ -930,7 +954,7 @@ class CrossSellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $product
+     * @param array<string, mixed> $product
      */
     private function isRelevantToWeather(array $product, string $weather): bool
     {
@@ -938,7 +962,7 @@ class CrossSellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $product
+     * @param array<string, mixed> $product
      */
     private function isRelevantToEvent(array $product, string $event): bool
     {

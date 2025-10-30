@@ -5,29 +5,17 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class DatabaseConnectionTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class DatabaseConnectionTest extends TestCase
 {
     use RefreshDatabase;
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_basic_functionality(): void
-    {
-        $this->assertTrue(true);
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_expected_behavior(): void
-    {
-        $this->assertTrue(true);
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_validation(): void
-    {
-        $this->assertTrue(true);
-    }
 
     protected function setUp(): void
     {
@@ -37,5 +25,23 @@ class DatabaseConnectionTest extends TestCase
     protected function tearDown(): void
     {
         parent::tearDown();
+    }
+
+    #[Test]
+    public function testBasicFunctionality(): void
+    {
+        self::assertTrue(true);
+    }
+
+    #[Test]
+    public function testExpectedBehavior(): void
+    {
+        self::assertTrue(true);
+    }
+
+    #[Test]
+    public function testValidation(): void
+    {
+        self::assertTrue(true);
     }
 }

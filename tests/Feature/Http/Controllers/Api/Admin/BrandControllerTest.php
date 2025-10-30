@@ -11,13 +11,17 @@ use Tests\TestCase;
 
 /**
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class BrandControllerTest extends TestCase
+final class BrandControllerTest extends TestCase
 {
     use RefreshDatabase;
     // Rely on RefreshDatabase migrations; avoid manual DB setup to prevent conflicts
 
-    public function test_can_list_brands()
+    public function testCanListBrands()
     {
         $admin = User::factory()->create(['is_admin' => true]);
         $this->actingAs($admin);
@@ -38,17 +42,18 @@ class BrandControllerTest extends TestCase
                         'updated_at',
                     ],
                 ],
-            ]);
+            ])
+        ;
     }
 
-    public function test_requires_admin_authentication_to_list_brands()
+    public function testRequiresAdminAuthenticationToListBrands()
     {
         $response = $this->getJson('/api/admin/brands');
 
         $response->assertStatus(401);
     }
 
-    public function test_requires_admin_role_to_list_brands()
+    public function testRequiresAdminRoleToListBrands()
     {
         $user = User::factory()->create(['is_admin' => false]);
         $this->actingAs($user);
@@ -58,7 +63,7 @@ class BrandControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
-    public function test_can_show_specific_brand()
+    public function testCanShowSpecificBrand()
     {
         $admin = User::factory()->create(['is_admin' => true]);
         $this->actingAs($admin);
@@ -75,10 +80,11 @@ class BrandControllerTest extends TestCase
                     'slug' => $brand->slug,
                     'description' => $brand->description,
                 ],
-            ]);
+            ])
+        ;
     }
 
-    public function test_returns_404_for_nonexistent_brand()
+    public function testReturns404ForNonexistentBrand()
     {
         $admin = User::factory()->create(['is_admin' => true]);
         $this->actingAs($admin);
@@ -88,7 +94,7 @@ class BrandControllerTest extends TestCase
         $response->assertStatus(404);
     }
 
-    public function test_can_create_brand()
+    public function testCanCreateBrand()
     {
         $admin = User::factory()->create(['is_admin' => true]);
         $this->actingAs($admin);
@@ -106,7 +112,8 @@ class BrandControllerTest extends TestCase
                     'name' => $brandData['name'],
                     'description' => $brandData['description'],
                 ],
-            ]);
+            ])
+        ;
 
         // Assert that the brand was actually saved to the database
         $this->assertDatabaseHas('brands', [
@@ -115,7 +122,7 @@ class BrandControllerTest extends TestCase
         ]);
     }
 
-    public function test_validates_brand_creation_request()
+    public function testValidatesBrandCreationRequest()
     {
         $admin = User::factory()->create(['is_admin' => true]);
         $this->actingAs($admin);
@@ -123,10 +130,11 @@ class BrandControllerTest extends TestCase
         $response = $this->postJson('/api/admin/brands', []);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['name']);
+            ->assertJsonValidationErrors(['name'])
+        ;
     }
 
-    public function test_requires_admin_authentication_to_create_brand()
+    public function testRequiresAdminAuthenticationToCreateBrand()
     {
         $brandData = [
             'name' => 'Test Brand',
@@ -138,7 +146,7 @@ class BrandControllerTest extends TestCase
         $response->assertStatus(401);
     }
 
-    public function test_can_update_brand()
+    public function testCanUpdateBrand()
     {
         $admin = User::factory()->create(['is_admin' => true]);
         $this->actingAs($admin);
@@ -159,7 +167,8 @@ class BrandControllerTest extends TestCase
                     'name' => $updateData['name'],
                     'description' => $updateData['description'],
                 ],
-            ]);
+            ])
+        ;
 
         // Assert that the brand was actually updated in the database
         $this->assertDatabaseHas('brands', [
@@ -169,7 +178,7 @@ class BrandControllerTest extends TestCase
         ]);
     }
 
-    public function test_validates_brand_update_request()
+    public function testValidatesBrandUpdateRequest()
     {
         $admin = User::factory()->create(['is_admin' => true]);
         $this->actingAs($admin);
@@ -179,10 +188,11 @@ class BrandControllerTest extends TestCase
         $response = $this->putJson("/api/admin/brands/{$brand->id}", []);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['name']);
+            ->assertJsonValidationErrors(['name'])
+        ;
     }
 
-    public function test_requires_admin_authentication_to_update_brand()
+    public function testRequiresAdminAuthenticationToUpdateBrand()
     {
         $brand = Brand::factory()->create();
 
@@ -196,7 +206,7 @@ class BrandControllerTest extends TestCase
         $response->assertStatus(401);
     }
 
-    public function test_can_delete_brand()
+    public function testCanDeleteBrand()
     {
         $admin = User::factory()->create(['is_admin' => true]);
         $this->actingAs($admin);
@@ -213,7 +223,7 @@ class BrandControllerTest extends TestCase
         ]);
     }
 
-    public function test_returns_404_when_deleting_nonexistent_brand()
+    public function testReturns404WhenDeletingNonexistentBrand()
     {
         $admin = User::factory()->create(['is_admin' => true]);
         $this->actingAs($admin);
@@ -223,7 +233,7 @@ class BrandControllerTest extends TestCase
         $response->assertStatus(404);
     }
 
-    public function test_requires_admin_authentication_to_delete_brand()
+    public function testRequiresAdminAuthenticationToDeleteBrand()
     {
         $brand = Brand::factory()->create();
 

@@ -32,12 +32,12 @@ class SecurityHeadersService
 
             if ($strategy->shouldApply($request, $config)) {
                 $value = $strategy->getValue($request, $config);
-                if ($value === null) {
+                if (null === $value) {
                     // Fall back to service logic if strategy returns null
                     $value = $this->getHeaderValue($header, $config, $request);
                 }
 
-                if ($value !== null) {
+                if (null !== $value) {
                     $response->headers->set($header, $value);
                 }
             }
@@ -73,16 +73,16 @@ class SecurityHeadersService
         }
 
         // Defensive override for well-known sensitive paths (ensures tests pass even if config is altered)
-        if ($header === 'X-Frame-Options' && ($value === null || $value === 'SAMEORIGIN') && ($request->is('admin/*') || $request->is('settings/*') || $request->is('profile/*') || $request->is('billing/*') || $request->is('api/*/admin/*'))) {
+        if ('X-Frame-Options' === $header && (null === $value || 'SAMEORIGIN' === $value) && ($request->is('admin/*') || $request->is('settings/*') || $request->is('profile/*') || $request->is('billing/*') || $request->is('api/*/admin/*'))) {
             $value = 'DENY';
         }
 
         // Handle dynamic values
-        if (isset($config['dynamic']) && $config['dynamic'] === true) {
+        if (isset($config['dynamic']) && true === $config['dynamic']) {
             $value = $this->getDynamicValue($header, $request);
         }
 
-        return is_string($value) ? $value : null;
+        return \is_string($value) ? $value : null;
     }
 
     /**
@@ -149,10 +149,10 @@ class SecurityHeadersService
     private function getPermissionsPolicy(): string
     {
         $config = $this->configuration->getHeaderConfig('Permissions-Policy');
-        $value = is_array($config) ? ($config['value'] ?? null) : null;
+        $value = \is_array($config) ? ($config['value'] ?? null) : null;
 
         // Prefer configuration-defined value to align with tests; fallback to expected baseline
-        return is_string($value) && $value !== ''
+        return \is_string($value) && '' !== $value
             ? $value
             : 'camera=(), microphone=(), geolocation=()';
     }

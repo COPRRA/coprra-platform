@@ -4,68 +4,191 @@ declare(strict_types=1);
 
 namespace Tests\AI;
 
-// Removed PreserveGlobalState to avoid risky test flags
-use PHPUnit\Framework\Attributes\Test;
+use App\Services\AI\StrictQualityAgent;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Process;
+use Tests\TestCase;
 
-class StrictQualityAgentTest extends \PHPUnit\Framework\TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class StrictQualityAgentTest extends TestCase
 {
-    #[Test]
-    public function agent_initializes_correctly(): void
+    private StrictQualityAgent $agent;
+
+    protected function setUp(): void
     {
-        $this->assertTrue(true);
+        parent::setUp();
+        $this->agent = new StrictQualityAgent();
     }
 
-    #[Test]
-    public function agent_has_all_required_stages(): void
+    public function testAgentInitializesCorrectly(): void
     {
-        $this->assertTrue(true);
+        self::assertInstanceOf(StrictQualityAgent::class, $this->agent);
     }
 
-    #[Test]
-    public function agent_stages_have_required_properties(): void
+    public function testAgentHasAllRequiredStages(): void
     {
-        $this->assertTrue(true);
+        // Use reflection to access private stages property
+        $reflection = new \ReflectionClass($this->agent);
+        $stagesProperty = $reflection->getProperty('stages');
+        $stagesProperty->setAccessible(true);
+        $stages = $stagesProperty->getValue($this->agent);
+
+        $expectedStages = [
+            'syntax_check',
+            'phpstan_analysis',
+            'phpmd_quality',
+            'pint_formatting',
+            'composer_audit',
+            'unit_tests',
+            'feature_tests',
+            'ai_tests',
+            'security_tests',
+            'performance_tests',
+            'integration_tests',
+            'e2e_tests',
+            'link_checker',
+        ];
+
+        foreach ($expectedStages as $expectedStage) {
+            self::assertArrayHasKey($expectedStage, $stages);
+        }
+
+        self::assertCount(\count($expectedStages), $stages);
     }
 
-    #[Test]
-    public function agent_can_execute_single_stage(): void
+    public function testAgentStagesHaveRequiredProperties(): void
     {
-        $this->assertTrue(true);
+        $reflection = new \ReflectionClass($this->agent);
+        $stagesProperty = $reflection->getProperty('stages');
+        $stagesProperty->setAccessible(true);
+        $stages = $stagesProperty->getValue($this->agent);
+
+        foreach ($stages as $stage) {
+            self::assertObjectHasProperty('name', $stage);
+            self::assertObjectHasProperty('command', $stage);
+            self::assertObjectHasProperty('strict', $stage);
+            self::assertObjectHasProperty('required', $stage);
+            self::assertTrue($stage->strict);
+            self::assertTrue($stage->required);
+        }
     }
 
-    #[Test]
-    public function agent_handles_stage_failure(): void
+    public function testExecuteAllStagesReturnsCorrectStructure(): void
     {
-        $this->assertTrue(true);
+        // Mock Process facade to avoid actual command execution
+        Process::fake([
+            '*' => Process::result(output: 'Success', exitCode: 0),
+        ]);
+
+        File::shouldReceive('exists')->andReturn(true);
+        File::shouldReceive('allFiles')->andReturn([]);
+        File::shouldReceive('put')->once();
+        Log::shouldReceive('info')->zeroOrMoreTimes();
+
+        $result = $this->agent->executeAllStages();
+
+        self::assertIsArray($result);
+        self::assertArrayHasKey('overall_success', $result);
+        self::assertArrayHasKey('stages', $result);
+        self::assertArrayHasKey('errors', $result);
+        self::assertArrayHasKey('fixes', $result);
+        self::assertIsBool($result['overall_success']);
+        self::assertIsArray($result['stages']);
+        self::assertIsArray($result['errors']);
+        self::assertIsArray($result['fixes']);
     }
 
-    #[Test]
-    public function agent_can_auto_fix_issues(): void
+    public function testAgentHandlesStageFailure(): void
     {
-        $this->assertTrue(true);
+        Process::fake([
+            '*' => Process::result(output: 'Error', exitCode: 1, errorOutput: 'Command failed'),
+        ]);
+
+        File::shouldReceive('exists')->andReturn(true);
+        File::shouldReceive('allFiles')->andReturn([]);
+        File::shouldReceive('put')->once();
+        Log::shouldReceive('info')->zeroOrMoreTimes();
+
+        $result = $this->agent->executeAllStages();
+
+        self::assertFalse($result['overall_success']);
+        self::assertNotEmpty($result['stages']);
+
+        // Check that at least one stage failed
+        $hasFailedStage = false;
+        foreach ($result['stages'] as $stageResult) {
+            if (! $stageResult->success) {
+                $hasFailedStage = true;
+
+                break;
+            }
+        }
+        self::assertTrue($hasFailedStage);
     }
 
-    #[Test]
-    public function agent_generates_report_file(): void
+    public function testAgentGeneratesReportFile(): void
     {
-        $this->assertTrue(true);
+        Process::fake([
+            '*' => Process::result(output: 'Success', exitCode: 0),
+        ]);
+
+        File::shouldReceive('exists')->andReturn(true);
+        File::shouldReceive('allFiles')->andReturn([]);
+        File::shouldReceive('put')
+            ->once()
+            ->with(storage_path('logs/ai-quality-report.json'), \Mockery::type('string'))
+        ;
+        Log::shouldReceive('info')->zeroOrMoreTimes();
+
+        $this->agent->executeAllStages();
     }
 
-    #[Test]
-    public function agent_returns_correct_stage_status(): void
+    public function testStageResultsHaveCorrectStructure(): void
     {
-        $this->assertTrue(true);
+        Process::fake([
+            '*' => Process::result(output: 'Success', exitCode: 0),
+        ]);
+
+        File::shouldReceive('exists')->andReturn(true);
+        File::shouldReceive('allFiles')->andReturn([]);
+        File::shouldReceive('put')->once();
+        Log::shouldReceive('info')->zeroOrMoreTimes();
+
+        $result = $this->agent->executeAllStages();
+
+        foreach ($result['stages'] as $stageResult) {
+            self::assertObjectHasProperty('success', $stageResult);
+            self::assertObjectHasProperty('output', $stageResult);
+            self::assertObjectHasProperty('errors', $stageResult);
+            self::assertObjectHasProperty('duration', $stageResult);
+            self::assertObjectHasProperty('timestamp', $stageResult);
+            self::assertIsBool($stageResult->success);
+            self::assertIsString($stageResult->output);
+            self::assertIsArray($stageResult->errors);
+            self::assertIsFloat($stageResult->duration);
+            self::assertIsString($stageResult->timestamp);
+        }
     }
 
-    #[Test]
-    public function agent_returns_all_results(): void
+    public function testAgentHandlesExceptionsDuringStageExecution(): void
     {
-        $this->assertTrue(true);
-    }
+        Process::shouldReceive('run')
+            ->andThrow(new \Exception('Test exception'))
+        ;
 
-    #[Test]
-    public function agent_returns_errors_summary(): void
-    {
-        $this->assertTrue(true);
+        File::shouldReceive('exists')->andReturn(true);
+        File::shouldReceive('allFiles')->andReturn([]);
+        File::shouldReceive('put')->once();
+        Log::shouldReceive('info')->zeroOrMoreTimes();
+
+        $result = $this->agent->executeAllStages();
+
+        self::assertFalse($result['overall_success']);
+        self::assertNotEmpty($result['errors']);
     }
 }

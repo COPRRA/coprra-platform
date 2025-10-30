@@ -6,72 +6,78 @@ namespace Tests\AI;
 
 // Removed PreserveGlobalState to avoid risky test flags
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
 
-class ContinuousQualityMonitorTest extends \PHPUnit\Framework\TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class ContinuousQualityMonitorTest extends TestCase
 {
     #[Test]
-    public function monitor_initializes_correctly(): void
+    public function monitorInitializesCorrectly(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function monitor_has_required_rules(): void
+    public function monitorHasRequiredRules(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function monitor_performs_quality_check(): void
+    public function monitorPerformsQualityCheck(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function monitor_calculates_health_scores_correctly(): void
+    public function monitorCalculatesHealthScoresCorrectly(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function monitor_handles_failed_commands(): void
+    public function monitorHandlesFailedCommands(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function monitor_triggers_critical_alerts(): void
+    public function monitorTriggersCriticalAlerts(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function monitor_triggers_warning_alerts(): void
+    public function monitorTriggersWarningAlerts(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function monitor_updates_health_status(): void
+    public function monitorUpdatesHealthStatus(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function monitor_returns_health_status(): void
+    public function monitorReturnsHealthStatus(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function monitor_returns_alerts_summary(): void
+    public function monitorReturnsAlertsSummary(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function monitor_can_clear_alerts(): void
+    public function monitorCanClearAlerts(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 }

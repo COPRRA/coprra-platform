@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use Closure;
 use Illuminate\Http\Middleware\HandleCors as Middleware;
 
 class HandleCors extends Middleware
@@ -19,7 +18,7 @@ class HandleCors extends Middleware
      * Handle an incoming request and append CORS headers.
      */
     #[\Override]
-    public function handle($request, Closure $next)
+    public function handle($request, \Closure $next)
     {
         $response = $next($request);
 

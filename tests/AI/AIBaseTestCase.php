@@ -9,8 +9,12 @@ use Tests\TestCase;
 /**
  * Base test case for AI-related tests
  * ÙŠÙˆÙØ± Ø¥Ø¹Ø¯Ø§Ø¯Ù‹Ø§ Ø£Ø³Ø§Ø³ÙŠÙ‹Ø§ Ù„Ø¬Ù…ÙŠØ¹ Ø§Ø®ØªØ¨Ø§Ø±Ø§Øª AI.
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class AIBaseTestCase extends TestCase
+final class AIBaseTestCase extends TestCase
 {
     use AITestTrait;
 

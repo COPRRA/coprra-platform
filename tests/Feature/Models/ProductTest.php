@@ -11,11 +11,18 @@ use App\Models\PriceOffer;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\Store;
+use App\Models\User;
 use App\Models\Wishlist;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class ProductTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class ProductTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -24,8 +31,8 @@ class ProductTest extends TestCase
         parent::setUp();
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_create_a_product(): void
+    #[Test]
+    public function testItCanCreateAProduct(): void
     {
         $product = Product::factory()->create([
             'name' => 'Test Product',
@@ -37,14 +44,14 @@ class ProductTest extends TestCase
             'stock_quantity' => 100,
         ]);
 
-        $this->assertInstanceOf(Product::class, $product);
-        $this->assertEquals('Test Product', $product->name);
-        $this->assertEquals('test-product', $product->slug);
-        $this->assertEquals('Test Description', $product->description);
-        $this->assertEquals(99.99, $product->price);
-        $this->assertEquals('test.jpg', $product->image);
-        $this->assertTrue($product->is_active);
-        $this->assertEquals(100, $product->stock_quantity);
+        self::assertInstanceOf(Product::class, $product);
+        self::assertSame('Test Product', $product->name);
+        self::assertSame('test-product', $product->slug);
+        self::assertSame('Test Description', $product->description);
+        self::assertSame(99.99, $product->price);
+        self::assertSame('test.jpg', $product->image);
+        self::assertTrue($product->is_active);
+        self::assertSame(100, $product->stock_quantity);
 
         // Assert that the product was actually saved to the database
         $this->assertDatabaseHas('products', [
@@ -58,8 +65,8 @@ class ProductTest extends TestCase
         ]);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_casts_attributes_correctly(): void
+    #[Test]
+    public function testItCastsAttributesCorrectly(): void
     {
         $product = Product::factory()->create([
             'price' => '99.99',
@@ -67,102 +74,87 @@ class ProductTest extends TestCase
             'stock_quantity' => '100',
         ]);
 
-        $this->assertIsString($product->price);
-        $this->assertIsBool($product->is_active);
-        $this->assertIsInt($product->stock_quantity);
-        $this->assertEquals('99.99', $product->price);
-        $this->assertTrue($product->is_active);
-        $this->assertEquals(100, $product->stock_quantity);
+        self::assertIsString($product->price);
+        self::assertIsBool($product->is_active);
+        self::assertIsInt($product->stock_quantity);
+        self::assertSame('99.99', $product->price);
+        self::assertTrue($product->is_active);
+        self::assertSame(100, $product->stock_quantity);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_belongs_to_brand(): void
+    #[Test]
+    public function testItBelongsToBrand(): void
     {
         $brand = Brand::factory()->create();
         $product = Product::factory()->create(['brand_id' => $brand->id]);
 
-        $this->assertInstanceOf(Brand::class, $product->brand);
-        $this->assertEquals($brand->id, $product->brand->id);
+        self::assertInstanceOf(Brand::class, $product->brand);
+        self::assertSame($brand->id, $product->brand->id);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_belongs_to_category(): void
+    #[Test]
+    public function testItBelongsToCategory(): void
     {
         $category = Category::factory()->create();
         $product = Product::factory()->create(['category_id' => $category->id]);
 
-        $this->assertInstanceOf(Category::class, $product->category);
-        $this->assertEquals($category->id, $product->category->id);
+        self::assertInstanceOf(Category::class, $product->category);
+        self::assertSame($category->id, $product->category->id);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_belongs_to_store(): void
+    #[Test]
+    public function testItBelongsToStore(): void
     {
         $store = Store::factory()->create();
         $product = Product::factory()->create(['store_id' => $store->id]);
 
-        $this->assertInstanceOf(Store::class, $product->store);
-        $this->assertEquals($store->id, $product->store->id);
+        self::assertInstanceOf(Store::class, $product->store);
+        self::assertSame($store->id, $product->store->id);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_has_many_price_alerts(): void
+    #[Test]
+    public function testProductHasManyRelationships(): void
     {
+        // Arrange
         $product = Product::factory()->create();
-        $user1 = \App\Models\User::factory()->create(['email' => 'user1@example.com']);
-        $user2 = \App\Models\User::factory()->create(['email' => 'user2@example.com']);
+        $user1 = User::factory()->create(['email' => 'user1@example.com']);
+        $user2 = User::factory()->create(['email' => 'user2@example.com']);
+        $store1 = Store::factory()->create(['name' => 'Store 1']);
+        $store2 = Store::factory()->create(['name' => 'Store 2']);
+
+        // Create related records
         $priceAlert1 = PriceAlert::factory()->create(['product_id' => $product->id, 'user_id' => $user1->id]);
         $priceAlert2 = PriceAlert::factory()->create(['product_id' => $product->id, 'user_id' => $user2->id]);
 
-        $this->assertCount(2, $product->priceAlerts);
-        $this->assertTrue($product->priceAlerts->contains($priceAlert1));
-        $this->assertTrue($product->priceAlerts->contains($priceAlert2));
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_has_many_reviews(): void
-    {
-        $product = Product::factory()->create();
-        $user1 = \App\Models\User::factory()->create(['email' => 'user1@example.com']);
-        $user2 = \App\Models\User::factory()->create(['email' => 'user2@example.com']);
         $review1 = Review::factory()->create(['product_id' => $product->id, 'user_id' => $user1->id]);
         $review2 = Review::factory()->create(['product_id' => $product->id, 'user_id' => $user2->id]);
 
-        $this->assertCount(2, $product->reviews);
-        $this->assertTrue($product->reviews->contains($review1));
-        $this->assertTrue($product->reviews->contains($review2));
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_has_many_wishlists(): void
-    {
-        $product = Product::factory()->create();
-        $user1 = \App\Models\User::factory()->create(['email' => 'user1@example.com']);
-        $user2 = \App\Models\User::factory()->create(['email' => 'user2@example.com']);
         $wishlist1 = Wishlist::factory()->create(['product_id' => $product->id, 'user_id' => $user1->id]);
         $wishlist2 = Wishlist::factory()->create(['product_id' => $product->id, 'user_id' => $user2->id]);
 
-        $this->assertCount(2, $product->wishlists);
-        $this->assertTrue($product->wishlists->contains($wishlist1));
-        $this->assertTrue($product->wishlists->contains($wishlist2));
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_has_many_price_offers(): void
-    {
-        $product = Product::factory()->create();
-        $store1 = Store::factory()->create(['name' => 'Store 1']);
-        $store2 = Store::factory()->create(['name' => 'Store 2']);
         $priceOffer1 = PriceOffer::factory()->create(['product_id' => $product->id, 'store_id' => $store1->id]);
         $priceOffer2 = PriceOffer::factory()->create(['product_id' => $product->id, 'store_id' => $store2->id]);
 
-        $this->assertCount(2, $product->priceOffers);
-        $this->assertTrue($product->priceOffers->contains($priceOffer1));
-        $this->assertTrue($product->priceOffers->contains($priceOffer2));
+        // Assert all hasMany relationships
+        self::assertCount(2, $product->priceAlerts, 'Product should have 2 price alerts');
+        self::assertTrue($product->priceAlerts->contains($priceAlert1));
+        self::assertTrue($product->priceAlerts->contains($priceAlert2));
+
+        self::assertCount(2, $product->reviews, 'Product should have 2 reviews');
+        self::assertTrue($product->reviews->contains($review1));
+        self::assertTrue($product->reviews->contains($review2));
+
+        self::assertCount(2, $product->wishlists, 'Product should have 2 wishlists');
+        self::assertTrue($product->wishlists->contains($wishlist1));
+        self::assertTrue($product->wishlists->contains($wishlist2));
+
+        self::assertCount(2, $product->priceOffers, 'Product should have 2 price offers');
+        self::assertTrue($product->priceOffers->contains($priceOffer1));
+        self::assertTrue($product->priceOffers->contains($priceOffer2));
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_scope_active_filters_active_products(): void
+    #[Test]
+    public function testScopeActiveFiltersActiveProducts(): void
     {
         Product::factory()->create(['is_active' => true]);
         Product::factory()->create(['is_active' => false]);
@@ -170,12 +162,12 @@ class ProductTest extends TestCase
 
         $activeProducts = Product::active()->get();
 
-        $this->assertCount(2, $activeProducts);
-        $this->assertTrue($activeProducts->every(fn ($product) => $product->is_active === true));
+        self::assertCount(2, $activeProducts);
+        self::assertTrue($activeProducts->every(static fn ($product) => true === $product->is_active));
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_scope_search_filters_by_name(): void
+    #[Test]
+    public function testScopeSearchFiltersByName(): void
     {
         Product::factory()->create(['name' => 'iPhone 15']);
         Product::factory()->create(['name' => 'Samsung Galaxy']);
@@ -184,63 +176,63 @@ class ProductTest extends TestCase
         $iphoneProducts = Product::search('iPhone')->get();
         $samsungProducts = Product::search('Samsung')->get();
 
-        $this->assertCount(2, $iphoneProducts);
-        $this->assertCount(1, $samsungProducts);
-        $this->assertTrue($iphoneProducts->every(fn ($product) => str_contains($product->name, 'iPhone')));
-        $this->assertTrue($samsungProducts->every(fn ($product) => str_contains($product->name, 'Samsung')));
+        self::assertCount(2, $iphoneProducts);
+        self::assertCount(1, $samsungProducts);
+        self::assertTrue($iphoneProducts->every(static fn ($product) => str_contains($product->name, 'iPhone')));
+        self::assertTrue($samsungProducts->every(static fn ($product) => str_contains($product->name, 'Samsung')));
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_scope_with_reviews_count_adds_reviews_count(): void
+    #[Test]
+    public function testScopeWithReviewsCountAddsReviewsCount(): void
     {
         $product = Product::factory()->create();
-        $user1 = \App\Models\User::factory()->create(['email' => 'user1@example.com']);
-        $user2 = \App\Models\User::factory()->create(['email' => 'user2@example.com']);
-        $user3 = \App\Models\User::factory()->create(['email' => 'user3@example.com']);
+        $user1 = User::factory()->create(['email' => 'user1@example.com']);
+        $user2 = User::factory()->create(['email' => 'user2@example.com']);
+        $user3 = User::factory()->create(['email' => 'user3@example.com']);
         Review::factory()->create(['product_id' => $product->id, 'user_id' => $user1->id]);
         Review::factory()->create(['product_id' => $product->id, 'user_id' => $user2->id]);
         Review::factory()->create(['product_id' => $product->id, 'user_id' => $user3->id]);
 
         $productWithCount = Product::withReviewsCount()->find($product->id);
 
-        $this->assertEquals(3, $productWithCount->reviews_count);
+        self::assertSame(3, $productWithCount->reviews_count);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_average_rating(): void
+    #[Test]
+    public function testGetAverageRating(): void
     {
         $product = Product::factory()->create();
-        $user1 = \App\Models\User::factory()->create(['email' => 'user1@example.com']);
-        $user2 = \App\Models\User::factory()->create(['email' => 'user2@example.com']);
-        $user3 = \App\Models\User::factory()->create(['email' => 'user3@example.com']);
+        $user1 = User::factory()->create(['email' => 'user1@example.com']);
+        $user2 = User::factory()->create(['email' => 'user2@example.com']);
+        $user3 = User::factory()->create(['email' => 'user3@example.com']);
         Review::factory()->create(['product_id' => $product->id, 'user_id' => $user1->id, 'rating' => 4]);
         Review::factory()->create(['product_id' => $product->id, 'user_id' => $user2->id, 'rating' => 5]);
         Review::factory()->create(['product_id' => $product->id, 'user_id' => $user3->id, 'rating' => 3]);
 
         $averageRating = $product->getAverageRating();
 
-        $this->assertEquals(4.0, $averageRating);
+        self::assertSame(4.0, $averageRating);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_average_rating_returns_zero_when_no_reviews(): void
+    #[Test]
+    public function testGetAverageRatingReturnsZeroWhenNoReviews(): void
     {
         $product = Product::factory()->create();
 
         $averageRating = $product->getAverageRating();
 
-        $this->assertEquals(0.0, $averageRating);
+        self::assertSame(0.0, $averageRating);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_total_reviews(): void
+    #[Test]
+    public function testGetTotalReviews(): void
     {
         $product = Product::factory()->create();
-        $user1 = \App\Models\User::factory()->create(['email' => 'user1@example.com']);
-        $user2 = \App\Models\User::factory()->create(['email' => 'user2@example.com']);
-        $user3 = \App\Models\User::factory()->create(['email' => 'user3@example.com']);
-        $user4 = \App\Models\User::factory()->create(['email' => 'user4@example.com']);
-        $user5 = \App\Models\User::factory()->create(['email' => 'user5@example.com']);
+        $user1 = User::factory()->create(['email' => 'user1@example.com']);
+        $user2 = User::factory()->create(['email' => 'user2@example.com']);
+        $user3 = User::factory()->create(['email' => 'user3@example.com']);
+        $user4 = User::factory()->create(['email' => 'user4@example.com']);
+        $user5 = User::factory()->create(['email' => 'user5@example.com']);
         Review::factory()->create(['product_id' => $product->id, 'user_id' => $user1->id]);
         Review::factory()->create(['product_id' => $product->id, 'user_id' => $user2->id]);
         Review::factory()->create(['product_id' => $product->id, 'user_id' => $user3->id]);
@@ -249,22 +241,22 @@ class ProductTest extends TestCase
 
         $totalReviews = $product->getTotalReviews();
 
-        $this->assertEquals(5, $totalReviews);
+        self::assertSame(5, $totalReviews);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_is_in_wishlist(): void
+    #[Test]
+    public function testIsInWishlist(): void
     {
         $product = Product::factory()->create();
-        $user = \App\Models\User::factory()->create(['email' => 'user@example.com']);
+        $user = User::factory()->create(['email' => 'user@example.com']);
         Wishlist::factory()->create(['product_id' => $product->id, 'user_id' => $user->id]);
 
-        $this->assertTrue($product->isInWishlist($user->id));
-        $this->assertFalse($product->isInWishlist(999));
+        self::assertTrue($product->isInWishlist($user->id));
+        self::assertFalse($product->isInWishlist(999));
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_current_price_with_active_offer(): void
+    #[Test]
+    public function testGetCurrentPriceWithActiveOffer(): void
     {
         $product = Product::factory()->create(['price' => 100.00]);
         PriceOffer::factory()->create([
@@ -276,21 +268,21 @@ class ProductTest extends TestCase
 
         $currentPrice = $product->getCurrentPrice();
 
-        $this->assertEquals(80.00, $currentPrice);
+        self::assertSame(80.00, $currentPrice);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_current_price_without_active_offer(): void
+    #[Test]
+    public function testGetCurrentPriceWithoutActiveOffer(): void
     {
         $product = Product::factory()->create(['price' => 100.00]);
 
         $currentPrice = $product->getCurrentPrice();
 
-        $this->assertEquals(100.00, $currentPrice);
+        self::assertSame(100.00, $currentPrice);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_price_history(): void
+    #[Test]
+    public function testGetPriceHistory(): void
     {
         $product = Product::factory()->create();
         $offer1 = PriceOffer::factory()->create([
@@ -306,13 +298,13 @@ class ProductTest extends TestCase
 
         $priceHistory = $product->getPriceHistory();
 
-        $this->assertCount(2, $priceHistory);
-        $this->assertEquals($offer2->id, $priceHistory->first()->id); // Most recent first
-        $this->assertEquals($offer1->id, $priceHistory->last()->id);
+        self::assertCount(2, $priceHistory);
+        self::assertSame($offer2->id, $priceHistory->first()->id); // Most recent first
+        self::assertSame($offer1->id, $priceHistory->last()->id);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_validation_passes_with_valid_data(): void
+    #[Test]
+    public function testValidationPassesWithValidData(): void
     {
         $brand = Brand::factory()->create();
         $category = Category::factory()->create();
@@ -324,25 +316,25 @@ class ProductTest extends TestCase
             'category_id' => $category->id,
         ]);
 
-        $this->assertTrue($product->validate());
-        $this->assertEmpty($product->getErrors());
+        self::assertTrue($product->validate());
+        self::assertEmpty($product->getErrors());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_validation_fails_with_missing_required_fields(): void
+    #[Test]
+    public function testValidationFailsWithMissingRequiredFields(): void
     {
-        $product = new Product;
+        $product = new Product();
 
-        $this->assertFalse($product->validate());
+        self::assertFalse($product->validate());
         $errors = $product->getErrors();
-        $this->assertArrayHasKey('name', $errors);
-        $this->assertArrayHasKey('price', $errors);
-        $this->assertArrayHasKey('brand_id', $errors);
-        $this->assertArrayHasKey('category_id', $errors);
+        self::assertArrayHasKey('name', $errors);
+        self::assertArrayHasKey('price', $errors);
+        self::assertArrayHasKey('brand_id', $errors);
+        self::assertArrayHasKey('category_id', $errors);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_validation_passes_with_string_price(): void
+    #[Test]
+    public function testValidationPassesWithStringPrice(): void
     {
         $brand = Brand::factory()->create();
         $category = Category::factory()->create();
@@ -354,13 +346,13 @@ class ProductTest extends TestCase
             'category_id' => $category->id,
         ]);
 
-        $this->assertTrue($product->validate());
+        self::assertTrue($product->validate());
         $errors = $product->getErrors();
-        $this->assertEmpty($errors);
+        self::assertEmpty($errors);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_validation_fails_with_negative_price(): void
+    #[Test]
+    public function testValidationFailsWithNegativePrice(): void
     {
         $brand = Brand::factory()->create();
         $category = Category::factory()->create();
@@ -372,13 +364,13 @@ class ProductTest extends TestCase
             'category_id' => $category->id,
         ]);
 
-        $this->assertFalse($product->validate());
+        self::assertFalse($product->validate());
         $errors = $product->getErrors();
-        $this->assertArrayHasKey('price', $errors);
+        self::assertArrayHasKey('price', $errors);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_soft_deletes(): void
+    #[Test]
+    public function testSoftDeletes(): void
     {
         $product = Product::factory()->create();
 
@@ -387,13 +379,13 @@ class ProductTest extends TestCase
         $this->assertSoftDeleted('products', ['id' => $product->id]);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_booted_deletes_related_records(): void
+    #[Test]
+    public function testBootedDeletesRelatedRecords(): void
     {
         $product = Product::factory()->create();
-        $user1 = \App\Models\User::factory()->create(['email' => 'user1@example.com']);
-        $user2 = \App\Models\User::factory()->create(['email' => 'user2@example.com']);
-        $user3 = \App\Models\User::factory()->create(['email' => 'user3@example.com']);
+        $user1 = User::factory()->create(['email' => 'user1@example.com']);
+        $user2 = User::factory()->create(['email' => 'user2@example.com']);
+        $user3 = User::factory()->create(['email' => 'user3@example.com']);
         $priceAlert = PriceAlert::factory()->create(['product_id' => $product->id, 'user_id' => $user1->id]);
         $review = Review::factory()->create(['product_id' => $product->id, 'user_id' => $user2->id]);
         $wishlist = Wishlist::factory()->create(['product_id' => $product->id, 'user_id' => $user3->id]);
@@ -408,22 +400,22 @@ class ProductTest extends TestCase
         $this->assertDatabaseMissing('price_offers', ['id' => $priceOffer->id]);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_factory_creates_valid_product(): void
+    #[Test]
+    public function testFactoryCreatesValidProduct(): void
     {
         $product = Product::factory()->make();
 
-        $this->assertInstanceOf(Product::class, $product);
-        $this->assertNotEmpty($product->name);
-        $this->assertNotEmpty($product->slug);
-        $this->assertNotEmpty($product->description);
-        $this->assertIsString($product->price);
-        $this->assertIsBool($product->is_active);
-        $this->assertIsInt($product->stock_quantity ?? 0);
+        self::assertInstanceOf(Product::class, $product);
+        self::assertNotEmpty($product->name);
+        self::assertNotEmpty($product->slug);
+        self::assertNotEmpty($product->description);
+        self::assertIsString($product->price);
+        self::assertIsBool($product->is_active);
+        self::assertIsInt($product->stock_quantity ?? 0);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_fillable_attributes(): void
+    #[Test]
+    public function testFillableAttributes(): void
     {
         $fillable = [
             'name',
@@ -438,6 +430,6 @@ class ProductTest extends TestCase
             'store_id',
         ];
 
-        $this->assertEquals($fillable, (new Product)->getFillable());
+        self::assertSame($fillable, (new Product())->getFillable());
     }
 }

@@ -4,24 +4,16 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
-use Illuminate\Contracts\View\View;
+use Illuminate\Http\Response;
+use Illuminate\View\View;
 
 class HomeController extends Controller
 {
     /**
-     * Display the application homepage.
+     * Show the application home page.
      */
-    public function index(): View
+    public function index(): Response|View
     {
-        $featuredProducts = Product::where('is_featured', true)
-            ->with(['category', 'brand'])
-            ->latest()
-            ->limit(8)
-            ->get();
-
-        return view('welcome', [
-            'featuredProducts' => $featuredProducts,
-        ]);
+        return view('welcome');
     }
 }

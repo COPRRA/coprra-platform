@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services\Backup\Services;
 
-use Exception;
-
 final class BackupConfigurationService
 {
     /**
@@ -17,7 +15,7 @@ final class BackupConfigurationService
      *     status: string
      * }
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function backupConfiguration(string $backupDir): array
     {
@@ -47,23 +45,24 @@ final class BackupConfigurationService
     /**
      * Restore configuration.
      *
-     * @param  array{files?: list<string>, size?: int, status?: string}  $configInfo
+     * @param array{files?: list<string>, size?: int, status?: string} $configInfo
+     *
      * @return array{files: list<string>, status: string}
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function restoreConfiguration(string $backupPath, array $configInfo): array
     {
         $configDir = $backupPath.'/config';
 
         if (! is_dir($configDir)) {
-            throw new Exception('Configuration backup directory not found');
+            throw new \Exception('Configuration backup directory not found');
         }
 
         $restoredFiles = [];
 
         $files = $configInfo['files'] ?? [];
-        if (is_array($files)) {
+        if (\is_array($files)) {
             foreach ($files as $file) {
                 $this->processSingleConfigRestore($configDir, $file, $restoredFiles);
             }
@@ -92,7 +91,7 @@ final class BackupConfigurationService
      */
     private function processSingleConfigRestore(string $configDir, string $file, array &$restoredFiles): void
     {
-        if (is_string($file)) {
+        if (\is_string($file)) {
             $sourcePath = $configDir.'/'.$file;
             $destPath = $this->getConfigDestinationPath($file);
 

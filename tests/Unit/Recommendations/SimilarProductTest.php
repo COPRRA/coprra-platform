@@ -7,10 +7,25 @@ namespace Tests\Unit\Recommendations;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class SimilarProductTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class SimilarProductTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        // Setup without calling parent to avoid error handler modifications
+    }
+
+    protected function tearDown(): void
+    {
+        // Cleanup without calling parent to avoid error handler modifications
+    }
+
     #[Test]
-    public function it_finds_similar_products_by_category(): void
+    public function itFindsSimilarProductsByCategory(): void
     {
         $targetProduct = [
             'id' => 1,
@@ -28,14 +43,14 @@ class SimilarProductTest extends TestCase
 
         $similarProducts = $this->findSimilarProducts($targetProduct, $products);
 
-        $this->assertNotEmpty($similarProducts);
+        self::assertNotEmpty($similarProducts);
         foreach ($similarProducts as $product) {
-            $this->assertTrue(true);
+            self::assertTrue(true);
         }
     }
 
     #[Test]
-    public function it_finds_similar_products_by_brand(): void
+    public function itFindsSimilarProductsByBrand(): void
     {
         $targetProduct = [
             'id' => 1,
@@ -53,14 +68,14 @@ class SimilarProductTest extends TestCase
 
         $similarProducts = $this->findSimilarProducts($targetProduct, $products);
 
-        $this->assertNotEmpty($similarProducts);
+        self::assertNotEmpty($similarProducts);
         foreach ($similarProducts as $product) {
-            $this->assertTrue(true);
+            self::assertTrue(true);
         }
     }
 
     #[Test]
-    public function it_finds_similar_products_by_price_range(): void
+    public function itFindsSimilarProductsByPriceRange(): void
     {
         $targetProduct = [
             'id' => 1,
@@ -79,14 +94,14 @@ class SimilarProductTest extends TestCase
 
         $similarProducts = $this->findSimilarProducts($targetProduct, $products);
 
-        $this->assertNotEmpty($similarProducts);
+        self::assertNotEmpty($similarProducts);
         foreach ($similarProducts as $product) {
-            $this->assertTrue(true);
+            self::assertTrue(true);
         }
     }
 
     #[Test]
-    public function it_finds_similar_products_by_specifications(): void
+    public function itFindsSimilarProductsBySpecifications(): void
     {
         $targetProduct = [
             'id' => 1,
@@ -124,13 +139,13 @@ class SimilarProductTest extends TestCase
 
         $similarProducts = $this->findSimilarProductsBySpecs($targetProduct, $products);
 
-        $this->assertNotEmpty($similarProducts);
+        self::assertNotEmpty($similarProducts);
         // Should prioritize products with similar storage and screen size
-        $this->assertEquals(2, $similarProducts[0]['id']); // Samsung Galaxy S24
+        self::assertSame(2, $similarProducts[0]['id']); // Samsung Galaxy S24
     }
 
     #[Test]
-    public function it_calculates_similarity_score(): void
+    public function itCalculatesSimilarityScore(): void
     {
         $product1 = [
             'name' => 'iPhone 15 Pro',
@@ -148,11 +163,11 @@ class SimilarProductTest extends TestCase
 
         $similarityScore = $this->calculateSimilarityScore($product1, $product2);
 
-        $this->assertGreaterThan(0.1, $similarityScore); // Lower threshold
+        self::assertGreaterThan(0.1, $similarityScore); // Lower threshold
     }
 
     #[Test]
-    public function it_handles_empty_product_list(): void
+    public function itHandlesEmptyProductList(): void
     {
         $targetProduct = [
             'id' => 1,
@@ -164,11 +179,11 @@ class SimilarProductTest extends TestCase
 
         $similarProducts = $this->findSimilarProducts($targetProduct, []);
 
-        $this->assertEmpty($similarProducts);
+        self::assertEmpty($similarProducts);
     }
 
     #[Test]
-    public function it_ranks_similar_products_by_relevance(): void
+    public function itRanksSimilarProductsByRelevance(): void
     {
         $targetProduct = [
             'id' => 1,
@@ -186,13 +201,13 @@ class SimilarProductTest extends TestCase
 
         $similarProducts = $this->findSimilarProducts($targetProduct, $products);
 
-        $this->assertNotEmpty($similarProducts);
+        self::assertNotEmpty($similarProducts);
         // iPhone 15 should be ranked first (same brand and category)
-        $this->assertEquals(2, $similarProducts[0]['id']);
+        self::assertSame(2, $similarProducts[0]['id']);
     }
 
     #[Test]
-    public function it_considers_user_preferences(): void
+    public function itConsidersUserPreferences(): void
     {
         $targetProduct = [
             'id' => 1,
@@ -215,14 +230,14 @@ class SimilarProductTest extends TestCase
 
         $similarProducts = $this->findSimilarProducts($targetProduct, $products, $userPreferences);
 
-        $this->assertNotEmpty($similarProducts);
+        self::assertNotEmpty($similarProducts);
         foreach ($similarProducts as $product) {
-            $this->assertTrue(true);
+            self::assertTrue(true);
         }
     }
 
     #[Test]
-    public function it_handles_case_insensitive_matching(): void
+    public function itHandlesCaseInsensitiveMatching(): void
     {
         $targetProduct = [
             'id' => 1,
@@ -237,17 +252,17 @@ class SimilarProductTest extends TestCase
 
         $similarProducts = $this->findSimilarProducts($targetProduct, $products);
 
-        $this->assertNotEmpty($similarProducts);
+        self::assertNotEmpty($similarProducts);
         foreach ($similarProducts as $product) {
             $category = $product['category'] ?? '';
-            if (is_string($category)) {
-                $this->assertEquals('smartphones', strtolower($category));
+            if (\is_string($category)) {
+                self::assertSame('smartphones', strtolower($category));
             }
         }
     }
 
     #[Test]
-    public function it_limits_number_of_similar_products(): void
+    public function itLimitsNumberOfSimilarProducts(): void
     {
         $targetProduct = [
             'id' => 1,
@@ -262,11 +277,11 @@ class SimilarProductTest extends TestCase
 
         $similarProducts = $this->findSimilarProducts($targetProduct, $products, [], $maxResults);
 
-        $this->assertLessThanOrEqual($maxResults, count($similarProducts));
+        self::assertLessThanOrEqual($maxResults, \count($similarProducts));
     }
 
     #[Test]
-    public function it_handles_products_with_missing_attributes(): void
+    public function itHandlesProductsWithMissingAttributes(): void
     {
         $targetProduct = [
             'id' => 1,
@@ -283,19 +298,21 @@ class SimilarProductTest extends TestCase
 
         $similarProducts = $this->findSimilarProducts($targetProduct, $products);
 
-        $this->assertNotEmpty($similarProducts);
+        self::assertNotEmpty($similarProducts);
         // Should handle missing attributes gracefully
     }
 
     /**
-     * @param  array<string, mixed>  $targetProduct
+     * @param array<string, mixed> $targetProduct
+     *
      * @return array<int, array<string, mixed>>
      */
 
     /**
-     * @param  array<string, mixed>  $targetProduct
-     * @param  array<int, array<string, mixed>>  $products
-     * @param  array<string, mixed>  $userPreferences
+     * @param array<string, mixed>             $targetProduct
+     * @param array<int, array<string, mixed>> $products
+     * @param array<string, mixed>             $userPreferences
+     *
      * @return array<int, array<string, mixed>>
      */
     private function findSimilarProducts(array $targetProduct, array $products, array $userPreferences = [], int $limit = 10): array
@@ -321,22 +338,24 @@ class SimilarProductTest extends TestCase
         }
 
         // Sort by similarity score (descending)
-        usort($similarities, fn ($a, $b) => $b['similarity_score'] <=> $a['similarity_score']);
+        usort($similarities, static fn ($a, $b) => $b['similarity_score'] <=> $a['similarity_score']);
 
         // Return top results
-        $results = array_slice($similarities, 0, $limit);
+        $results = \array_slice($similarities, 0, $limit);
 
-        return array_map(fn ($item) => $item['product'], $results);
+        return array_map(static fn ($item) => $item['product'], $results);
     }
 
     /**
-     * @param  array<string, mixed>  $targetProduct
+     * @param array<string, mixed> $targetProduct
+     *
      * @return array<int, array<string, mixed>>
      */
 
     /**
-     * @param  array<string, mixed>  $targetProduct
-     * @param  array<int, array<string, mixed>>  $products
+     * @param array<string, mixed>             $targetProduct
+     * @param array<int, array<string, mixed>> $products
+     *
      * @return array<int, array<string, mixed>>
      */
     private function findSimilarProductsBySpecs(array $targetProduct, array $products): array
@@ -355,14 +374,14 @@ class SimilarProductTest extends TestCase
             ];
         }
 
-        usort($similarities, fn ($a, $b) => $b['similarity_score'] <=> $a['similarity_score']);
+        usort($similarities, static fn ($a, $b) => $b['similarity_score'] <=> $a['similarity_score']);
 
-        return array_map(fn ($item) => $item['product'], $similarities);
+        return array_map(static fn ($item) => $item['product'], $similarities);
     }
 
     /**
-     * @param  array<string, mixed>  $product1
-     * @param  array<string, mixed>  $product2
+     * @param array<string, mixed> $product1
+     * @param array<string, mixed> $product2
      */
     private function calculateSimilarityScore(array $product1, array $product2): float
     {
@@ -370,19 +389,19 @@ class SimilarProductTest extends TestCase
         $factors = 0;
 
         // Category similarity (40% weight)
-        if (isset($product1['category']) && isset($product2['category'])) {
+        if (isset($product1['category'], $product2['category'])) {
             $score += ($product1['category'] === $product2['category']) ? 0.4 : 0;
-            $factors++;
+            ++$factors;
         }
 
         // Brand similarity (30% weight)
-        if (isset($product1['brand']) && isset($product2['brand'])) {
+        if (isset($product1['brand'], $product2['brand'])) {
             $score += ($product1['brand'] === $product2['brand']) ? 0.3 : 0;
-            $factors++;
+            ++$factors;
         }
 
         // Price similarity (20% weight)
-        if (isset($product1['price']) && isset($product2['price'])) {
+        if (isset($product1['price'], $product2['price'])) {
             $price1 = $product1['price'];
             $price2 = $product2['price'];
 
@@ -393,19 +412,19 @@ class SimilarProductTest extends TestCase
                 $maxPrice = max($price1Float, $price2Float);
                 $priceSimilarity = $maxPrice > 0 ? 1 - ($priceDiff / $maxPrice) : 0;
                 $score += $priceSimilarity * 0.2;
-                $factors++;
+                ++$factors;
             }
         }
 
         // Name similarity (10% weight)
-        if (isset($product1['name']) && isset($product2['name'])) {
+        if (isset($product1['name'], $product2['name'])) {
             $name1 = $product1['name'];
             $name2 = $product2['name'];
 
-            if (is_string($name1) && is_string($name2)) {
+            if (\is_string($name1) && \is_string($name2)) {
                 $nameSimilarity = $this->calculateStringSimilarity($name1, $name2);
                 $score += $nameSimilarity * 0.1;
-                $factors++;
+                ++$factors;
             }
         }
 
@@ -413,8 +432,8 @@ class SimilarProductTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $product1
-     * @param  array<string, mixed>  $product2
+     * @param array<string, mixed> $product1
+     * @param array<string, mixed> $product2
      */
     private function calculateSpecSimilarity(array $product1, array $product2): float
     {
@@ -425,7 +444,7 @@ class SimilarProductTest extends TestCase
         $specs1 = $product1['specifications'];
         $specs2 = $product2['specifications'];
 
-        if (! is_array($specs1) || ! is_array($specs2)) {
+        if (! \is_array($specs1) || ! \is_array($specs2)) {
             return 0;
         }
 
@@ -433,10 +452,10 @@ class SimilarProductTest extends TestCase
         $total = 0;
 
         foreach ($specs1 as $key => $value) {
-            if (is_string($key) && isset($specs2[$key])) {
-                $total++;
+            if (\is_string($key) && isset($specs2[$key])) {
+                ++$total;
                 if ($value === $specs2[$key]) {
-                    $matches++;
+                    ++$matches;
                 }
             }
         }
@@ -449,8 +468,8 @@ class SimilarProductTest extends TestCase
         $str1 = strtolower($str1);
         $str2 = strtolower($str2);
 
-        $maxLength = max(strlen($str1), strlen($str2));
-        if ($maxLength === 0) {
+        $maxLength = max(\strlen($str1), \strlen($str2));
+        if (0 === $maxLength) {
             return 1.0;
         }
 
@@ -460,25 +479,25 @@ class SimilarProductTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $product
-     * @param  array<string, mixed>  $preferences
+     * @param array<string, mixed> $product
+     * @param array<string, mixed> $preferences
      */
     private function applyUserPreferences(float $similarity, array $product, array $preferences): float
     {
         $bonus = 0;
 
-        if (isset($preferences['preferred_brands']) && isset($product['brand'])) {
+        if (isset($preferences['preferred_brands'], $product['brand'])) {
             $preferredBrands = $preferences['preferred_brands'];
             $brand = $product['brand'];
-            if (is_array($preferredBrands) && is_string($brand) && in_array($brand, $preferredBrands)) {
+            if (\is_array($preferredBrands) && \is_string($brand) && \in_array($brand, $preferredBrands, true)) {
                 $bonus += 0.2;
             }
         }
 
-        if (isset($preferences['price_range']) && isset($product['price'])) {
+        if (isset($preferences['price_range'], $product['price'])) {
             $priceRange = $preferences['price_range'];
             $price = $product['price'];
-            if (is_array($priceRange) && is_numeric($price)) {
+            if (\is_array($priceRange) && is_numeric($price)) {
                 $min = $priceRange['min'] ?? 0;
                 $max = $priceRange['max'] ?? 0;
                 if (is_numeric($min) && is_numeric($max) && $price >= $min && $price <= $max) {
@@ -499,7 +518,7 @@ class SimilarProductTest extends TestCase
         $brands = ['Apple', 'Samsung', 'Google', 'OnePlus', 'Xiaomi'];
         $categories = ['Smartphones', 'Laptops', 'Tablets', 'Wearables'];
 
-        for ($i = 0; $i < $count; $i++) {
+        for ($i = 0; $i < $count; ++$i) {
             $products[] = [
                 'id' => $i + 2,
                 'name' => 'Product '.($i + 2),
@@ -510,15 +529,5 @@ class SimilarProductTest extends TestCase
         }
 
         return $products;
-    }
-
-    protected function setUp(): void
-    {
-        // Setup without calling parent to avoid error handler modifications
-    }
-
-    protected function tearDown(): void
-    {
-        // Cleanup without calling parent to avoid error handler modifications
     }
 }

@@ -13,15 +13,19 @@ use Tests\TestCase;
 
 /**
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class SettingControllerTest extends TestCase
+final class SettingControllerTest extends TestCase
 {
     use RefreshDatabase;
 
     #[Test]
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function it_can_get_all_settings(): void
+    public function itCanGetAllSettings(): void
     {
         $user = User::factory()->create();
         $this->actingAs($user);
@@ -29,13 +33,14 @@ class SettingControllerTest extends TestCase
         $response = $this->getJson('/api/settings');
 
         $response->assertStatus(200)
-            ->assertJsonStructure(['success', 'data', 'message']);
+            ->assertJsonStructure(['success', 'data', 'message'])
+        ;
     }
 
     #[Test]
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function it_can_update_settings(): void
+    public function itCanUpdateSettings(): void
     {
         $user = User::factory()->create();
         $this->actingAs($user);
@@ -45,13 +50,14 @@ class SettingControllerTest extends TestCase
         $response = $this->putJson('/api/settings', $settings);
 
         $response->assertStatus(200)
-            ->assertJson(['success' => true, 'message' => 'Settings updated successfully.']);
+            ->assertJson(['success' => true, 'message' => 'Settings updated successfully.'])
+        ;
     }
 
     #[Test]
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function it_validates_settings_update_request(): void
+    public function itValidatesSettingsUpdateRequest(): void
     {
         $user = User::factory()->create();
         $this->actingAs($user);

@@ -4,12 +4,17 @@ declare(strict_types=1);
 
 namespace Tests\TestUtilities;
 
+use App\Models\User;
+use App\Services\LoginAttemptService;
+use App\Services\PasswordHistoryService;
+use App\Services\PasswordPolicyService;
+use App\Services\ProductService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
-use Mockery;
 
 /**
  * Security Test Suite for comprehensive security testing.
@@ -84,13 +89,48 @@ class SecurityTestSuite
     }
 
     /**
+     * Generate security report.
+     */
+    public function generateSecurityReport(): array
+    {
+        $results = $this->runComprehensiveSecurityTests();
+
+        $totalTests = 0;
+        $totalPassed = 0;
+        $totalFailed = 0;
+        $totalVulnerabilities = 0;
+
+        foreach ($results as $category => $categoryResults) {
+            if (isset($categoryResults['passed'])) {
+                $totalTests += $categoryResults['passed'] + $categoryResults['failed'];
+                $totalPassed += $categoryResults['passed'];
+                $totalFailed += $categoryResults['failed'];
+                $totalVulnerabilities += \count($categoryResults['vulnerabilities'] ?? []);
+            }
+        }
+
+        return [
+            'summary' => [
+                'total_tests' => $totalTests,
+                'passed' => $totalPassed,
+                'failed' => $totalFailed,
+                'success_rate' => $totalTests > 0 ? ($totalPassed / $totalTests) * 100 : 0,
+                'vulnerabilities_found' => $totalVulnerabilities,
+                'security_score' => $this->calculateSecurityScore($results),
+            ],
+            'detailed_results' => $results,
+            'recommendations' => $this->generateSecurityRecommendations($results),
+        ];
+    }
+
+    /**
      * Test authentication security.
      */
     private function testAuthenticationSecurity(): array
     {
         $tests = [
             'test_strong_password_requirements' => function () {
-                $passwordPolicy = new \App\Services\PasswordPolicyService;
+                $passwordPolicy = new PasswordPolicyService();
                 $weakPasswords = ['123', 'password', '12345678', 'qwerty'];
 
                 foreach ($weakPasswords as $password) {
@@ -100,10 +140,10 @@ class SecurityTestSuite
             },
 
             'test_password_brute_force_protection' => function () {
-                $loginAttempt = new \App\Services\LoginAttemptService;
+                $loginAttempt = new LoginAttemptService();
 
                 // Simulate multiple failed attempts
-                for ($i = 0; $i < 6; $i++) {
+                for ($i = 0; $i < 6; ++$i) {
                     $loginAttempt->recordFailedAttempt('test@example.com', '127.0.0.1');
                 }
 
@@ -112,10 +152,10 @@ class SecurityTestSuite
             },
 
             'test_account_lockout_mechanism' => function () {
-                $loginAttempt = new \App\Services\LoginAttemptService;
+                $loginAttempt = new LoginAttemptService();
 
                 // Record failed attempts
-                for ($i = 0; $i < 5; $i++) {
+                for ($i = 0; $i < 5; ++$i) {
                     $loginAttempt->recordFailedAttempt('user@example.com', '192.168.1.1');
                 }
 
@@ -124,7 +164,7 @@ class SecurityTestSuite
             },
 
             'test_password_history_prevention' => function () {
-                $passwordHistory = new \App\Services\PasswordHistoryService;
+                $passwordHistory = new PasswordHistoryService();
 
                 // Save password to history
                 $passwordHistory->savePasswordToHistory(1, 'OldPassword123!');
@@ -158,7 +198,7 @@ class SecurityTestSuite
             },
 
             'test_role_based_access_control' => function () {
-                $user = Mockery::mock();
+                $user = \Mockery::mock();
                 $user->shouldReceive('hasRole')->with('admin')->andReturn(false);
                 Auth::shouldReceive('check')->andReturn(true);
                 Auth::shouldReceive('user')->andReturn($user);
@@ -168,7 +208,7 @@ class SecurityTestSuite
             },
 
             'test_resource_ownership_verification' => function () {
-                $user = Mockery::mock();
+                $user = \Mockery::mock();
                 $user->shouldReceive('getAttribute')->with('id')->andReturn(1);
                 Auth::shouldReceive('check')->andReturn(true);
                 Auth::shouldReceive('user')->andReturn($user);
@@ -242,7 +282,7 @@ class SecurityTestSuite
                 ];
 
                 foreach ($maliciousFiles as $filename) {
-                    $file = \Illuminate\Http\UploadedFile::fake()->create($filename, 100);
+                    $file = UploadedFile::fake()->create($filename, 100);
                     $response = $this->post('/api/upload', [
                         'file' => $file,
                     ]);
@@ -300,7 +340,7 @@ class SecurityTestSuite
                 DB::shouldReceive('update')->andReturn(1);
                 DB::shouldReceive('delete')->andReturn(1);
 
-                $service = new \App\Services\ProductService;
+                $service = new ProductService();
                 $result = $service->getPaginatedProducts(1, 15);
 
                 $this->assertIsObject($result);
@@ -437,7 +477,7 @@ class SecurityTestSuite
 
             'test_database_encryption' => function () {
                 // Test that sensitive fields are encrypted in database
-                $user = new \App\Models\User;
+                $user = new User();
                 $user->email = 'test@example.com';
                 $user->password = Hash::make('password');
                 $user->save();
@@ -458,7 +498,7 @@ class SecurityTestSuite
         $tests = [
             'test_session_regeneration' => function () {
                 $oldSessionId = Session::getId();
-                Auth::login(new \App\Models\User);
+                Auth::login(new User());
                 $newSessionId = Session::getId();
 
                 $this->assertNotEquals($oldSessionId, $newSessionId);
@@ -491,9 +531,9 @@ class SecurityTestSuite
         $tests = [
             'test_api_rate_limiting' => function () {
                 // Make multiple requests to test rate limiting
-                for ($i = 0; $i < 100; $i++) {
+                for ($i = 0; $i < 100; ++$i) {
                     $response = $this->get('/api/products');
-                    if ($response->status() === 429) {
+                    if (429 === $response->status()) {
                         break;
                     }
                 }
@@ -535,7 +575,7 @@ class SecurityTestSuite
                 ];
 
                 foreach ($maliciousFiles as $filename) {
-                    $file = \Illuminate\Http\UploadedFile::fake()->create($filename, 100);
+                    $file = UploadedFile::fake()->create($filename, 100);
                     $response = $this->post('/api/upload', [
                         'file' => $file,
                     ]);
@@ -544,7 +584,7 @@ class SecurityTestSuite
             },
 
             'test_file_size_limitation' => function () {
-                $largeFile = \Illuminate\Http\UploadedFile::fake()->create('large.jpg', 10240); // 10MB
+                $largeFile = UploadedFile::fake()->create('large.jpg', 10240); // 10MB
                 $response = $this->post('/api/upload', [
                     'file' => $largeFile,
                 ]);
@@ -554,7 +594,7 @@ class SecurityTestSuite
             'test_file_content_scanning' => function () {
                 // Test that uploaded files are scanned for malicious content
                 $response = $this->post('/api/upload', [
-                    'file' => \Illuminate\Http\UploadedFile::fake()->create('test.jpg', 100),
+                    'file' => UploadedFile::fake()->create('test.jpg', 100),
                 ]);
                 $response->assertStatus(200);
             },
@@ -578,9 +618,9 @@ class SecurityTestSuite
         foreach ($tests as $testName => $testFunction) {
             try {
                 $testFunction();
-                $results['passed']++;
+                ++$results['passed'];
             } catch (\Exception $e) {
-                $results['failed']++;
+                ++$results['failed'];
                 $results['errors'][] = [
                     'test' => $testName,
                     'error' => $e->getMessage(),
@@ -617,7 +657,7 @@ class SecurityTestSuite
         ];
 
         foreach ($vulnerabilityKeywords as $keyword) {
-            if (stripos($errorMessage, $keyword) !== false) {
+            if (false !== stripos($errorMessage, $keyword)) {
                 return true;
             }
         }
@@ -631,55 +671,20 @@ class SecurityTestSuite
     private function getVulnerabilitySeverity(string $errorMessage): string
     {
         if (
-            stripos($errorMessage, 'sql injection') !== false ||
-            stripos($errorMessage, 'xss') !== false
+            false !== stripos($errorMessage, 'sql injection')
+            || false !== stripos($errorMessage, 'xss')
         ) {
             return 'HIGH';
         }
 
         if (
-            stripos($errorMessage, 'csrf') !== false ||
-            stripos($errorMessage, 'authentication') !== false
+            false !== stripos($errorMessage, 'csrf')
+            || false !== stripos($errorMessage, 'authentication')
         ) {
             return 'MEDIUM';
         }
 
         return 'LOW';
-    }
-
-    /**
-     * Generate security report.
-     */
-    public function generateSecurityReport(): array
-    {
-        $results = $this->runComprehensiveSecurityTests();
-
-        $totalTests = 0;
-        $totalPassed = 0;
-        $totalFailed = 0;
-        $totalVulnerabilities = 0;
-
-        foreach ($results as $category => $categoryResults) {
-            if (isset($categoryResults['passed'])) {
-                $totalTests += $categoryResults['passed'] + $categoryResults['failed'];
-                $totalPassed += $categoryResults['passed'];
-                $totalFailed += $categoryResults['failed'];
-                $totalVulnerabilities += count($categoryResults['vulnerabilities'] ?? []);
-            }
-        }
-
-        return [
-            'summary' => [
-                'total_tests' => $totalTests,
-                'passed' => $totalPassed,
-                'failed' => $totalFailed,
-                'success_rate' => $totalTests > 0 ? ($totalPassed / $totalTests) * 100 : 0,
-                'vulnerabilities_found' => $totalVulnerabilities,
-                'security_score' => $this->calculateSecurityScore($results),
-            ],
-            'detailed_results' => $results,
-            'recommendations' => $this->generateSecurityRecommendations($results),
-        ];
     }
 
     /**
@@ -691,12 +696,12 @@ class SecurityTestSuite
         $categoryCount = 0;
 
         foreach ($results as $category => $categoryResults) {
-            if (isset($categoryResults['passed']) && isset($categoryResults['failed'])) {
+            if (isset($categoryResults['passed'], $categoryResults['failed'])) {
                 $totalTests = $categoryResults['passed'] + $categoryResults['failed'];
                 if ($totalTests > 0) {
                     $score = ($categoryResults['passed'] / $totalTests) * 100;
                     $totalScore += $score;
-                    $categoryCount++;
+                    ++$categoryCount;
                 }
             }
         }

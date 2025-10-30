@@ -4,12 +4,18 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Services;
 
+use App\Models\Product;
+use App\Services\AuditService;
 use App\Services\FinancialTransactionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Mockery;
 use Tests\TestCase;
 
-class FinancialTransactionServiceTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class FinancialTransactionServiceTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -18,21 +24,32 @@ class FinancialTransactionServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $auditService = \Mockery::mock(\App\Services\AuditService::class);
+
+        // Verify method existence for better test reliability
+        self::assertTrue(
+            method_exists(AuditService::class, 'logUpdated'),
+            'AuditService must have logUpdated method'
+        );
+        self::assertTrue(
+            method_exists(FinancialTransactionService::class, 'updateProductPrice'),
+            'FinancialTransactionService must have updateProductPrice method'
+        );
+
+        $auditService = \Mockery::mock(AuditService::class);
         $auditService->shouldReceive('logUpdated')->andReturn(true);
         $this->service = new FinancialTransactionService($auditService);
     }
 
     protected function tearDown(): void
     {
-        Mockery::close();
+        \Mockery::close();
         parent::tearDown();
     }
 
-    public function test_processes_payment_successfully()
+    public function testProcessesPaymentSuccessfully()
     {
         // Arrange
-        $product = \App\Models\Product::factory()->create(['price' => '100.50']);
+        $product = Product::factory()->create(['price' => '100.50']);
         $newPrice = 120.00;
         $reason = 'Price update';
 
@@ -40,7 +57,7 @@ class FinancialTransactionServiceTest extends TestCase
         $result = $this->service->updateProductPrice($product, $newPrice, $reason);
 
         // Assert
-        $this->assertTrue($result);
+        self::assertTrue($result);
 
         // Verify the product price was actually updated in the database
         $this->assertDatabaseHas('products', [
@@ -56,13 +73,13 @@ class FinancialTransactionServiceTest extends TestCase
 
         // Verify the product was refreshed with the new price
         $product->refresh();
-        $this->assertEquals($newPrice, $product->price);
+        self::assertSame($newPrice, $product->price);
     }
 
-    public function test_handles_payment_failure()
+    public function testHandlesPaymentFailure()
     {
         // Arrange
-        $product = \App\Models\Product::factory()->create(['price' => '100.50']);
+        $product = Product::factory()->create(['price' => '100.50']);
         $newPrice = -50.00; // Invalid negative price
         $reason = 'Invalid price update';
 
@@ -83,10 +100,10 @@ class FinancialTransactionServiceTest extends TestCase
         ]);
     }
 
-    public function test_refunds_transaction()
+    public function testRefundsTransaction()
     {
         // Arrange
-        $product = \App\Models\Product::factory()->create(['price' => '100.50']);
+        $product = Product::factory()->create(['price' => '100.50']);
         $newPrice = 80.00; // Price reduction
         $reason = 'Price reduction';
 
@@ -94,7 +111,7 @@ class FinancialTransactionServiceTest extends TestCase
         $result = $this->service->updateProductPrice($product, $newPrice, $reason);
 
         // Assert
-        $this->assertTrue($result);
+        self::assertTrue($result);
 
         // Verify the price reduction was saved to the database
         $this->assertDatabaseHas('products', [
@@ -110,14 +127,14 @@ class FinancialTransactionServiceTest extends TestCase
 
         // Verify the price change was significant (reduction)
         $product->refresh();
-        $this->assertLessThan(100.50, $product->price);
-        $this->assertEquals($newPrice, $product->price);
+        self::assertLessThan(100.50, $product->price);
+        self::assertSame($newPrice, $product->price);
     }
 
-    public function test_gets_transaction_history()
+    public function testGetsTransactionHistory()
     {
         // Arrange
-        $product = \App\Models\Product::factory()->create(['price' => '100.50']);
+        $product = Product::factory()->create(['price' => '100.50']);
         $newPrice = 120.00;
         $reason = 'Price update';
 
@@ -125,13 +142,13 @@ class FinancialTransactionServiceTest extends TestCase
         $result = $this->service->updateProductPrice($product, $newPrice, $reason);
 
         // Assert
-        $this->assertTrue($result);
+        self::assertTrue($result);
     }
 
-    public function test_calculates_tax()
+    public function testCalculatesTax()
     {
         // Arrange
-        $product = \App\Models\Product::factory()->create(['price' => '100.50']);
+        $product = Product::factory()->create(['price' => '100.50']);
         $newPrice = 120.00;
         $reason = 'Price update with tax';
 
@@ -139,13 +156,13 @@ class FinancialTransactionServiceTest extends TestCase
         $result = $this->service->updateProductPrice($product, $newPrice, $reason);
 
         // Assert
-        $this->assertTrue($result);
+        self::assertTrue($result);
     }
 
-    public function test_validates_payment_method()
+    public function testValidatesPaymentMethod()
     {
         // Arrange
-        $product = \App\Models\Product::factory()->create(['price' => '100.50']);
+        $product = Product::factory()->create(['price' => '100.50']);
         $newPrice = 120.00;
         $reason = 'Price update validation';
 
@@ -153,13 +170,13 @@ class FinancialTransactionServiceTest extends TestCase
         $result = $this->service->updateProductPrice($product, $newPrice, $reason);
 
         // Assert
-        $this->assertTrue($result);
+        self::assertTrue($result);
     }
 
-    public function test_handles_invalid_payment_method()
+    public function testHandlesInvalidPaymentMethod()
     {
         // Arrange
-        $product = \App\Models\Product::factory()->create(['price' => '100.50']);
+        $product = Product::factory()->create(['price' => '100.50']);
         $newPrice = -10.00; // Invalid negative price
         $reason = 'Invalid payment method';
 

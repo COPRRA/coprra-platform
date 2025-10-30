@@ -26,7 +26,7 @@ final readonly class SEOAuditReporter
 
         $this->displaySummaryTable($totalIssues, $fixedIssues);
 
-        if ($totalIssues === 0) {
+        if (0 === $totalIssues) {
             $this->command->info('✅ No SEO issues found! Your site is well optimized.');
         } elseif ($fixedIssues > 0) {
             $this->command->info("✅ Fixed {$fixedIssues} issues automatically.");
@@ -52,11 +52,11 @@ final readonly class SEOAuditReporter
     /**
      * Display duplicate routes information.
      *
-     * @param  array<string, int>  $duplicates
+     * @param array<string, int> $duplicates
      */
     public function displayDuplicateRoutes(array $duplicates, bool $showDetails): void
     {
-        $duplicateCount = count($duplicates);
+        $duplicateCount = \count($duplicates);
 
         if ($duplicateCount > 0) {
             $this->command->warn("  ⚠️  Found {$duplicateCount} duplicate routes");
@@ -107,7 +107,7 @@ final readonly class SEOAuditReporter
     /**
      * Display the list of issues.
      *
-     * @param  array<int, string>  $issues
+     * @param array<int, string> $issues
      */
     private function displayIssuesList(array $issues): void
     {

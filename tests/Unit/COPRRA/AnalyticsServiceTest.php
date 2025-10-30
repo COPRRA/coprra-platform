@@ -13,13 +13,16 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\TestCase;
 
+/**
+ * @internal
+ */
 #[CoversClass(AnalyticsService::class)]
 #[CoversClass(AnalyticsEvent::class)]
-class AnalyticsServiceTest extends TestCase
+final class AnalyticsServiceTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_it_tracks_price_comparison_event(): void
+    public function testItTracksPriceComparisonEvent(): void
     {
         $analyticsService = $this->app->make(AnalyticsService::class);
         $product = Product::factory()->create();
@@ -27,25 +30,25 @@ class AnalyticsServiceTest extends TestCase
 
         $event = $analyticsService->trackPriceComparison($product->id, $user->id);
 
-        $this->assertInstanceOf(AnalyticsEvent::class, $event);
-        $this->assertEquals(AnalyticsEvent::TYPE_PRICE_COMPARISON, $event->event_type);
-        $this->assertEquals($product->id, $event->product_id);
-        $this->assertEquals($user->id, $event->user_id);
+        self::assertInstanceOf(AnalyticsEvent::class, $event);
+        self::assertSame(AnalyticsEvent::TYPE_PRICE_COMPARISON, $event->event_type);
+        self::assertSame($product->id, $event->product_id);
+        self::assertSame($user->id, $event->user_id);
     }
 
-    public function test_it_tracks_product_view_event(): void
+    public function testItTracksProductViewEvent(): void
     {
         $analyticsService = $this->app->make(AnalyticsService::class);
         $product = Product::factory()->create();
 
         $event = $analyticsService->trackProductView($product->id);
 
-        $this->assertInstanceOf(AnalyticsEvent::class, $event);
-        $this->assertEquals(AnalyticsEvent::TYPE_PRODUCT_VIEW, $event->event_type);
-        $this->assertEquals($product->id, $event->product_id);
+        self::assertInstanceOf(AnalyticsEvent::class, $event);
+        self::assertSame(AnalyticsEvent::TYPE_PRODUCT_VIEW, $event->event_type);
+        self::assertSame($product->id, $event->product_id);
     }
 
-    public function test_it_tracks_search_event(): void
+    public function testItTracksSearchEvent(): void
     {
         $analyticsService = $this->app->make(AnalyticsService::class);
         $query = 'laptop';
@@ -53,13 +56,13 @@ class AnalyticsServiceTest extends TestCase
 
         $event = $analyticsService->trackSearch($query, null, $filters);
 
-        $this->assertInstanceOf(AnalyticsEvent::class, $event);
-        $this->assertEquals(AnalyticsEvent::TYPE_SEARCH, $event->event_type);
-        $this->assertEquals($query, $event->metadata['query']);
-        $this->assertEquals($filters, $event->metadata['filters']);
+        self::assertInstanceOf(AnalyticsEvent::class, $event);
+        self::assertSame(AnalyticsEvent::TYPE_SEARCH, $event->event_type);
+        self::assertSame($query, $event->metadata['query']);
+        self::assertSame($filters, $event->metadata['filters']);
     }
 
-    public function test_it_tracks_store_click_event(): void
+    public function testItTracksStoreClickEvent(): void
     {
         $analyticsService = $this->app->make(AnalyticsService::class);
         $product = Product::factory()->create();
@@ -67,35 +70,35 @@ class AnalyticsServiceTest extends TestCase
 
         $event = $analyticsService->trackStoreClick($store->id, $product->id);
 
-        $this->assertInstanceOf(AnalyticsEvent::class, $event);
-        $this->assertEquals(AnalyticsEvent::TYPE_STORE_CLICK, $event->event_type);
-        $this->assertEquals($store->id, $event->store_id);
-        $this->assertEquals($product->id, $event->product_id);
+        self::assertInstanceOf(AnalyticsEvent::class, $event);
+        self::assertSame(AnalyticsEvent::TYPE_STORE_CLICK, $event->event_type);
+        self::assertSame($store->id, $event->store_id);
+        self::assertSame($product->id, $event->product_id);
     }
 
-    public function test_it_gets_most_viewed_products(): void
+    public function testItGetsMostViewedProducts(): void
     {
         $analyticsService = $this->app->make(AnalyticsService::class);
         $product1 = Product::factory()->create();
         $product2 = Product::factory()->create();
 
         // Create view events
-        for ($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 5; ++$i) {
             $analyticsService->trackProductView($product1->id);
         }
 
-        for ($i = 0; $i < 3; $i++) {
+        for ($i = 0; $i < 3; ++$i) {
             $analyticsService->trackProductView($product2->id);
         }
 
         $mostViewed = $analyticsService->getMostViewedProducts(10, 30);
 
-        $this->assertCount(2, $mostViewed);
-        $this->assertEquals($product1->id, $mostViewed[0]['product_id']);
-        $this->assertEquals(5, $mostViewed[0]['view_count']);
+        self::assertCount(2, $mostViewed);
+        self::assertSame($product1->id, $mostViewed[0]['product_id']);
+        self::assertSame(5, $mostViewed[0]['view_count']);
     }
 
-    public function test_it_gets_most_searched_queries(): void
+    public function testItGetsMostSearchedQueries(): void
     {
         $analyticsService = $this->app->make(AnalyticsService::class);
         $analyticsService->trackSearch('laptop');
@@ -104,13 +107,13 @@ class AnalyticsServiceTest extends TestCase
 
         $mostSearched = $analyticsService->getMostSearchedQueries(10, 30);
 
-        $this->assertArrayHasKey('laptop', $mostSearched);
-        $this->assertEquals(2, $mostSearched['laptop']);
-        $this->assertArrayHasKey('phone', $mostSearched);
-        $this->assertEquals(1, $mostSearched['phone']);
+        self::assertArrayHasKey('laptop', $mostSearched);
+        self::assertSame(2, $mostSearched['laptop']);
+        self::assertArrayHasKey('phone', $mostSearched);
+        self::assertSame(1, $mostSearched['phone']);
     }
 
-    public function test_it_gets_most_popular_stores(): void
+    public function testItGetsMostPopularStores(): void
     {
         $analyticsService = $this->app->make(AnalyticsService::class);
         $product = Product::factory()->create();
@@ -118,40 +121,40 @@ class AnalyticsServiceTest extends TestCase
         $store2 = Store::factory()->create();
 
         // Create click events
-        for ($i = 0; $i < 4; $i++) {
+        for ($i = 0; $i < 4; ++$i) {
             $analyticsService->trackStoreClick($store1->id, $product->id);
         }
 
-        for ($i = 0; $i < 2; $i++) {
+        for ($i = 0; $i < 2; ++$i) {
             $analyticsService->trackStoreClick($store2->id, $product->id);
         }
 
         $mostPopular = $analyticsService->getMostPopularStores(10, 30);
 
-        $this->assertCount(2, $mostPopular);
-        $this->assertEquals($store1->id, $mostPopular[0]['store_id']);
-        $this->assertEquals(4, $mostPopular[0]['click_count']);
+        self::assertCount(2, $mostPopular);
+        self::assertSame($store1->id, $mostPopular[0]['store_id']);
+        self::assertSame(4, $mostPopular[0]['click_count']);
     }
 
-    public function test_it_gets_price_comparison_statistics(): void
+    public function testItGetsPriceComparisonStatistics(): void
     {
         $analyticsService = $this->app->make(AnalyticsService::class);
         $product = Product::factory()->create();
         $user = User::factory()->create();
 
-        for ($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 5; ++$i) {
             $analyticsService->trackPriceComparison($product->id, $user->id);
         }
 
         $stats = $analyticsService->getPriceComparisonStats(30);
 
-        $this->assertEquals(5, $stats['total_comparisons']);
-        $this->assertEquals(1, $stats['unique_products']);
-        $this->assertEquals(1, $stats['unique_users']);
-        $this->assertIsFloat($stats['average_per_day']);
+        self::assertSame(5, $stats['total_comparisons']);
+        self::assertSame(1, $stats['unique_products']);
+        self::assertSame(1, $stats['unique_users']);
+        self::assertIsFloat($stats['average_per_day']);
     }
 
-    public function test_it_gets_dashboard_data(): void
+    public function testItGetsDashboardData(): void
     {
         $analyticsService = $this->app->make(AnalyticsService::class);
         $product = Product::factory()->create();
@@ -162,14 +165,14 @@ class AnalyticsServiceTest extends TestCase
 
         $dashboardData = $analyticsService->getDashboardData(30);
 
-        $this->assertArrayHasKey('overview', $dashboardData);
-        $this->assertArrayHasKey('price_comparisons', $dashboardData);
-        $this->assertArrayHasKey('most_viewed_products', $dashboardData);
-        $this->assertArrayHasKey('most_searched_queries', $dashboardData);
-        $this->assertArrayHasKey('most_popular_stores', $dashboardData);
+        self::assertArrayHasKey('overview', $dashboardData);
+        self::assertArrayHasKey('price_comparisons', $dashboardData);
+        self::assertArrayHasKey('most_viewed_products', $dashboardData);
+        self::assertArrayHasKey('most_searched_queries', $dashboardData);
+        self::assertArrayHasKey('most_popular_stores', $dashboardData);
     }
 
-    public function test_it_cleans_old_analytics_data(): void
+    public function testItCleansOldAnalyticsData(): void
     {
         $analyticsService = $this->app->make(AnalyticsService::class);
         // Create old and recent events
@@ -183,12 +186,12 @@ class AnalyticsServiceTest extends TestCase
 
         $cleanedCount = $analyticsService->cleanOldData(90);
 
-        $this->assertEquals(1, $cleanedCount);
+        self::assertSame(1, $cleanedCount);
         $this->assertDatabaseMissing('analytics_events', ['id' => $oldEvent->id]);
         $this->assertDatabaseHas('analytics_events', ['id' => $recentEvent->id]);
     }
 
-    public function test_it_does_not_track_when_disabled(): void
+    public function testItDoesNotTrackWhenDisabled(): void
     {
         // Disable tracking
         config(['coprra.analytics.track_user_behavior' => false]);
@@ -198,29 +201,29 @@ class AnalyticsServiceTest extends TestCase
 
         $event = $analyticsService->trackProductView($product->id);
 
-        $this->assertNull($event);
+        self::assertNull($event);
         $this->assertDatabaseCount('analytics_events', 0);
     }
 
-    public function test_it_handles_null_user_id(): void
+    public function testItHandlesNullUserId(): void
     {
         $analyticsService = $this->app->make(AnalyticsService::class);
         $product = Product::factory()->create();
 
         $event = $analyticsService->trackPriceComparison($product->id, null);
 
-        $this->assertInstanceOf(AnalyticsEvent::class, $event);
-        $this->assertNull($event->user_id);
+        self::assertInstanceOf(AnalyticsEvent::class, $event);
+        self::assertNull($event->user_id);
     }
 
-    public function test_it_handles_empty_metadata(): void
+    public function testItHandlesEmptyMetadata(): void
     {
         $analyticsService = $this->app->make(AnalyticsService::class);
         $product = Product::factory()->create();
 
         $event = $analyticsService->trackPriceComparison($product->id, null, []);
 
-        $this->assertInstanceOf(AnalyticsEvent::class, $event);
-        $this->assertEquals([], $event->metadata);
+        self::assertInstanceOf(AnalyticsEvent::class, $event);
+        self::assertSame([], $event->metadata);
     }
 }

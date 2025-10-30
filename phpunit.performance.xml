@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
+         bootstrap="tests/bootstrap.php"
+         colors="true"
+         processIsolation="false"
+         stopOnFailure="false"
+         stopOnError="false"
+         stopOnIncomplete="false"
+         stopOnSkipped="false"
+         stopOnRisky="false"
+         backupGlobals="false"
+         backupStaticAttributes="false"
+         cacheDirectory=".phpunit.cache"
+         requireCoverageMetadata="false"
+         beStrictAboutChangesToGlobalState="true"
+         beStrictAboutOutputDuringTests="true"
+         beStrictAboutResourceUsageDuringSmallTests="true"
+         beStrictAboutTestsThatDoNotTestAnything="true"
+         beStrictAboutUnusedMockObjects="true"
+         beStrictAboutCoverageMetadata="false"
+         enforceTimeLimit="true"
+         defaultTimeLimit="10"
+         timeoutForSmallTests="10"
+         timeoutForMediumTests="60"
+         timeoutForLargeTests="300"
+         executionOrder="random"
+         resolveDependencies="true"
+         failOnRisky="true"
+         failOnWarning="true">
+  <testsuites>
+    <!-- Fast Unit Tests - Run First -->
+    <testsuite name="Unit">
+      <directory suffix="Test.php">./tests/Unit</directory>
+    </testsuite>
+    
+    <!-- Feature Tests -->
+    <testsuite name="Feature">
+      <directory suffix="Test.php">./tests/Feature</directory>
+    </testsuite>
+    
+    <!-- Performance Critical Tests -->
+    <testsuite name="Performance">
+      <directory suffix="Test.php">./tests/Performance</directory>
+    </testsuite>
+    
+    <!-- Integration Tests -->
+    <testsuite name="Integration">
+      <directory suffix="Test.php">./tests/Integration</directory>
+    </testsuite>
+    
+    <!-- Security Tests -->
+    <testsuite name="Security">
+      <directory suffix="Test.php">./tests/Security</directory>
+    </testsuite>
+  </testsuites>
+  
+  <source>
+    <include>
+      <directory suffix=".php">./app</directory>
+    </include>
+    <exclude>
+      <directory>./app/Console/Commands/Stubs</directory>
+      <file>./app/Http/Kernel.php</file>
+      <directory>./app/Providers</directory>
+    </exclude>
+  </source>
+  
+  <coverage ignoreDeprecatedCodeUnits="false" 
+            pathCoverage="false" 
+            disableCodeCoverageIgnore="false"
+            includeUncoveredFiles="true">
+    <report>
+      <clover outputFile="reports/coverage.xml"/>
+      <html outputDirectory="reports/coverage" lowUpperBound="35" highLowerBound="70"/>
+      <text outputFile="reports/coverage.txt" showUncoveredFiles="false" showOnlySummary="true"/>
+    </report>
+  </coverage>
+  
+  <php>
+    <!-- Performance Optimizations -->
+    <ini name="memory_limit" value="512M"/>
+    <ini name="max_execution_time" value="0"/>
+    <ini name="opcache.enable" value="1"/>
+    <ini name="opcache.enable_cli" value="1"/>
+    <ini name="opcache.memory_consumption" value="256"/>
+    <ini name="opcache.max_accelerated_files" value="20000"/>
+    <ini name="opcache.validate_timestamps" value="0"/>
+    <ini name="opcache.save_comments" value="1"/>
+    <ini name="opcache.fast_shutdown" value="1"/>
+    
+    <!-- Error Reporting -->
+    <ini name="error_reporting" value="E_ALL"/>
+    <ini name="display_errors" value="Off"/>
+    <ini name="display_startup_errors" value="Off"/>
+    <ini name="log_errors" value="On"/>
+    
+    <!-- Environment Variables -->
+    <env name="APP_ENV" value="testing"/>
+    <env name="APP_DEBUG" value="false"/>
+    <env name="CACHE_DRIVER" value="array"/>
+    <env name="QUEUE_CONNECTION" value="sync"/>
+    <env name="SESSION_DRIVER" value="array"/>
+    <env name="DB_CONNECTION" value="sqlite"/>
+    <env name="DB_DATABASE" value=":memory:"/>
+    <env name="MAIL_MAILER" value="array"/>
+    <env name="BROADCAST_DRIVER" value="log"/>
+    <env name="LOG_CHANNEL" value="null"/>
+    <env name="LOG_LEVEL" value="emergency"/>
+    
+    <!-- Disable External Services -->
+    <env name="TELESCOPE_ENABLED" value="false"/>
+    <env name="REDIS_CLIENT" value="predis"/>
+    <env name="REDIS_HOST" value="127.0.0.1"/>
+    <env name="REDIS_PORT" value="6379"/>
+    <env name="REDIS_PASSWORD" value="null"/>
+  </php>
+  
+  <logging>
+    <junit outputFile="reports/junit.xml"/>
+    <teamcity outputFile="reports/teamcity.txt"/>
+    <testdoxHtml outputFile="reports/testdox.html"/>
+    <testdoxText outputFile="reports/testdox.txt"/>
+  </logging>
+</phpunit>

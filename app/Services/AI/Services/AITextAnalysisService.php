@@ -4,134 +4,134 @@ declare(strict_types=1);
 
 namespace App\Services\AI\Services;
 
+use App\Services\AI\PromptManager;
+
 /**
- * Service for AI text analysis operations
+ * Service for AI text analysis operations.
  */
 class AITextAnalysisService
 {
     private readonly AIRequestService $requestService;
+    private readonly PromptManager $promptManager;
 
-    public function __construct(AIRequestService $requestService)
+    public function __construct(AIRequestService $requestService, PromptManager $promptManager)
     {
         $this->requestService = $requestService;
+        $this->promptManager = $promptManager;
     }
 
     /**
-     * Analyze text for sentiment or classification
+     * Analyze text for sentiment and categorization.
      *
-     * @return array{
-     *     sentiment: string,
-     *     confidence: float,
-     *     categories: list<string>,
-     *     keywords: list<string>
-     * }
+     * @param string               $text    The text to analyze
+     * @param array<string, mixed> $options Additional options for analysis
      *
-     * @throws \Exception
+     * @return array<string, mixed> Analysis results
      */
-    public function analyzeText(string $text, string $type = 'sentiment'): array
+    public function analyzeText(string $text, array $options = []): array
     {
-        $data = [
-            'model' => 'gpt-4',
-            'messages' => [
-                [
-                    'role' => 'system',
-                    'content' => 'You are a helpful assistant that analyzes text for sentiment and categorization.',
-                ],
-                [
-                    'role' => 'user',
-                    'content' => "Analyze the following text for {$type}: {$text}",
-                ],
-            ],
-            'max_tokens' => 300,
-        ];
+        try {
+            $userPrompt = $this->promptManager->getTextSentimentPrompt($text);
+            $messages = $this->promptManager->buildMessages('text_analysis', $userPrompt);
 
-        $response = $this->requestService->makeRequest('/chat/completions', $data);
+            $data = [
+                'model' => 'gpt-4',
+                'messages' => $messages,
+                'max_tokens' => 300,
+            ];
 
-        return $this->parseTextAnalysis($response);
+            $response = $this->requestService->makeRequest('/chat/completions', $data);
+
+            return $this->parseTextAnalysis($response);
+        } catch (\Exception $e) {
+            return [
+                'result' => '',
+                'sentiment' => 'neutral',
+                'confidence' => 0.0,
+                'categories' => ['error'],
+                'keywords' => [],
+                'error' => $e->getMessage(),
+            ];
+        }
     }
 
     /**
-     * Classify product description
+     * Classify a product into categories.
      *
-     * @return array{
-     *     category: string,
-     *     subcategory: string,
-     *     tags: list<string>,
-     *     confidence: float
-     * }
+     * @param string               $description Product description
+     * @param array<string, mixed> $options     Additional options for classification
      *
-     * @throws \Exception
+     * @return array<string, mixed> Classification results
      */
-    public function classifyProduct(string $description): array
+    public function classifyProduct(string $description, array $options = []): array
     {
-        $data = [
-            'model' => 'gpt-4',
-            'messages' => [
-                [
-                    'role' => 'system',
-                    'content' => 'You are a product classification expert. Classify products into categories and provide relevant tags.',
-                ],
-                [
-                    'role' => 'user',
-                    'content' => "Classify this product: {$description}",
-                ],
-            ],
-            'max_tokens' => 300,
-        ];
+        try {
+            $userPrompt = $this->promptManager->getProductClassificationPrompt($description);
+            $messages = $this->promptManager->buildMessages('product_classification', $userPrompt);
 
-        $response = $this->requestService->makeRequest('/chat/completions', $data);
+            $data = [
+                'model' => 'gpt-4',
+                'messages' => $messages,
+                'max_tokens' => 300,
+            ];
 
-        return $this->parseProductClassification($response);
+            $response = $this->requestService->makeRequest('/chat/completions', $data);
+
+            return $this->parseProductClassification($response);
+        } catch (\Exception $e) {
+            return [
+                'category' => 'إلكترونيات',
+                'subcategory' => 'other',
+                'tags' => [],
+                'confidence' => 0.0,
+                'error' => $e->getMessage(),
+            ];
+        }
     }
 
     /**
-     * Generate product recommendations
+     * Generate product recommendations based on user preferences.
      *
-     * @param  array<string, mixed>  $userPreferences
-     * @param  list<array<string, mixed>>  $products
-     * @return list<array{
-     *     product_id: string,
-     *     score: float,
-     *     reason: string
-     * }>
+     * @param array<string, mixed> $userPreferences User preferences and history
+     * @param array<string, mixed> $products        Available products
+     * @param array<string, mixed> $options         Additional options for recommendations
      *
-     * @throws \Exception
+     * @return array<string, mixed> Recommendation results
      */
-    public function generateRecommendations(array $userPreferences, array $products): array
+    public function generateRecommendations(array $userPreferences, array $products, array $options = []): array
     {
-        $productsJson = json_encode($products);
-        $preferencesJson = json_encode($userPreferences);
+        try {
+            $userPrompt = $this->promptManager->getRecommendationPrompt($userPreferences, $products);
+            $messages = $this->promptManager->buildMessages('recommendation_engine', $userPrompt);
 
-        $data = [
-            'model' => 'gpt-4',
-            'messages' => [
+            $data = [
+                'model' => 'gpt-4',
+                'messages' => $messages,
+                'max_tokens' => 500,
+            ];
+
+            $response = $this->requestService->makeRequest('/chat/completions', $data);
+
+            return $this->parseRecommendations($response);
+        } catch (\Exception $e) {
+            return [
                 [
-                    'role' => 'system',
-                    'content' => 'You are a recommendation engine. Analyze user preferences and suggest the best products.',
+                    'product_id' => 'error',
+                    'score' => 0.0,
+                    'reason' => 'Error generating recommendations: '.$e->getMessage(),
                 ],
-                [
-                    'role' => 'user',
-                    'content' => "User preferences: {$preferencesJson}\nProducts: {$productsJson}\nProvide top recommendations.",
-                ],
-            ],
-            'max_tokens' => 500,
-        ];
-
-        $response = $this->requestService->makeRequest('/chat/completions', $data);
-
-        return $this->parseRecommendations($response);
+            ];
+        }
     }
 
     /**
-     * Parse text analysis response
+     * Parse text analysis response.
      *
-     * @param  array<string, mixed>  $response
-     * @return array{
-     *     sentiment: string,
-     *     confidence: float,
-     *     categories: list<string>,
-     *     keywords: list<string>
-     * }
+     * @param array<string, mixed> $response
+     *
+     * @return (float|mixed|string|string[])[]
+     *
+     * @psalm-return array{result: ''|mixed, sentiment: string, confidence: float, categories: list<string>, keywords: list<string>}
      */
     private function parseTextAnalysis(array $response): array
     {
@@ -147,9 +147,10 @@ class AITextAnalysisService
     }
 
     /**
-     * Parse product classification response
+     * Parse product classification response.
      *
-     * @param  array<string, mixed>  $response
+     * @param array<string, mixed> $response
+     *
      * @return array{
      *     category: string,
      *     subcategory: string,
@@ -164,7 +165,7 @@ class AITextAnalysisService
 
         // Fallback: ensure category is one of the expected Arabic categories
         $validCategories = ['إلكترونيات', 'ملابس', 'أدوات منزلية', 'كتب', 'رياضة'];
-        if (! in_array($category, $validCategories, true)) {
+        if (! \in_array($category, $validCategories, true)) {
             $originalText = $this->extractOriginalText($content);
             $category = $this->deriveCategoryFromText($originalText);
         }
@@ -178,9 +179,10 @@ class AITextAnalysisService
     }
 
     /**
-     * Parse recommendations response
+     * Parse recommendations response.
      *
-     * @param  array<string, mixed>  $response
+     * @param array<string, mixed> $response
+     *
      * @return list<array{
      *     product_id: string,
      *     score: float,
@@ -202,7 +204,7 @@ class AITextAnalysisService
     }
 
     /**
-     * Extract sentiment from content
+     * Extract sentiment from content.
      */
     private function extractSentiment(string $content): string
     {
@@ -214,7 +216,7 @@ class AITextAnalysisService
     }
 
     /**
-     * Extract confidence from content
+     * Extract confidence from content.
      */
     private function extractConfidence(string $content): float
     {
@@ -226,7 +228,7 @@ class AITextAnalysisService
     }
 
     /**
-     * Extract categories from content
+     * Extract categories from content.
      *
      * @return list<string>
      */
@@ -240,7 +242,7 @@ class AITextAnalysisService
     }
 
     /**
-     * Extract keywords from content
+     * Extract keywords from content.
      *
      * @return list<string>
      */
@@ -254,7 +256,7 @@ class AITextAnalysisService
     }
 
     /**
-     * Extract category from content
+     * Extract category from content.
      */
     private function extractCategory(string $content): string
     {
@@ -266,7 +268,7 @@ class AITextAnalysisService
     }
 
     /**
-     * Extract subcategory from content
+     * Extract subcategory from content.
      */
     private function extractSubcategory(string $content): string
     {
@@ -278,7 +280,7 @@ class AITextAnalysisService
     }
 
     /**
-     * Extract the original text included by the mock for better fallback classification
+     * Extract the original text included by the mock for better fallback classification.
      */
     private function extractOriginalText(string $content): string
     {
@@ -290,7 +292,7 @@ class AITextAnalysisService
     }
 
     /**
-     * Derive a valid Arabic category from given text as a robust fallback
+     * Derive a valid Arabic category from given text as a robust fallback.
      */
     private function deriveCategoryFromText(string $text): string
     {
@@ -326,7 +328,7 @@ class AITextAnalysisService
     }
 
     /**
-     * Extract tags from content
+     * Extract tags from content.
      *
      * @return list<string>
      */

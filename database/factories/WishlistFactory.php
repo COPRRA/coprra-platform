@@ -17,7 +17,7 @@ class WishlistFactory extends Factory
     protected $model = Wishlist::class;
 
     /**
-     * @return (ProductFactory|UserFactory|string)[]
+     * @return (ProductFactory|string|UserFactory)[]
      *
      * @psalm-return array{user_id: UserFactory, product_id: ProductFactory, notes: string}
      */

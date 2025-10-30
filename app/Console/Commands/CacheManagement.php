@@ -38,14 +38,14 @@ final class CacheManagement extends Command
     {
         $action = $this->argument('action');
 
-        if (! is_string($action)) {
+        if (! \is_string($action)) {
             $this->error('Invalid action argument.');
 
             return self::FAILURE;
         }
 
         $validatedAction = $this->validateAction($action);
-        if ($validatedAction === null) {
+        if (null === $validatedAction) {
             return self::FAILURE;
         }
 
@@ -121,7 +121,7 @@ final class CacheManagement extends Command
     private function validateAction(string $action): ?string
     {
         $validActions = ['stats', 'clear-prices', 'clear-search', 'clear-all'];
-        if (! in_array($action, $validActions, true)) {
+        if (! \in_array($action, $validActions, true)) {
             $this->error("Unknown action: {$action}");
 
             return null;
@@ -141,7 +141,7 @@ final class CacheManagement extends Command
 
         $result = $actions[$action]();
 
-        return is_int($result) ? $result : self::SUCCESS;
+        return \is_int($result) ? $result : self::SUCCESS;
     }
 
     /**

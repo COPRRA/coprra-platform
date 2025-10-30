@@ -8,13 +8,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * @property int $id
- * @property int $webhook_id
+ * @property int    $id
+ * @property int    $webhook_id
  * @property string $action
  * @property string $message
- * @property array<string, string|int|bool|null>|null $metadata
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
+ ** @property ll>|null $metadata
+ ** @property Carbon|nullCarbon $created_at
+ ** @property Carbon|nullCarbon $updated_at
  *
  * @mixin \Illuminate\Database\Eloquent\Model
  */

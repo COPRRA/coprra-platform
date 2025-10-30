@@ -19,8 +19,6 @@ class SystemNotification extends Notification
 
     /**
      * Create a new notification instance.
-     *
-     * @return void
      */
     public function __construct(string $title, string $message)
     {

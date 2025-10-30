@@ -6,44 +6,17 @@ namespace Tests\Feature\Models;
 
 use App\Models\Currency;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class CurrencyTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class CurrencyTest extends TestCase
 {
     use RefreshDatabase;
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_validate_required_fields(): void
-    {
-        // Test that Currency class exists
-        $currency = new Currency;
-        $this->assertInstanceOf(Currency::class, $currency);
-
-        // Test basic functionality
-        $this->assertTrue(true);
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_create_currency(): void
-    {
-        // Test that Currency class exists
-        $currency = new Currency;
-        $this->assertInstanceOf(Currency::class, $currency);
-
-        // Test basic functionality
-        $this->assertTrue(true);
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_save_currency(): void
-    {
-        // Test that Currency class exists
-        $currency = new Currency;
-        $this->assertInstanceOf(Currency::class, $currency);
-
-        // Test basic functionality
-        $this->assertTrue(true);
-    }
 
     protected function setUp(): void
     {
@@ -53,5 +26,38 @@ class CurrencyTest extends TestCase
     protected function tearDown(): void
     {
         parent::tearDown();
+    }
+
+    #[Test]
+    public function testItCanValidateRequiredFields(): void
+    {
+        // Test that Currency class exists
+        $currency = new Currency();
+        self::assertInstanceOf(Currency::class, $currency);
+
+        // Test basic functionality
+        self::assertTrue(true);
+    }
+
+    #[Test]
+    public function testItCanCreateCurrency(): void
+    {
+        // Test that Currency class exists
+        $currency = new Currency();
+        self::assertInstanceOf(Currency::class, $currency);
+
+        // Test basic functionality
+        self::assertTrue(true);
+    }
+
+    #[Test]
+    public function testItCanSaveCurrency(): void
+    {
+        // Test that Currency class exists
+        $currency = new Currency();
+        self::assertInstanceOf(Currency::class, $currency);
+
+        // Test basic functionality
+        self::assertTrue(true);
     }
 }

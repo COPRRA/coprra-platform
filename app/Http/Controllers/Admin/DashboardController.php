@@ -134,13 +134,13 @@ final class DashboardController extends Controller
     private function getUserStatistics(): array
     {
         return [
-            'total_users' => $this->getUserCount(fn ($query) => $query),
-            'active_users' => $this->getUserCount(fn ($query) => $query->where('is_active', true)),
+            'total_users' => $this->getUserCount(static fn ($query) => $query),
+            'active_users' => $this->getUserCount(static fn ($query) => $query->where('is_active', true)),
             'blocked_users' => 0, // Placeholder - no blocked users column
-            'verified_users' => $this->getUserCount(fn ($query) => $query->whereNotNull('email_verified_at')),
-            'new_users_today' => $this->getUserCount(fn ($query) => $query->whereDate('created_at', today())),
-            'new_users_this_week' => $this->getUserCount(fn ($query) => $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])),
-            'new_users_this_month' => $this->getUserCount(fn ($query) => $query->whereMonth('created_at', now()->month)),
+            'verified_users' => $this->getUserCount(static fn ($query) => $query->whereNotNull('email_verified_at')),
+            'new_users_today' => $this->getUserCount(static fn ($query) => $query->whereDate('created_at', today())),
+            'new_users_this_week' => $this->getUserCount(static fn ($query) => $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])),
+            'new_users_this_month' => $this->getUserCount(static fn ($query) => $query->whereMonth('created_at', now()->month)),
         ];
     }
 
@@ -160,12 +160,12 @@ final class DashboardController extends Controller
     private function getProductStatistics(): array
     {
         return [
-            'total_products' => $this->getProductCount(fn ($query) => $query),
-            'active_products' => $this->getProductCount(fn ($query) => $query->where('is_active', true)),
-            'featured_products' => $this->getProductCount(fn ($query) => $query->where('is_featured', true)),
-            'out_of_stock' => $this->getProductCount(fn ($query) => $query->where('stock_quantity', 0)),
-            'low_stock' => $this->getProductCount(fn ($query) => $query->where('stock_quantity', '>', 0)->where('stock_quantity', '<=', 10)),
-            'new_products_today' => $this->getProductCount(fn ($query) => $query->whereDate('created_at', today())),
+            'total_products' => $this->getProductCount(static fn ($query) => $query),
+            'active_products' => $this->getProductCount(static fn ($query) => $query->where('is_active', true)),
+            'featured_products' => $this->getProductCount(static fn ($query) => $query->where('is_featured', true)),
+            'out_of_stock' => $this->getProductCount(static fn ($query) => $query->where('stock_quantity', 0)),
+            'low_stock' => $this->getProductCount(static fn ($query) => $query->where('stock_quantity', '>', 0)->where('stock_quantity', '<=', 10)),
+            'new_products_today' => $this->getProductCount(static fn ($query) => $query->whereDate('created_at', today())),
         ];
     }
 
@@ -205,7 +205,7 @@ final class DashboardController extends Controller
     }
 
     /**
-     * @return array<array<int|array<string>>|int>
+     * @return array<array<array<string>|int>|int>
      *
      * @psalm-return array{login_attempts: array{max_attempts: 5, lockout_duration: 15, blocked_emails_count: int<0, max>, blocked_ips_count: int<0, max>}, banned_users: array<string, array<string, string>|int>, file_security: array{allowed_extensions: list{'jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'pdf', 'doc', 'docx', 'txt', 'rtf', 'xls', 'xlsx', 'csv', 'zip', 'rar', '7z'}, dangerous_extensions: list{'exe', 'bat', 'cmd', 'com', 'pif', 'scr', 'vbs', 'js', 'jar', 'php', 'asp', 'aspx', 'jsp', 'py', 'rb', 'pl', 'sh', 'ps1', 'psm1', 'psd1', 'ps1xml', 'psc1', 'psc2'}, max_file_size: 10485760, max_file_size_mb: 10}, failed_logins_today: int, security_incidents: array<never, never>}
      */
@@ -228,7 +228,7 @@ final class DashboardController extends Controller
     private function getSystemStatistics(): array
     {
         return [
-            'php_version' => PHP_VERSION,
+            'php_version' => \PHP_VERSION,
             'laravel_version' => app()->version(),
             'memory_usage' => memory_get_usage(true),
             'memory_peak' => memory_get_peak_usage(true),
@@ -292,8 +292,8 @@ final class DashboardController extends Controller
     {
         return [
             'failed_logins' => $this->getFailedLoginsToday(),
-            'blocked_ips' => count($this->loginAttemptService->getBlockedIps()),
-            'banned_users' => count($this->userBanService->getBannedUsers()),
+            'blocked_ips' => \count($this->loginAttemptService->getBlockedIps()),
+            'banned_users' => \count($this->userBanService->getBannedUsers()),
             'security_incidents' => $this->getSecurityIncidents(),
         ];
     }
@@ -323,7 +323,7 @@ final class DashboardController extends Controller
         $total = disk_total_space('/');
         $free = disk_free_space('/');
 
-        if ($total === false || $free === false) {
+        if (false === $total || false === $free) {
             return [
                 'total' => 0,
                 'used' => 0,
@@ -355,17 +355,17 @@ final class DashboardController extends Controller
     {
         try {
             $this->cache->put('test_key', 'test_value', 1);
-            $status = $this->cache->get('test_key') === 'test_value';
+            $status = 'test_value' === $this->cache->get('test_key');
             $this->cache->forget('test_key');
 
             return [
                 'status' => $status ? 'working' : 'error',
-                'driver' => is_string(config('cache.default')) ? config('cache.default') : 'unknown',
+                'driver' => \is_string(config('cache.default')) ? config('cache.default') : 'unknown',
             ];
         } catch (\Exception $e) {
             return [
                 'status' => 'error',
-                'driver' => is_string(config('cache.default')) ? config('cache.default') : 'unknown',
+                'driver' => \is_string(config('cache.default')) ? config('cache.default') : 'unknown',
                 'error' => $e->getMessage(),
             ];
         }
@@ -422,7 +422,7 @@ final class DashboardController extends Controller
                 $result = $this->cache->get('health_check');
                 $this->cache->forget('health_check');
 
-                return $result === 'ok';
+                return 'ok' === $result;
             },
             'Cache test completed'
         );
@@ -442,7 +442,7 @@ final class DashboardController extends Controller
                 $result = $this->storage->get($testFile);
                 $this->storage->delete($testFile);
 
-                return is_string($result) && $result === 'test';
+                return \is_string($result) && 'test' === $result;
             },
             'Storage test completed'
         );
@@ -456,8 +456,8 @@ final class DashboardController extends Controller
     private function checkMemoryHealth(): array
     {
         $memoryUsage = memory_get_usage(true);
-        $memoryLimit = ini_get('memory_limit');
-        $memoryLimitString = is_string($memoryLimit) ? $memoryLimit : '128M';
+        $memoryLimit = \ini_get('memory_limit');
+        $memoryLimitString = \is_string($memoryLimit) ? $memoryLimit : '128M';
         $memoryLimitBytes = $this->convertToBytes($memoryLimitString);
         $percentage = $memoryUsage / $memoryLimitBytes * 100;
         $criticalThreshold = (float) config('coprra.storage.thresholds.critical', 90);
@@ -477,7 +477,7 @@ final class DashboardController extends Controller
     {
         // This would require chart data generation
         $data = [];
-        for ($i = 6; $i >= 0; $i--) {
+        for ($i = 6; $i >= 0; --$i) {
             $date = now()->subDays($i);
             $data[] = [
                 'date' => $date->format('Y-m-d'),

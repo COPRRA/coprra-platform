@@ -17,14 +17,14 @@ class OrderItemFactory extends Factory
     /**
      * The name of the factory's corresponding model.
      *
-     * @var class-string<\App\Models\OrderItem>
+     * @var class-string<OrderItem>
      */
     protected $model = OrderItem::class;
 
     /**
      * Define the model's default state.
      *
-     * @return (Factory|ProductFactory|float|int)[]
+     * @return (Factory|float|int|ProductFactory)[]
      *
      * @psalm-return array{order_id: Factory, product_id: ProductFactory, quantity: int, unit_price: float, total_price: float}
      */

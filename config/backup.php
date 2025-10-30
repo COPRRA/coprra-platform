@@ -1,6 +1,9 @@
 <?php
 
 declare(strict_types=1);
+use Spatie\Backup\Tasks\Cleanup\Strategies\DefaultStrategy;
+use Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumAgeInDays;
+use Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumStorageInMegabytes;
 
 return [
     // Toggle backups via config instead of runtime env() checks
@@ -35,13 +38,13 @@ return [
             'name' => env('APP_NAME', 'Laravel'),
             'disks' => ['local'],
             'health_checks' => [
-                \Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumAgeInDays::class => 1,
-                \Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumStorageInMegabytes::class => 5000,
+                MaximumAgeInDays::class => 1,
+                MaximumStorageInMegabytes::class => 5000,
             ],
         ],
     ],
     'cleanup' => [
-        'strategy' => \Spatie\Backup\Tasks\Cleanup\Strategies\DefaultStrategy::class,
+        'strategy' => DefaultStrategy::class,
         'defaultStrategy' => [
             'keepAllBackupsForDays' => 7,
             'keepDailyBackupsForDays' => 16,

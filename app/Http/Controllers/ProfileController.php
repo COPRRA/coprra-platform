@@ -10,25 +10,10 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class ProfileController extends Controller
 {
-    /**
-     * Show the profile edit page.
-     */
-    public function edit(): \Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse
-    {
-        $user = Auth::user();
-
-        if (! $user) {
-            return redirect()->route('login');
-        }
-
-        return view('user.profile', [
-            'user' => $user,
-        ]);
-    }
-
     /**
      * Update the user profile.
      */
@@ -46,7 +31,7 @@ class ProfileController extends Controller
 
         try {
             $this->validateRequest($request, $user);
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'The given data was invalid.',
                 'errors' => $e->errors(),
@@ -56,7 +41,7 @@ class ProfileController extends Controller
 
         if ($request->filled('new_password')) {
             $passwordUpdateResult = $this->updatePassword($request, $user);
-            if ($passwordUpdateResult instanceof \Illuminate\Http\RedirectResponse) {
+            if ($passwordUpdateResult instanceof RedirectResponse) {
                 // Convert redirect with errors to JSON format
                 return response()->json([
                     'success' => false,
@@ -70,54 +55,6 @@ class ProfileController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Profile updated successfully.',
-        ]);
-    }
-
-    /**
-     * Change the user's password.
-     */
-    public function changePassword(Request $request): JsonResponse
-    {
-        /** @var User|null $user */
-        $user = Auth::user();
-
-        if (! $user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'User not authenticated.',
-            ], 401);
-        }
-
-        try {
-            $request->validate([
-                'current_password' => 'required',
-                'password' => 'required|string|min:8|confirmed',
-            ]);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'message' => 'The given data was invalid.',
-                'errors' => $e->errors(),
-            ], 422);
-        }
-
-        $currentPassword = $request->input('current_password');
-        $newPassword = $request->input('password');
-
-        if (! is_string($currentPassword) || ! Hash::check($currentPassword, $user->password)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'The current password is incorrect.',
-            ], 422);
-        }
-
-        if (is_string($newPassword)) {
-            $user->password = Hash::make($newPassword);
-            $user->save();
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Password changed successfully.',
         ]);
     }
 
@@ -140,12 +77,12 @@ class ProfileController extends Controller
     private function updateProfileData(Request $request, User $user): void
     {
         $name = $request->input('name');
-        if (is_string($name)) {
+        if (\is_string($name)) {
             $user->name = $name;
         }
 
         $email = $request->input('email');
-        if (is_string($email)) {
+        if (\is_string($email)) {
             $user->email = $email;
         }
     }
@@ -158,11 +95,11 @@ class ProfileController extends Controller
         $currentPassword = $request->input('current_password');
         $newPassword = $request->input('new_password');
 
-        if (! is_string($currentPassword) || ! Hash::check($currentPassword, $user->password)) {
+        if (! \is_string($currentPassword) || ! Hash::check($currentPassword, $user->password)) {
             return back()->withErrors(['current_password' => 'The current password is incorrect.']);
         }
 
-        if (is_string($newPassword)) {
+        if (\is_string($newPassword)) {
             $user->password = Hash::make($newPassword);
         }
 

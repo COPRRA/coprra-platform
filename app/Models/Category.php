@@ -5,30 +5,30 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Database\Factories\CategoryFactory;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 
 /**
- * @property int $id
- * @property string $name
- * @property string $slug
+ * @property int         $id
+ * @property string      $name
+ * @property string      $slug
  * @property string|null $description
- * @property int|null $parent_id
- * @property int $level
- * @property bool $is_active
- * @property \Carbon\Carbon|null $created_at
- * @property \Carbon\Carbon|null $updated_at
- * @property \Carbon\Carbon|null $deleted_at
- * @property Category|null $parent
- * @property \Illuminate\Database\Eloquent\Collection<int, Category> $childfinal ren
- * @property \Illuminate\Database\Eloquent\Collection<int, Product> $products
+ * @property int|null    $parent_id
+ * @property int         $level
+ * @property bool        $is_active
+ ** @property Carbon|nullCarbon|null $created_at
+ ** @property Carbon|nullCarbon|null $updated_at
+ ** @property Carbon|nullCarbon|null $deleted_at
+ * @property Category|null             $parent
+ * @property Collection<int, Category> $childfinal ren
+ **  @property Collection<int, Product> $products
  *
- * @method static \App\Models\Category create(array<string, string|int|bool|null> $attributes = [])
- * @method static CategoryFactory factory(...$parameters)
+ * @method static \App\Models\Category create(array<string, string|int|bool|* @method static \App\Models\Brand create(array<string, string|bool|null> $attributes = [])
+ * @method static CategoryFactory      factory(...$parameters)
  *
  * @phpstan-type TFactory \Database\Factories\CategoryFactory
  *
@@ -42,9 +42,9 @@ class Category extends ValidatableModel
     use SoftDeletes;
 
     /**
-     * @var class-string<\Illuminate\Database\Eloquent\Factories\Factory<Category>>
+     * @var class-string<Factory<Category>>
      */
-    protected static $factory = \Database\Factories\CategoryFactory::class;
+    protected static $factory = CategoryFactory::class;
 
     // Use $errors from ValidatableModel (MessageBag). Do not redeclare here.
 
@@ -82,84 +82,63 @@ class Category extends ValidatableModel
         'is_active' => 'boolean',
     ];
 
+    // --- Relationships ---
+
     /**
-     * Parent relationship.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<Category, Category>
+     * Get the parent category.
      */
-    public function parent(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function parent()
     {
         return $this->belongsTo(self::class, 'parent_id');
     }
 
     /**
-     * Products relationship.
-     *
-     * @return HasMany<Product, Category>
+     * Get the child categories.
      */
-    public function products(): HasMany
+    public function children()
     {
-        return $this->hasMany(Product::class, 'category_id');
+        return $this->hasMany(self::class, 'parent_id');
     }
 
     /**
-     * Children relationship.
-     *
-     * @return HasMany<Category, Category>
+     * Get the products for the category.
      */
-    public function children(): HasMany
+    public function products()
     {
-        return $this->hasMany(self::class, 'parent_id');
+        return $this->hasMany(Product::class);
     }
 
     // --- Scopes ---
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Builder<Category>  $query
-     * @return \Illuminate\Database\Eloquent\Builder<Category>
-     */
-    public function scopeActive(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
-    {
-        return $query->withTrashed()->where('is_active', true);
-    }
-
-    /**
-     * @param  \Illuminate\Database\Eloquent\Builder<Category>  $query
-     * @return \Illuminate\Database\Eloquent\Builder<Category>
-     */
-    public function scopeSearch(\Illuminate\Database\Eloquent\Builder $query, string $searchTerm): \Illuminate\Database\Eloquent\Builder
-    {
-        return $query->withTrashed()->where('name', 'like', "%{$searchTerm}%");
-    }
-
-    /**
-     * Validate the category instance against its rules.
-     */
-    #[\Override]
-    public function validate(): bool
-    {
-        $validator = Validator::make($this->getAttributes(), $this->rules);
-
-        if ($validator->fails()) {
-            $this->errors = $validator->errors();
-
-            return false;
-        }
-
-        $this->errors = new MessageBag;
-
-        return true;
-    }
-
-    /**
-     * Get validation errors.
+     * Scope a query to only include active categories.
      *
-     * @return array<string, array<int, string>>
+     * @param mixed $query
      */
-    #[\Override]
-    public function getErrors(): array
+    public function scopeActive($query)
     {
-        return $this->errors instanceof \Illuminate\Support\MessageBag ? $this->errors->toArray() : [];
+        return $query->where('is_active', true);
+    }
+
+    /**
+     * Scope a query to search categories by name.
+     *
+     * @param mixed $query
+     * @param mixed $term
+     */
+    public function scopeSearch($query, $term)
+    {
+        return $query->where('name', 'like', '%'.$term.'%');
+    }
+
+    // --- Methods ---
+
+    /**
+     * Get the validation rules for the model.
+     */
+    public function getRules()
+    {
+        return $this->rules;
     }
 
     /**
@@ -187,7 +166,7 @@ class Category extends ValidatableModel
     {
         $this->generateSlug();
         // Respect explicitly provided level when no parent is set
-        if ($this->parent_id !== null || $this->level === null) {
+        if (null !== $this->parent_id || null === $this->level) {
             $this->calculateLevel();
         }
 
@@ -209,7 +188,7 @@ class Category extends ValidatableModel
 
     private function generateSlug(): void
     {
-        if (($this->slug === null) || ($this->slug === '')) {
+        if ((null === $this->slug) || ('' === $this->slug)) {
             $this->slug = \Str::slug($this->name);
         }
     }
@@ -217,7 +196,7 @@ class Category extends ValidatableModel
     private function calculateLevel(): void
     {
         // Recalculate level based on parent when applicable
-        if ($this->parent_id !== null) {
+        if (null !== $this->parent_id) {
             $this->load('parent');
             $parent = $this->parent;
             $this->level = $parent ? $parent->level + 1 : 0;
@@ -226,7 +205,7 @@ class Category extends ValidatableModel
         }
 
         // No parent: set default only if not explicitly provided
-        if ($this->level === null) {
+        if (null === $this->level) {
             $this->level = 0;
         }
     }

@@ -54,7 +54,7 @@ class BackupListService
     /**
      * Calculate backup statistics.
      *
-     * @return array<int|string|null>
+     * @return array<int|string|* @method static \App\Models\Brand create(array<string, string|bool|null>
      *
      * @psalm-return array{total_backups: int<0, max>, total_size: int, total_size_formatted: string, oldest_backup: null, newest_backup: null}
      */
@@ -64,7 +64,7 @@ class BackupListService
         $totalSize = $this->calculateTotalSize($backups);
 
         return [
-            'total_backups' => count($backups),
+            'total_backups' => \count($backups),
             'total_size' => $totalSize,
             'total_size_formatted' => $this->formatBytes($totalSize),
             'oldest_backup' => null,
@@ -106,13 +106,14 @@ class BackupListService
     {
         $files = scandir($this->backupPath);
 
-        return $files === false ? [] : $files;
+        return false === $files ? [] : $files;
     }
 
     /**
      * Process backup files and create metadata.
      *
-     * @param  array<int, string>  $files
+     * @param array<int, string> $files
+     *
      * @return list<array<string, int|string>>
      */
     private function processBackupFiles(array $files): array
@@ -125,7 +126,8 @@ class BackupListService
     /**
      * Extract valid backup files and create metadata.
      *
-     * @param  array<int, string>  $files
+     * @param array<int, string> $files
+     *
      * @return list<array<string, int|string>>
      */
     private function extractValidBackups(array $files): array
@@ -133,7 +135,7 @@ class BackupListService
         $backups = [];
         foreach ($files as $file) {
             $backupData = $this->processSingleBackupFile($file);
-            if ($backupData !== null) {
+            if (null !== $backupData) {
                 $backups[] = $backupData;
             }
         }
@@ -162,7 +164,7 @@ class BackupListService
      */
     private function isValidBackupFile(string $file): bool
     {
-        return $file !== '.' && $file !== '..' && is_file($this->backupPath.'/'.$file);
+        return '.' !== $file && '..' !== $file && is_file($this->backupPath.'/'.$file);
     }
 
     /**
@@ -178,12 +180,12 @@ class BackupListService
         $fileSize = filesize($filePath);
         $fileTime = filemtime($filePath);
 
-        if ($fileSize === false || $fileTime === false) {
+        if (false === $fileSize || false === $fileTime) {
             return null;
         }
 
         return [
-            'id' => pathinfo($file, PATHINFO_FILENAME),
+            'id' => pathinfo($file, \PATHINFO_FILENAME),
             'filename' => $file,
             'size' => $fileSize,
             'size_formatted' => $this->formatBytes($fileSize),
@@ -195,7 +197,8 @@ class BackupListService
     /**
      * Sort backups by creation date (newest first).
      *
-     * @param  list<array<string, int|string>>  $backups
+     * @param list<array<string, int|string>> $backups
+     *
      * @return list<array<string, int|string>>
      */
     private function sortBackupsByDate(array $backups): array
@@ -208,7 +211,7 @@ class BackupListService
     /**
      * Calculate total size of all backups.
      *
-     * @param  list<array<string, int|string>>  $backups
+     * @param list<array<string, int|string>> $backups
      *
      * @psalm-return int<min, max>
      */
@@ -251,7 +254,7 @@ class BackupListService
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
         $bytes = max($bytes, 0);
         $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
-        $pow = min($pow, count($units) - 1);
+        $pow = min($pow, \count($units) - 1);
         $bytes /= 1024 ** $pow;
 
         return round($bytes, 2).' '.$units[$pow];

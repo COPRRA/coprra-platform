@@ -16,7 +16,7 @@ class StoreFactory extends Factory
     protected $model = Store::class;
 
     /**
-     * @return (CurrencyFactory|bool|int|mixed|string|string[])[]
+     * @return (bool|CurrencyFactory|int|mixed|string|string[])[]
      *
      * @psalm-return array{name: string, slug: string, description: string, logo_url: string, website_url: string, country_code: string, supported_countries: list<'AU'|'CA'|'DE'|'ES'|'FR'|'IT'|'UK'|'US'>, is_active: bool, priority: int, affiliate_base_url: string, affiliate_code: string, api_config: mixed, currency_id: CurrencyFactory}
      */
@@ -30,7 +30,7 @@ class StoreFactory extends Factory
             'logo_url' => $this->faker->imageUrl(200, 200),
             'website_url' => $this->faker->url(),
             'country_code' => ['EG', 'US', 'UK', 'DE', 'FR'][array_rand(['EG', 'US', 'UK', 'DE', 'FR'])],
-            'supported_countries' => array_slice(['US', 'CA', 'UK', 'DE', 'FR', 'IT', 'ES', 'AU'], 0, 3),
+            'supported_countries' => \array_slice(['US', 'CA', 'UK', 'DE', 'FR', 'IT', 'ES', 'AU'], 0, 3),
             'is_active' => $this->faker->boolean(80),
             'priority' => $this->faker->numberBetween(0, 100),
             'affiliate_base_url' => $this->faker->optional()->url,

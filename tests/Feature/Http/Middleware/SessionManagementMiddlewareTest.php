@@ -4,39 +4,46 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Middleware;
 
+use App\Http\Middleware\SessionManagementMiddleware;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Request;
+use Illuminate\Session\FileSessionHandler;
 use Illuminate\Session\Store;
 use Tests\TestCase;
 
 /**
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class SessionManagementMiddlewareTest extends TestCase
+final class SessionManagementMiddlewareTest extends TestCase
 {
-    public function test_session_management_middleware_manages_session(): void
+    public function testSessionManagementMiddlewareManagesSession(): void
     {
         $request = Request::create('/test', 'GET');
-        $sessionHandler = new \Illuminate\Session\FileSessionHandler(
-            new \Illuminate\Filesystem\Filesystem,
+        $sessionHandler = new FileSessionHandler(
+            new Filesystem(),
             storage_path('framework/sessions'),
             120
         );
         $request->setLaravelSession($session = new Store('test', $sessionHandler));
 
-        $middleware = $this->app->make(\App\Http\Middleware\SessionManagementMiddleware::class);
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = $this->app->make(SessionManagementMiddleware::class);
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('OK', $response->getContent());
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('OK', $response->getContent());
     }
 
-    public function test_session_management_middleware_handles_session_data(): void
+    public function testSessionManagementMiddlewareHandlesSessionData(): void
     {
         $request = Request::create('/test', 'GET');
-        $sessionHandler = new \Illuminate\Session\FileSessionHandler(
-            new \Illuminate\Filesystem\Filesystem,
+        $sessionHandler = new FileSessionHandler(
+            new Filesystem(),
             storage_path('framework/sessions'),
             120
         );
@@ -44,73 +51,73 @@ class SessionManagementMiddlewareTest extends TestCase
         $session->put('user_id', 123);
         $session->put('last_activity', now());
 
-        $middleware = $this->app->make(\App\Http\Middleware\SessionManagementMiddleware::class);
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = $this->app->make(SessionManagementMiddleware::class);
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('OK', $response->getContent());
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('OK', $response->getContent());
     }
 
-    public function test_session_management_middleware_handles_post_requests(): void
+    public function testSessionManagementMiddlewareHandlesPostRequests(): void
     {
         $request = Request::create('/test', 'POST', [
             'name' => 'John Doe',
         ]);
-        $sessionHandler = new \Illuminate\Session\FileSessionHandler(
-            new \Illuminate\Filesystem\Filesystem,
+        $sessionHandler = new FileSessionHandler(
+            new Filesystem(),
             storage_path('framework/sessions'),
             120
         );
         $request->setLaravelSession($session = new Store('test', $sessionHandler));
 
-        $middleware = $this->app->make(\App\Http\Middleware\SessionManagementMiddleware::class);
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = $this->app->make(SessionManagementMiddleware::class);
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('OK', $response->getContent());
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('OK', $response->getContent());
     }
 
-    public function test_session_management_middleware_handles_api_requests(): void
+    public function testSessionManagementMiddlewareHandlesApiRequests(): void
     {
         $request = Request::create('/api/test', 'GET');
         $request->headers->set('Accept', 'application/json');
-        $sessionHandler = new \Illuminate\Session\FileSessionHandler(
-            new \Illuminate\Filesystem\Filesystem,
+        $sessionHandler = new FileSessionHandler(
+            new Filesystem(),
             storage_path('framework/sessions'),
             120
         );
         $request->setLaravelSession($session = new Store('test', $sessionHandler));
 
-        $middleware = $this->app->make(\App\Http\Middleware\SessionManagementMiddleware::class);
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = $this->app->make(SessionManagementMiddleware::class);
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('OK', $response->getContent());
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('OK', $response->getContent());
     }
 
-    public function test_session_management_middleware_handles_session_timeout(): void
+    public function testSessionManagementMiddlewareHandlesSessionTimeout(): void
     {
         $request = Request::create('/test', 'GET');
-        $sessionHandler = new \Illuminate\Session\FileSessionHandler(
-            new \Illuminate\Filesystem\Filesystem,
+        $sessionHandler = new FileSessionHandler(
+            new Filesystem(),
             storage_path('framework/sessions'),
             120
         );
         $request->setLaravelSession($session = new Store('test', $sessionHandler));
         $session->put('last_activity', now()->subHours(2));
 
-        $middleware = new \App\Http\Middleware\SessionManagementMiddleware;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new SessionManagementMiddleware();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('OK', $response->getContent());
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('OK', $response->getContent());
     }
 }

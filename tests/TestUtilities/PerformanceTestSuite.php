@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\TestUtilities;
 
+use App\Services\AIService;
+use App\Services\CacheService;
+use App\Services\FinancialTransactionService;
+use App\Services\PasswordPolicyService;
+use App\Services\ProductService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -62,41 +67,62 @@ class PerformanceTestSuite
     }
 
     /**
+     * Generate performance report.
+     */
+    public function generatePerformanceReport(): array
+    {
+        $results = $this->runComprehensivePerformanceTests();
+
+        return [
+            'summary' => [
+                'total_services_tested' => \count($results['services']),
+                'average_service_performance' => $this->calculateAverageServicePerformance($results['services']),
+                'database_performance_score' => $this->calculateDatabasePerformanceScore($results['database']),
+                'api_performance_score' => $this->calculateApiPerformanceScore($results['api_endpoints']),
+                'memory_efficiency_score' => $this->calculateMemoryEfficiencyScore($results['memory_usage']),
+                'concurrent_user_capacity' => $this->calculateConcurrentUserCapacity($results['concurrent_users']),
+            ],
+            'detailed_results' => $results,
+            'recommendations' => $this->generatePerformanceRecommendations($results),
+        ];
+    }
+
+    /**
      * Test performance of all services.
      */
     private function testAllServicesPerformance(): array
     {
         $services = [
-            'AIService' => function () {
+            'AIService' => static function () {
                 Http::fake(['api.openai.com/*' => Http::response(['choices' => [['message' => ['content' => 'test']]]], 200)]);
-                $service = new \App\Services\AIService;
+                $service = new AIService();
 
                 return $service->analyzeText('Test text', 'sentiment');
             },
-            'CacheService' => function () {
+            'CacheService' => static function () {
                 Cache::shouldReceive('get')->andReturn(null);
                 Cache::shouldReceive('put')->andReturn(true);
-                $service = new \App\Services\CacheService;
+                $service = new CacheService();
 
-                return $service->remember('test_key', fn () => 'test_data', 3600);
+                return $service->remember('test_key', static fn () => 'test_data', 3600);
             },
-            'ProductService' => function () {
+            'ProductService' => static function () {
                 Cache::shouldReceive('get')->andReturn(null);
                 Cache::shouldReceive('put')->andReturn(true);
-                $service = new \App\Services\ProductService;
+                $service = new ProductService();
 
                 return $service->getPaginatedProducts(1, 15);
             },
-            'PasswordPolicyService' => function () {
-                $service = new \App\Services\PasswordPolicyService;
+            'PasswordPolicyService' => static function () {
+                $service = new PasswordPolicyService();
 
                 return $service->validatePassword('StrongPass123!');
             },
-            'FinancialTransactionService' => function () {
+            'FinancialTransactionService' => static function () {
                 DB::shouldReceive('beginTransaction')->andReturn(true);
                 DB::shouldReceive('commit')->andReturn(true);
                 Log::shouldReceive('info')->andReturn(true);
-                $service = new \App\Services\FinancialTransactionService;
+                $service = new FinancialTransactionService();
 
                 return $service->processPayment(['amount' => 100, 'currency' => 'USD', 'payment_method' => 'card', 'user_id' => 1]);
             },
@@ -119,7 +145,7 @@ class PerformanceTestSuite
         $executionTimes = [];
         $memoryUsages = [];
 
-        for ($i = 0; $i < $iterations; $i++) {
+        for ($i = 0; $i < $iterations; ++$i) {
             $startTime = microtime(true);
             $startMemory = memory_get_usage();
 
@@ -137,10 +163,10 @@ class PerformanceTestSuite
         }
 
         return [
-            'average_execution_time' => array_sum($executionTimes) / count($executionTimes),
+            'average_execution_time' => array_sum($executionTimes) / \count($executionTimes),
             'min_execution_time' => min($executionTimes),
             'max_execution_time' => max($executionTimes),
-            'average_memory_usage' => array_sum($memoryUsages) / count($memoryUsages),
+            'average_memory_usage' => array_sum($memoryUsages) / \count($memoryUsages),
             'max_memory_usage' => max($memoryUsages),
             'iterations' => $iterations,
             'success_rate' => $this->calculateSuccessRate($executionTimes),
@@ -196,7 +222,7 @@ class PerformanceTestSuite
             $iterations = 50;
             $executionTimes = [];
 
-            for ($i = 0; $i < $iterations; $i++) {
+            for ($i = 0; $i < $iterations; ++$i) {
                 $startTime = microtime(true);
 
                 try {
@@ -211,7 +237,7 @@ class PerformanceTestSuite
 
             $results[] = [
                 'query' => substr($query, 0, 100).'...',
-                'average_time' => array_sum($executionTimes) / count($executionTimes),
+                'average_time' => array_sum($executionTimes) / \count($executionTimes),
                 'min_time' => min($executionTimes),
                 'max_time' => max($executionTimes),
                 'iterations' => $iterations,
@@ -229,7 +255,7 @@ class PerformanceTestSuite
         $iterations = 100;
         $executionTimes = [];
 
-        for ($i = 0; $i < $iterations; $i++) {
+        for ($i = 0; $i < $iterations; ++$i) {
             $startTime = microtime(true);
 
             try {
@@ -248,7 +274,7 @@ class PerformanceTestSuite
         }
 
         return [
-            'average_time' => array_sum($executionTimes) / count($executionTimes),
+            'average_time' => array_sum($executionTimes) / \count($executionTimes),
             'min_time' => min($executionTimes),
             'max_time' => max($executionTimes),
             'iterations' => $iterations,
@@ -263,13 +289,14 @@ class PerformanceTestSuite
         $iterations = 100;
         $executionTimes = [];
 
-        for ($i = 0; $i < $iterations; $i++) {
+        for ($i = 0; $i < $iterations; ++$i) {
             $startTime = microtime(true);
 
             try {
                 DB::table('test_performance')
                     ->where('id', $i + 1)
-                    ->update(['value' => $i * 20, 'updated_at' => now()]);
+                    ->update(['value' => $i * 20, 'updated_at' => now()])
+                ;
             } catch (\Exception $e) {
                 // Continue testing even if updates fail
             }
@@ -279,7 +306,7 @@ class PerformanceTestSuite
         }
 
         return [
-            'average_time' => array_sum($executionTimes) / count($executionTimes),
+            'average_time' => array_sum($executionTimes) / \count($executionTimes),
             'min_time' => min($executionTimes),
             'max_time' => max($executionTimes),
             'iterations' => $iterations,
@@ -323,7 +350,7 @@ class PerformanceTestSuite
         $executionTimes = [];
         $responseCodes = [];
 
-        for ($i = 0; $i < $iterations; $i++) {
+        for ($i = 0; $i < $iterations; ++$i) {
             $startTime = microtime(true);
 
             try {
@@ -338,10 +365,10 @@ class PerformanceTestSuite
         }
 
         return [
-            'average_response_time' => array_sum($executionTimes) / count($executionTimes),
+            'average_response_time' => array_sum($executionTimes) / \count($executionTimes),
             'min_response_time' => min($executionTimes),
             'max_response_time' => max($executionTimes),
-            'success_rate' => count(array_filter($responseCodes, fn ($code) => $code < 400)) / count($responseCodes) * 100,
+            'success_rate' => \count(array_filter($responseCodes, static fn ($code) => $code < 400)) / \count($responseCodes) * 100,
             'iterations' => $iterations,
         ];
     }
@@ -352,25 +379,25 @@ class PerformanceTestSuite
     private function testMemoryUsage(): array
     {
         $memoryTests = [
-            'large_array_creation' => function () {
+            'large_array_creation' => static function () {
                 $array = [];
-                for ($i = 0; $i < 10000; $i++) {
+                for ($i = 0; $i < 10000; ++$i) {
                     $array[] = str_repeat('test', 100);
                 }
 
                 return $array;
             },
-            'object_instantiation' => function () {
+            'object_instantiation' => static function () {
                 $objects = [];
-                for ($i = 0; $i < 1000; $i++) {
-                    $objects[] = new \stdClass;
+                for ($i = 0; $i < 1000; ++$i) {
+                    $objects[] = new \stdClass();
                 }
 
                 return $objects;
             },
-            'string_manipulation' => function () {
+            'string_manipulation' => static function () {
                 $string = '';
-                for ($i = 0; $i < 1000; $i++) {
+                for ($i = 0; $i < 1000; ++$i) {
                     $string .= 'test_string_'.$i;
                 }
 
@@ -426,7 +453,7 @@ class PerformanceTestSuite
         $responses = [];
 
         // Simulate concurrent requests
-        for ($i = 0; $i < $userCount; $i++) {
+        for ($i = 0; $i < $userCount; ++$i) {
             $requestStart = microtime(true);
 
             try {
@@ -450,8 +477,8 @@ class PerformanceTestSuite
 
         return [
             'total_time' => $totalTime,
-            'average_response_time' => array_sum(array_column($responses, 'response_time')) / count($responses),
-            'success_rate' => count(array_filter($responses, fn ($r) => $r['status'] < 400)) / count($responses) * 100,
+            'average_response_time' => array_sum(array_column($responses, 'response_time')) / \count($responses),
+            'success_rate' => \count(array_filter($responses, static fn ($r) => $r['status'] < 400)) / \count($responses) * 100,
             'requests_per_second' => $userCount / ($totalTime / 1000),
             'responses' => $responses,
         ];
@@ -462,9 +489,9 @@ class PerformanceTestSuite
      */
     private function calculateSuccessRate(array $executionTimes): float
     {
-        $successfulCalls = count(array_filter($executionTimes, fn ($time) => $time < 5000)); // Less than 5 seconds
+        $successfulCalls = \count(array_filter($executionTimes, static fn ($time) => $time < 5000)); // Less than 5 seconds
 
-        return ($successfulCalls / count($executionTimes)) * 100;
+        return ($successfulCalls / \count($executionTimes)) * 100;
     }
 
     /**
@@ -479,33 +506,12 @@ class PerformanceTestSuite
     }
 
     /**
-     * Generate performance report.
-     */
-    public function generatePerformanceReport(): array
-    {
-        $results = $this->runComprehensivePerformanceTests();
-
-        return [
-            'summary' => [
-                'total_services_tested' => count($results['services']),
-                'average_service_performance' => $this->calculateAverageServicePerformance($results['services']),
-                'database_performance_score' => $this->calculateDatabasePerformanceScore($results['database']),
-                'api_performance_score' => $this->calculateApiPerformanceScore($results['api_endpoints']),
-                'memory_efficiency_score' => $this->calculateMemoryEfficiencyScore($results['memory_usage']),
-                'concurrent_user_capacity' => $this->calculateConcurrentUserCapacity($results['concurrent_users']),
-            ],
-            'detailed_results' => $results,
-            'recommendations' => $this->generatePerformanceRecommendations($results),
-        ];
-    }
-
-    /**
      * Calculate average service performance.
      */
     private function calculateAverageServicePerformance(array $services): float
     {
         $totalScore = 0;
-        $serviceCount = count($services);
+        $serviceCount = \count($services);
 
         foreach ($services as $service) {
             $score = 100 - ($service['average_execution_time'] / 100); // Penalize slow services
@@ -523,7 +529,7 @@ class PerformanceTestSuite
         $scores = [];
 
         foreach ($databaseResults as $testType => $results) {
-            if (is_array($results) && isset($results[0]['average_time'])) {
+            if (\is_array($results) && isset($results[0]['average_time'])) {
                 foreach ($results as $result) {
                     $score = 100 - ($result['average_time'] / 10); // Penalize slow queries
                     $scores[] = max(0, min(100, $score));
@@ -534,7 +540,7 @@ class PerformanceTestSuite
             }
         }
 
-        return count($scores) > 0 ? array_sum($scores) / count($scores) : 0;
+        return \count($scores) > 0 ? array_sum($scores) / \count($scores) : 0;
     }
 
     /**
@@ -551,7 +557,7 @@ class PerformanceTestSuite
             $scores[] = max(0, min(100, $score));
         }
 
-        return count($scores) > 0 ? array_sum($scores) / count($scores) : 0;
+        return \count($scores) > 0 ? array_sum($scores) / \count($scores) : 0;
     }
 
     /**
@@ -565,7 +571,7 @@ class PerformanceTestSuite
             $scores[] = $result['memory_efficiency'];
         }
 
-        return count($scores) > 0 ? array_sum($scores) / count($scores) : 0;
+        return \count($scores) > 0 ? array_sum($scores) / \count($scores) : 0;
     }
 
     /**

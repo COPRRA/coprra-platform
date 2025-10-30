@@ -4,76 +4,82 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Middleware;
 
+use App\Http\Middleware\SetCacheHeaders;
 use Illuminate\Http\Request;
 use Tests\TestCase;
 
-class SetCacheHeadersTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class SetCacheHeadersTest extends TestCase
 {
-    public function test_set_cache_headers_middleware_adds_cache_headers(): void
+    public function testSetCacheHeadersMiddlewareAddsCacheHeaders(): void
     {
         $request = Request::create('/test', 'GET');
 
-        $middleware = new \App\Http\Middleware\SetCacheHeaders;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new SetCacheHeaders();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertTrue($response->headers->has('Cache-Control'));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertTrue($response->headers->has('Cache-Control'));
     }
 
-    public function test_set_cache_headers_middleware_passes_request_successfully(): void
+    public function testSetCacheHeadersMiddlewarePassesRequestSuccessfully(): void
     {
         $request = Request::create('/test', 'GET');
 
-        $middleware = new \App\Http\Middleware\SetCacheHeaders;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new SetCacheHeaders();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('OK', $response->getContent());
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('OK', $response->getContent());
     }
 
-    public function test_set_cache_headers_middleware_handles_different_response_codes(): void
+    public function testSetCacheHeadersMiddlewareHandlesDifferentResponseCodes(): void
     {
         $request = Request::create('/test', 'GET');
 
-        $middleware = new \App\Http\Middleware\SetCacheHeaders;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new SetCacheHeaders();
+        $response = $middleware->handle($request, static function ($req) {
             return response('Not Found', 404);
         });
 
-        $this->assertEquals(404, $response->getStatusCode());
-        $this->assertTrue($response->headers->has('Cache-Control'));
+        self::assertSame(404, $response->getStatusCode());
+        self::assertTrue($response->headers->has('Cache-Control'));
     }
 
-    public function test_set_cache_headers_middleware_handles_post_requests(): void
+    public function testSetCacheHeadersMiddlewareHandlesPostRequests(): void
     {
         $request = Request::create('/test', 'POST', [
             'name' => 'John Doe',
         ]);
 
-        $middleware = new \App\Http\Middleware\SetCacheHeaders;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new SetCacheHeaders();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertTrue($response->headers->has('Cache-Control'));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertTrue($response->headers->has('Cache-Control'));
     }
 
-    public function test_set_cache_headers_middleware_handles_api_requests(): void
+    public function testSetCacheHeadersMiddlewareHandlesApiRequests(): void
     {
         $request = Request::create('/api/test', 'GET');
         $request->headers->set('Accept', 'application/json');
 
-        $middleware = new \App\Http\Middleware\SetCacheHeaders;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new SetCacheHeaders();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertTrue($response->headers->has('Cache-Control'));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertTrue($response->headers->has('Cache-Control'));
     }
 }

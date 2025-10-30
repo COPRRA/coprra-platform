@@ -4,94 +4,101 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Middleware;
 
+use App\Http\Middleware\AuthenticateSession;
 use App\Models\User;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
+use Illuminate\Session\FileSessionHandler;
 use Illuminate\Session\Store;
 use Tests\TestCase;
 
 /**
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class AuthenticateSessionTest extends TestCase
+final class AuthenticateSessionTest extends TestCase
 {
     use RefreshDatabase;
 
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function test_authenticate_session_middleware_allows_authenticated_users(): void
+    public function testAuthenticateSessionMiddlewareAllowsAuthenticatedUsers(): void
     {
         $user = User::factory()->create();
         $this->actingAs($user);
 
         $request = Request::create('/test', 'GET');
-        $sessionHandler = new \Illuminate\Session\FileSessionHandler(
-            new \Illuminate\Filesystem\Filesystem,
+        $sessionHandler = new FileSessionHandler(
+            new Filesystem(),
             storage_path('framework/sessions'),
             120
         );
         $request->setLaravelSession($session = new Store('test', $sessionHandler));
-        $request->setUserResolver(fn () => $user);
+        $request->setUserResolver(static fn () => $user);
 
-        $middleware = new \App\Http\Middleware\AuthenticateSession;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new AuthenticateSession();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('OK', $response->getContent());
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('OK', $response->getContent());
     }
 
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function test_authenticate_session_middleware_handles_unauthenticated_users(): void
+    public function testAuthenticateSessionMiddlewareHandlesUnauthenticatedUsers(): void
     {
         $request = Request::create('/test', 'GET');
-        $sessionHandler = new \Illuminate\Session\FileSessionHandler(
-            new \Illuminate\Filesystem\Filesystem,
+        $sessionHandler = new FileSessionHandler(
+            new Filesystem(),
             storage_path('framework/sessions'),
             120
         );
         $request->setLaravelSession($session = new Store('test', $sessionHandler));
 
-        $middleware = new \App\Http\Middleware\AuthenticateSession;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new AuthenticateSession();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('OK', $response->getContent());
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('OK', $response->getContent());
     }
 
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function test_authenticate_session_middleware_handles_session_data(): void
+    public function testAuthenticateSessionMiddlewareHandlesSessionData(): void
     {
         $user = User::factory()->create();
         $this->actingAs($user);
 
         $request = Request::create('/test', 'GET');
-        $sessionHandler = new \Illuminate\Session\FileSessionHandler(
-            new \Illuminate\Filesystem\Filesystem,
+        $sessionHandler = new FileSessionHandler(
+            new Filesystem(),
             storage_path('framework/sessions'),
             120
         );
         $request->setLaravelSession($session = new Store('test', $sessionHandler));
         $session->put('user_id', $user->id);
-        $request->setUserResolver(fn () => $user);
+        $request->setUserResolver(static fn () => $user);
 
-        $middleware = new \App\Http\Middleware\AuthenticateSession;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new AuthenticateSession();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('OK', $response->getContent());
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('OK', $response->getContent());
     }
 
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function test_authenticate_session_middleware_handles_post_requests(): void
+    public function testAuthenticateSessionMiddlewareHandlesPostRequests(): void
     {
         $user = User::factory()->create();
         $this->actingAs($user);
@@ -99,42 +106,42 @@ class AuthenticateSessionTest extends TestCase
         $request = Request::create('/test', 'POST', [
             'name' => 'John Doe',
         ]);
-        $sessionHandler = new \Illuminate\Session\FileSessionHandler(
-            new \Illuminate\Filesystem\Filesystem,
+        $sessionHandler = new FileSessionHandler(
+            new Filesystem(),
             storage_path('framework/sessions'),
             120
         );
         $request->setLaravelSession($session = new Store('test', $sessionHandler));
-        $request->setUserResolver(fn () => $user);
+        $request->setUserResolver(static fn () => $user);
 
-        $middleware = new \App\Http\Middleware\AuthenticateSession;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new AuthenticateSession();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('OK', $response->getContent());
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('OK', $response->getContent());
     }
 
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function test_authenticate_session_middleware_handles_api_requests(): void
+    public function testAuthenticateSessionMiddlewareHandlesApiRequests(): void
     {
         $request = Request::create('/api/test', 'GET');
         $request->headers->set('Accept', 'application/json');
-        $sessionHandler = new \Illuminate\Session\FileSessionHandler(
-            new \Illuminate\Filesystem\Filesystem,
+        $sessionHandler = new FileSessionHandler(
+            new Filesystem(),
             storage_path('framework/sessions'),
             120
         );
         $request->setLaravelSession($session = new Store('test', $sessionHandler));
 
-        $middleware = new \App\Http\Middleware\AuthenticateSession;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new AuthenticateSession();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('OK', $response->getContent());
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('OK', $response->getContent());
     }
 }

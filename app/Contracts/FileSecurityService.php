@@ -9,7 +9,7 @@ interface FileSecurityService
     /**
      * Get file security statistics.
      *
-     * @return array<string, int|float|array<int, string>>
+     * @return array<string, array<int, string>|float|int>
      */
     public function getStatistics(): array;
 }

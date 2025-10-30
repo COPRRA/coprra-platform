@@ -6,15 +6,14 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
         if (! Schema::hasColumn('stores', 'logo_url')) {
-            Schema::table('stores', function (Blueprint $table): void {
+            Schema::table('stores', static function (Blueprint $table): void {
                 $table->string('logo_url', 500)->nullable()->after('description');
             });
         }
@@ -26,7 +25,7 @@ return new class extends Migration
     public function down(): void
     {
         if (Schema::hasColumn('stores', 'logo_url')) {
-            Schema::table('stores', function (Blueprint $table): void {
+            Schema::table('stores', static function (Blueprint $table): void {
                 $table->dropColumn('logo_url');
             });
         }

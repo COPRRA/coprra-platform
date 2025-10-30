@@ -8,21 +8,19 @@ namespace App\Rules;
 
 use App\Enums\OrderStatus;
 use App\Models\Order;
-use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 
-final readonly class ValidOrderStatusTransition implements RuleValidationRule
+final readonly class ValidOrderStatusTransition implements ValidationRule
 {
     public function __construct(private Order $order) {}
 
     /**
-     * Run the validation rule.
-     *
-     * @param  \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
+     * Validate the given value.
      */
     #[\Override]
-    public function validate(string $attribute, mixed $value, Closure $fail): void
+    public function validate(string $attribute, mixed $value, \Closure $fail): void
     {
-        if (! is_string($value)) {
+        if (! \is_string($value)) {
             $fail('The :attribute must be a string.');
 
             return;
@@ -30,7 +28,7 @@ final readonly class ValidOrderStatusTransition implements RuleValidationRule
 
         // Normalize legacy alias
         $normalized = strtolower($value);
-        if ($normalized === 'completed') {
+        if ('completed' === $normalized) {
             $normalized = OrderStatus::DELIVERED->value;
         }
 

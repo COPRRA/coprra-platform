@@ -22,7 +22,7 @@ class WebhookFactory extends Factory
     /**
      * Define the model's default state.
      *
-     * @return ((bool|float|mixed)[]|mixed|null|string)[]
+     * @return ((bool|float|mixed)[]|mixed|string|null)[]
      *
      * @psalm-return array{store_identifier: mixed, event_type: mixed, product_identifier: string, product_id: null, payload: array{price: float, currency: mixed, in_stock: bool}, signature: string, status: mixed, error_message: null, processed_at: null}
      */

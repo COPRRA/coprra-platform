@@ -7,10 +7,15 @@ namespace Tests\Unit\Recommendations;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-class UpsellRecommendationTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class UpsellRecommendationTest extends TestCase
 {
     #[Test]
-    public function it_recommends_higher_tier_products(): void
+    public function itRecommendsHigherTierProducts(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -22,15 +27,15 @@ class UpsellRecommendationTest extends TestCase
 
         $recommendations = $this->getUpsellRecommendations($currentProduct);
 
-        $this->assertGreaterThan(0, count($recommendations));
-        $this->assertArrayHasKey('product_id', $recommendations[0]);
-        $this->assertArrayHasKey('name', $recommendations[0]);
-        $this->assertArrayHasKey('price', $recommendations[0]);
-        $this->assertArrayHasKey('upsell_ratio', $recommendations[0]);
+        self::assertGreaterThan(0, \count($recommendations));
+        self::assertArrayHasKey('product_id', $recommendations[0]);
+        self::assertArrayHasKey('name', $recommendations[0]);
+        self::assertArrayHasKey('price', $recommendations[0]);
+        self::assertArrayHasKey('upsell_ratio', $recommendations[0]);
     }
 
     #[Test]
-    public function it_recommends_premium_versions(): void
+    public function itRecommendsPremiumVersions(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -42,16 +47,16 @@ class UpsellRecommendationTest extends TestCase
 
         $recommendations = $this->getPremiumVersions($currentProduct);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products are premium versions
         foreach ($recommendations as $recommendation) {
-            $this->assertTrue($this->isPremiumVersion($currentProduct, $recommendation));
+            self::assertTrue($this->isPremiumVersion($currentProduct, $recommendation));
         }
     }
 
     #[Test]
-    public function it_recommends_products_with_more_features(): void
+    public function itRecommendsProductsWithMoreFeatures(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -63,16 +68,16 @@ class UpsellRecommendationTest extends TestCase
 
         $recommendations = $this->getFeatureRichProducts($currentProduct);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products have more features
         foreach ($recommendations as $recommendation) {
-            $this->assertTrue($this->hasMoreFeatures($currentProduct, $recommendation));
+            self::assertTrue($this->hasMoreFeatures($currentProduct, $recommendation));
         }
     }
 
     #[Test]
-    public function it_recommends_products_with_better_specifications(): void
+    public function itRecommendsProductsWithBetterSpecifications(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -84,16 +89,16 @@ class UpsellRecommendationTest extends TestCase
 
         $recommendations = $this->getBetterSpecProducts($currentProduct);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products have better specifications
         foreach ($recommendations as $recommendation) {
-            $this->assertTrue($this->hasBetterSpecs($currentProduct, $recommendation));
+            self::assertTrue($this->hasBetterSpecs($currentProduct, $recommendation));
         }
     }
 
     #[Test]
-    public function it_recommends_products_with_extended_warranty(): void
+    public function itRecommendsProductsWithExtendedWarranty(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -105,16 +110,16 @@ class UpsellRecommendationTest extends TestCase
 
         $recommendations = $this->getExtendedWarrantyProducts($currentProduct);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products have extended warranty
         foreach ($recommendations as $recommendation) {
-            $this->assertTrue($this->hasExtendedWarranty($currentProduct, $recommendation));
+            self::assertTrue($this->hasExtendedWarranty($currentProduct, $recommendation));
         }
     }
 
     #[Test]
-    public function it_recommends_products_with_premium_materials(): void
+    public function itRecommendsProductsWithPremiumMaterials(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -126,16 +131,16 @@ class UpsellRecommendationTest extends TestCase
 
         $recommendations = $this->getPremiumMaterialProducts($currentProduct);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products have premium materials
         foreach ($recommendations as $recommendation) {
-            $this->assertTrue($this->hasPremiumMaterial($currentProduct, $recommendation));
+            self::assertTrue($this->hasPremiumMaterial($currentProduct, $recommendation));
         }
     }
 
     #[Test]
-    public function it_recommends_products_with_better_brand(): void
+    public function itRecommendsProductsWithBetterBrand(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -147,16 +152,16 @@ class UpsellRecommendationTest extends TestCase
 
         $recommendations = $this->getBetterBrandProducts($currentProduct);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products have better brand
         foreach ($recommendations as $recommendation) {
-            $this->assertTrue($this->hasBetterBrand($currentProduct, $recommendation));
+            self::assertTrue($this->hasBetterBrand($currentProduct, $recommendation));
         }
     }
 
     #[Test]
-    public function it_recommends_products_with_higher_capacity(): void
+    public function itRecommendsProductsWithHigherCapacity(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -168,16 +173,16 @@ class UpsellRecommendationTest extends TestCase
 
         $recommendations = $this->getHigherCapacityProducts($currentProduct);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products have higher capacity
         foreach ($recommendations as $recommendation) {
-            $this->assertTrue($this->hasHigherCapacity($currentProduct, $recommendation));
+            self::assertTrue($this->hasHigherCapacity($currentProduct, $recommendation));
         }
     }
 
     #[Test]
-    public function it_recommends_products_with_better_performance(): void
+    public function itRecommendsProductsWithBetterPerformance(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -189,16 +194,16 @@ class UpsellRecommendationTest extends TestCase
 
         $recommendations = $this->getBetterPerformanceProducts($currentProduct);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products have better performance
         foreach ($recommendations as $recommendation) {
-            $this->assertTrue($this->hasBetterPerformance($currentProduct, $recommendation));
+            self::assertTrue($this->hasBetterPerformance($currentProduct, $recommendation));
         }
     }
 
     #[Test]
-    public function it_recommends_products_with_more_storage(): void
+    public function itRecommendsProductsWithMoreStorage(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -210,16 +215,16 @@ class UpsellRecommendationTest extends TestCase
 
         $recommendations = $this->getMoreStorageProducts($currentProduct);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products have more storage
         foreach ($recommendations as $recommendation) {
-            $this->assertTrue($this->hasMoreStorage($currentProduct, $recommendation));
+            self::assertTrue($this->hasMoreStorage($currentProduct, $recommendation));
         }
     }
 
     #[Test]
-    public function it_recommends_products_with_better_display(): void
+    public function itRecommendsProductsWithBetterDisplay(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -231,16 +236,16 @@ class UpsellRecommendationTest extends TestCase
 
         $recommendations = $this->getBetterDisplayProducts($currentProduct);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products have better display
         foreach ($recommendations as $recommendation) {
-            $this->assertTrue($this->hasBetterDisplay($currentProduct, $recommendation));
+            self::assertTrue($this->hasBetterDisplay($currentProduct, $recommendation));
         }
     }
 
     #[Test]
-    public function it_recommends_products_with_better_connectivity(): void
+    public function itRecommendsProductsWithBetterConnectivity(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -252,16 +257,16 @@ class UpsellRecommendationTest extends TestCase
 
         $recommendations = $this->getBetterConnectivityProducts($currentProduct);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products have better connectivity
         foreach ($recommendations as $recommendation) {
-            $this->assertTrue($this->hasBetterConnectivity($currentProduct, $recommendation));
+            self::assertTrue($this->hasBetterConnectivity($currentProduct, $recommendation));
         }
     }
 
     #[Test]
-    public function it_recommends_products_with_better_battery_life(): void
+    public function itRecommendsProductsWithBetterBatteryLife(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -273,16 +278,16 @@ class UpsellRecommendationTest extends TestCase
 
         $recommendations = $this->getBetterBatteryProducts($currentProduct);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products have better battery life
         foreach ($recommendations as $recommendation) {
-            $this->assertTrue($this->hasBetterBatteryLife($currentProduct, $recommendation));
+            self::assertTrue($this->hasBetterBatteryLife($currentProduct, $recommendation));
         }
     }
 
     #[Test]
-    public function it_recommends_products_with_better_camera(): void
+    public function itRecommendsProductsWithBetterCamera(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -294,16 +299,16 @@ class UpsellRecommendationTest extends TestCase
 
         $recommendations = $this->getBetterCameraProducts($currentProduct);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products have better camera
         foreach ($recommendations as $recommendation) {
-            $this->assertTrue($this->hasBetterCamera($currentProduct, $recommendation));
+            self::assertTrue($this->hasBetterCamera($currentProduct, $recommendation));
         }
     }
 
     #[Test]
-    public function it_recommends_products_with_better_audio(): void
+    public function itRecommendsProductsWithBetterAudio(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -315,16 +320,16 @@ class UpsellRecommendationTest extends TestCase
 
         $recommendations = $this->getBetterAudioProducts($currentProduct);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products have better audio
         foreach ($recommendations as $recommendation) {
-            $this->assertTrue($this->hasBetterAudio($currentProduct, $recommendation));
+            self::assertTrue($this->hasBetterAudio($currentProduct, $recommendation));
         }
     }
 
     #[Test]
-    public function it_recommends_products_with_better_security(): void
+    public function itRecommendsProductsWithBetterSecurity(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -336,16 +341,16 @@ class UpsellRecommendationTest extends TestCase
 
         $recommendations = $this->getBetterSecurityProducts($currentProduct);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products have better security
         foreach ($recommendations as $recommendation) {
-            $this->assertTrue($this->hasBetterSecurity($currentProduct, $recommendation));
+            self::assertTrue($this->hasBetterSecurity($currentProduct, $recommendation));
         }
     }
 
     #[Test]
-    public function it_recommends_products_with_better_support(): void
+    public function itRecommendsProductsWithBetterSupport(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -357,16 +362,16 @@ class UpsellRecommendationTest extends TestCase
 
         $recommendations = $this->getBetterSupportProducts($currentProduct);
 
-        $this->assertGreaterThan(0, count($recommendations));
+        self::assertGreaterThan(0, \count($recommendations));
 
         // Check that recommended products have better support
         foreach ($recommendations as $recommendation) {
-            $this->assertTrue($this->hasBetterSupport($currentProduct, $recommendation));
+            self::assertTrue($this->hasBetterSupport($currentProduct, $recommendation));
         }
     }
 
     #[Test]
-    public function it_calculates_upsell_potential(): void
+    public function itCalculatesUpsellPotential(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -384,12 +389,12 @@ class UpsellRecommendationTest extends TestCase
 
         $upsellPotential = $this->calculateUpsellPotential($currentProduct, $recommendedProduct);
 
-        $this->assertGreaterThan(0, $upsellPotential);
-        $this->assertGreaterThan(0, $upsellPotential);
+        self::assertGreaterThan(0, $upsellPotential);
+        self::assertGreaterThan(0, $upsellPotential);
     }
 
     #[Test]
-    public function it_generates_upsell_report(): void
+    public function itGeneratesUpsellReport(): void
     {
         $currentProduct = [
             'id' => 1,
@@ -400,15 +405,16 @@ class UpsellRecommendationTest extends TestCase
 
         $report = $this->generateUpsellReport($currentProduct);
 
-        $this->assertArrayHasKey('product_id', $report);
-        $this->assertArrayHasKey('recommendations', $report);
-        $this->assertArrayHasKey('total_recommendations', $report);
-        $this->assertArrayHasKey('average_upsell_ratio', $report);
-        $this->assertArrayHasKey('generated_at', $report);
+        self::assertArrayHasKey('product_id', $report);
+        self::assertArrayHasKey('recommendations', $report);
+        self::assertArrayHasKey('total_recommendations', $report);
+        self::assertArrayHasKey('average_upsell_ratio', $report);
+        self::assertArrayHasKey('generated_at', $report);
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getUpsellRecommendations(array $currentProduct): array
@@ -429,7 +435,7 @@ class UpsellRecommendationTest extends TestCase
         ];
 
         $recommendations = [];
-        $products = is_string($tier) ? ($upsellProducts[$tier] ?? []) : [];
+        $products = \is_string($tier) ? ($upsellProducts[$tier] ?? []) : [];
 
         foreach ($products as $product) {
             $recommendations[] = [
@@ -446,7 +452,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getPremiumVersions(array $currentProduct): array
@@ -464,7 +471,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getFeatureRichProducts(array $currentProduct): array
@@ -482,7 +490,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getBetterSpecProducts(array $currentProduct): array
@@ -500,7 +509,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getExtendedWarrantyProducts(array $currentProduct): array
@@ -518,7 +528,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getPremiumMaterialProducts(array $currentProduct): array
@@ -536,7 +547,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getBetterBrandProducts(array $currentProduct): array
@@ -554,7 +566,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getHigherCapacityProducts(array $currentProduct): array
@@ -572,7 +585,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getBetterPerformanceProducts(array $currentProduct): array
@@ -590,7 +604,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getMoreStorageProducts(array $currentProduct): array
@@ -608,7 +623,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getBetterDisplayProducts(array $currentProduct): array
@@ -626,7 +642,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getBetterConnectivityProducts(array $currentProduct): array
@@ -644,7 +661,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getBetterBatteryProducts(array $currentProduct): array
@@ -662,7 +680,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getBetterCameraProducts(array $currentProduct): array
@@ -680,7 +699,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getBetterAudioProducts(array $currentProduct): array
@@ -698,7 +718,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getBetterSecurityProducts(array $currentProduct): array
@@ -716,7 +737,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getBetterSupportProducts(array $currentProduct): array
@@ -734,8 +756,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
-     * @param  array<string, mixed>  $recommendedProduct
+     * @param array<string, mixed> $currentProduct
+     * @param array<string, mixed> $recommendedProduct
      */
     private function calculateUpsellPotential(array $currentProduct, array $recommendedProduct): float
     {
@@ -749,13 +771,14 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
+     * @param array<string, mixed> $currentProduct
+     *
      * @return array<string, mixed>
      */
     private function generateUpsellReport(array $currentProduct): array
     {
         $recommendations = $this->getUpsellRecommendations($currentProduct);
-        $totalRecommendations = count($recommendations);
+        $totalRecommendations = \count($recommendations);
         $upsellRatios = array_column($recommendations, 'upsell_ratio');
         $averageUpsellRatio = $totalRecommendations > 0 ? array_sum($upsellRatios) / $totalRecommendations : 0.0;
 
@@ -770,8 +793,8 @@ class UpsellRecommendationTest extends TestCase
 
     // Helper methods for validation
     /**
-     * @param  array<string, mixed>  $currentProduct
-     * @param  array<string, mixed>  $recommendedProduct
+     * @param array<string, mixed> $currentProduct
+     * @param array<string, mixed> $recommendedProduct
      */
     private function isPremiumVersion(array $currentProduct, array $recommendedProduct): bool
     {
@@ -779,23 +802,23 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
-     * @param  array<string, mixed>  $recommendedProduct
+     * @param array<string, mixed> $currentProduct
+     * @param array<string, mixed> $recommendedProduct
      */
     private function hasMoreFeatures(array $currentProduct, array $recommendedProduct): bool
     {
         $currentFeatures = $currentProduct['features'] ?? [];
         $recommendedFeatures = $recommendedProduct['features'] ?? [];
 
-        $currentFeaturesArray = is_array($currentFeatures) ? $currentFeatures : [];
-        $recommendedFeaturesArray = is_array($recommendedFeatures) ? $recommendedFeatures : [];
+        $currentFeaturesArray = \is_array($currentFeatures) ? $currentFeatures : [];
+        $recommendedFeaturesArray = \is_array($recommendedFeatures) ? $recommendedFeatures : [];
 
-        return count($recommendedFeaturesArray) > count($currentFeaturesArray);
+        return \count($recommendedFeaturesArray) > \count($currentFeaturesArray);
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
-     * @param  array<string, mixed>  $recommendedProduct
+     * @param array<string, mixed> $currentProduct
+     * @param array<string, mixed> $recommendedProduct
      */
     private function hasBetterSpecs(array $currentProduct, array $recommendedProduct): bool
     {
@@ -803,8 +826,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
-     * @param  array<string, mixed>  $recommendedProduct
+     * @param array<string, mixed> $currentProduct
+     * @param array<string, mixed> $recommendedProduct
      */
     private function hasExtendedWarranty(array $currentProduct, array $recommendedProduct): bool
     {
@@ -812,8 +835,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
-     * @param  array<string, mixed>  $recommendedProduct
+     * @param array<string, mixed> $currentProduct
+     * @param array<string, mixed> $recommendedProduct
      */
     private function hasPremiumMaterial(array $currentProduct, array $recommendedProduct): bool
     {
@@ -821,8 +844,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
-     * @param  array<string, mixed>  $recommendedProduct
+     * @param array<string, mixed> $currentProduct
+     * @param array<string, mixed> $recommendedProduct
      */
     private function hasBetterBrand(array $currentProduct, array $recommendedProduct): bool
     {
@@ -830,8 +853,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
-     * @param  array<string, mixed>  $recommendedProduct
+     * @param array<string, mixed> $currentProduct
+     * @param array<string, mixed> $recommendedProduct
      */
     private function hasHigherCapacity(array $currentProduct, array $recommendedProduct): bool
     {
@@ -839,8 +862,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
-     * @param  array<string, mixed>  $recommendedProduct
+     * @param array<string, mixed> $currentProduct
+     * @param array<string, mixed> $recommendedProduct
      */
     private function hasBetterPerformance(array $currentProduct, array $recommendedProduct): bool
     {
@@ -848,8 +871,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
-     * @param  array<string, mixed>  $recommendedProduct
+     * @param array<string, mixed> $currentProduct
+     * @param array<string, mixed> $recommendedProduct
      */
     private function hasMoreStorage(array $currentProduct, array $recommendedProduct): bool
     {
@@ -857,8 +880,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
-     * @param  array<string, mixed>  $recommendedProduct
+     * @param array<string, mixed> $currentProduct
+     * @param array<string, mixed> $recommendedProduct
      */
     private function hasBetterDisplay(array $currentProduct, array $recommendedProduct): bool
     {
@@ -866,8 +889,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
-     * @param  array<string, mixed>  $recommendedProduct
+     * @param array<string, mixed> $currentProduct
+     * @param array<string, mixed> $recommendedProduct
      */
     private function hasBetterConnectivity(array $currentProduct, array $recommendedProduct): bool
     {
@@ -875,8 +898,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
-     * @param  array<string, mixed>  $recommendedProduct
+     * @param array<string, mixed> $currentProduct
+     * @param array<string, mixed> $recommendedProduct
      */
     private function hasBetterBatteryLife(array $currentProduct, array $recommendedProduct): bool
     {
@@ -884,8 +907,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
-     * @param  array<string, mixed>  $recommendedProduct
+     * @param array<string, mixed> $currentProduct
+     * @param array<string, mixed> $recommendedProduct
      */
     private function hasBetterCamera(array $currentProduct, array $recommendedProduct): bool
     {
@@ -893,8 +916,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
-     * @param  array<string, mixed>  $recommendedProduct
+     * @param array<string, mixed> $currentProduct
+     * @param array<string, mixed> $recommendedProduct
      */
     private function hasBetterAudio(array $currentProduct, array $recommendedProduct): bool
     {
@@ -902,8 +925,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
-     * @param  array<string, mixed>  $recommendedProduct
+     * @param array<string, mixed> $currentProduct
+     * @param array<string, mixed> $recommendedProduct
      */
     private function hasBetterSecurity(array $currentProduct, array $recommendedProduct): bool
     {
@@ -911,8 +934,8 @@ class UpsellRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $currentProduct
-     * @param  array<string, mixed>  $recommendedProduct
+     * @param array<string, mixed> $currentProduct
+     * @param array<string, mixed> $recommendedProduct
      */
     private function hasBetterSupport(array $currentProduct, array $recommendedProduct): bool
     {

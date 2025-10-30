@@ -14,7 +14,7 @@ trait SimpleDatabaseSetup
         // Only set up if we're using SQLite in memory
         $connection = config('database.default', 'sqlite');
 
-        if ('sqlite' !== $connection) {
+        if (! \in_array($connection, ['sqlite', 'testing', 'sqlite_testing'], true)) {
             return;
         }
 
@@ -77,7 +77,7 @@ trait SimpleDatabaseSetup
             // Only clean up if we're using SQLite in memory
             $connection = config('database.default', 'sqlite');
 
-            if ('sqlite' === $connection) {
+            if (\in_array($connection, ['sqlite', 'testing', 'sqlite_testing'], true)) {
                 // For in-memory SQLite, no cleanup needed
                 // Tables will be destroyed when connection closes
             }

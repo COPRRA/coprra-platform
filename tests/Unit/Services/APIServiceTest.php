@@ -12,65 +12,70 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Tests\TestCase;
 
-class APIServiceTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class APIServiceTest extends TestCase
 {
-    public function test_api_info_service_version_and_urls(): void
+    public function testApiInfoServiceVersionAndUrls(): void
     {
-        $service = new ApiInfoService;
+        $service = new ApiInfoService();
 
-        $this->assertSame('2.0', $service->getApiVersion());
-        $this->assertTrue($service->checkApiVersion());
+        self::assertSame('2.0', $service->getApiVersion());
+        self::assertTrue($service->checkApiVersion());
 
-        $this->assertStringEndsWith('/api/v2/documentation', $service->getApiDocumentationUrl());
-        $this->assertStringEndsWith('/api/v2/changelog', $service->getApiChangelogUrl());
-        $this->assertStringEndsWith('/api/v2/migration-guide', $service->getApiMigrationGuideUrl());
+        self::assertStringEndsWith('/api/v2/documentation', $service->getApiDocumentationUrl());
+        self::assertStringEndsWith('/api/v2/changelog', $service->getApiChangelogUrl());
+        self::assertStringEndsWith('/api/v2/migration-guide', $service->getApiMigrationGuideUrl());
 
         $notices = $service->getApiDeprecationNotices();
-        $this->assertArrayHasKey('v1_endpoint', $notices);
-        $this->assertArrayHasKey('migration_guide', $notices);
-        $this->assertStringEndsWith('/api/v2/migration-guide', $notices['migration_guide']);
+        self::assertArrayHasKey('v1_endpoint', $notices);
+        self::assertArrayHasKey('migration_guide', $notices);
+        self::assertStringEndsWith('/api/v2/migration-guide', $notices['migration_guide']);
     }
 
-    public function test_response_builder_success_and_error(): void
+    public function testResponseBuilderSuccessAndError(): void
     {
-        $builder = new ResponseBuilderService;
+        $builder = new ResponseBuilderService();
 
         $success = $builder->successResponse(['id' => 1, 'name' => 'ok'], 'Success', 200, ['meta' => 'x']);
-        $this->assertSame(200, $success->status());
+        self::assertSame(200, $success->status());
         $payload = $success->getData(true);
-        $this->assertTrue($payload['success']);
-        $this->assertSame('Success', $payload['message']);
-        $this->assertSame('2.0', $payload['version']);
-        $this->assertArrayHasKey('timestamp', $payload);
-        $this->assertArrayHasKey('data', $payload);
-        $this->assertArrayHasKey('meta', $payload);
+        self::assertTrue($payload['success']);
+        self::assertSame('Success', $payload['message']);
+        self::assertSame('2.0', $payload['version']);
+        self::assertArrayHasKey('timestamp', $payload);
+        self::assertArrayHasKey('data', $payload);
+        self::assertArrayHasKey('meta', $payload);
 
         $error = $builder->errorResponse('Error', ['bad' => 'thing'], 422, ['ctx' => 'y']);
-        $this->assertSame(422, $error->status());
+        self::assertSame(422, $error->status());
         $errPayload = $error->getData(true);
-        $this->assertFalse($errPayload['success']);
-        $this->assertSame('Error', $errPayload['message']);
-        $this->assertSame('2.0', $errPayload['version']);
-        $this->assertArrayHasKey('errors', $errPayload);
-        $this->assertArrayHasKey('meta', $errPayload);
+        self::assertFalse($errPayload['success']);
+        self::assertSame('Error', $errPayload['message']);
+        self::assertSame('2.0', $errPayload['version']);
+        self::assertArrayHasKey('errors', $errPayload);
+        self::assertArrayHasKey('meta', $errPayload);
     }
 
-    public function test_paginated_response_structure_with_collection(): void
+    public function testPaginatedResponseStructureWithCollection(): void
     {
-        $builder = new ResponseBuilderService;
+        $builder = new ResponseBuilderService();
         $data = new Collection([['id' => 1], ['id' => 2]]);
         $resp = $builder->paginatedResponse($data, 'Success');
-        $this->assertSame(200, $resp->status());
+        self::assertSame(200, $resp->status());
         $payload = $resp->getData(true);
-        $this->assertTrue($payload['success']);
-        $this->assertArrayHasKey('pagination', $payload);
-        $this->assertArrayHasKey('version', $payload);
-        $this->assertSame('2.0', $payload['version']);
+        self::assertTrue($payload['success']);
+        self::assertArrayHasKey('pagination', $payload);
+        self::assertArrayHasKey('version', $payload);
+        self::assertSame('2.0', $payload['version']);
     }
 
-    public function test_request_parameter_service_parsing(): void
+    public function testRequestParameterServiceParsing(): void
     {
-        $paramsService = new RequestParameterService;
+        $paramsService = new RequestParameterService();
 
         $request = Request::create('/api/v2/items', 'GET', [
             'include' => 'user,orders',
@@ -84,25 +89,25 @@ class APIServiceTest extends TestCase
         $sorting = $paramsService->getSortingParams($request);
         $rate = $paramsService->getRateLimitInfo();
 
-        $this->assertArrayHasKey('user', $include);
-        $this->assertArrayHasKey('orders', $include);
-        $this->assertArrayHasKey('id', $fields);
-        $this->assertArrayHasKey('name', $fields);
-        $this->assertSame('name', $sorting['sort_by']);
-        $this->assertSame('asc', $sorting['sort_order']);
-        $this->assertSame('2.0', $rate['version']);
+        self::assertArrayHasKey('user', $include);
+        self::assertArrayHasKey('orders', $include);
+        self::assertArrayHasKey('id', $fields);
+        self::assertArrayHasKey('name', $fields);
+        self::assertSame('name', $sorting['sort_by']);
+        self::assertSame('asc', $sorting['sort_order']);
+        self::assertSame('2.0', $rate['version']);
     }
 
-    public function test_pagination_service_defaults_for_non_paginator(): void
+    public function testPaginationServiceDefaultsForNonPaginator(): void
     {
-        $service = new PaginationService;
+        $service = new PaginationService();
         $pagination = $service->getPaginationData([['id' => 1], ['id' => 2]]);
 
-        $this->assertArrayHasKey('current_page', $pagination);
-        $this->assertArrayHasKey('links', $pagination);
-        $this->assertNull($pagination['links']['first']);
-        $this->assertNull($pagination['links']['last']);
-        $this->assertNull($pagination['links']['prev']);
-        $this->assertNull($pagination['links']['next']);
+        self::assertArrayHasKey('current_page', $pagination);
+        self::assertArrayHasKey('links', $pagination);
+        self::assertNull($pagination['links']['first']);
+        self::assertNull($pagination['links']['last']);
+        self::assertNull($pagination['links']['prev']);
+        self::assertNull($pagination['links']['next']);
     }
 }

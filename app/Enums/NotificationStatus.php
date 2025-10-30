@@ -6,11 +6,11 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-use App\Traits\HasEnumUtilities;
+use App\Traits\HasStatusUtilities;
 
 enum NotificationStatus: string
 {
-    use HasEnumUtilities;
+    use HasStatusUtilities;
 
     case PENDING = 'pending';
     case SENT = 'sent';
@@ -48,7 +48,7 @@ enum NotificationStatus: string
     /**
      * Get allowed transitions for this status.
      *
-     * @return array<App\Enums\NotificationStatus::CANCELLED|App\Enums\NotificationStatus::FAILED|App\Enums\NotificationStatus::PENDING|App\Enums\NotificationStatus::SENT>
+     * @return (App\Enums\NotificationStatus::CANCELLED|App\Enums\NotificationStatus::FAILED|App\Enums\NotificationStatus::PENDING|App\Enums\NotificationStatus::SENT)[]
      *
      * @psalm-return list{0?: App\Enums\NotificationStatus::PENDING|App\Enums\NotificationStatus::SENT, 1?: App\Enums\NotificationStatus::FAILED, 2?: App\Enums\NotificationStatus::CANCELLED}
      */
@@ -69,38 +69,7 @@ enum NotificationStatus: string
     #[\Override]
     public function canTransitionTo(self $status): bool
     {
-        return in_array($status, $this->allowedTransitions(), true);
-    }
-
-    /**
-     * Get permissions for this status (not applicable for notification statuses).
-     *
-     * @psalm-return array<never, never>
-     */
-    #[\Override]
-    public function permissions(): array
-    {
-        return [];
-    }
-
-    /**
-     * Check if this status has a specific permission (not applicable for notification statuses).
-     *
-     * @SuppressWarnings("UnusedFormalParameter")
-     */
-    #[\Override]
-    public function hasPermission(string $permission): bool
-    {
-        return false;
-    }
-
-    /**
-     * Check if this status represents admin privileges (not applicable for notification statuses).
-     */
-    #[\Override]
-    public function isAdmin(): bool
-    {
-        return false;
+        return \in_array($status, $this->allowedTransitions(), true);
     }
 }
 // phpcs:enable

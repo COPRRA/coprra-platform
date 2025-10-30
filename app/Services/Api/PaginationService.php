@@ -8,21 +8,22 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 /**
- * Service for handling pagination data and links
+ * Service for handling pagination data and links.
  */
 class PaginationService
 {
     /**
-     * Get pagination data
+     * Get pagination data.
      *
-     * @param  LengthAwarePaginator|Collection|array<int, array|object>  $data
-     * @return array<array<string|null>|bool|int|string|null>
+     * @param array<int, array|object>|Collection|LengthAwarePaginator $data
      *
-     * @psalm-return array{current_page: bool|int|string|null, per_page: bool|int|string|null, total: bool|int|string|null, last_page: bool|int|string|null, from: bool|int|string|null, to: bool|int|string|null, has_more_pages: bool|int|string|null, links: array<string, string|null>}
+     * @return array<array<string|* @method static \App\Models\Brand create(array<string, string|bool|null>|bool|int|string|* @method static \App\Models\Brand create(array<string, string|bool|null>
+     *
+     * @psalm-return array{current_page: bool|int|string|null, per_page: bool|int|string|null, total: bool|int|string|null, last_page: bool|int|string|null, from: bool|int|string|null, to: bool|int|string|null, has_more_pages: bool|int|string|null, links: array<string, string|* @method static \App\Models\Brand create(array<string, string|bool|null>}
      */
-    public function getPaginationData(LengthAwarePaginator|Collection|array $data): array
+    public function getPaginationData(array|Collection|LengthAwarePaginator $data): array
     {
-        $isPaginator = is_object($data);
+        $isPaginator = \is_object($data);
 
         $result = [
             'current_page' => $this->getMethodValue($data, 'currentPage', 1),
@@ -40,21 +41,21 @@ class PaginationService
     }
 
     /**
-     * Get method value if exists on object
+     * Get method value if exists on object.
      */
-    protected function getMethodValue(array|LengthAwarePaginator|Collection $object, string $method, string|int|bool|null $default): string|int|bool|null
+    protected function getMethodValue(array|Collection|LengthAwarePaginator $object, string $method, bool|int|string|null $default): bool|int|string|null
     {
-        return is_object($object) && method_exists($object, $method) ? $object->$method() : $default;
+        return \is_object($object) && method_exists($object, $method) ? $object->{$method}() : $default;
     }
 
     /**
-     * Get pagination links
+     * Get pagination links.
      *
-     * @return array<bool|int|mixed|string|null>
+     * @return array<bool|int|mixed|string|* @method static \App\Models\Brand create(array<string, string|bool|null>
      *
      * @psalm-return array{first: mixed|string|null, last: mixed|string|null, prev: bool|int|string|null, next: bool|int|string|null}
      */
-    protected function getPaginationLinks(array|LengthAwarePaginator|Collection $data, bool $isPaginator): array
+    protected function getPaginationLinks(array|Collection|LengthAwarePaginator $data, bool $isPaginator): array
     {
         if (! $isPaginator) {
             return [
@@ -65,7 +66,7 @@ class PaginationService
             ];
         }
 
-        $hasUrlMethod = is_object($data) && method_exists($data, 'url');
+        $hasUrlMethod = \is_object($data) && method_exists($data, 'url');
         $lastPage = $this->getMethodValue($data, 'lastPage', null);
 
         return [

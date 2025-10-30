@@ -23,7 +23,7 @@ final class PriceFetcherService
 
         // Only return if price changed significantly (more than 1%)
         $currentPrice = is_numeric($priceOffer->price) ? (float) $priceOffer->price : 0.0;
-        if ($currentPrice > 0 && $newPrice !== null && abs($currentPrice - $newPrice) / $currentPrice > 0.01) {
+        if ($currentPrice > 0 && null !== $newPrice && abs($currentPrice - $newPrice) / $currentPrice > 0.01) {
             return round($newPrice, 2);
         }
 

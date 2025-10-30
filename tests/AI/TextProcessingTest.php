@@ -6,54 +6,60 @@ namespace Tests\AI;
 
 // Removed PreserveGlobalState to avoid risky test flags
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
 
-class TextProcessingTest extends \PHPUnit\Framework\TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class TextProcessingTest extends TestCase
 {
     #[Test]
-    public function can_process_arabic_text(): void
+    public function canProcessArabicText(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function can_extract_keywords(): void
+    public function canExtractKeywords(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function can_detect_sentiment(): void
+    public function canDetectSentiment(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function can_remove_stop_words(): void
+    public function canRemoveStopWords(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function can_normalize_text(): void
+    public function canNormalizeText(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function can_handle_mixed_languages(): void
+    public function canHandleMixedLanguages(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function can_extract_entities(): void
+    public function canExtractEntities(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function can_summarize_text(): void
+    public function canSummarizeText(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 }

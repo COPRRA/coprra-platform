@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use Closure;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 
 class AddQueuedCookiesToResponse
@@ -13,11 +13,11 @@ class AddQueuedCookiesToResponse
     /**
      * Handle an incoming request.
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, \Closure $next): Response
     {
         $response = $next($request);
 
-        if (! ($response instanceof Response)) {
+        if (! $response instanceof Response) {
             throw new \RuntimeException('Middleware must return Response instance');
         }
 
@@ -33,11 +33,11 @@ class AddQueuedCookiesToResponse
     {
         if (app()->bound('cookie.queue')) {
             $cookieQueue = app('cookie.queue');
-            if (is_object($cookieQueue) && method_exists($cookieQueue, 'getQueuedCookies')) {
+            if (\is_object($cookieQueue) && method_exists($cookieQueue, 'getQueuedCookies')) {
                 $cookies = $cookieQueue->getQueuedCookies();
                 if (is_iterable($cookies)) {
                     foreach ($cookies as $cookie) {
-                        if ($cookie instanceof \Symfony\Component\HttpFoundation\Cookie) {
+                        if ($cookie instanceof Cookie) {
                             $response->headers->setCookie($cookie);
                         }
                     }

@@ -5,35 +5,19 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /**
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class RoutingTest extends TestCase
+final class RoutingTest extends TestCase
 {
     use RefreshDatabase;
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_basic_functionality(): void
-    {
-        // Test basic functionality
-        $this->assertTrue(true);
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_expected_behavior(): void
-    {
-        // Test expected behavior
-        $this->assertTrue(true);
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_validation(): void
-    {
-        // Test validation
-        $this->assertTrue(true);
-    }
 
     protected function setUp(): void
     {
@@ -43,5 +27,31 @@ class RoutingTest extends TestCase
     protected function tearDown(): void
     {
         parent::tearDown();
+    }
+
+    #[Test]
+    public function testBasicFunctionality(): void
+    {
+        // Test that basic routes are accessible
+        $response = $this->get('/');
+        $response->assertStatus(200);
+    }
+
+    #[Test]
+    public function testExpectedBehavior(): void
+    {
+        // Test that API routes return JSON
+        $response = $this->get('/api/health');
+        $response->assertStatus(200)
+            ->assertHeader('Content-Type', 'application/json')
+        ;
+    }
+
+    #[Test]
+    public function testValidation(): void
+    {
+        // Test that invalid routes return 404
+        $response = $this->get('/non-existent-route');
+        $response->assertStatus(404);
     }
 }

@@ -10,7 +10,12 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
-class ProcessHeavyOperationTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class ProcessHeavyOperationTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -20,7 +25,7 @@ class ProcessHeavyOperationTest extends TestCase
         Cache::flush();
     }
 
-    public function test_job_constructor_sets_properties_correctly(): void
+    public function testJobConstructorSetsPropertiesCorrectly(): void
     {
         $operation = 'test_operation';
         $data = ['key' => 'value'];
@@ -33,48 +38,48 @@ class ProcessHeavyOperationTest extends TestCase
 
         $operationProperty = $reflection->getProperty('operation');
         $operationProperty->setAccessible(true);
-        $this->assertEquals($operation, $operationProperty->getValue($job));
+        self::assertSame($operation, $operationProperty->getValue($job));
 
         $dataProperty = $reflection->getProperty('data');
         $dataProperty->setAccessible(true);
-        $this->assertEquals($data, $dataProperty->getValue($job));
+        self::assertSame($data, $dataProperty->getValue($job));
 
         $userIdProperty = $reflection->getProperty('userId');
         $userIdProperty->setAccessible(true);
-        $this->assertEquals($userId, $userIdProperty->getValue($job));
+        self::assertSame($userId, $userIdProperty->getValue($job));
     }
 
     /**
      * Test that ProcessHeavyOperationTest can be instantiated.
      */
-    public function test_can_be_instantiated(): void
+    public function testCanBeInstantiated(): void
     {
-        $this->assertInstanceOf(self::class, $this);
+        self::assertInstanceOf(self::class, $this);
     }
 
-    public function test_job_has_correct_timeout_and_retry_settings(): void
+    public function testJobHasCorrectTimeoutAndRetrySettings(): void
     {
         $job = new ProcessHeavyOperation('test', [], 1);
 
-        $this->assertEquals(300, $job->timeout);
-        $this->assertEquals(3, $job->tries);
-        $this->assertEquals(3, $job->maxExceptions);
+        self::assertSame(300, $job->timeout);
+        self::assertSame(3, $job->tries);
+        self::assertSame(3, $job->maxExceptions);
     }
 
-    public function test_job_get_job_status_returns_null_for_unknown_job(): void
+    public function testJobGetJobStatusReturnsNullForUnknownJob(): void
     {
         $status = ProcessHeavyOperation::getJobStatus('unknown-job-id');
-        $this->assertNull($status);
+        self::assertNull($status);
     }
 
-    public function test_job_get_user_job_statuses_returns_empty_array(): void
+    public function testJobGetUserJobStatusesReturnsEmptyArray(): void
     {
         $statuses = ProcessHeavyOperation::getUserJobStatuses(1);
-        $this->assertIsArray($statuses);
-        $this->assertEmpty($statuses);
+        self::assertIsArray($statuses);
+        self::assertEmpty($statuses);
     }
 
-    public function test_job_throws_exception_for_unknown_operation(): void
+    public function testJobThrowsExceptionForUnknownOperation(): void
     {
         Log::shouldReceive('info')->once();
         Log::shouldReceive('error')->once();
@@ -87,9 +92,25 @@ class ProcessHeavyOperationTest extends TestCase
         $job->handle();
     }
 
-    public function test_job_handles_generate_report_operation_without_job_instance(): void
+    public function testJobHandlesGenerateReportOperationSuccessfully(): void
     {
-        Log::shouldReceive('info')->twice();
+        Log::shouldReceive('info')
+            ->once()
+            ->with('Processing heavy operation: generate_report', [
+                'user_id' => 1,
+                'data' => [
+                    'type' => 'sales',
+                    'start_date' => '2024-01-01',
+                    'end_date' => '2024-01-31',
+                ],
+            ])
+        ;
+
+        Log::shouldReceive('info')
+            ->once()
+            ->with('Heavy operation completed successfully: generate_report')
+        ;
+
         Log::shouldReceive('error')->never();
 
         $job = new ProcessHeavyOperation('generate_report', [
@@ -98,15 +119,27 @@ class ProcessHeavyOperationTest extends TestCase
             'end_date' => '2024-01-31',
         ], 1);
 
-        // Don't set jobInstance to test the fallback behavior
         $job->handle();
 
-        $this->assertTrue(true); // Job completed without exception
+        // Verify job completed without throwing exceptions
+        $this->addToAssertionCount(1);
     }
 
-    public function test_job_handles_process_images_operation_without_job_instance(): void
+    public function testJobHandlesProcessImagesOperationSuccessfully(): void
     {
-        Log::shouldReceive('info')->twice();
+        Log::shouldReceive('info')
+            ->once()
+            ->with('Processing heavy operation: process_images', [
+                'user_id' => 1,
+                'data' => ['image_ids' => [1, 2, 3, 4, 5]],
+            ])
+        ;
+
+        Log::shouldReceive('info')
+            ->once()
+            ->with('Heavy operation completed successfully: process_images')
+        ;
+
         Log::shouldReceive('error')->never();
 
         $job = new ProcessHeavyOperation('process_images', [
@@ -115,12 +148,25 @@ class ProcessHeavyOperationTest extends TestCase
 
         $job->handle();
 
-        $this->assertTrue(true); // Job completed without exception
+        // Verify job completed without throwing exceptions
+        $this->addToAssertionCount(1);
     }
 
-    public function test_job_handles_sync_data_operation_without_job_instance(): void
+    public function testJobHandlesSyncDataOperationSuccessfully(): void
     {
-        Log::shouldReceive('info')->twice();
+        Log::shouldReceive('info')
+            ->once()
+            ->with('Processing heavy operation: sync_data', [
+                'user_id' => 1,
+                'data' => ['source' => 'external_api'],
+            ])
+        ;
+
+        Log::shouldReceive('info')
+            ->once()
+            ->with('Heavy operation completed successfully: sync_data')
+        ;
+
         Log::shouldReceive('error')->never();
 
         $job = new ProcessHeavyOperation('sync_data', [
@@ -129,12 +175,28 @@ class ProcessHeavyOperationTest extends TestCase
 
         $job->handle();
 
-        $this->assertTrue(true); // Job completed without exception
+        // Verify job completed without throwing exceptions
+        $this->addToAssertionCount(1);
     }
 
-    public function test_job_handles_send_bulk_notifications_operation_without_job_instance(): void
+    public function testJobHandlesSendBulkNotificationsOperationSuccessfully(): void
     {
-        Log::shouldReceive('info')->twice();
+        Log::shouldReceive('info')
+            ->once()
+            ->with('Processing heavy operation: send_bulk_notifications', [
+                'user_id' => 1,
+                'data' => [
+                    'user_ids' => [1, 2, 3, 4, 5],
+                    'message' => 'Test notification',
+                ],
+            ])
+        ;
+
+        Log::shouldReceive('info')
+            ->once()
+            ->with('Heavy operation completed successfully: send_bulk_notifications')
+        ;
+
         Log::shouldReceive('error')->never();
 
         $job = new ProcessHeavyOperation('send_bulk_notifications', [
@@ -144,12 +206,25 @@ class ProcessHeavyOperationTest extends TestCase
 
         $job->handle();
 
-        $this->assertTrue(true); // Job completed without exception
+        // Verify job completed without throwing exceptions
+        $this->addToAssertionCount(1);
     }
 
-    public function test_job_handles_update_statistics_operation_without_job_instance(): void
+    public function testJobHandlesUpdateStatisticsOperationSuccessfully(): void
     {
-        Log::shouldReceive('info')->twice();
+        Log::shouldReceive('info')
+            ->once()
+            ->with('Processing heavy operation: update_statistics', [
+                'user_id' => 1,
+                'data' => ['stat_types' => ['users', 'products', 'orders']],
+            ])
+        ;
+
+        Log::shouldReceive('info')
+            ->once()
+            ->with('Heavy operation completed successfully: update_statistics')
+        ;
+
         Log::shouldReceive('error')->never();
 
         $job = new ProcessHeavyOperation('update_statistics', [
@@ -158,12 +233,25 @@ class ProcessHeavyOperationTest extends TestCase
 
         $job->handle();
 
-        $this->assertTrue(true); // Job completed without exception
+        // Verify job completed without throwing exceptions
+        $this->addToAssertionCount(1);
     }
 
-    public function test_job_handles_cleanup_old_data_operation_without_job_instance(): void
+    public function testJobHandlesCleanupOldDataOperationSuccessfully(): void
     {
-        Log::shouldReceive('info')->twice();
+        Log::shouldReceive('info')
+            ->once()
+            ->with('Processing heavy operation: cleanup_old_data', [
+                'user_id' => 1,
+                'data' => ['days_old' => 30],
+            ])
+        ;
+
+        Log::shouldReceive('info')
+            ->once()
+            ->with('Heavy operation completed successfully: cleanup_old_data')
+        ;
+
         Log::shouldReceive('error')->never();
 
         $job = new ProcessHeavyOperation('cleanup_old_data', [
@@ -172,12 +260,28 @@ class ProcessHeavyOperationTest extends TestCase
 
         $job->handle();
 
-        $this->assertTrue(true); // Job completed without exception
+        // Verify job completed without throwing exceptions
+        $this->addToAssertionCount(1);
     }
 
-    public function test_job_handles_export_data_operation_without_job_instance(): void
+    public function testJobHandlesExportDataOperationSuccessfully(): void
     {
-        Log::shouldReceive('info')->twice();
+        Log::shouldReceive('info')
+            ->once()
+            ->with('Processing heavy operation: export_data', [
+                'user_id' => 1,
+                'data' => [
+                    'format' => 'csv',
+                    'table' => 'products',
+                ],
+            ])
+        ;
+
+        Log::shouldReceive('info')
+            ->once()
+            ->with('Heavy operation completed successfully: export_data')
+        ;
+
         Log::shouldReceive('error')->never();
 
         $job = new ProcessHeavyOperation('export_data', [
@@ -187,12 +291,25 @@ class ProcessHeavyOperationTest extends TestCase
 
         $job->handle();
 
-        $this->assertTrue(true); // Job completed without exception
+        // Verify job completed without throwing exceptions
+        $this->addToAssertionCount(1);
     }
 
-    public function test_job_handles_import_data_operation_without_job_instance(): void
+    public function testJobHandlesImportDataOperationSuccessfully(): void
     {
-        Log::shouldReceive('info')->twice();
+        Log::shouldReceive('info')
+            ->once()
+            ->with('Processing heavy operation: import_data', [
+                'user_id' => 1,
+                'data' => ['file_path' => '/path/to/file.csv'],
+            ])
+        ;
+
+        Log::shouldReceive('info')
+            ->once()
+            ->with('Heavy operation completed successfully: import_data')
+        ;
+
         Log::shouldReceive('error')->never();
 
         $job = new ProcessHeavyOperation('import_data', [
@@ -201,6 +318,61 @@ class ProcessHeavyOperationTest extends TestCase
 
         $job->handle();
 
-        $this->assertTrue(true); // Job completed without exception
+        // Verify job completed without throwing exceptions
+        $this->addToAssertionCount(1);
+    }
+
+    public function testJobHandlesProcessDataOperation(): void
+    {
+        Log::shouldReceive('info')
+            ->once()
+            ->with('Processing heavy operation: process_data', [
+                'user_id' => 1,
+                'data' => ['batch_size' => 100],
+            ])
+        ;
+
+        Log::shouldReceive('info')
+            ->once()
+            ->with('Heavy operation completed successfully: process_data')
+        ;
+
+        Log::shouldReceive('error')->never();
+
+        $job = new ProcessHeavyOperation('process_data', [
+            'batch_size' => 100,
+        ], 1);
+
+        $job->handle();
+
+        // Verify job completed without throwing exceptions
+        $this->addToAssertionCount(1);
+    }
+
+    public function testJobHandlesCleanupFilesOperation(): void
+    {
+        Log::shouldReceive('info')
+            ->once()
+            ->with('Processing heavy operation: cleanup_files', [
+                'user_id' => 1,
+                'data' => ['directory' => '/tmp'],
+            ])
+        ;
+
+        Log::shouldReceive('info')
+            ->once()
+            ->with('Heavy operation completed successfully: cleanup_files')
+        ;
+
+        Log::shouldReceive('error')->never();
+
+        $job = new ProcessHeavyOperation('cleanup_files', [
+            'directory' => '/tmp',
+        ], 1);
+
+        $job->handle();
+
+        // Verify job completed without throwing exceptions
+        $this->addToAssertionCount(1);
     }
 }

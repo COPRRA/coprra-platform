@@ -19,7 +19,7 @@ class ContentTypeService
     ];
 
     /**
-     * Check if response content type is compressible
+     * Check if response content type is compressible.
      */
     public function isCompressibleContentType(Response $response): bool
     {

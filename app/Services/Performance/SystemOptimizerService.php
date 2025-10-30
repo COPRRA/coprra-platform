@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services\Performance;
 
-use Exception;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Console\Kernel;
 
@@ -19,15 +18,15 @@ final readonly class SystemOptimizerService
     {
         $this->executeOptimizationTask(
             '📦 Optimizing autoloader...',
-            function (): void {
+            static function (): void {
                 $returnCode = 0;
                 $execOutput = [];
                 exec('composer dump-autoload --optimize --no-dev 2>&1', $execOutput, $returnCode);
 
-                if ($returnCode !== 0) {
+                if (0 !== $returnCode) {
                     $details = implode("\n", $execOutput);
 
-                    throw new Exception('Composer autoload optimization failed'.($details !== '' ? ":\n".$details : ''));
+                    throw new \Exception('Composer autoload optimization failed'.('' !== $details ? ":\n".$details : ''));
                 }
             },
             'Autoloader optimized'
@@ -77,7 +76,7 @@ final readonly class SystemOptimizerService
         try {
             $task();
             $this->output->line('  ✓ '.$successMessage);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->output->warn('  ✗ Failed: '.$e->getMessage());
         }
 

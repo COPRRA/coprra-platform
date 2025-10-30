@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Models\Webhook;
 use App\Models\WebhookLog;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -15,18 +16,20 @@ class WebhookLogFactory extends Factory
     protected $model = WebhookLog::class;
 
     /**
-     * @return (int|string|string[])[]
+     * Define the model's default state.
      *
-     * @psalm-return array{webhook_id: 1, action: string, message: string, metadata: array{ip: string}}
+     * @return array<string, mixed>
      */
-    #[\Override]
-    public function definition()
+    public function definition(): array
     {
         return [
-            'webhook_id' => 1, // Or use a factory
-            'action' => $this->faker->word,
-            'message' => $this->faker->sentence,
-            'metadata' => ['ip' => $this->faker->ipv4],
+            'webhook_id' => Webhook::factory(),
+            'status' => 'success',
+            'response_code' => 200,
+            'response_body' => json_encode(['status' => 'success']),
+            'error_message' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 }

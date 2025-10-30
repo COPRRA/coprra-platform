@@ -9,6 +9,12 @@ use App\Jobs\SendPriceAlert;
 use App\Services\AI\ContinuousQualityMonitor;
 use App\Services\AI\StrictQualityAgent;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Foundation\Bootstrap\BootProviders;
+use Illuminate\Foundation\Bootstrap\LoadConfiguration;
+use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
+use Illuminate\Foundation\Bootstrap\RegisterFacades;
+use Illuminate\Foundation\Bootstrap\RegisterProviders;
+use Illuminate\Foundation\Bootstrap\SetRequestForConsole;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Psr\Log\LoggerInterface;
 
@@ -30,13 +36,13 @@ class Kernel extends ConsoleKernel
     {
         if ($this->app && $this->app->environment('testing')) {
             return [
-                \Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables::class,
-                \Illuminate\Foundation\Bootstrap\LoadConfiguration::class,
+                LoadEnvironmentVariables::class,
+                LoadConfiguration::class,
                 // Intentionally exclude HandleExceptions to avoid PHPUnit handler conflicts
-                \Illuminate\Foundation\Bootstrap\RegisterFacades::class,
-                \Illuminate\Foundation\Bootstrap\SetRequestForConsole::class,
-                \Illuminate\Foundation\Bootstrap\RegisterProviders::class,
-                \Illuminate\Foundation\Bootstrap\BootProviders::class,
+                RegisterFacades::class,
+                SetRequestForConsole::class,
+                RegisterProviders::class,
+                BootProviders::class,
             ];
         }
 
@@ -82,7 +88,8 @@ class Kernel extends ConsoleKernel
             ->onSuccess(function (): void {
                 // Using PSR logger via container to avoid static access
                 $this->app->make(LoggerInterface::class)->info('Log pruning completed successfully');
-            });
+            })
+        ;
 
         // Session Cleanup
         $schedule->command('session:gc')->weekly();
@@ -92,39 +99,44 @@ class Kernel extends ConsoleKernel
 
         // Database Maintenance
         $schedule->command('db:monitor')->hourly()
-            ->onFailure(function () use ($logger): void {
+            ->onFailure(static function () use ($logger): void {
                 $logger->error('Database monitoring failed');
-            });
+            })
+        ;
 
         // Deployment Health Checks
         $schedule->command('deployment:check')->daily()
-            ->onFailure(function () use ($logger): void {
+            ->onFailure(static function () use ($logger): void {
                 $logger->error('Deployment health check failed');
-            });
+            })
+        ;
     }
 
     private function scheduleBackups(Schedule $schedule, LoggerInterface $logger): void
     {
         // Backups (Spatie) — gated by config('backup.enabled')
         $backupEnabled = config('backup.enabled');
-        if ($backupEnabled === true) {
+        if (true === $backupEnabled) {
             // Run full backup daily at 2 AM
             $schedule->command('backup:run')->dailyAt('02:00')
-                ->onFailure(function () use ($logger): void {
+                ->onFailure(static function () use ($logger): void {
                     $logger->error('Backup run failed');
-                });
+                })
+            ;
 
             // Cleanup old backups daily at 3 AM
             $schedule->command('backup:clean')->dailyAt('03:00')
-                ->onFailure(function () use ($logger): void {
+                ->onFailure(static function () use ($logger): void {
                     $logger->error('Backup cleanup failed');
-                });
+                })
+            ;
 
             // Monitor backup health daily at 4 AM
             $schedule->command('backup:monitor')->dailyAt('04:00')
-                ->onFailure(function () use ($logger): void {
+                ->onFailure(static function () use ($logger): void {
                     $logger->error('Backup monitoring failed');
-                });
+                })
+            ;
         }
     }
 
@@ -132,69 +144,76 @@ class Kernel extends ConsoleKernel
     {
         // COPRRA: Exchange Rates Update (Daily at 2 AM)
         $schedule->command('exchange-rates:update')->dailyAt('02:00')
-            ->onSuccess(function () use ($logger): void {
+            ->onSuccess(static function () use ($logger): void {
                 $logger->info('Exchange rates updated successfully');
             })
-            ->onFailure(function () use ($logger): void {
+            ->onFailure(static function () use ($logger): void {
                 $logger->error('Exchange rates update failed');
-            });
+            })
+        ;
 
         // COPRRA: Sitemap Generation (Daily at 3 AM)
         $schedule->command('sitemap:generate')->dailyAt('03:00')
-            ->onSuccess(function () use ($logger): void {
+            ->onSuccess(static function () use ($logger): void {
                 $logger->info('Sitemap generated successfully');
             })
-            ->onFailure(function () use ($logger): void {
+            ->onFailure(static function () use ($logger): void {
                 $logger->error('Sitemap generation failed');
-            });
+            })
+        ;
 
         // COPRRA: SEO Audit (Weekly on Sunday at 4 AM)
         $schedule->command('seo:audit --fix')->weekly()->sundays()->at('04:00')
-            ->onSuccess(function () use ($logger): void {
+            ->onSuccess(static function () use ($logger): void {
                 $logger->info('SEO audit completed successfully');
             })
-            ->onFailure(function () use ($logger): void {
+            ->onFailure(static function () use ($logger): void {
                 $logger->error('SEO audit failed');
-            });
+            })
+        ;
 
         // COPRRA: Analytics Cleanup (Monthly on 1st at 5 AM)
         $schedule->command('analytics:clean --days=90 --force')->monthly()->at('05:00')
-            ->onSuccess(function () use ($logger): void {
+            ->onSuccess(static function () use ($logger): void {
                 $logger->info('Analytics cleanup completed successfully');
             })
-            ->onFailure(function () use ($logger): void {
+            ->onFailure(static function () use ($logger): void {
                 $logger->error('Analytics cleanup failed');
-            });
+            })
+        ;
 
         // COPRRA: Process Pending Webhooks (Every 5 minutes)
         $schedule->command('webhooks:process --limit=100')->everyFiveMinutes()
-            ->onSuccess(function () use ($logger): void {
+            ->onSuccess(static function () use ($logger): void {
                 $logger->info('Webhooks processed successfully');
             })
-            ->onFailure(function () use ($logger): void {
+            ->onFailure(static function () use ($logger): void {
                 $logger->error('Webhook processing failed');
-            });
+            })
+        ;
     }
 
     private function schedulePriceJobs(Schedule $schedule, LoggerInterface $logger): void
     {
         // Price System: Daily price history capture
-        $schedule->job(new FetchDailyPriceUpdates)->dailyAt('01:00')
-            ->onSuccess(function () use ($logger): void {
+        $schedule->job(new FetchDailyPriceUpdates())->dailyAt('01:00')
+            ->onSuccess(static function () use ($logger): void {
                 $logger->info('Daily price updates captured successfully');
             })
-            ->onFailure(function () use ($logger): void {
+            ->onFailure(static function () use ($logger): void {
                 $logger->error('Daily price updates capture failed');
-            });
+            })
+        ;
 
         // Price Alerts: notify users when targets are met
-        $schedule->job(new SendPriceAlert)->hourly()
-            ->onSuccess(function () use ($logger): void {
+        $schedule->job(new SendPriceAlert())->hourly()
+            ->onSuccess(static function () use ($logger): void {
                 $logger->info('Price alerts dispatched successfully');
             })
-            ->onFailure(function () use ($logger): void {
+            ->onFailure(static function () use ($logger): void {
                 $logger->error('Price alert dispatch failed');
-            });
+            })
+        ;
     }
 
     private function scheduleAiAgents(Schedule $schedule, LoggerInterface $logger): void
@@ -202,7 +221,7 @@ class Kernel extends ConsoleKernel
         // ContinuousQualityMonitor — gated by config('ai.monitor.enabled')
         $schedule->call(function () use ($logger): void {
             $monitorEnabled = config('ai.monitor.enabled');
-            if ($monitorEnabled !== true) {
+            if (true !== $monitorEnabled) {
                 return;
             }
             if ($this->app->environment('testing')) {
@@ -219,19 +238,21 @@ class Kernel extends ConsoleKernel
             }
 
             try {
-                $monitor = new ContinuousQualityMonitor;
+                $monitor = new ContinuousQualityMonitor();
                 $result = $monitor->performQualityCheck();
                 $overall = (int) ($result['overall_health'] ?? 0);
                 $logger->info('ContinuousQualityMonitor executed', ['overall_health' => $overall]);
+
                 try {
-                    file_put_contents($dir.'/monitor.log', '['.now()->toDateTimeString().'] overall_health='.$overall."\n", FILE_APPEND);
+                    file_put_contents($dir.'/monitor.log', '['.now()->toDateTimeString().'] overall_health='.$overall."\n", \FILE_APPEND);
                 } catch (\Throwable $e) {
                     $logger->error('Failed writing monitor log', ['error' => $e->getMessage()]);
                 }
             } catch (\Throwable $e) {
                 $logger->error('ContinuousQualityMonitor failed', ['error' => $e->getMessage()]);
+
                 try {
-                    file_put_contents($dir.'/monitor.log', '['.now()->toDateTimeString().'] ERROR: '.$e->getMessage()."\n", FILE_APPEND);
+                    file_put_contents($dir.'/monitor.log', '['.now()->toDateTimeString().'] ERROR: '.$e->getMessage()."\n", \FILE_APPEND);
                 } catch (\Throwable $writeError) {
                     $logger->error('Failed writing monitor error log', ['error' => $writeError->getMessage()]);
                 }
@@ -240,19 +261,21 @@ class Kernel extends ConsoleKernel
             ->hourly()
             ->name('ai:monitor')
             ->withoutOverlapping()
-            ->onFailure(function () use ($logger): void {
+            ->onFailure(static function () use ($logger): void {
                 $logger->error('Scheduled ai:monitor job failed');
+
                 try {
-                    file_put_contents(base_path('logs/agent/monitor.log'), '['.now()->toDateTimeString()."] SCHEDULE FAILURE\n", FILE_APPEND);
+                    file_put_contents(base_path('logs/agent/monitor.log'), '['.now()->toDateTimeString()."] SCHEDULE FAILURE\n", \FILE_APPEND);
                 } catch (\Throwable $e) {
                     $logger->error('Failed writing monitor schedule failure log', ['error' => $e->getMessage()]);
                 }
-            });
+            })
+        ;
 
         // StrictQualityAgent — gated by config('ai.strict_agent.enabled')
         $schedule->call(function () use ($logger): void {
             $strictAgentEnabled = config('ai.strict_agent.enabled');
-            if ($strictAgentEnabled !== true) {
+            if (true !== $strictAgentEnabled) {
                 return;
             }
             if ($this->app->environment('testing')) {
@@ -269,19 +292,21 @@ class Kernel extends ConsoleKernel
             }
 
             try {
-                $agent = new StrictQualityAgent;
+                $agent = new StrictQualityAgent();
                 $summary = $agent->executeAllStages();
                 $success = (bool) ($summary['overall_success'] ?? false);
                 $logger->info('StrictQualityAgent executed', ['overall_success' => $success]);
+
                 try {
-                    file_put_contents($dir.'/quality_agent.log', '['.now()->toDateTimeString().'] overall_success='.($success ? 'true' : 'false')."\n", FILE_APPEND);
+                    file_put_contents($dir.'/quality_agent.log', '['.now()->toDateTimeString().'] overall_success='.($success ? 'true' : 'false')."\n", \FILE_APPEND);
                 } catch (\Throwable $e) {
                     $logger->error('Failed writing quality_agent log', ['error' => $e->getMessage()]);
                 }
             } catch (\Throwable $e) {
                 $logger->error('StrictQualityAgent failed', ['error' => $e->getMessage()]);
+
                 try {
-                    file_put_contents($dir.'/quality_agent.log', '['.now()->toDateTimeString().'] ERROR: '.$e->getMessage()."\n", FILE_APPEND);
+                    file_put_contents($dir.'/quality_agent.log', '['.now()->toDateTimeString().'] ERROR: '.$e->getMessage()."\n", \FILE_APPEND);
                 } catch (\Throwable $writeError) {
                     $logger->error('Failed writing quality_agent error log', ['error' => $writeError->getMessage()]);
                 }
@@ -290,13 +315,15 @@ class Kernel extends ConsoleKernel
             ->dailyAt('02:30')
             ->name('ai:strict-quality-agent')
             ->withoutOverlapping()
-            ->onFailure(function () use ($logger): void {
+            ->onFailure(static function () use ($logger): void {
                 $logger->error('Scheduled ai:strict-quality-agent job failed');
+
                 try {
-                    file_put_contents(base_path('logs/agent/quality_agent.log'), '['.now()->toDateTimeString()."] SCHEDULE FAILURE\n", FILE_APPEND);
+                    file_put_contents(base_path('logs/agent/quality_agent.log'), '['.now()->toDateTimeString()."] SCHEDULE FAILURE\n", \FILE_APPEND);
                 } catch (\Throwable $e) {
                     $logger->error('Failed writing quality_agent schedule failure log', ['error' => $e->getMessage()]);
                 }
-            });
+            })
+        ;
     }
 }

@@ -1,24 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
-    private function tryModify(string $table, string $column, string $definition): void
-    {
-        if (! Schema::hasTable($table) || ! Schema::hasColumn($table, $column)) {
-            return;
-        }
-        $sql = "ALTER TABLE `{$table}` MODIFY `{$column}` {$definition}";
-        try {
-            DB::statement($sql);
-        } catch (\Throwable $e) {
-            // Ignore failures to keep migration resilient in varied environments
-        }
-    }
-
+return new class extends Migration {
     public function up(): void
     {
         // Ensure all FK columns are BIGINT UNSIGNED to match Laravel conventions
@@ -79,5 +67,19 @@ return new class extends Migration
         $this->tryModify('order_items', 'order_id', 'BIGINT NOT NULL');
 
         $this->tryModify('orders', 'user_id', 'BIGINT NOT NULL');
+    }
+
+    private function tryModify(string $table, string $column, string $definition): void
+    {
+        if (! Schema::hasTable($table) || ! Schema::hasColumn($table, $column)) {
+            return;
+        }
+        $sql = "ALTER TABLE `{$table}` MODIFY `{$column}` {$definition}";
+
+        try {
+            DB::statement($sql);
+        } catch (Throwable $e) {
+            // Ignore failures to keep migration resilient in varied environments
+        }
     }
 };

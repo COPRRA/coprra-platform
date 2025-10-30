@@ -17,14 +17,14 @@ class OrderFactory extends Factory
     /**
      * The name of the factory's corresponding model.
      *
-     * @var class-string<\App\Models\Order>
+     * @var class-string<Order>
      */
     protected $model = Order::class;
 
     /**
      * Define the model's default state.
      *
-     * @return (UserFactory|\DateTime|float|mixed|string|string[])[]
+     * @return (\DateTime|float|mixed|string|string[]|UserFactory)[]
      *
      * @psalm-return array{order_number: string, user_id: UserFactory, status: mixed, total_amount: float, subtotal: float, tax_amount: float, shipping_amount: float, discount_amount: float, currency: 'USD', shipping_address: array{street: string, city: string, state: string, zip: string, country: string}, billing_address: array{street: string, city: string, state: string, zip: string, country: string}, notes: string, order_date: \DateTime, shipped_at: \DateTime, delivered_at: \DateTime}
      */

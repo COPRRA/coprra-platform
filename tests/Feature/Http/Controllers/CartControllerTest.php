@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers;
 
+use App\Models\CartItem;
+use App\Models\Product;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -12,72 +15,194 @@ use Tests\TestCase;
 
 /**
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class CartControllerTest extends TestCase
+final class CartControllerTest extends TestCase
 {
     use RefreshDatabase;
 
     #[Test]
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function it_can_display_cart_index(): void
+    public function itCanDisplayCartIndex(): void
     {
-        $this->assertTrue(true);
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get('/cart');
+
+        $response->assertStatus(200)
+            ->assertViewIs('cart.index')
+            ->assertViewHas('cartItems')
+        ;
     }
 
     #[Test]
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function it_can_add_product_to_cart(): void
+    public function itCanAddProductToCart(): void
     {
-        $this->assertTrue(true);
+        $user = User::factory()->create();
+        $product = Product::factory()->create([
+            'price' => 29.99,
+            'stock' => 10,
+        ]);
+
+        $response = $this->actingAs($user)->post('/cart/add', [
+            'product_id' => $product->id,
+            'quantity' => 2,
+        ]);
+
+        $response->assertRedirect('/cart')
+            ->assertSessionHas('success')
+        ;
+
+        $this->assertDatabaseHas('cart_items', [
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'quantity' => 2,
+        ]);
     }
 
     #[Test]
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function it_validates_add_to_cart_request(): void
+    public function itValidatesAddToCartRequest(): void
     {
-        $this->assertTrue(true);
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post('/cart/add', [
+            'product_id' => '',
+            'quantity' => 0,
+        ]);
+
+        $response->assertSessionHasErrors(['product_id', 'quantity']);
     }
 
     #[Test]
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function it_returns_404_when_adding_nonexistent_product_to_cart(): void
+    public function itReturns404WhenAddingNonexistentProductToCart(): void
     {
-        $this->assertTrue(true);
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post('/cart/add', [
+            'product_id' => 99999,
+            'quantity' => 1,
+        ]);
+
+        $response->assertStatus(404);
     }
 
     #[Test]
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function it_can_update_cart_item_quantity(): void
+    public function itCanUpdateCartItemQuantity(): void
     {
-        $this->assertTrue(true);
+        $user = User::factory()->create();
+        $product = Product::factory()->create();
+        $cartItem = CartItem::factory()->create([
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'quantity' => 1,
+        ]);
+
+        $response = $this->actingAs($user)->patch("/cart/{$cartItem->id}", [
+            'quantity' => 3,
+        ]);
+
+        $response->assertRedirect('/cart')
+            ->assertSessionHas('success')
+        ;
+
+        $this->assertDatabaseHas('cart_items', [
+            'id' => $cartItem->id,
+            'quantity' => 3,
+        ]);
     }
 
     #[Test]
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function it_can_remove_product_from_cart(): void
+    public function itCanRemoveProductFromCart(): void
     {
-        $this->assertTrue(true);
+        $user = User::factory()->create();
+        $product = Product::factory()->create();
+        $cartItem = CartItem::factory()->create([
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+        ]);
+
+        $response = $this->actingAs($user)->delete("/cart/{$cartItem->id}");
+
+        $response->assertRedirect('/cart')
+            ->assertSessionHas('success')
+        ;
+
+        $this->assertDatabaseMissing('cart_items', [
+            'id' => $cartItem->id,
+        ]);
     }
 
     #[Test]
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function it_can_clear_entire_cart(): void
+    public function itCanClearEntireCart(): void
     {
-        $this->assertTrue(true);
+        $user = User::factory()->create();
+        $product1 = Product::factory()->create();
+        $product2 = Product::factory()->create();
+
+        CartItem::factory()->create([
+            'user_id' => $user->id,
+            'product_id' => $product1->id,
+        ]);
+        CartItem::factory()->create([
+            'user_id' => $user->id,
+            'product_id' => $product2->id,
+        ]);
+
+        $response = $this->actingAs($user)->delete('/cart/clear');
+
+        $response->assertRedirect('/cart')
+            ->assertSessionHas('success')
+        ;
+
+        $this->assertDatabaseMissing('cart_items', [
+            'user_id' => $user->id,
+        ]);
     }
 
     #[Test]
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function it_requires_authentication_for_all_cart_routes(): void
+    public function itRequiresAuthenticationForAllCartRoutes(): void
     {
-        $this->assertTrue(true);
+        $product = Product::factory()->create();
+
+        // Test cart index
+        $response = $this->get('/cart');
+        $response->assertRedirect('/login');
+
+        // Test add to cart
+        $response = $this->post('/cart/add', [
+            'product_id' => $product->id,
+            'quantity' => 1,
+        ]);
+        $response->assertRedirect('/login');
+
+        // Test update cart
+        $response = $this->patch('/cart/1', ['quantity' => 2]);
+        $response->assertRedirect('/login');
+
+        // Test remove from cart
+        $response = $this->delete('/cart/1');
+        $response->assertRedirect('/login');
+
+        // Test clear cart
+        $response = $this->delete('/cart/clear');
+        $response->assertRedirect('/login');
     }
 }

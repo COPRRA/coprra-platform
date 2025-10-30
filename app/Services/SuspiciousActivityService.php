@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use Exception;
 use Psr\Log\LoggerInterface;
 
 final class SuspiciousActivityService
 {
     /**
-     * @var array<string, array<string, string|int|float|bool|array|null>
-     *     |bool|float|int|string|null>
+     * @var array<string, array<string, string|int|float|bool|array|* @method static \App\Models\Brand create(array<string, string|bool|null>
+     *
+     *     |bool|float|int|string|* @method static \App\Models\Brand create(array<string, string|bool|null>
      */
     private array $config = [];
 
@@ -34,7 +34,7 @@ final class SuspiciousActivityService
     }
 
     /**
-     * @param  array<string, scalar|null>  $data
+     * @param  array<string, scalar|* @method static \App\Models\Brand create(array<string, string|bool|null>  $data
      */
     public function monitorActivity(string $event, iterable $data): void
     {
@@ -44,7 +44,7 @@ final class SuspiciousActivityService
             }
 
             $this->processActivity($event, $data);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->logger->error('Suspicious activity monitoring failed', [
                 'event' => $event,
                 'data' => $data,
@@ -69,7 +69,7 @@ final class SuspiciousActivityService
     }
 
     /**
-     * @param  array<string, scalar|null>  $data
+     * @param  array<string, scalar|* @method static \App\Models\Brand create(array<string, string|bool|null>  $data
      */
     private function processActivity(string $event, iterable $data): void
     {
@@ -81,7 +81,7 @@ final class SuspiciousActivityService
     }
 
     /**
-     * @param  array<string, scalar|null>  $activity
+     * @param array{type: string, severity: string, user_id: int, details: array<string, mixed>, timestamp: string, ip_address?: string} $activity
      */
     private function processSuspiciousActivity(iterable $activity): void
     {
@@ -90,19 +90,19 @@ final class SuspiciousActivityService
     }
 
     /**
-     * @param  array<string, scalar|null>  $activity
+     * @param array{type: string, severity: string, user_id: int, details: array<string, mixed>, timestamp: string, ip_address?: string} $activity
      */
     private function takeAutomaticActions(iterable $activity): void
     {
         $severity = $activity['severity'] ?? 'medium';
         $type = $activity['type'] ?? 'unknown';
 
-        if ($severity !== 'high') {
+        if ('high' !== $severity) {
             return;
         }
 
         $userId = (int) ($activity['user_id'] ?? 0);
-        if ($userId === 0) {
+        if (0 === $userId) {
             return;
         }
 

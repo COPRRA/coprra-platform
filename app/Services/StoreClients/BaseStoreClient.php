@@ -13,7 +13,7 @@ abstract class BaseStoreClient
     protected string $apiUrl;
 
     /**
-     * @param  array<string, string>  $config
+     * @param array<string, string> $config
      */
     public function __construct(array $config)
     {
@@ -22,20 +22,21 @@ abstract class BaseStoreClient
     }
 
     /**
-     * @param  array<string, string|int|float|bool>  $filters
-     * @return array<int, array<string, string|int|float|bool|array<string, string>>>
+     * @param array<string, bool|float|int|string> $filters
+     *
+     * @return array<int, array<string, array<string, string>|bool|float|int|string>>
      */
     abstract public function search(string $query, array $filters): array;
 
     /**
-     * @return array<string, string|int|float|bool|array<string, string>>|null
+     * @return array<string, array<string, string>|bool|float|int|string>|null
      */
     abstract public function getProduct(string $productId): ?array;
 
     abstract public function syncProducts(callable $syncCallback): void;
 
     /**
-     * @return array<string, string|int|float>
+     * @return array<string, float|int|string>
      */
     public function getStatus(): array
     {
@@ -55,7 +56,7 @@ abstract class BaseStoreClient
     }
 
     /**
-     * @param  array<string, string|int|float|bool|array<string, string>>  $data
+     * @param array<string, array<string, string>|bool|float|int|string> $data
      */
     protected function makeRequest(string $method, string $endpoint, array $data = [])
     {

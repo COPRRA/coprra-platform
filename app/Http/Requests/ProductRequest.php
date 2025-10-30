@@ -69,7 +69,7 @@ class ProductRequest extends FormRequest
     {
         if ($this->has('name') && ! $this->has('slug')) {
             $this->merge([
-                'slug' => str(is_string($this->name) ? $this->name : '')->slug()->toString(),
+                'slug' => str(\is_string($this->name) ? $this->name : '')->slug()->toString(),
             ]);
         }
     }

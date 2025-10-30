@@ -30,7 +30,7 @@ final class SEOIssueFixer
     /**
      * Fix model issues.
      *
-     * @param  array<string, string|null>  $metaData
+     * @param  array<string, string|* @method static \App\Models\Brand create(array<string, string|bool|null>  $metaData
      */
     public function fixModelIssues(Model $model, array $metaData): bool
     {
@@ -63,8 +63,9 @@ final class SEOIssueFixer
     /**
      * Fix multiple meta fields on a model.
      *
-     * @param  array<string, string>  $metaFields  Map of model field names to metaData keys
-     * @param  array<string, string|null>  $metaData
+     * @param array<string, string> $metaFields Map of model field names to metaData keys
+     * @param  array<string, string|* @method static \App\Models\Brand create(array<string, string|bool|null>  $metaData
+     *
      * @return bool Whether any fields were fixed
      */
     private function fixMetaFields(Model $model, array $metaFields, array $metaData): bool
@@ -84,7 +85,7 @@ final class SEOIssueFixer
     /**
      * Determine if a field should be fixed.
      *
-     * @param  array<string, string|null>  $metaData
+     * @param  array<string, string|* @method static \App\Models\Brand create(array<string, string|bool|null>  $metaData
      */
     private function shouldFixField(Model $model, string $field, array $metaData, string $metaType): bool
     {
@@ -93,9 +94,9 @@ final class SEOIssueFixer
             return false;
         }
 
-        return ($model->{$field} === null || $model->{$field} === '')
+        return (null === $model->{$field} || '' === $model->{$field})
             && isset($metaData[$metaType])
-            && $metaData[$metaType] !== '';
+            && '' !== $metaData[$metaType];
     }
 
     /**
@@ -107,7 +108,7 @@ final class SEOIssueFixer
         try {
             $columns = \Schema::getColumnListing($model->getTable());
 
-            return in_array($field, $columns, true);
+            return \in_array($field, $columns, true);
         } catch (\Throwable $e) {
             // If we can't check the schema, try to access the attribute
             try {

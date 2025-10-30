@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\Order;
 
 use App\Models\Order;
@@ -27,10 +29,11 @@ final class OrderTotalsCalculator
 
         // Prefer querying totals directly first for reliability
         try {
-            $sum = (float) (DB::connection($connName)
+            $sum = (float) DB::connection($connName)
                 ->table('order_items')
                 ->where('order_id', $order->getKey())
-                ->sum('total'));
+                ->sum('total')
+            ;
             if ($sum > 0.0) {
                 return round($sum, 2);
             }
@@ -83,7 +86,7 @@ final class OrderTotalsCalculator
         try {
             $items = $order->items()->get(['quantity', 'price', 'unit_price', 'total', 'total_price']);
             if ($items->isNotEmpty()) {
-                $sum = $items->sum(function ($row): float {
+                $sum = $items->sum(static function ($row): float {
                     $qty = (int) ($row->quantity ?? 1);
                     $price = (float) ($row->price ?? $row->unit_price ?? 0.0);
 

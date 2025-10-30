@@ -17,7 +17,7 @@ class ReviewFactory extends Factory
     protected $model = Review::class;
 
     /**
-     * @return (ProductFactory|UserFactory|array|bool|int|string)[]
+     * @return (array|bool|int|ProductFactory|string|UserFactory)[]
      *
      * @psalm-return array{user_id: UserFactory, product_id: ProductFactory, title: string, content: string, rating: int, is_verified_purchase: bool, is_approved: true, helpful_votes: array<never, never>, helpful_count: int}
      */

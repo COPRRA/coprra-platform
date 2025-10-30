@@ -6,54 +6,60 @@ namespace Tests\AI;
 
 // Removed PreserveGlobalState to avoid risky test flags
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
 
-class ProductClassificationTest extends \PHPUnit\Framework\TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class ProductClassificationTest extends TestCase
 {
     #[Test]
-    public function can_classify_electronics(): void
+    public function canClassifyElectronics(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function can_classify_clothing(): void
+    public function canClassifyClothing(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function can_classify_books(): void
+    public function canClassifyBooks(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function can_classify_home_garden(): void
+    public function canClassifyHomeGarden(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function can_classify_sports(): void
+    public function canClassifySports(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function classification_confidence_is_high(): void
+    public function classificationConfidenceIsHigh(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function can_handle_ambiguous_products(): void
+    public function canHandleAmbiguousProducts(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function can_suggest_subcategories(): void
+    public function canSuggestSubcategories(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 }

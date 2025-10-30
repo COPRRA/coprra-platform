@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use PDO;
-use PDOException;
-
 /**
- * Environment Checker Service
+ * Environment Checker Service.
  *
  * This class is responsible for checking the server environment
  * and ensuring all requirements are met for the application.
@@ -32,7 +29,7 @@ class EnvironmentChecker
     private array $warnings = [];
 
     /**
-     * Run all environment checks
+     * Run all environment checks.
      */
     public function run(): void
     {
@@ -53,67 +50,67 @@ class EnvironmentChecker
     }
 
     /**
-     * Print header
+     * Print header.
      */
     private function printHeader(): void
     {
         $this->printInfo('=========================================');
         $this->printInfo('Environment Configuration Check');
         $this->printInfo('=========================================');
-        echo PHP_EOL;
+        echo \PHP_EOL;
     }
 
     /**
-     * Print success message
+     * Print success message.
      */
     private function printSuccess(string $message): void
     {
-        echo self::COLOR_GREEN."✓ {$message}".self::COLOR_RESET.PHP_EOL;
+        echo self::COLOR_GREEN."✓ {$message}".self::COLOR_RESET.\PHP_EOL;
     }
 
     /**
-     * Print error message
+     * Print error message.
      */
     private function printError(string $message): void
     {
-        echo self::COLOR_RED."✗ {$message}".self::COLOR_RESET.PHP_EOL;
+        echo self::COLOR_RED."✗ {$message}".self::COLOR_RESET.\PHP_EOL;
         $this->errors[] = $message;
     }
 
     /**
-     * Print warning message
+     * Print warning message.
      */
     private function printWarning(string $message): void
     {
-        echo self::COLOR_YELLOW."⚠ {$message}".self::COLOR_RESET.PHP_EOL;
+        echo self::COLOR_YELLOW."⚠ {$message}".self::COLOR_RESET.\PHP_EOL;
         $this->warnings[] = $message;
     }
 
     /**
-     * Print info message
+     * Print info message.
      */
     private function printInfo(string $message): void
     {
-        echo self::COLOR_BLUE.$message.self::COLOR_RESET.PHP_EOL;
+        echo self::COLOR_BLUE.$message.self::COLOR_RESET.\PHP_EOL;
     }
 
     /**
-     * Check PHP version
+     * Check PHP version.
      */
     private function checkPhpVersion(): void
     {
         $this->printInfo('Checking PHP version...');
-        $phpVersion = phpversion();
+        $phpVersion = \PHP_VERSION;
         if (version_compare($phpVersion, '8.1.0', '<')) {
             $this->printError("PHP version {$phpVersion} is too old. Minimum required: 8.1.0");
         } else {
             $this->printSuccess("PHP version {$phpVersion} is compatible");
         }
-        echo PHP_EOL;
+        echo \PHP_EOL;
     }
 
     /**
-     * Check required PHP extensions
+     * Check required PHP extensions.
      */
     private function checkRequiredExtensions(): void
     {
@@ -121,17 +118,17 @@ class EnvironmentChecker
         $requiredExtensions = ['pdo', 'pdo_mysql', 'mbstring', 'openssl', 'tokenizer', 'xml', 'json', 'bcmath', 'ctype', 'fileinfo', 'intl', 'gd'];
 
         foreach ($requiredExtensions as $extension) {
-            if (extension_loaded($extension)) {
+            if (\extension_loaded($extension)) {
                 $this->printSuccess("Extension '{$extension}' is loaded");
             } else {
                 $this->printError("Extension '{$extension}' is not loaded");
             }
         }
-        echo PHP_EOL;
+        echo \PHP_EOL;
     }
 
     /**
-     * Check recommended PHP extensions
+     * Check recommended PHP extensions.
      */
     private function checkRecommendedExtensions(): void
     {
@@ -139,17 +136,17 @@ class EnvironmentChecker
         $recommendedExtensions = ['redis', 'memcached', 'gd', 'imagick', 'zip', 'curl', 'intl'];
 
         foreach ($recommendedExtensions as $extension) {
-            if (extension_loaded($extension)) {
+            if (\extension_loaded($extension)) {
                 $this->printSuccess("Extension '{$extension}' is loaded");
             } else {
                 $this->printWarning("Extension '{$extension}' is not loaded (optional)");
             }
         }
-        echo PHP_EOL;
+        echo \PHP_EOL;
     }
 
     /**
-     * Check PHP configuration
+     * Check PHP configuration.
      */
     private function checkPhpConfiguration(): void
     {
@@ -159,15 +156,15 @@ class EnvironmentChecker
         $this->checkPhpConfigSetting('upload_max_filesize', '10M', '>=');
         $this->checkPhpConfigSetting('post_max_size', '10M', '>=');
         $this->checkPhpConfigSetting('max_input_vars', '3000', '>=');
-        echo PHP_EOL;
+        echo \PHP_EOL;
     }
 
     /**
-     * Check a specific PHP configuration setting
+     * Check a specific PHP configuration setting.
      */
     private function checkPhpConfigSetting(string $setting, string $requiredValue, string $operator): void
     {
-        $currentValue = ini_get($setting);
+        $currentValue = \ini_get($setting);
         $currentBytes = $this->returnBytes($currentValue);
         $requiredBytes = $this->returnBytes($requiredValue);
 
@@ -187,12 +184,12 @@ class EnvironmentChecker
     }
 
     /**
-     * Convert PHP size format to bytes
+     * Convert PHP size format to bytes.
      */
     private function returnBytes(string $val): int
     {
         $trimmedVal = trim($val);
-        $last = strtolower($trimmedVal[strlen($trimmedVal) - 1]);
+        $last = strtolower($trimmedVal[\strlen($trimmedVal) - 1]);
         $numericVal = (int) $trimmedVal;
 
         return match ($last) {
@@ -204,7 +201,7 @@ class EnvironmentChecker
     }
 
     /**
-     * Check directory permissions
+     * Check directory permissions.
      */
     private function checkDirectoryPermissions(): void
     {
@@ -219,11 +216,11 @@ class EnvironmentChecker
                 $this->printError("Directory '{$directory}' is not writable");
             }
         }
-        echo PHP_EOL;
+        echo \PHP_EOL;
     }
 
     /**
-     * Check environment file
+     * Check environment file.
      */
     private function checkEnvironmentFile(): void
     {
@@ -236,18 +233,18 @@ class EnvironmentChecker
         } else {
             $this->printError('Environment file does not exist');
         }
-        echo PHP_EOL;
+        echo \PHP_EOL;
     }
 
     /**
-     * Check environment settings
+     * Check environment settings.
      */
     private function checkEnvironmentSettings(): void
     {
         $requiredEnvVars = ['APP_KEY', 'DB_CONNECTION', 'DB_HOST', 'DB_PORT', 'DB_DATABASE', 'DB_USERNAME'];
 
         foreach ($requiredEnvVars as $var) {
-            if (env($var) !== null) {
+            if (null !== env($var)) {
                 $this->printSuccess("Environment variable '{$var}' is set");
             } else {
                 $this->printError("Environment variable '{$var}' is not set");
@@ -256,7 +253,7 @@ class EnvironmentChecker
     }
 
     /**
-     * Check composer dependencies
+     * Check composer dependencies.
      */
     private function checkComposerDependencies(): void
     {
@@ -269,11 +266,11 @@ class EnvironmentChecker
         } else {
             $this->printWarning('Composer lock file does not exist');
         }
-        echo PHP_EOL;
+        echo \PHP_EOL;
     }
 
     /**
-     * Check composer autoload
+     * Check composer autoload.
      */
     private function checkComposerAutoload(): void
     {
@@ -286,55 +283,55 @@ class EnvironmentChecker
     }
 
     /**
-     * Check database connection
+     * Check database connection.
      */
     private function checkDatabaseConnection(): void
     {
         $this->printInfo('Checking database connection...');
 
         try {
-            $dsn = sprintf(
+            $dsn = \sprintf(
                 'mysql:host=%s;port=%s;dbname=%s',
                 env('DB_HOST', '127.0.0.1'),
                 env('DB_PORT', '3306'),
                 env('DB_DATABASE', 'forge')
             );
 
-            new PDO($dsn, env('DB_USERNAME'), env('DB_PASSWORD'));
+            new \PDO($dsn, env('DB_USERNAME'), env('DB_PASSWORD'));
             $this->printSuccess('Database connection successful');
-        } catch (PDOException $e) {
+        } catch (\PDOException $e) {
             $this->printError('Database connection failed: '.$e->getMessage());
         }
-        echo PHP_EOL;
+        echo \PHP_EOL;
     }
 
     /**
-     * Check cache configuration
+     * Check cache configuration.
      */
     private function checkCacheConfiguration(): void
     {
         $this->printInfo('Checking cache configuration...');
         $cacheDriver = env('CACHE_DRIVER', 'file');
 
-        if ($cacheDriver === 'redis') {
+        if ('redis' === $cacheDriver) {
             $this->checkRedisConnection();
-        } elseif ($cacheDriver === 'memcached') {
+        } elseif ('memcached' === $cacheDriver) {
             $this->checkMemcachedConnection();
         } else {
             $this->printSuccess('Using file cache driver');
             $this->checkFileCacheDirectory();
         }
-        echo PHP_EOL;
+        echo \PHP_EOL;
     }
 
     /**
-     * Check Redis connection
+     * Check Redis connection.
      */
     private function checkRedisConnection(): void
     {
-        if (extension_loaded('redis')) {
+        if (\extension_loaded('redis')) {
             try {
-                $redis = new \Redis;
+                $redis = new \Redis();
                 $redis->connect((string) env('REDIS_HOST', '127.0.0.1'), (int) env('REDIS_PORT', '6379'));
                 $this->printSuccess('Redis connection successful');
             } catch (\Exception $e) {
@@ -346,13 +343,13 @@ class EnvironmentChecker
     }
 
     /**
-     * Check Memcached connection
+     * Check Memcached connection.
      */
     private function checkMemcachedConnection(): void
     {
-        if (extension_loaded('memcached')) {
+        if (\extension_loaded('memcached')) {
             try {
-                $memcached = new \Memcached;
+                $memcached = new \Memcached();
                 $memcached->addServer((string) env('MEMCACHED_HOST', '127.0.0.1'), (int) env('MEMCACHED_PORT', '11211'));
                 $this->printSuccess('Memcached connection successful');
             } catch (\Exception $e) {
@@ -364,7 +361,7 @@ class EnvironmentChecker
     }
 
     /**
-     * Check file cache directory
+     * Check file cache directory.
      */
     private function checkFileCacheDirectory(): void
     {
@@ -377,31 +374,31 @@ class EnvironmentChecker
     }
 
     /**
-     * Check queue configuration
+     * Check queue configuration.
      */
     private function checkQueueConfiguration(): void
     {
         $this->printInfo('Checking queue configuration...');
         $queueDriver = env('QUEUE_CONNECTION', 'sync');
 
-        if ($queueDriver === 'redis') {
+        if ('redis' === $queueDriver) {
             $this->checkRedisQueueConnection();
-        } elseif ($queueDriver === 'database') {
+        } elseif ('database' === $queueDriver) {
             $this->printSuccess('Using database queue driver');
         } else {
             $this->printWarning('Using sync queue driver (not recommended for production)');
         }
-        echo PHP_EOL;
+        echo \PHP_EOL;
     }
 
     /**
-     * Check Redis queue connection
+     * Check Redis queue connection.
      */
     private function checkRedisQueueConnection(): void
     {
-        if (extension_loaded('redis')) {
+        if (\extension_loaded('redis')) {
             try {
-                $redis = new \Redis;
+                $redis = new \Redis();
                 $redis->connect((string) env('REDIS_HOST', '127.0.0.1'), (int) env('REDIS_PORT', '6379'));
                 $this->printSuccess('Redis queue connection successful');
             } catch (\Exception $e) {
@@ -413,7 +410,7 @@ class EnvironmentChecker
     }
 
     /**
-     * Print summary
+     * Print summary.
      */
     private function printSummary(): void
     {
@@ -421,27 +418,27 @@ class EnvironmentChecker
         $this->printInfo('Environment Check Summary');
         $this->printInfo('=========================================');
 
-        if ($this->errors === [] && $this->warnings === []) {
+        if ([] === $this->errors && [] === $this->warnings) {
             $this->printSuccess('All checks passed! Environment is ready.');
         } else {
-            if ($this->errors !== []) {
-                echo PHP_EOL;
-                $this->printInfo('Errors ('.count($this->errors).'):');
+            if ([] !== $this->errors) {
+                echo \PHP_EOL;
+                $this->printInfo('Errors ('.\count($this->errors).'):');
                 foreach ($this->errors as $error) {
                     $this->printError($error);
                 }
             }
 
-            if ($this->warnings !== []) {
-                echo PHP_EOL;
-                $this->printInfo('Warnings ('.count($this->warnings).'):');
+            if ([] !== $this->warnings) {
+                echo \PHP_EOL;
+                $this->printInfo('Warnings ('.\count($this->warnings).'):');
                 foreach ($this->warnings as $warning) {
                     $this->printWarning($warning);
                 }
             }
         }
 
-        echo PHP_EOL;
+        echo \PHP_EOL;
         $this->printInfo('=========================================');
     }
 }

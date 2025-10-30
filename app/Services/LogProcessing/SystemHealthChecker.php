@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 class SystemHealthChecker
 {
     /**
-     * Check all system health components
+     * Check all system health components.
      *
      * @return array<array<string>>
      *
@@ -28,7 +28,7 @@ class SystemHealthChecker
     }
 
     /**
-     * Check database health
+     * Check database health.
      *
      * @return array<string>
      *
@@ -46,7 +46,7 @@ class SystemHealthChecker
     }
 
     /**
-     * Check cache health
+     * Check cache health.
      *
      * @return array<string>
      *
@@ -60,7 +60,7 @@ class SystemHealthChecker
             $retrieved = Cache::get($testKey);
             Cache::forget($testKey);
 
-            if ($retrieved === 'test') {
+            if ('test' === $retrieved) {
                 return ['status' => 'healthy', 'message' => 'Cache is working'];
             }
 
@@ -71,7 +71,7 @@ class SystemHealthChecker
     }
 
     /**
-     * Check storage health
+     * Check storage health.
      *
      * @return array<string>
      *
@@ -110,7 +110,7 @@ class SystemHealthChecker
     }
 
     /**
-     * Check memory health
+     * Check memory health.
      *
      * @return array<string>
      *
@@ -119,7 +119,7 @@ class SystemHealthChecker
     private function checkMemoryHealth(): array
     {
         $memoryUsage = memory_get_usage(true);
-        $memoryLimit = ini_get('memory_limit');
+        $memoryLimit = \ini_get('memory_limit');
         $memoryLimitBytes = $this->convertToBytes($memoryLimit);
         $usagePercentage = $memoryUsage / $memoryLimitBytes * 100;
 
@@ -144,7 +144,7 @@ class SystemHealthChecker
     }
 
     /**
-     * Check disk space health
+     * Check disk space health.
      *
      * @return array<string>
      *
@@ -176,12 +176,12 @@ class SystemHealthChecker
     }
 
     /**
-     * Convert memory limit to bytes
+     * Convert memory limit to bytes.
      */
     private function convertToBytes(string $memoryLimit): int
     {
         $memoryLimit = trim($memoryLimit);
-        $unit = strtolower($memoryLimit[strlen($memoryLimit) - 1]);
+        $unit = strtolower($memoryLimit[\strlen($memoryLimit) - 1]);
         $value = (int) $memoryLimit;
 
         return match ($unit) {

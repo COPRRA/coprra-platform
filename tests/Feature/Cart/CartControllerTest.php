@@ -8,7 +8,12 @@ use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class CartControllerTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class CartControllerTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -20,7 +25,7 @@ class CartControllerTest extends TestCase
         app('cart')->clear();
     }
 
-    public function test_user_can_view_cart(): void
+    public function testUserCanViewCart(): void
     {
         $response = $this->get('/cart');
 
@@ -29,7 +34,7 @@ class CartControllerTest extends TestCase
         $response->assertViewHas(['cartItems', 'total']);
     }
 
-    public function test_user_can_add_product_to_cart(): void
+    public function testUserCanAddProductToCart(): void
     {
         $product = Product::factory()->create([
             'name' => 'Test Product',
@@ -45,11 +50,11 @@ class CartControllerTest extends TestCase
         $response->assertSessionHas('success');
 
         $cartItems = app('cart')->getContent();
-        $this->assertCount(1, $cartItems);
-        $this->assertEquals(2, $cartItems->first()->quantity);
+        self::assertCount(1, $cartItems);
+        self::assertSame(2, $cartItems->first()->quantity);
     }
 
-    public function test_user_can_update_cart_quantity(): void
+    public function testUserCanUpdateCartQuantity(): void
     {
         $product = Product::factory()->create(['price' => 50.00]);
 
@@ -73,10 +78,10 @@ class CartControllerTest extends TestCase
         $response->assertSessionHas('success');
 
         $updatedItem = app('cart')->get($cartItem->id);
-        $this->assertEquals(5, $updatedItem->quantity);
+        self::assertSame(5, $updatedItem->quantity);
     }
 
-    public function test_user_cannot_update_cart_with_invalid_quantity(): void
+    public function testUserCannotUpdateCartWithInvalidQuantity(): void
     {
         $product = Product::factory()->create();
 
@@ -98,7 +103,7 @@ class CartControllerTest extends TestCase
         $response->assertSessionHasErrors('quantity');
     }
 
-    public function test_user_can_remove_item_from_cart(): void
+    public function testUserCanRemoveItemFromCart(): void
     {
         $product = Product::factory()->create();
 
@@ -117,10 +122,10 @@ class CartControllerTest extends TestCase
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
-        $this->assertCount(0, app('cart')->getContent());
+        self::assertCount(0, app('cart')->getContent());
     }
 
-    public function test_user_can_clear_entire_cart(): void
+    public function testUserCanClearEntireCart(): void
     {
         $products = Product::factory()->count(3)->create();
 
@@ -134,17 +139,17 @@ class CartControllerTest extends TestCase
             ]);
         }
 
-        $this->assertCount(3, app('cart')->getContent());
+        self::assertCount(3, app('cart')->getContent());
 
         $response = $this->post('/cart/clear');
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
-        $this->assertCount(0, app('cart')->getContent());
+        self::assertCount(0, app('cart')->getContent());
     }
 
-    public function test_cart_calculates_total_correctly(): void
+    public function testCartCalculatesTotalCorrectly(): void
     {
         $product1 = Product::factory()->create(['price' => 10.00]);
         $product2 = Product::factory()->create(['price' => 20.00]);
@@ -166,10 +171,10 @@ class CartControllerTest extends TestCase
         ]);
 
         $total = app('cart')->getTotal();
-        $this->assertEquals(80.00, $total); // 20 + 60 = 80
+        self::assertSame(80.00, $total); // 20 + 60 = 80
     }
 
-    public function test_cart_persists_product_attributes(): void
+    public function testCartPersistsProductAttributes(): void
     {
         $product = Product::factory()->create([
             'slug' => 'test-product',
@@ -186,13 +191,13 @@ class CartControllerTest extends TestCase
 
         $cartItem = app('cart')->getContent()->first();
 
-        $this->assertEquals('test-product', $cartItem->attributes['slug']);
-        $this->assertEquals('test-image.jpg', $cartItem->attributes['image']);
-        $this->assertEquals('red', $cartItem->attributes['color']);
-        $this->assertEquals('large', $cartItem->attributes['size']);
+        self::assertSame('test-product', $cartItem->attributes['slug']);
+        self::assertSame('test-image.jpg', $cartItem->attributes['image']);
+        self::assertSame('red', $cartItem->attributes['color']);
+        self::assertSame('large', $cartItem->attributes['size']);
     }
 
-    public function test_update_cart_request_validates_input(): void
+    public function testUpdateCartRequestValidatesInput(): void
     {
         $response = $this->post('/cart/update', [
             // Missing required fields
@@ -201,7 +206,7 @@ class CartControllerTest extends TestCase
         $response->assertSessionHasErrors(['id', 'quantity']);
     }
 
-    public function test_quantity_cannot_exceed_maximum(): void
+    public function testQuantityCannotExceedMaximum(): void
     {
         $product = Product::factory()->create();
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'welcome' => 'مرحباً بك في كوبرا',
     'products' => 'المنتجات',

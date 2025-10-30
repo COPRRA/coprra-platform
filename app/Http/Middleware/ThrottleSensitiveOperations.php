@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
+use Symfony\Component\HttpFoundation\Response;
 
 class ThrottleSensitiveOperations
 {
     /**
      * Handle an incoming request.
      */
-    public function handle(Request $request, Closure $next, string $operation = 'default'): \Symfony\Component\HttpFoundation\Response
+    public function handle(Request $request, \Closure $next, string $operation = 'default'): Response
     {
         $key = $this->resolveRequestSignature($request, $operation);
 
@@ -42,7 +42,7 @@ class ThrottleSensitiveOperations
         RateLimiter::hit($key, $decaySeconds);
 
         $response = $next($request);
-        if (! ($response instanceof \Symfony\Component\HttpFoundation\Response)) {
+        if (! $response instanceof Response) {
             throw new \RuntimeException('Middleware must return Response instance');
         }
 

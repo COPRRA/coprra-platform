@@ -10,8 +10,12 @@ use Tests\TestCase;
 
 /**
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class ProductControllerTest extends TestCase
+final class ProductControllerTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -27,7 +31,7 @@ class ProductControllerTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_can_list_products()
+    public function testCanListProducts()
     {
         $products = Product::factory()->count(3)->create();
 
@@ -56,10 +60,11 @@ class ProductControllerTest extends TestCase
             ->assertJsonFragment([
                 'id' => $products->first()->id,
                 'name' => $products->first()->name,
-            ]);
+            ])
+        ;
     }
 
-    public function test_can_show_specific_product()
+    public function testCanShowSpecificProduct()
     {
         $product = Product::factory()->create();
 
@@ -87,17 +92,18 @@ class ProductControllerTest extends TestCase
                     'slug' => $product->slug,
                     'price' => $product->price,
                 ],
-            ]);
+            ])
+        ;
     }
 
-    public function test_returns_404_for_nonexistent_product()
+    public function testReturns404ForNonexistentProduct()
     {
         $response = $this->getJson('/api/products/999');
 
         $response->assertStatus(404);
     }
 
-    public function test_can_search_products()
+    public function testCanSearchProducts()
     {
         $product = Product::factory()->create(['name' => 'Test Product']);
 
@@ -115,10 +121,11 @@ class ProductControllerTest extends TestCase
                         'price',
                     ],
                 ],
-            ]);
+            ])
+        ;
     }
 
-    public function test_can_filter_products_by_category()
+    public function testCanFilterProductsByCategory()
     {
         $product = Product::factory()->create();
 
@@ -136,10 +143,11 @@ class ProductControllerTest extends TestCase
                         'price',
                     ],
                 ],
-            ]);
+            ])
+        ;
     }
 
-    public function test_can_sort_products()
+    public function testCanSortProducts()
     {
         $response = $this->getJson('/api/products', [
             'sort' => 'price_asc',
@@ -155,10 +163,11 @@ class ProductControllerTest extends TestCase
                         'price',
                     ],
                 ],
-            ]);
+            ])
+        ;
     }
 
-    public function test_can_paginate_products()
+    public function testCanPaginateProducts()
     {
         Product::factory()->count(15)->create();
 
@@ -171,18 +180,20 @@ class ProductControllerTest extends TestCase
                 'data',
                 'links',
                 'meta',
-            ]);
+            ])
+        ;
     }
 
-    public function test_handles_invalid_pagination_parameters()
+    public function testHandlesInvalidPaginationParameters()
     {
         $response = $this->getJson('/api/products?per_page=invalid');
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['per_page']);
+            ->assertJsonValidationErrors(['per_page'])
+        ;
     }
 
-    public function test_handles_invalid_sort_parameters()
+    public function testHandlesInvalidSortParameters()
     {
         $response = $this->getJson('/api/products?sort=invalid_sort');
 

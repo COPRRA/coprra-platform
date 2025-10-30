@@ -21,7 +21,7 @@ final readonly class AnalysisFixer implements AgentFixerInterface
 
         $this->ensureBaselineFileExists();
 
-        $phpstanPath = implode(DIRECTORY_SEPARATOR, ['.', 'vendor', 'bin', 'phpstan']);
+        $phpstanPath = implode(\DIRECTORY_SEPARATOR, ['.', 'vendor', 'bin', 'phpstan']);
         $phpstanResult = $this->processService->run(['php', '-d', 'memory_limit=512M', $phpstanPath, 'analyse', '--generate-baseline']);
 
         if ($phpstanResult->failed()) {

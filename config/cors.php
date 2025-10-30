@@ -28,11 +28,11 @@ return [
         $env = (string) env('APP_ENV', 'production');
         $fromEnv = array_filter(array_map('trim', explode(',', (string) env('CORS_ALLOWED_ORIGINS', ''))));
 
-        if ($fromEnv !== []) {
+        if ([] !== $fromEnv) {
             return $fromEnv;
         }
 
-        if ($env === 'local' || $env === 'development') {
+        if ('local' === $env || 'development' === $env) {
             return [
                 'http://localhost:5173',
                 'http://127.0.0.1:5173',

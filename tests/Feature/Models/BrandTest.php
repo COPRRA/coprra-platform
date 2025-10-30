@@ -7,17 +7,22 @@ namespace Tests\Feature\Models;
 use App\Models\Brand;
 use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /**
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class BrandTest extends TestCase
+final class BrandTest extends TestCase
 {
     use RefreshDatabase;
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_create_a_brand(): void
+    #[Test]
+    public function testItCanCreateABrand(): void
     {
         // Arrange
         $attributes = [
@@ -33,14 +38,14 @@ class BrandTest extends TestCase
         $brand = Brand::create($attributes);
 
         // Assert
-        $this->assertInstanceOf(Brand::class, $brand);
-        $this->assertEquals('Test Brand', $brand->name);
-        $this->assertEquals('test-brand', $brand->slug);
-        $this->assertTrue($brand->is_active);
+        self::assertInstanceOf(Brand::class, $brand);
+        self::assertSame('Test Brand', $brand->name);
+        self::assertSame('test-brand', $brand->slug);
+        self::assertTrue($brand->is_active);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_has_products_relationship(): void
+    #[Test]
+    public function testItHasProductsRelationship(): void
     {
         // Arrange
         $brand = Brand::factory()->create();
@@ -50,59 +55,59 @@ class BrandTest extends TestCase
         $brand->refresh();
 
         // Assert
-        $this->assertCount(1, $brand->products);
-        $this->assertInstanceOf(Product::class, $brand->products->first());
+        self::assertCount(1, $brand->products);
+        self::assertInstanceOf(Product::class, $brand->products->first());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_validate_required_fields(): void
+    #[Test]
+    public function testItCanValidateRequiredFields(): void
     {
         // Arrange
-        $brand = new Brand;
+        $brand = new Brand();
 
         // Act
         $rules = $brand->getRules();
 
         // Assert
-        $this->assertArrayHasKey('name', $rules);
-        $this->assertEquals('required|string|max:255', $rules['name']);
+        self::assertArrayHasKey('name', $rules);
+        self::assertSame('required|string|max:255', $rules['name']);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_validate_name_length(): void
+    #[Test]
+    public function testItCanValidateNameLength(): void
     {
         // Arrange & Act
         $brand = Brand::factory()->make(['name' => str_repeat('a', 256)]);
 
         // Assert
-        $this->assertFalse($brand->validate());
-        $this->assertArrayHasKey('name', $brand->getErrors());
+        self::assertFalse($brand->validate());
+        self::assertArrayHasKey('name', $brand->getErrors());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_validate_website_url_format(): void
+    #[Test]
+    public function testItCanValidateWebsiteUrlFormat(): void
     {
         // Arrange & Act
         $brand = Brand::factory()->make(['website_url' => 'invalid-url']);
 
         // Assert
-        $this->assertFalse($brand->validate());
-        $this->assertArrayHasKey('website_url', $brand->getErrors());
+        self::assertFalse($brand->validate());
+        self::assertArrayHasKey('website_url', $brand->getErrors());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_validate_logo_url_format(): void
+    #[Test]
+    public function testItCanValidateLogoUrlFormat(): void
     {
         // Arrange & Act
         $brand = Brand::factory()->make(['logo_url' => 'invalid-url']);
 
         // Assert
-        $this->assertFalse($brand->validate());
-        $this->assertArrayHasKey('logo_url', $brand->getErrors());
+        self::assertFalse($brand->validate());
+        self::assertArrayHasKey('logo_url', $brand->getErrors());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_scope_active_brands(): void
+    #[Test]
+    public function testItCanScopeActiveBrands(): void
     {
         // Arrange
         Brand::factory()->create(['is_active' => true]);
@@ -112,12 +117,12 @@ class BrandTest extends TestCase
         $activeBrands = Brand::active()->get();
 
         // Assert
-        $this->assertCount(1, $activeBrands);
-        $this->assertTrue($activeBrands->first()->is_active);
+        self::assertCount(1, $activeBrands);
+        self::assertTrue($activeBrands->first()->is_active);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_search_brands_by_name(): void
+    #[Test]
+    public function testItCanSearchBrandsByName(): void
     {
         // Arrange
         Brand::factory()->create(['name' => 'Apple Brand']);
@@ -127,12 +132,12 @@ class BrandTest extends TestCase
         $results = Brand::search('Apple')->get();
 
         // Assert
-        $this->assertCount(1, $results);
-        $this->assertEquals('Apple Brand', $results->first()->name);
+        self::assertCount(1, $results);
+        self::assertSame('Apple Brand', $results->first()->name);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_get_brand_with_products_count(): void
+    #[Test]
+    public function testItCanGetBrandWithProductsCount(): void
     {
         // Arrange
         $brand = Brand::factory()->create();
@@ -142,11 +147,11 @@ class BrandTest extends TestCase
         $brandWithCount = Brand::withCount('products')->find($brand->id);
 
         // Assert
-        $this->assertEquals(3, $brandWithCount->products_count);
+        self::assertSame(3, $brandWithCount->products_count);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_soft_delete_brand(): void
+    #[Test]
+    public function testItCanSoftDeleteBrand(): void
     {
         // Arrange
         $brand = Brand::factory()->create();
@@ -156,11 +161,11 @@ class BrandTest extends TestCase
 
         // Assert
         $this->assertSoftDeleted($brand);
-        $this->assertNull(Brand::find($brand->id));
+        self::assertNull(Brand::find($brand->id));
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_restore_soft_deleted_brand(): void
+    #[Test]
+    public function testItCanRestoreSoftDeletedBrand(): void
     {
         // Arrange
         $brand = Brand::factory()->create();
@@ -171,16 +176,16 @@ class BrandTest extends TestCase
 
         // Assert
         $this->assertNotSoftDeleted($brand);
-        $this->assertNotNull(Brand::find($brand->id));
+        self::assertNotNull(Brand::find($brand->id));
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_slug_generation_on_create(): void
+    #[Test]
+    public function testSlugGenerationOnCreate(): void
     {
         // Arrange & Act
         $brand = Brand::create(['name' => 'Test Brand Name']);
 
         // Assert
-        $this->assertEquals('test-brand-name', $brand->slug);
+        self::assertSame('test-brand-name', $brand->slug);
     }
 }

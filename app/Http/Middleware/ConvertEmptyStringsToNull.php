@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use Closure;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class ConvertEmptyStringsToNull
 {
     /**
      * Handle an incoming request.
      */
-    public function handle(Request $request, Closure $next): \Symfony\Component\HttpFoundation\Response
+    public function handle(Request $request, \Closure $next): Response
     {
         $input = $request->all();
         $convertedInput = $this->convertEmptyStringsToNull($input);
         $request->merge($convertedInput);
 
         $response = $next($request);
-        if (! ($response instanceof \Symfony\Component\HttpFoundation\Response)) {
+        if (! $response instanceof Response) {
             throw new \RuntimeException('Middleware must return Response instance');
         }
 
@@ -32,9 +32,9 @@ class ConvertEmptyStringsToNull
     private function convertEmptyStringsToNull(array $input): array
     {
         foreach ($input as $key => $value) {
-            if (is_string($value) && $value === '') {
+            if (\is_string($value) && '' === $value) {
                 $input[$key] = null;
-            } elseif (is_array($value)) {
+            } elseif (\is_array($value)) {
                 $input[$key] = $this->convertEmptyStringsToNull($value);
             }
         }

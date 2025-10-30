@@ -46,7 +46,7 @@ final readonly class CacheOptimizerService
     /**
      * Execute multiple Artisan commands.
      *
-     * @param  array<string, string>  $commands
+     * @param array<string, string> $commands
      */
     private function executeCommands(array $commands): void
     {

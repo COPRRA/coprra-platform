@@ -24,7 +24,7 @@ class Authenticate extends Middleware
     }
 
     /**
-     * @param  array<int, string>  $guards
+     * @param array<int, string> $guards
      *
      * @SuppressWarnings("UnusedFormalParameter")
      */

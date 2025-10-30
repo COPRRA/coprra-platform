@@ -2,18 +2,34 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\Api\Admin\BrandController;
 use App\Http\Controllers\Api\Admin\CategoryController;
+use App\Http\Controllers\Api\AIController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DocumentationController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PriceSearchController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\HealthController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PointsController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\SettingController;
+use App\Http\Controllers\SystemController;
+use App\Http\Controllers\UploadController;
 use App\Http\Controllers\WebhookController;
+use App\Models\PriceOffer;
+use App\Models\Product;
+use App\Models\Review;
+use App\Models\User;
+use App\Services\AIService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Validation\ValidationException;
 
 // Authentication routes with Rate Limiting
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
@@ -23,43 +39,43 @@ Route::middleware(['auth:sanctum', 'throttle:auth'])->get('/user', [AuthControll
 Route::middleware(['auth:sanctum', 'throttle:authenticated'])->get('/me', [AuthController::class, 'me']);
 
 // Public API routes (no authentication required)
-Route::middleware(['throttle:public'])->group(function (): void {
+Route::middleware(['throttle:public'])->group(static function (): void {
     // Price search routes
-    Route::get('/price-search', [\App\Http\Controllers\Api\PriceSearchController::class, 'search']);
-    Route::get('/price-search/search', [\App\Http\Controllers\Api\PriceSearchController::class, 'search']);
-    Route::get('/price-search/best-offer', [\App\Http\Controllers\Api\PriceSearchController::class, 'bestOffer']);
-    Route::get('/price-search/supported-stores', [\App\Http\Controllers\Api\PriceSearchController::class, 'supportedStores']);
+    Route::get('/price-search', [PriceSearchController::class, 'search']);
+    Route::get('/price-search/search', [PriceSearchController::class, 'search']);
+    Route::get('/price-search/best-offer', [PriceSearchController::class, 'bestOffer']);
+    Route::get('/price-search/supported-stores', [PriceSearchController::class, 'supportedStores']);
 
     // Public product routes
     Route::get('/products', [ProductController::class, 'index']);
     Route::get('/products/{id}', [ProductController::class, 'show'])->whereNumber('id');
 
     // Additional API routes for testing
-    Route::get('/categories', function () {
+    Route::get('/categories', static function () {
         return response()->json(['data' => [], 'message' => 'Categories endpoint']);
     });
 
-    Route::get('/brands', function () {
+    Route::get('/brands', static function () {
         return response()->json(['data' => [], 'message' => 'Brands endpoint']);
     });
 
-    Route::get('/wishlist', function () {
+    Route::get('/wishlist', static function () {
         return response()->json(['data' => [], 'message' => 'Wishlist endpoint']);
     });
 
-    Route::get('/price-alerts', function () {
+    Route::get('/price-alerts', static function () {
         return response()->json(['data' => [], 'message' => 'Price alerts endpoint']);
     });
 
-    Route::get('/reviews', function () {
+    Route::get('/reviews', static function () {
         return response()->json(['data' => [], 'message' => 'Reviews endpoint']);
     });
 
-    Route::get('/search', function () {
+    Route::get('/search', static function () {
         return response()->json(['data' => [], 'message' => 'Search endpoint']);
     });
 
-    Route::get('/ai', function () {
+    Route::get('/ai', static function () {
         return response()->json(['data' => [], 'message' => 'AI endpoint']);
     });
 
@@ -68,19 +84,19 @@ Route::middleware(['throttle:public'])->group(function (): void {
 });
 
 // Authenticated API routes
-Route::middleware(['auth:sanctum', 'throttle:authenticated'])->group(function (): void {
+Route::middleware(['auth:sanctum', 'throttle:authenticated'])->group(static function (): void {
     // Protected product routes
     Route::put('/products/{id}', [ProductController::class, 'update']);
     Route::delete('/products/{id}', [ProductController::class, 'destroy']);
 
     // Reviews routes
-    Route::post('/products/{product}/reviews', [\App\Http\Controllers\ReviewController::class, 'store']);
+    Route::post('/products/{product}/reviews', [ReviewController::class, 'store']);
 
     // Order routes
     Route::apiResource('orders', OrderController::class);
 
     // Secure upload route using UploadController
-    Route::post('/uploads', [\App\Http\Controllers\UploadController::class, 'store']);
+    Route::post('/uploads', [UploadController::class, 'store']);
 });
 
 // Product deletion requires authentication
@@ -90,17 +106,17 @@ Route::middleware(['auth:sanctum', 'throttle:authenticated'])->group(function ()
 
 // Admin API routes (high rate limits)
 // Use 'auth' guard to align with tests using actingAs without Sanctum
-Route::middleware(['auth', 'admin', 'throttle:admin'])->group(function (): void {
+Route::middleware(['auth', 'admin', 'throttle:admin'])->group(static function (): void {
     // Admin-specific routes
-    Route::get('/admin/stats', function () {
+    Route::get('/admin/stats', static function () {
         return response()->json([
             'uptime' => time() - strtotime('2025-01-01 00:00:00'),
-            'total_users' => \App\Models\User::count(),
-            'total_products' => \App\Models\Product::count(),
-            'total_offers' => \App\Models\PriceOffer::count(),
-            'total_reviews' => \App\Models\Review::count(),
-            'active_users_today' => \App\Models\User::whereDate('created_at', today())->count(),
-            'new_products_today' => \App\Models\Product::whereDate('created_at', today())->count(),
+            'total_users' => User::count(),
+            'total_products' => Product::count(),
+            'total_offers' => PriceOffer::count(),
+            'total_reviews' => Review::count(),
+            'active_users_today' => User::whereDate('created_at', today())->count(),
+            'new_products_today' => Product::whereDate('created_at', today())->count(),
             'server_time' => now()->toISOString(),
             'status' => 'operational',
         ]);
@@ -115,8 +131,9 @@ Route::middleware(['auth', 'admin', 'throttle:admin'])->group(function (): void 
 Route::get('/', [DocumentationController::class, 'index']);
 Route::get('/documentation', [DocumentationController::class, 'index']);
 
-// API Health check (unified JSON)
-Route::get('/health', [\App\Http\Controllers\Api\DocumentationController::class, 'health']);
+// API Health check (comprehensive monitoring)
+Route::get('/health', [HealthController::class, 'check'])->name('api.health.check');
+Route::get('/health/ping', [HealthController::class, 'ping'])->name('api.health.ping');
 
 // CSRF token route for testing - REMOVED FOR PRODUCTION
 // Route::get('/csrf-token', function () {
@@ -133,12 +150,12 @@ Route::get('/health', [\App\Http\Controllers\Api\DocumentationController::class,
 // });
 
 // Simple test route
-Route::get('/test-simple', function () {
+Route::get('/test-simple', static function () {
     return response()->json(['message' => 'Simple test route works']);
 });
 
 // Test route for API tests
-Route::get('/test', function () {
+Route::get('/test', static function () {
     return response()->json([
         'data' => ['message' => 'API test route works'],
         'status' => 'success',
@@ -146,7 +163,7 @@ Route::get('/test', function () {
 });
 
 // POST route for validation testing
-Route::post('/test', function (Request $request) {
+Route::post('/test', static function (Request $request) {
     try {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -154,7 +171,7 @@ Route::post('/test', function (Request $request) {
         ]);
 
         return response()->json(['message' => 'Validation passed', 'data' => $validated]);
-    } catch (\Illuminate\Validation\ValidationException $e) {
+    } catch (ValidationException $e) {
         return response()->json([
             'message' => 'Validation failed',
             'errors' => $e->errors(),
@@ -163,12 +180,12 @@ Route::post('/test', function (Request $request) {
 });
 
 // Temporary best offer route outside middleware - test method call
-Route::get('/best-offer-debug', function (Request $request) {
+Route::get('/best-offer-debug', static function (Request $request) {
     try {
-        $controller = app(\App\Http\Controllers\Api\PriceSearchController::class);
+        $controller = app(PriceSearchController::class);
 
         return $controller->bestOffer($request);
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
         return response()->json([
             'error' => 'Method call failed',
             'message' => $e->getMessage(),
@@ -178,7 +195,7 @@ Route::get('/best-offer-debug', function (Request $request) {
 });
 
 // Direct test of the bestOffer method
-Route::get('/direct-best-offer', function (Request $request) {
+Route::get('/direct-best-offer', static function (Request $request) {
     return response()->json([
         'message' => 'Direct route test',
         'params' => $request->all(),
@@ -188,40 +205,40 @@ Route::get('/direct-best-offer', function (Request $request) {
 });
 
 // Versioned API routes
-Route::prefix('v1')->middleware(['throttle:api'])->group(function (): void {
+Route::prefix('v1')->middleware(['throttle:api'])->group(static function (): void {
     Route::get('/best-offer', [PriceSearchController::class, 'bestOffer']);
     Route::get('/supported-stores', [PriceSearchController::class, 'supportedStores']);
 });
 
 // Test API routes for external service testing
-Route::middleware(['throttle:public'])->group(function (): void {
+Route::middleware(['throttle:public'])->group(static function (): void {
     // AI Text Analysis API
-    Route::post('/ai/analyze', [\App\Http\Controllers\Api\AIController::class, 'analyze']);
+    Route::post('/ai/analyze', [AIController::class, 'analyze']);
 
     // AI Product Classification API
-    Route::post('/ai/classify-product', [\App\Http\Controllers\Api\AIController::class, 'classifyProduct']);
+    Route::post('/ai/classify-product', [AIController::class, 'classifyProduct']);
 
-    Route::get('/external-data', function () {
+    Route::get('/external-data', static function () {
         try {
             $response = Http::get('https://api.external-service.com/data');
 
             return response()->json($response->json(), $response->status());
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['error' => 'External service unavailable'], 503);
         }
     });
 
-    Route::get('/slow-external-data', function () {
+    Route::get('/slow-external-data', static function () {
         try {
             $response = Http::timeout(3)->get('https://api.slow-service.com/data');
 
             return response()->json($response->json(), $response->status());
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['error' => 'Service timeout'], 408);
         }
     });
 
-    Route::get('/error-external-data', function () {
+    Route::get('/error-external-data', static function () {
         try {
             $response = Http::get('https://api.error-service.com/data');
             if ($response->status() >= 400) {
@@ -229,56 +246,56 @@ Route::middleware(['throttle:public'])->group(function (): void {
             }
 
             return response()->json($response->json(), $response->status());
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['error' => 'External service unavailable'], 503);
         }
     });
 
-    Route::get('/authenticated-external-data', function () {
+    Route::get('/authenticated-external-data', static function () {
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer test-token',
             ])->get('https://api.authenticated-service.com/data');
 
             return response()->json($response->json(), $response->status());
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['error' => 'Authentication failed'], 401);
         }
     });
 
-    Route::get('/rate-limited-external-data', function () {
+    Route::get('/rate-limited-external-data', static function () {
         try {
             $response = Http::get('https://api.rate-limited-service.com/data');
-            if ($response->status() === 429) {
+            if (429 === $response->status()) {
                 return response()->json(['error' => 'Rate limited'], 429);
             }
 
             return response()->json($response->json(), $response->status());
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['error' => 'Service unavailable'], 503);
         }
     });
 
-    Route::get('/cached-external-data', function () {
-        return Cache::remember('external-data', 60, function () {
+    Route::get('/cached-external-data', static function () {
+        return Cache::remember('external-data', 60, static function () {
             try {
                 $response = Http::get('https://api.cacheable-service.com/data');
 
                 return $response->json();
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 return ['error' => 'Service unavailable'];
             }
         });
     });
 
-    Route::get('/fallback-external-data', function () {
+    Route::get('/fallback-external-data', static function () {
         try {
             // Try primary service first
             $response = Http::get('https://api.primary-service.com/data');
             if ($response->successful()) {
                 return response()->json($response->json(), 200);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Primary service failed, try fallback
         }
 
@@ -287,72 +304,82 @@ Route::middleware(['throttle:public'])->group(function (): void {
             $response = Http::get('https://api.fallback-service.com/data');
 
             return response()->json($response->json(), $response->status());
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['error' => 'All services unavailable'], 503);
         }
     });
 });
 
 // Payment Routes
-Route::middleware('auth:sanctum')->group(function (): void {
-    Route::get('/payment-methods', [\App\Http\Controllers\PaymentController::class, 'getPaymentMethods']);
-    Route::post('/orders/{order}/payments', [\App\Http\Controllers\PaymentController::class, 'processPayment']);
-    Route::post('/orders/{order}/refund', [\App\Http\Controllers\PaymentController::class, 'refundPayment']);
+Route::middleware('auth:sanctum')->group(static function (): void {
+    Route::get('/payment-methods', [PaymentController::class, 'getPaymentMethods']);
+    Route::post('/orders/{order}/payments', [PaymentController::class, 'processPayment']);
+    Route::post('/orders/{order}/refund', [PaymentController::class, 'refundPayment']);
 });
 
 // Order Routes
-Route::middleware(['auth:sanctum', 'throttle:authenticated'])->group(function (): void {
-    Route::get('/orders', [\App\Http\Controllers\Api\OrderController::class, 'index']);
-    Route::post('/orders', [\App\Http\Controllers\Api\OrderController::class, 'store']);
-    Route::get('/orders/{order}', [\App\Http\Controllers\Api\OrderController::class, 'show']);
+Route::middleware(['auth:sanctum', 'throttle:authenticated'])->group(static function (): void {
+    Route::get('/orders', [OrderController::class, 'index']);
+    Route::post('/orders', [OrderController::class, 'store']);
+    Route::get('/orders/{order}', [OrderController::class, 'show']);
 });
 
 // Points & Rewards Routes
-Route::middleware(['auth:sanctum', 'throttle:authenticated'])->group(function (): void {
-    Route::get('/points', [\App\Http\Controllers\PointsController::class, 'index']);
-    Route::post('/points/redeem', [\App\Http\Controllers\PointsController::class, 'redeem']);
-    Route::get('/rewards', [\App\Http\Controllers\PointsController::class, 'getRewards']);
-    Route::post('/rewards/{reward}/redeem', [\App\Http\Controllers\PointsController::class, 'redeemReward']);
+Route::middleware(['auth:sanctum', 'throttle:authenticated'])->group(static function (): void {
+    Route::get('/points', [PointsController::class, 'index']);
+    Route::post('/points/redeem', [PointsController::class, 'redeem']);
+    Route::get('/rewards', [PointsController::class, 'getRewards']);
+    Route::post('/rewards/{reward}/redeem', [PointsController::class, 'redeemReward']);
 });
 
 // Settings API routes
-Route::middleware(['throttle:api'])->prefix('settings')->group(function (): void {
-    Route::get('/', [\App\Http\Controllers\SettingController::class, 'index']);
-    Route::put('/', [\App\Http\Controllers\SettingController::class, 'update']);
-    Route::get('/password-policy', [\App\Http\Controllers\SettingController::class, 'getPasswordPolicySettings']);
-    Route::get('/notifications', [\App\Http\Controllers\SettingController::class, 'getNotificationSettings']);
-    Route::get('/storage', [\App\Http\Controllers\SettingController::class, 'getStorageSettings']);
-    Route::get('/general', [\App\Http\Controllers\SettingController::class, 'getGeneralSettings']);
-    Route::get('/security', [\App\Http\Controllers\SettingController::class, 'getSecuritySettings']);
-    Route::get('/performance', [\App\Http\Controllers\SettingController::class, 'getPerformanceSettings']);
-    Route::post('/reset', [\App\Http\Controllers\SettingController::class, 'resetToDefault']);
-    Route::post('/import', [\App\Http\Controllers\SettingController::class, 'importSettings']);
-    Route::get('/export', [\App\Http\Controllers\SettingController::class, 'exportSettings']);
-    Route::get('/system-health', [\App\Http\Controllers\SettingController::class, 'getSystemHealth']);
+Route::middleware(['throttle:api'])->prefix('settings')->group(static function (): void {
+    // Public read-only routes
+    Route::get('/password-policy', [SettingController::class, 'getPasswordPolicySettings']);
+    Route::get('/notifications', [SettingController::class, 'getNotificationSettings']);
+    Route::get('/general', [SettingController::class, 'getGeneralSettings']);
+
+    // Admin-only routes
+    Route::middleware(['auth', 'admin'])->group(static function (): void {
+        Route::get('/', [SettingController::class, 'index']);
+        Route::put('/', [SettingController::class, 'update']);
+        Route::get('/storage', [SettingController::class, 'getStorageSettings']);
+        Route::get('/security', [SettingController::class, 'getSecuritySettings']);
+        Route::get('/performance', [SettingController::class, 'getPerformanceSettings']);
+        Route::post('/reset', [SettingController::class, 'resetToDefault']);
+        Route::post('/import', [SettingController::class, 'importSettings']);
+        Route::get('/export', [SettingController::class, 'exportSettings']);
+        Route::get('/system-health', [SettingController::class, 'getSystemHealth']);
+    });
 });
 
 // System API routes
-Route::middleware(['throttle:api'])->prefix('system')->group(function (): void {
+Route::middleware(['throttle:api'])->prefix('system')->group(static function (): void {
     // Wrap system info in try/catch to return unified JSON on errors (as tests expect)
-    Route::get('/info', function () {
+    Route::get('/info', static function () {
         try {
-            return app(\App\Http\Controllers\SystemController::class)->getSystemInfo();
-        } catch (\Throwable $e) {
+            return app(SystemController::class)->getSystemInfo();
+        } catch (Throwable $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to get system information',
             ], 500);
         }
     });
-    Route::post('/migrations', [\App\Http\Controllers\SystemController::class, 'runMigrations']);
-    Route::post('/cache/clear', [\App\Http\Controllers\SystemController::class, 'clearCache']);
-    Route::post('/optimize', [\App\Http\Controllers\SystemController::class, 'optimizeApp']);
-    Route::post('/composer-update', [\App\Http\Controllers\SystemController::class, 'runComposerUpdate']);
+
+    // CRITICAL OPERATIONS - Require Admin Authentication
+    Route::middleware(['auth', 'admin'])->group(static function (): void {
+        Route::post('/migrations', [SystemController::class, 'runMigrations']);
+        Route::post('/cache/clear', [SystemController::class, 'clearCache']);
+        Route::post('/optimize', [SystemController::class, 'optimizeApp']);
+        Route::post('/composer-update', [SystemController::class, 'runComposerUpdate']);
+    });
+
     // Wrap performance metrics endpoint to return unified JSON on exceptions
-    Route::get('/performance', function () {
+    Route::get('/performance', static function () {
         try {
-            return app(\App\Http\Controllers\SystemController::class)->getPerformanceMetrics();
-        } catch (\Throwable $e) {
+            return app(SystemController::class)->getPerformanceMetrics();
+        } catch (Throwable $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to get performance metrics',
@@ -362,35 +389,35 @@ Route::middleware(['throttle:api'])->prefix('system')->group(function (): void {
 });
 
 // Report API routes
-Route::middleware(['throttle:api'])->prefix('reports')->group(function (): void {
+Route::middleware(['throttle:api'])->prefix('reports')->group(static function (): void {
     // POST routes for generating reports
-    Route::post('/product-performance', [\App\Http\Controllers\ReportController::class, 'generateProductPerformanceReport']);
-    Route::post('/user-activity', [\App\Http\Controllers\ReportController::class, 'generateUserActivityReport']);
-    Route::post('/sales', [\App\Http\Controllers\ReportController::class, 'generateSalesReport']);
-    Route::post('/custom', [\App\Http\Controllers\ReportController::class, 'generateCustomReport']);
-    Route::post('/export', [\App\Http\Controllers\ReportController::class, 'exportReport']);
+    Route::post('/product-performance', [ReportController::class, 'generateProductPerformanceReport']);
+    Route::post('/user-activity', [ReportController::class, 'generateUserActivityReport']);
+    Route::post('/sales', [ReportController::class, 'generateSalesReport']);
+    Route::post('/custom', [ReportController::class, 'generateCustomReport']);
+    Route::post('/export', [ReportController::class, 'exportReport']);
 
     // GET routes for retrieving reports
-    Route::get('/system-overview', [\App\Http\Controllers\ReportController::class, 'getSystemOverview']);
-    Route::get('/engagement-metrics', [\App\Http\Controllers\ReportController::class, 'getEngagementMetrics']);
-    Route::get('/performance-metrics', [\App\Http\Controllers\ReportController::class, 'getPerformanceMetrics']);
-    Route::get('/top-stores', [\App\Http\Controllers\ReportController::class, 'getTopStores']);
-    Route::get('/price-trends', [\App\Http\Controllers\ReportController::class, 'getPriceTrends']);
-    Route::get('/most-viewed-products', [\App\Http\Controllers\ReportController::class, 'getMostViewedProducts']);
+    Route::get('/system-overview', [ReportController::class, 'getSystemOverview']);
+    Route::get('/engagement-metrics', [ReportController::class, 'getEngagementMetrics']);
+    Route::get('/performance-metrics', [ReportController::class, 'getPerformanceMetrics']);
+    Route::get('/top-stores', [ReportController::class, 'getTopStores']);
+    Route::get('/price-trends', [ReportController::class, 'getPriceTrends']);
+    Route::get('/most-viewed-products', [ReportController::class, 'getMostViewedProducts']);
 });
 
 // Analytics API routes
-Route::middleware(['throttle:public'])->group(function (): void {
-    Route::get('/analytics/site', [\App\Http\Controllers\AnalyticsController::class, 'siteAnalytics']);
+Route::middleware(['throttle:public'])->group(static function (): void {
+    Route::get('/analytics/site', [AnalyticsController::class, 'siteAnalytics']);
 });
-Route::middleware(['auth:sanctum', 'throttle:authenticated'])->group(function (): void {
-    Route::get('/analytics/user', [\App\Http\Controllers\AnalyticsController::class, 'userAnalytics']);
-    Route::post('/analytics/track', [\App\Http\Controllers\AnalyticsController::class, 'trackBehavior']);
+Route::middleware(['auth:sanctum', 'throttle:authenticated'])->group(static function (): void {
+    Route::get('/analytics/user', [AnalyticsController::class, 'userAnalytics']);
+    Route::post('/analytics/track', [AnalyticsController::class, 'trackBehavior']);
 });
 
 // AI API routes
-Route::middleware(['throttle:ai'])->prefix('ai')->group(function (): void {
-    Route::post('/analyze', function (Request $request) {
+Route::middleware(['throttle:ai'])->prefix('ai')->group(static function (): void {
+    Route::post('/analyze', static function (Request $request) {
         try {
             /** @var array{text: string, type: string} $validated */
             $validated = $request->validate([
@@ -408,7 +435,7 @@ Route::middleware(['throttle:ai'])->prefix('ai')->group(function (): void {
                 ], 422);
             }
 
-            $aiService = app(\App\Services\AIService::class);
+            $aiService = app(AIService::class);
             $result = $aiService->analyzeText($validated['text'], $validated['type']);
 
             return response()->json([
@@ -416,14 +443,14 @@ Route::middleware(['throttle:ai'])->prefix('ai')->group(function (): void {
                 'data' => $result,
                 'message' => 'Analysis completed successfully',
             ], 200);
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
                 'error' => 'Validation failed',
                 'message' => 'Invalid input data',
                 'errors' => $e->errors(),
             ], 422);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'error' => 'Analysis failed',
@@ -433,16 +460,16 @@ Route::middleware(['throttle:ai'])->prefix('ai')->group(function (): void {
         }
     });
 
-    Route::post('/classify-product', function (Request $request) {
+    Route::post('/classify-product', static function (Request $request) {
         try {
-            /** @var array{name: string, description: ?string, price: ?(string|int|float)} $validated */
+            /** @var array{name: string, description: ?string, price: ?(float|int|string)} $validated */
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string|max:1000',
                 'price' => 'nullable|numeric|min:0',
             ]);
 
-            $aiService = app(\App\Services\AIService::class);
+            $aiService = app(AIService::class);
             $productDescription = $validated['description'] ?? '';
             $category = $aiService->classifyProduct($productDescription);
 
@@ -456,14 +483,14 @@ Route::middleware(['throttle:ai'])->prefix('ai')->group(function (): void {
                 ],
                 'message' => 'Product classified successfully',
             ], 200);
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
                 'error' => 'Validation failed',
                 'message' => 'Invalid input data',
                 'errors' => $e->errors(),
             ], 422);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'error' => 'Classification failed',
@@ -473,21 +500,21 @@ Route::middleware(['throttle:ai'])->prefix('ai')->group(function (): void {
         }
     });
 
-    Route::post('/analyze-image', function (Request $request) {
+    Route::post('/analyze-image', static function (Request $request) {
         /** @var array{image_url: string} $validated */
         $validated = $request->validate([
             'image_url' => 'required|url|max:2048',
         ]);
 
         try {
-            $aiService = app(\App\Services\AIService::class);
+            $aiService = app(AIService::class);
             $result = $aiService->analyzeImage($validated['image_url']);
 
             return response()->json([
                 'success' => true,
                 'data' => $result,
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'error' => 'فشل في تحليل الصورة',
@@ -496,7 +523,7 @@ Route::middleware(['throttle:ai'])->prefix('ai')->group(function (): void {
         }
     });
 
-    Route::post('/recommendations', function (Request $request) {
+    Route::post('/recommendations', static function (Request $request) {
         $validated = $request->validate([
             'preferences' => 'required|array|min:1',
             'products' => 'required|array|min:1',
@@ -505,14 +532,14 @@ Route::middleware(['throttle:ai'])->prefix('ai')->group(function (): void {
             'products.*.price' => 'nullable|numeric|min:0',
         ]);
 
-        /**
+        /*
          * @var array{
          *   preferences: array<string, mixed>,
          *   products: array<int, array<string, mixed>>
          * } $validated
          */
         try {
-            $aiService = app(\App\Services\AIService::class);
+            $aiService = app(AIService::class);
 
             $recommendations = $aiService->generateRecommendations($validated['preferences'], $validated['products']);
 
@@ -520,7 +547,7 @@ Route::middleware(['throttle:ai'])->prefix('ai')->group(function (): void {
                 'success' => true,
                 'recommendations' => $recommendations,
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'error' => 'فشل في توليد التوصيات',
@@ -534,13 +561,14 @@ Route::middleware(['throttle:ai'])->prefix('ai')->group(function (): void {
 // Webhook Routes (No Authentication - Verified by Signature)
 // ============================================================================
 
-Route::prefix('webhooks')->group(function (): void {
+Route::prefix('webhooks')->group(static function (): void {
     Route::post('/amazon', [WebhookController::class, 'amazon'])->name('webhooks.amazon');
     Route::post('/ebay', [WebhookController::class, 'ebay'])->name('webhooks.ebay');
     Route::post('/noon', [WebhookController::class, 'noon'])->name('webhooks.noon');
 });
 
 // Secure upload endpoint (authenticated), stores to private disk and returns signed URL
-Route::post('/uploads', [\App\Http\Controllers\UploadController::class, 'store'])
+Route::post('/uploads', [UploadController::class, 'store'])
     ->middleware(['auth:sanctum', 'throttle:api'])
-    ->name('uploads.store');
+    ->name('uploads.store')
+;

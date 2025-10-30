@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Middleware;
 
 use App\Services\Security\SecurityHeadersService;
-use Closure;
 use Illuminate\Http\Request;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,10 +25,10 @@ class SecurityHeaders
         $this->logger = $logger ?? app(LoggerInterface::class);
     }
 
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, \Closure $next): Response
     {
         // Redirect HTTP to HTTPS in production for security (guarded for non-Laravel contexts)
-        $isProduction = function_exists('app') && method_exists(app(), 'environment')
+        $isProduction = \function_exists('app') && method_exists(app(), 'environment')
             ? app()->environment('production')
             : false;
         if ($isProduction && ! $request->isSecure()) {
@@ -69,7 +68,7 @@ class SecurityHeaders
 
         // Defensive: normalize CSP retrieval to guarantee a non-null value
         $cspCheck = $response->headers->get('Content-Security-Policy');
-        if ($cspCheck === null || $cspCheck === '') {
+        if (null === $cspCheck || '' === $cspCheck) {
             if (method_exists($response, 'withHeaders')) {
                 $response = $response->withHeaders(['Content-Security-Policy' => "default-src 'self'"]);
             } else {
@@ -77,23 +76,22 @@ class SecurityHeaders
             }
         }
 
-        // Debug: log headers for visibility during tests
-        try {
-            $this->logger->debug('SecurityHeaders middleware headers', [
-                'headers' => $response->headers->all(),
-                'csp' => $response->headers->get('Content-Security-Policy'),
-            ]);
-
-            // Persist debug snapshot to a file for post-test inspection
+        // Log security headers in development mode only
+        if (config('app.debug')) {
             try {
-                $snapshot = 'CSP='.var_export($response->headers->get('Content-Security-Policy'), true)."\n".
-                    'HEADERS='.var_export($response->headers->all(), true)."\n";
-                file_put_contents(base_path('csp_test_debug_root.txt'), $snapshot, FILE_APPEND);
-            } catch (\Throwable $e2) {
-                $this->logger->debug('Failed writing CSP debug snapshot', ['error' => $e2->getMessage()]);
+                $this->logger->debug('SecurityHeaders middleware applied', [
+                    'csp_enabled' => $response->headers->has('Content-Security-Policy'),
+                    'security_headers_count' => \count(array_filter([
+                        $response->headers->get('X-Frame-Options'),
+                        $response->headers->get('X-Content-Type-Options'),
+                        $response->headers->get('X-XSS-Protection'),
+                        $response->headers->get('Referrer-Policy'),
+                        $response->headers->get('Content-Security-Policy'),
+                    ])),
+                ]);
+            } catch (\Throwable $e) {
+                // Silently handle logging errors in production
             }
-        } catch (\Throwable $e) {
-            $this->logger->debug('Failed logging SecurityHeaders headers', ['error' => $e->getMessage()]);
         }
 
         // Return the original response to preserve framework-specific behavior
@@ -108,7 +106,7 @@ class SecurityHeaders
         try {
             $payload = $request->all();
             foreach ($payload as $key => $value) {
-                if (is_string($value)) {
+                if (\is_string($value)) {
                     $valLower = strtolower($value);
                     if (str_contains($valLower, 'select ') || str_contains($valLower, 'drop table') || str_contains($valLower, '<script')) {
                         $this->logger->warning('Suspicious request detected', [
@@ -123,7 +121,7 @@ class SecurityHeaders
             }
 
             foreach ($request->files as $file) {
-                if ($file && is_object($file)) {
+                if ($file && \is_object($file)) {
                     $mime = strtolower((string) $file->getMimeType());
                     $name = strtolower((string) $file->getClientOriginalName());
                     if (str_contains($mime, 'php') || str_ends_with($name, '.php')) {

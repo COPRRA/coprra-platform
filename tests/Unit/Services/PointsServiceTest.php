@@ -11,7 +11,12 @@ use App\Services\PointsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class PointsServiceTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class PointsServiceTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -20,10 +25,10 @@ class PointsServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new PointsService;
+        $this->service = new PointsService();
     }
 
-    public function test_add_points_creates_user_point(): void
+    public function testAddPointsCreatesUserPoint(): void
     {
         // Arrange
         $user = User::factory()->create();
@@ -35,13 +40,13 @@ class PointsServiceTest extends TestCase
         $userPoint = $this->service->addPoints($user, $points, $type, $source);
 
         // Assert
-        $this->assertInstanceOf(UserPoint::class, $userPoint);
-        $this->assertEquals($user->id, $userPoint->user_id);
-        $this->assertEquals($points, $userPoint->points);
-        $this->assertEquals($type, $userPoint->type);
+        self::assertInstanceOf(UserPoint::class, $userPoint);
+        self::assertSame($user->id, $userPoint->user_id);
+        self::assertSame($points, $userPoint->points);
+        self::assertSame($type, $userPoint->type);
     }
 
-    public function test_get_available_points_returns_sum(): void
+    public function testGetAvailablePointsReturnsSum(): void
     {
         // Arrange
         $user = User::factory()->create();
@@ -52,10 +57,10 @@ class PointsServiceTest extends TestCase
         $available = $this->service->getAvailablePoints($user->id);
 
         // Assert
-        $this->assertEquals(30, $available);
+        self::assertSame(30, $available);
     }
 
-    public function test_redeem_points_succeeds_with_sufficient_points(): void
+    public function testRedeemPointsSucceedsWithSufficientPoints(): void
     {
         // Arrange
         $user = User::factory()->create();
@@ -65,11 +70,11 @@ class PointsServiceTest extends TestCase
         $result = $this->service->redeemPoints($user, 50, 'Test redemption');
 
         // Assert
-        $this->assertTrue($result);
-        $this->assertEquals(50, $this->service->getAvailablePoints($user->id));
+        self::assertTrue($result);
+        self::assertSame(50, $this->service->getAvailablePoints($user->id));
     }
 
-    public function test_redeem_points_fails_with_insufficient_points(): void
+    public function testRedeemPointsFailsWithInsufficientPoints(): void
     {
         // Arrange
         $user = User::factory()->create();
@@ -79,11 +84,11 @@ class PointsServiceTest extends TestCase
         $result = $this->service->redeemPoints($user, 50, 'Test redemption');
 
         // Assert
-        $this->assertFalse($result);
-        $this->assertEquals(30, $this->service->getAvailablePoints($user->id));
+        self::assertFalse($result);
+        self::assertSame(30, $this->service->getAvailablePoints($user->id));
     }
 
-    public function test_award_purchase_points_adds_points(): void
+    public function testAwardPurchasePointsAddsPoints(): void
     {
         // Arrange
         $user = User::factory()->create();
@@ -93,10 +98,10 @@ class PointsServiceTest extends TestCase
         $this->service->awardPurchasePoints($order);
 
         // Assert
-        $this->assertEquals(1, $this->service->getAvailablePoints($user->id)); // 100 * 0.01 = 1
+        self::assertSame(1, $this->service->getAvailablePoints($user->id)); // 100 * 0.01 = 1
     }
 
-    public function test_get_points_history_returns_paginated(): void
+    public function testGetPointsHistoryReturnsPaginated(): void
     {
         // Arrange
         $user = User::factory()->create();
@@ -106,6 +111,6 @@ class PointsServiceTest extends TestCase
         $history = $this->service->getPointsHistory($user->id, 3);
 
         // Assert
-        $this->assertCount(3, $history);
+        self::assertCount(3, $history);
     }
 }

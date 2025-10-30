@@ -8,18 +8,24 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /**
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class OrderTest extends TestCase
+final class OrderTest extends TestCase
 {
     use RefreshDatabase;
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_create_an_order(): void
+    #[Test]
+    public function testItCanCreateAnOrder(): void
     {
         // Arrange
         $user = User::factory()->create();
@@ -42,17 +48,17 @@ class OrderTest extends TestCase
         $order = Order::create($attributes);
 
         // Assert
-        $this->assertInstanceOf(Order::class, $order);
-        $this->assertEquals('ORD-001', $order->order_number);
-        $this->assertEquals('pending', $order->status);
-        $this->assertEquals(100.00, $order->total_amount);
-        $this->assertEquals('USD', $order->currency);
-        $this->assertIsArray($order->shipping_address);
-        $this->assertIsArray($order->billing_address);
+        self::assertInstanceOf(Order::class, $order);
+        self::assertSame('ORD-001', $order->order_number);
+        self::assertSame('pending', $order->status);
+        self::assertSame(100.00, $order->total_amount);
+        self::assertSame('USD', $order->currency);
+        self::assertIsArray($order->shipping_address);
+        self::assertIsArray($order->billing_address);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_order_relationships(): void
+    #[Test]
+    public function testOrderRelationships(): void
     {
         // Arrange
         $user = User::factory()->create();
@@ -64,14 +70,14 @@ class OrderTest extends TestCase
         $order->refresh();
 
         // Assert
-        $this->assertInstanceOf(User::class, $order->user);
-        $this->assertEquals($user->id, $order->user->id);
-        $this->assertCount(1, $order->items);
-        $this->assertCount(1, $order->payments);
+        self::assertInstanceOf(User::class, $order->user);
+        self::assertSame($user->id, $order->user->id);
+        self::assertCount(1, $order->items);
+        self::assertCount(1, $order->payments);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_order_casts_attributes_correctly(): void
+    #[Test]
+    public function testOrderCastsAttributesCorrectly(): void
     {
         // Arrange
         $order = Order::factory()->create([
@@ -82,15 +88,15 @@ class OrderTest extends TestCase
         ]);
 
         // Act & Assert
-        $this->assertIsArray($order->shipping_address);
-        $this->assertEquals('123 Main St', $order->shipping_address['street']);
-        $this->assertIsArray($order->billing_address);
-        $this->assertInstanceOf(\Carbon\Carbon::class, $order->shipped_at);
-        $this->assertInstanceOf(\Carbon\Carbon::class, $order->delivered_at);
+        self::assertIsArray($order->shipping_address);
+        self::assertSame('123 Main St', $order->shipping_address['street']);
+        self::assertIsArray($order->billing_address);
+        self::assertInstanceOf(Carbon::class, $order->shipped_at);
+        self::assertInstanceOf(Carbon::class, $order->delivered_at);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_scope_by_status(): void
+    #[Test]
+    public function testScopeByStatus(): void
     {
         // Arrange
         Order::factory()->create(['status' => 'pending']);
@@ -101,14 +107,14 @@ class OrderTest extends TestCase
         $pendingOrders = Order::byStatus('pending')->get();
 
         // Assert
-        $this->assertCount(2, $pendingOrders);
+        self::assertCount(2, $pendingOrders);
         $pendingOrders->each(function ($order) {
-            $this->assertEquals('pending', $order->status);
+            $this->assertSame('pending', $order->status);
         });
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_scope_for_user(): void
+    #[Test]
+    public function testScopeForUser(): void
     {
         // Arrange
         $user1 = User::factory()->create();
@@ -121,14 +127,14 @@ class OrderTest extends TestCase
         $userOrders = Order::forUser($user1->id)->get();
 
         // Assert
-        $this->assertCount(2, $userOrders);
+        self::assertCount(2, $userOrders);
         $userOrders->each(function ($order) use ($user1) {
-            $this->assertEquals($user1->id, $order->user_id);
+            $this->assertSame($user1->id, $order->user_id);
         });
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_order_fillable_attributes(): void
+    #[Test]
+    public function testOrderFillableAttributes(): void
     {
         // Arrange
         $fillable = [
@@ -150,14 +156,14 @@ class OrderTest extends TestCase
         ];
 
         // Act
-        $order = new Order;
+        $order = new Order();
 
         // Assert
-        $this->assertEquals($fillable, $order->getFillable());
+        self::assertSame($fillable, $order->getFillable());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_order_status_transitions(): void
+    #[Test]
+    public function testOrderStatusTransitions(): void
     {
         // Arrange
         $order = Order::factory()->create(['status' => 'pending']);
@@ -167,13 +173,13 @@ class OrderTest extends TestCase
         $order->update(['status' => 'delivered', 'delivered_at' => now()]);
 
         // Assert
-        $this->assertEquals('delivered', $order->status);
-        $this->assertNotNull($order->shipped_at);
-        $this->assertNotNull($order->delivered_at);
+        self::assertSame('delivered', $order->status);
+        self::assertNotNull($order->shipped_at);
+        self::assertNotNull($order->delivered_at);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_order_totals_calculation(): void
+    #[Test]
+    public function testOrderTotalsCalculation(): void
     {
         // Arrange
         $order = Order::factory()->create([
@@ -184,10 +190,10 @@ class OrderTest extends TestCase
         ]);
 
         // Act & Assert
-        $this->assertEquals(100.00, $order->subtotal);
-        $this->assertEquals(10.00, $order->tax_amount);
-        $this->assertEquals(5.00, $order->shipping_amount);
-        $this->assertEquals(5.00, $order->discount_amount);
-        $this->assertEquals(110.00, $order->total_amount); // subtotal + tax + shipping - discount
+        self::assertSame(100.00, $order->subtotal);
+        self::assertSame(10.00, $order->tax_amount);
+        self::assertSame(5.00, $order->shipping_amount);
+        self::assertSame(5.00, $order->discount_amount);
+        self::assertSame(110.00, $order->total_amount); // subtotal + tax + shipping - discount
     }
 }

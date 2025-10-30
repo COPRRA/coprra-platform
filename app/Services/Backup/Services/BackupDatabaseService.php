@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services\Backup\Services;
 
-use Exception;
 use Illuminate\Support\Facades\Process;
 
 final class BackupDatabaseService
@@ -18,7 +17,7 @@ final class BackupDatabaseService
      *     status: string
      * }
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function backupDatabase(string $backupDir): array
     {
@@ -26,7 +25,7 @@ final class BackupDatabaseService
         $filename = 'database.sql';
         $filepath = $backupDir.'/'.$filename;
 
-        $command = sprintf(
+        $command = \sprintf(
             'mysqldump --host=%s --port=%s --user=%s --password=%s %s > %s',
             $dbConfig['host'],
             $dbConfig['port'],
@@ -39,7 +38,7 @@ final class BackupDatabaseService
         $result = Process::run($command);
 
         if (! $result->successful()) {
-            throw new Exception('Database backup failed: '.$result->errorOutput());
+            throw new \Exception('Database backup failed: '.$result->errorOutput());
         }
 
         return [
@@ -52,12 +51,13 @@ final class BackupDatabaseService
     /**
      * Restore database.
      *
-     * @param  array{filename?: string}  $dbInfo
+     * @param array{filename?: string} $dbInfo
+     *
      * @return array<string>
      *
      * @psalm-return array{status: 'completed'}
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function restoreDatabase(string $backupPath, array $dbInfo): array
     {
@@ -69,13 +69,13 @@ final class BackupDatabaseService
         $database = $credentials['database'];
 
         $filename = $dbInfo['filename'] ?? 'database.sql';
-        $sqlFile = $backupPath.'/'.(is_string($filename) ? $filename : 'database.sql');
+        $sqlFile = $backupPath.'/'.(\is_string($filename) ? $filename : 'database.sql');
 
         if (! file_exists($sqlFile)) {
-            throw new Exception('Database backup file not found');
+            throw new \Exception('Database backup file not found');
         }
 
-        $command = sprintf(
+        $command = \sprintf(
             'mysql --host=%s --port=%s --user=%s --password=%s %s < %s',
             $host,
             $port,
@@ -88,7 +88,7 @@ final class BackupDatabaseService
         $result = Process::run($command);
 
         if (! $result->successful()) {
-            throw new Exception('Database restoration failed: '.$result->errorOutput());
+            throw new \Exception('Database restoration failed: '.$result->errorOutput());
         }
 
         return [
@@ -104,14 +104,14 @@ final class BackupDatabaseService
     private function getDatabaseCredentials(): array
     {
         $dbConfig = config('database.connections.mysql', null);
-        $dbConfigArray = is_array($dbConfig) ? $dbConfig : [];
+        $dbConfigArray = \is_array($dbConfig) ? $dbConfig : [];
 
         return [
-            'host' => is_string($dbConfigArray['host'] ?? null) ? $dbConfigArray['host'] : 'localhost',
-            'port' => is_string($dbConfigArray['port'] ?? null) ? $dbConfigArray['port'] : '3306',
-            'username' => is_string($dbConfigArray['username'] ?? null) ? $dbConfigArray['username'] : 'root',
-            'password' => is_string($dbConfigArray['password'] ?? null) ? $dbConfigArray['password'] : '',
-            'database' => is_string($dbConfigArray['database'] ?? null) ? $dbConfigArray['database'] : 'database',
+            'host' => \is_string($dbConfigArray['host'] ?? null) ? $dbConfigArray['host'] : 'localhost',
+            'port' => \is_string($dbConfigArray['port'] ?? null) ? $dbConfigArray['port'] : '3306',
+            'username' => \is_string($dbConfigArray['username'] ?? null) ? $dbConfigArray['username'] : 'root',
+            'password' => \is_string($dbConfigArray['password'] ?? null) ? $dbConfigArray['password'] : '',
+            'database' => \is_string($dbConfigArray['database'] ?? null) ? $dbConfigArray['database'] : 'database',
         ];
     }
 }

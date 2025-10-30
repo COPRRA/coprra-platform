@@ -9,8 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 final readonly class SEOAuditResult
 {
     /**
-     * @param  array<string, mixed>  $metaData
-     * @param  array<int, array<string, mixed>>  $issues
+     * @param array<string, mixed>             $metaData
+     * @param array<int, array<string, mixed>> $issues
      */
     public function __construct(
         private Model $model,
@@ -41,7 +41,7 @@ final readonly class SEOAuditResult
 
     public function hasIssues(): bool
     {
-        return $this->issues !== [];
+        return [] !== $this->issues;
     }
 
     /**
@@ -49,7 +49,7 @@ final readonly class SEOAuditResult
      */
     public function getIssueCount(): int
     {
-        return count($this->issues);
+        return \count($this->issues);
     }
 
     public function getModelType(): string

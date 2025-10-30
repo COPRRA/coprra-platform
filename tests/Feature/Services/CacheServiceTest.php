@@ -5,91 +5,132 @@ declare(strict_types=1);
 namespace Tests\Feature\Services;
 
 use App\Services\CacheService;
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 use Mockery;
+use Psr\Log\LoggerInterface;
+use Tests\Support\MockValidationTrait;
+use Tests\Support\TestIsolationTrait;
 use Tests\TestCase;
 
-class CacheServiceTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class CacheServiceTest extends TestCase
 {
+    use MockValidationTrait;
     use RefreshDatabase;
+    use TestIsolationTrait;
 
     private CacheService $service;
+    private CacheRepository $cacheMock;
+    private LoggerInterface $loggerMock;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new CacheService;
+        $this->backupGlobalState();
+
+        // Create mocks for dependencies
+        $this->cacheMock = \Mockery::mock(CacheRepository::class);
+        $this->loggerMock = \Mockery::mock(LoggerInterface::class);
+
+        // Validate mock interfaces and methods
+        $this->assertImplementsInterface(CacheRepository::class, $this->cacheMock);
+        $this->assertImplementsInterface(LoggerInterface::class, $this->loggerMock);
+
+        $this->validateMockMethods(CacheRepository::class, ['get', 'put', 'forget']);
+        $this->validateMockMethods(LoggerInterface::class, ['debug', 'info', 'error']);
+
+        // Validate service dependencies
+        $this->validateServiceMock(CacheService::class, [
+            CacheRepository::class,
+            LoggerInterface::class,
+        ]);
+
+        // Inject mocks into service
+        $this->service = new CacheService($this->cacheMock, $this->loggerMock);
     }
 
     protected function tearDown(): void
     {
-        Mockery::close();
+        $this->restoreGlobalState();
+        $this->clearTestCaches();
+        $this->closeMockery();
+        $this->verifyTestIsolation();
         parent::tearDown();
     }
 
-    public function test_remembers_data_with_cache_hit(): void
+    public function testRemembersDataWithCacheHit(): void
     {
         // Arrange
         $key = 'test-key';
         $ttl = 3600;
         $expectedData = ['test' => 'data'];
-        $callback = fn () => $expectedData;
+        $callback = static fn () => $expectedData;
 
-        Cache::shouldReceive('get')
+        $this->cacheMock->expects(self::once())
+            ->method('get')
             ->with('coprra_cache_test-key')
-            ->andReturn($expectedData);
+            ->willReturn($expectedData)
+        ;
 
         // Act
         $result = $this->service->remember($key, $ttl, $callback);
 
         // Assert
-        $this->assertEquals($expectedData, $result);
+        self::assertSame($expectedData, $result);
     }
 
-    public function test_executes_callback_on_cache_miss(): void
+    public function testExecutesCallbackOnCacheMiss(): void
     {
         // Arrange
         $key = 'test-key';
         $ttl = 3600;
         $expectedData = ['test' => 'data'];
-        $callback = fn () => $expectedData;
+        $callback = static fn () => $expectedData;
 
-        Cache::shouldReceive('get')
+        $this->cacheMock->expects(self::once())
+            ->method('get')
             ->with('coprra_cache_test-key')
-            ->andReturn(null);
+            ->willReturn(null)
+        ;
 
-        Cache::shouldReceive('put')
+        $this->cacheMock->expects(self::once())
+            ->method('put')
             ->with('coprra_cache_test-key', $expectedData, $ttl)
-            ->andReturn(true);
+            ->willReturn(true)
+        ;
 
         // Act
         $result = $this->service->remember($key, $ttl, $callback);
 
         // Assert
-        $this->assertEquals($expectedData, $result);
+        self::assertSame($expectedData, $result);
     }
 
-    public function test_handles_cache_exception_gracefully(): void
+    public function testHandlesCacheExceptionGracefully(): void
     {
         // Arrange
         $key = 'test-key';
         $ttl = 3600;
         $expectedData = ['test' => 'data'];
-        $callback = fn () => $expectedData;
+        $callback = static fn () => $expectedData;
 
         Cache::shouldReceive('get')
-            ->andThrow(new \Exception('Cache error'));
+            ->andThrow(new \Exception('Cache error'))
+        ;
 
         // Act
         $result = $this->service->remember($key, $ttl, $callback);
 
         // Assert
-        $this->assertEquals($expectedData, $result);
+        self::assertSame($expectedData, $result);
     }
 
-    public function test_builds_cache_key_correctly(): void
+    public function testBuildsCacheKeyCorrectly(): void
     {
         // Arrange
         $key = 'test-key';
@@ -101,7 +142,8 @@ class CacheServiceTest extends TestCase
         // Assert - Verify the key is built correctly by checking cache call
         Cache::shouldReceive('get')
             ->with($expectedKey, null)
-            ->andReturn(null);
+            ->andReturn(null)
+        ;
 
         $this->service->get($key);
 
@@ -109,17 +151,17 @@ class CacheServiceTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function test_handles_tags_when_supported(): void
+    public function testHandlesTagsWhenSupported(): void
     {
         // Arrange
         $key = 'test-key';
         $ttl = 3600;
         $tags = ['products', 'featured'];
         $expectedData = ['test' => 'data'];
-        $callback = fn () => $expectedData;
+        $callback = static fn () => $expectedData;
 
-        $cacheMock = Mockery::mock();
-        $storeMock = Mockery::mock();
+        $cacheMock = \Mockery::mock();
+        $storeMock = \Mockery::mock();
 
         $storeMock->shouldReceive('tags')->andReturn(true);
         $cacheMock->shouldReceive('getStore')->andReturn($storeMock);
@@ -133,62 +175,65 @@ class CacheServiceTest extends TestCase
         $result = $this->service->remember($key, $ttl, $callback, $tags);
 
         // Assert
-        $this->assertEquals($expectedData, $result);
+        self::assertSame($expectedData, $result);
     }
 
-    public function test_logs_cache_miss_with_execution_time(): void
+    public function testLogsCacheMissWithExecutionTime(): void
     {
         // Arrange
         $key = 'test-key';
         $ttl = 3600;
         $expectedData = ['test' => 'data'];
-        $callback = fn () => $expectedData;
+        $callback = static fn () => $expectedData;
 
-        $cacheMock = Mockery::mock();
+        $cacheMock = \Mockery::mock();
         $cacheMock->shouldReceive('remember')
-            ->with('coprra_cache_test-key', $ttl, Mockery::type('Closure'))
-            ->andReturnUsing(function ($key, $ttl, $callback) {
+            ->with('coprra_cache_test-key', $ttl, \Mockery::type('Closure'))
+            ->andReturnUsing(static function ($key, $ttl, $callback) {
                 return $callback();
-            });
+            })
+        ;
 
         Cache::shouldReceive('getFacadeRoot')->andReturn($cacheMock);
 
         // Mock Log::debug to be called zero or more times since the actual call depends on cache behavior
         Log::shouldReceive('debug')
             ->zeroOrMoreTimes()
-            ->with('Cache miss - data generated', Mockery::type('array'));
+            ->with('Cache miss - data generated', \Mockery::type('array'))
+        ;
 
         // Act
         $result = $this->service->remember($key, $ttl, $callback);
 
         // Assert
-        $this->assertEquals($expectedData, $result);
+        self::assertSame($expectedData, $result);
     }
 
-    public function test_forgets_cache_by_key(): void
+    public function testForgetsCacheByKey(): void
     {
         // Arrange
         $key = 'test-key';
 
         Cache::shouldReceive('forget')
             ->with('coprra_cache_test-key')
-            ->andReturn(1);
+            ->andReturn(1)
+        ;
 
         // Act
         $result = $this->service->forget($key);
 
         // Assert
-        $this->assertTrue($result);
+        self::assertTrue($result);
     }
 
-    public function test_forgets_cache_by_tags(): void
+    public function testForgetsCacheByTags(): void
     {
         // Arrange
         $tags = ['products', 'featured'];
 
-        $cacheMock = Mockery::mock();
-        $storeMock = Mockery::mock('Illuminate\Cache\TaggableStore');
-        $taggedCacheMock = Mockery::mock();
+        $cacheMock = \Mockery::mock();
+        $storeMock = \Mockery::mock('Illuminate\Cache\TaggableStore');
+        $taggedCacheMock = \Mockery::mock();
 
         // Create a store mock that has the tags method
         $storeMock->shouldReceive('tags')->andReturn($taggedCacheMock);
@@ -203,21 +248,22 @@ class CacheServiceTest extends TestCase
         $result = $this->service->forgetByTags($tags);
 
         // Assert
-        $this->assertFalse($result);
+        self::assertFalse($result);
     }
 
-    public function test_handles_forget_exception(): void
+    public function testHandlesForgetException(): void
     {
         // Arrange
         $key = 'test-key';
 
         Cache::shouldReceive('forget')
-            ->andThrow(new \Exception('Cache error'));
+            ->andThrow(new \Exception('Cache error'))
+        ;
 
         // Act
         $result = $this->service->forget($key);
 
         // Assert
-        $this->assertFalse($result);
+        self::assertFalse($result);
     }
 }

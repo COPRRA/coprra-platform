@@ -6,12 +6,14 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\ImageManager;
 
 final class ImageOptimizationService
 {
     /**
-     * @param  array<string, array{0: int, 1: int}>  $sizes
+     * @param array<string, array{0: int, 1: int}> $sizes
+     *
      * @return array<string, array{path: string, url: string, width: int, height: int, size: int}>
      */
     public function optimizeImage(string $path, array $sizes = []): array
@@ -28,10 +30,11 @@ final class ImageOptimizationService
 
         try {
             $originalPath = Storage::path($path);
-            $image = Image::make($originalPath);
+            $manager = new ImageManager(new Driver());
+            $image = $manager->read($originalPath);
 
             foreach ($sizes as $sizeName => $dimensions) {
-                if (! is_array($dimensions) || count($dimensions) < 2) {
+                if (! \is_array($dimensions) || \count($dimensions) < 2) {
                     continue;
                 }
 
@@ -41,18 +44,11 @@ final class ImageOptimizationService
                 $sizeNameStr = (string) $sizeName;
                 $optimizedPath = $this->generateOptimizedPath($path, $sizeNameStr);
 
-                $resizedImage = $image->resize($width, $height, static function (object $constraint): void {
-                    if (method_exists($constraint, 'aspectRatio')) {
-                        $constraint->aspectRatio();
-                    }
-                    if (method_exists($constraint, 'upsize')) {
-                        $constraint->upsize();
-                    }
-                });
+                $resizedImage = $image->resize($width, $height);
 
                 // Convert to WebP for better compression
                 $webpPath = str_replace(['.jpg', '.jpeg', '.png'], '.webp', $optimizedPath);
-                $resizedImage->encode('webp', 85)->save(Storage::path($webpPath));
+                $resizedImage->toWebp(85)->save(Storage::path($webpPath));
 
                 $fileSize = filesize(Storage::path($webpPath));
 
@@ -61,7 +57,7 @@ final class ImageOptimizationService
                     'url' => Storage::url($webpPath),
                     'width' => $resizedImage->width(),
                     'height' => $resizedImage->height(),
-                    'size' => $fileSize !== false ? $fileSize : 0,
+                    'size' => false !== $fileSize ? $fileSize : 0,
                 ];
             }
 
@@ -84,18 +80,19 @@ final class ImageOptimizationService
             ->map(static function (array $image): string {
                 return $image['url'].' '.$image['width'].'w';
             })
-            ->implode(', ');
+            ->implode(', ')
+        ;
     }
 
     /**
-     * @param  array<string, string|int|float|bool>  $attributes
+     * @param array<string, bool|float|int|string> $attributes
      */
     public function lazyLoadImage(string $originalPath, string $alt = '', array $attributes = []): string
     {
         $optimizedImages = $this->optimizeImage($originalPath);
         $placeholder = $this->generatePlaceholder($originalPath);
 
-        if (isset($optimizedImages['medium']) && is_array($optimizedImages['medium'])) {
+        if (isset($optimizedImages['medium']) && \is_array($optimizedImages['medium'])) {
             $mediumUrl = $optimizedImages['medium']['url'] ?? Storage::url($originalPath);
         } else {
             $mediumUrl = Storage::url($originalPath);
@@ -109,14 +106,15 @@ final class ImageOptimizationService
         ], $attributes);
 
         $attributesString = collect($attributes)
-            ->map(static function (string|int|float|bool $value, string $key): string {
-                if (! is_string($value) && ! is_numeric($value)) {
+            ->map(static function (bool|float|int|string $value, string $key): string {
+                if (! \is_string($value) && ! is_numeric($value)) {
                     return '';
                 }
 
                 return $key.'="'.htmlspecialchars((string) $value).'"';
             })
-            ->implode(' ');
+            ->implode(' ')
+        ;
 
         return '<img '.$attributesString.' src="'.$placeholder.'">';
     }
@@ -124,8 +122,9 @@ final class ImageOptimizationService
     public function compressImage(string $path, int $quality = 85): bool
     {
         try {
-            $image = Image::make(Storage::path($path));
-            $image->encode(null, $quality)->save();
+            $manager = new ImageManager(new Driver());
+            $image = $manager->read(Storage::path($path));
+            $image->save(Storage::path($path), $quality);
 
             return true;
         } catch (\Exception $e) {
@@ -153,10 +152,10 @@ final class ImageOptimizationService
     {
         try {
             // Generate a low-quality placeholder
-            $image = Image::make(Storage::path($originalPath))->resize(20, 20)->blur(10);
-            $encoded = $image->encode('data-url');
+            $manager = new ImageManager(new Driver());
+            $image = $manager->read(Storage::path($originalPath))->resize(20, 20)->blur(10);
 
-            return is_string($encoded) ? $encoded : '';
+            return $image->encode()->toDataUri();
         } catch (\Exception $e) {
             Log::error('Failed to generate placeholder', [
                 'path' => $originalPath,

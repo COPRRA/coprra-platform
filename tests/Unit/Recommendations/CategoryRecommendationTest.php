@@ -7,10 +7,15 @@ namespace Tests\Unit\Recommendations;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-class CategoryRecommendationTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class CategoryRecommendationTest extends TestCase
 {
     #[Test]
-    public function it_recommends_categories_based_on_user_history(): void
+    public function itRecommendsCategoriesBasedOnUserHistory(): void
     {
         $userHistory = [
             ['category' => 'Electronics', 'purchases' => 5],
@@ -20,13 +25,13 @@ class CategoryRecommendationTest extends TestCase
 
         $recommendations = $this->getCategoryRecommendations($userHistory);
 
-        $this->assertContains('Electronics', $recommendations);
-        $this->assertContains('Clothing', $recommendations);
-        $this->assertCount(2, $recommendations);
+        self::assertContains('Electronics', $recommendations);
+        self::assertContains('Clothing', $recommendations);
+        self::assertCount(2, $recommendations);
     }
 
     #[Test]
-    public function it_recommends_popular_categories(): void
+    public function itRecommendsPopularCategories(): void
     {
         $categoryStats = [
             'Electronics' => 1000,
@@ -38,14 +43,14 @@ class CategoryRecommendationTest extends TestCase
 
         $recommendations = $this->getPopularCategoryRecommendations($categoryStats, 3);
 
-        $this->assertContains('Electronics', $recommendations);
-        $this->assertContains('Clothing', $recommendations);
-        $this->assertContains('Books', $recommendations);
-        $this->assertCount(3, $recommendations);
+        self::assertContains('Electronics', $recommendations);
+        self::assertContains('Clothing', $recommendations);
+        self::assertContains('Books', $recommendations);
+        self::assertCount(3, $recommendations);
     }
 
     #[Test]
-    public function it_recommends_related_categories(): void
+    public function itRecommendsRelatedCategories(): void
     {
         $currentCategory = 'Electronics';
         $categoryRelations = [
@@ -56,13 +61,13 @@ class CategoryRecommendationTest extends TestCase
 
         $recommendations = $this->getRelatedCategoryRecommendations($currentCategory, $categoryRelations);
 
-        $this->assertContains('Accessories', $recommendations);
-        $this->assertContains('Gadgets', $recommendations);
-        $this->assertContains('Computers', $recommendations);
+        self::assertContains('Accessories', $recommendations);
+        self::assertContains('Gadgets', $recommendations);
+        self::assertContains('Computers', $recommendations);
     }
 
     #[Test]
-    public function it_handles_seasonal_category_recommendations(): void
+    public function itHandlesSeasonalCategoryRecommendations(): void
     {
         $currentSeason = 'Winter';
         $seasonalCategories = [
@@ -74,13 +79,13 @@ class CategoryRecommendationTest extends TestCase
 
         $recommendations = $this->getSeasonalCategoryRecommendations($currentSeason, $seasonalCategories);
 
-        $this->assertContains('Winter Clothing', $recommendations);
-        $this->assertContains('Heating', $recommendations);
-        $this->assertContains('Hot Beverages', $recommendations);
+        self::assertContains('Winter Clothing', $recommendations);
+        self::assertContains('Heating', $recommendations);
+        self::assertContains('Hot Beverages', $recommendations);
     }
 
     #[Test]
-    public function it_recommends_categories_based_on_demographics(): void
+    public function itRecommendsCategoriesBasedOnDemographics(): void
     {
         $userProfile = [
             'age_group' => '25-35',
@@ -96,25 +101,25 @@ class CategoryRecommendationTest extends TestCase
 
         $recommendations = $this->getDemographicCategoryRecommendations($userProfile, $demographicCategories);
 
-        $this->assertNotEmpty($recommendations);
-        $this->assertContains('Fashion', $recommendations);
+        self::assertNotEmpty($recommendations);
+        self::assertContains('Fashion', $recommendations);
     }
 
     #[Test]
-    public function it_filters_categories_by_availability(): void
+    public function itFiltersCategoriesByAvailability(): void
     {
         $allCategories = ['Electronics', 'Clothing', 'Books', 'Sports'];
         $availableCategories = ['Electronics', 'Books', 'Sports'];
 
         $filteredRecommendations = $this->filterCategoriesByAvailability($allCategories, $availableCategories);
 
-        $this->assertNotContains('Clothing', $filteredRecommendations);
-        $this->assertContains('Electronics', $filteredRecommendations);
-        $this->assertContains('Books', $filteredRecommendations);
+        self::assertNotContains('Clothing', $filteredRecommendations);
+        self::assertContains('Electronics', $filteredRecommendations);
+        self::assertContains('Books', $filteredRecommendations);
     }
 
     #[Test]
-    public function it_ranks_categories_by_relevance_score(): void
+    public function itRanksCategoriesByRelevanceScore(): void
     {
         $categories = [
             ['name' => 'Electronics', 'score' => 0.9],
@@ -125,27 +130,27 @@ class CategoryRecommendationTest extends TestCase
 
         $rankedCategories = $this->rankCategoriesByScore($categories);
 
-        $this->assertIsArray($rankedCategories[0]);
-        $this->assertEquals('Electronics', $rankedCategories[0]['name']);
-        $this->assertIsArray($rankedCategories[1]);
-        $this->assertEquals('Books', $rankedCategories[1]['name']);
-        $this->assertIsArray($rankedCategories[2]);
-        $this->assertEquals('Clothing', $rankedCategories[2]['name']);
-        $this->assertIsArray($rankedCategories[3]);
-        $this->assertEquals('Sports', $rankedCategories[3]['name']);
+        self::assertIsArray($rankedCategories[0]);
+        self::assertSame('Electronics', $rankedCategories[0]['name']);
+        self::assertIsArray($rankedCategories[1]);
+        self::assertSame('Books', $rankedCategories[1]['name']);
+        self::assertIsArray($rankedCategories[2]);
+        self::assertSame('Clothing', $rankedCategories[2]['name']);
+        self::assertIsArray($rankedCategories[3]);
+        self::assertSame('Sports', $rankedCategories[3]['name']);
     }
 
     #[Test]
-    public function it_handles_empty_category_data(): void
+    public function itHandlesEmptyCategoryData(): void
     {
         $emptyHistory = [];
         $recommendations = $this->getCategoryRecommendations($emptyHistory);
 
-        $this->assertEmpty($recommendations);
+        self::assertEmpty($recommendations);
     }
 
     #[Test]
-    public function it_calculates_category_affinity_score(): void
+    public function itCalculatesCategoryAffinityScore(): void
     {
         $userPurchases = [
             'Electronics' => 10,
@@ -156,11 +161,11 @@ class CategoryRecommendationTest extends TestCase
         $category = 'Electronics';
         $affinityScore = $this->calculateCategoryAffinityScore($userPurchases, $category);
 
-        $this->assertGreaterThan(0.5, $affinityScore);
+        self::assertGreaterThan(0.5, $affinityScore);
     }
 
     #[Test]
-    public function it_recommends_trending_categories(): void
+    public function itRecommendsTrendingCategories(): void
     {
         $categoryTrends = [
             'Electronics' => ['trend' => 'up', 'growth' => 0.15],
@@ -171,13 +176,14 @@ class CategoryRecommendationTest extends TestCase
 
         $trendingCategories = $this->getTrendingCategoryRecommendations($categoryTrends);
 
-        $this->assertContains('Electronics', $trendingCategories);
-        $this->assertContains('Fitness', $trendingCategories);
-        $this->assertNotContains('Books', $trendingCategories);
+        self::assertContains('Electronics', $trendingCategories);
+        self::assertContains('Fitness', $trendingCategories);
+        self::assertNotContains('Books', $trendingCategories);
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $userHistory
+     * @param array<int, array<string, mixed>> $userHistory
+     *
      * @return list<mixed>
      */
     private function getCategoryRecommendations(array $userHistory): array
@@ -187,31 +193,34 @@ class CategoryRecommendationTest extends TestCase
         }
 
         // Sort by purchase count and return top 2 categories
-        usort($userHistory, function ($a, $b) {
+        usort($userHistory, static function ($a, $b) {
             return $b['purchases'] <=> $a['purchases'];
         });
 
-        return array_slice(array_column($userHistory, 'category'), 0, 2);
+        return \array_slice(array_column($userHistory, 'category'), 0, 2);
     }
 
     /**
-     * @param  array<string, mixed>  $categoryStats
+     * @param array<string, mixed> $categoryStats
+     *
      * @return array<int, array<string, mixed>>
      */
 
     /**
-     * @param  array<string, mixed>  $categoryStats
+     * @param array<string, mixed> $categoryStats
+     *
      * @return list<string>
      */
     private function getPopularCategoryRecommendations(array $categoryStats, int $limit): array
     {
         arsort($categoryStats);
 
-        return array_slice(array_keys($categoryStats), 0, $limit);
+        return \array_slice(array_keys($categoryStats), 0, $limit);
     }
 
     /**
-     * @param  array<string, list<string>>  $categoryRelations
+     * @param array<string, list<string>> $categoryRelations
+     *
      * @return list<string>
      */
     private function getRelatedCategoryRecommendations(string $currentCategory, array $categoryRelations): array
@@ -220,7 +229,8 @@ class CategoryRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, list<string>>  $seasonalCategories
+     * @param array<string, list<string>> $seasonalCategories
+     *
      * @return list<string>
      */
     private function getSeasonalCategoryRecommendations(string $season, array $seasonalCategories): array
@@ -229,13 +239,15 @@ class CategoryRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $userProfile
+     * @param array<string, mixed> $userProfile
+     *
      * @return array<int, array<string, mixed>>
      */
 
     /**
-     * @param  array<string, mixed>  $userProfile
-     * @param  array<string, list<string>>  $demographicCategories
+     * @param array<string, mixed>        $userProfile
+     * @param array<string, list<string>> $demographicCategories
+     *
      * @return array<int, string>
      */
     private function getDemographicCategoryRecommendations(array $userProfile, array $demographicCategories): array
@@ -243,9 +255,9 @@ class CategoryRecommendationTest extends TestCase
         $recommendations = [];
 
         foreach ($userProfile as $demographic => $value) {
-            if (is_string($value) && isset($demographicCategories[$value])) {
+            if (\is_string($value) && isset($demographicCategories[$value])) {
                 $categories = $demographicCategories[$value];
-                if (is_array($categories)) {
+                if (\is_array($categories)) {
                     $recommendations = array_merge($recommendations, $categories);
                 }
             }
@@ -255,13 +267,15 @@ class CategoryRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $allCategories
+     * @param array<int, array<string, mixed>> $allCategories
+     *
      * @return array<int, array<string, mixed>>
      */
 
     /**
-     * @param  list<string>  $allCategories
-     * @param  list<string>  $availableCategories
+     * @param list<string> $allCategories
+     * @param list<string> $availableCategories
+     *
      * @return array<int, string>
      */
     private function filterCategoriesByAvailability(array $allCategories, array $availableCategories): array
@@ -270,12 +284,13 @@ class CategoryRecommendationTest extends TestCase
     }
 
     /**
-     * @param  list<array<string, mixed>>  $categories
+     * @param list<array<string, mixed>> $categories
+     *
      * @return list<array<string, mixed>>
      */
     private function rankCategoriesByScore(array $categories): array
     {
-        usort($categories, function ($a, $b) {
+        usort($categories, static function ($a, $b) {
             return $b['score'] <=> $a['score'];
         });
 
@@ -283,7 +298,7 @@ class CategoryRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, int>  $userPurchases
+     * @param array<string, int> $userPurchases
      */
     private function calculateCategoryAffinityScore(array $userPurchases, string $category): float
     {
@@ -294,7 +309,8 @@ class CategoryRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, array<string, mixed>>  $categoryTrends
+     * @param array<string, array<string, mixed>> $categoryTrends
+     *
      * @return list<string>
      */
     private function getTrendingCategoryRecommendations(array $categoryTrends): array
@@ -302,7 +318,7 @@ class CategoryRecommendationTest extends TestCase
         $trending = [];
 
         foreach ($categoryTrends as $category => $data) {
-            if ($data['trend'] === 'up' && $data['growth'] > 0.1) {
+            if ('up' === $data['trend'] && $data['growth'] > 0.1) {
                 $trending[] = $category;
             }
         }

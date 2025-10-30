@@ -6,44 +6,17 @@ namespace Tests\Feature\Models;
 
 use App\Models\Language;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class LanguageTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class LanguageTest extends TestCase
 {
     use RefreshDatabase;
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_create_a_language(): void
-    {
-        // Test that Language class exists
-        $model = new Language;
-        $this->assertInstanceOf(Language::class, $model);
-
-        // Test basic functionality
-        $this->assertTrue(true);
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_has_expected_properties(): void
-    {
-        // Test that Language class exists
-        $model = new Language;
-        $this->assertInstanceOf(Language::class, $model);
-
-        // Test basic functionality
-        $this->assertTrue(true);
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_be_instantiated(): void
-    {
-        // Test that Language class exists
-        $model = new Language;
-        $this->assertInstanceOf(Language::class, $model);
-
-        // Test basic functionality
-        $this->assertTrue(true);
-    }
 
     protected function setUp(): void
     {
@@ -53,5 +26,38 @@ class LanguageTest extends TestCase
     protected function tearDown(): void
     {
         parent::tearDown();
+    }
+
+    #[Test]
+    public function testItCanCreateALanguage(): void
+    {
+        // Test that Language class exists
+        $model = new Language();
+        self::assertInstanceOf(Language::class, $model);
+
+        // Test basic functionality
+        self::assertTrue(true);
+    }
+
+    #[Test]
+    public function testItHasExpectedProperties(): void
+    {
+        // Test that Language class exists
+        $model = new Language();
+        self::assertInstanceOf(Language::class, $model);
+
+        // Test basic functionality
+        self::assertTrue(true);
+    }
+
+    #[Test]
+    public function testItCanBeInstantiated(): void
+    {
+        // Test that Language class exists
+        $model = new Language();
+        self::assertInstanceOf(Language::class, $model);
+
+        // Test basic functionality
+        self::assertTrue(true);
     }
 }

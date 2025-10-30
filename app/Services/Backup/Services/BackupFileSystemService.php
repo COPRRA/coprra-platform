@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services\Backup\Services;
 
-use Exception;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-
 final class BackupFileSystemService
 {
     /**
@@ -19,7 +15,7 @@ final class BackupFileSystemService
      *     status: string
      * }
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function backupFiles(string $backupDir): array
     {
@@ -48,23 +44,24 @@ final class BackupFileSystemService
     /**
      * Restore files.
      *
-     * @param  array{directories?: list<string>, size?: int, status?: string}  $filesInfo
+     * @param array{directories?: list<string>, size?: int, status?: string} $filesInfo
+     *
      * @return array{directories: list<string>, status: string}
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function restoreFiles(string $backupPath, array $filesInfo): array
     {
         $filesDir = $backupPath.'/files';
 
         if (! is_dir($filesDir)) {
-            throw new Exception('Files backup directory not found');
+            throw new \Exception('Files backup directory not found');
         }
 
         $restoredDirs = [];
 
         $directories = $filesInfo['directories'] ?? [];
-        if (is_array($directories)) {
+        if (\is_array($directories)) {
             foreach ($directories as $dir) {
                 $this->processSingleFileRestore($filesDir, $dir, $restoredDirs);
             }
@@ -93,7 +90,7 @@ final class BackupFileSystemService
      */
     private function processSingleFileRestore(string $filesDir, string $dir, array &$restoredDirs): void
     {
-        if (is_string($dir)) {
+        if (\is_string($dir)) {
             $sourcePath = $this->joinPaths($filesDir, $dir);
             $destPath = $this->getDestinationPath($dir);
 
@@ -109,9 +106,9 @@ final class BackupFileSystemService
      */
     private function joinPaths(string ...$parts): string
     {
-        $trimmed = array_map(static fn (string $p): string => trim($p, '\\/'), $parts);
+        $trimmed = array_map(static fn (string $p): string => trim($p, '\/'), $parts);
 
-        return implode(DIRECTORY_SEPARATOR, $trimmed);
+        return implode(\DIRECTORY_SEPARATOR, $trimmed);
     }
 
     /**
@@ -123,9 +120,9 @@ final class BackupFileSystemService
             mkdir($dest, 0o755, true);
         }
 
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($source, RecursiveDirectoryIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::SELF_FIRST
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($source, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::SELF_FIRST
         );
 
         foreach ($iterator as $item) {
@@ -136,9 +133,9 @@ final class BackupFileSystemService
     /**
      * Process single item copy.
      */
-    private function processSingleItemCopy(\SplFileInfo $item, string $dest, RecursiveIteratorIterator $iterator): void
+    private function processSingleItemCopy(\SplFileInfo $item, string $dest, \RecursiveIteratorIterator $iterator): void
     {
-        $destPath = $dest.DIRECTORY_SEPARATOR.$iterator->getSubPathName();
+        $destPath = $dest.\DIRECTORY_SEPARATOR.$iterator->getSubPathName();
         if ($item->isDir()) {
             mkdir($destPath, 0o755, true);
         } else {
@@ -173,8 +170,8 @@ final class BackupFileSystemService
             return $size;
         }
 
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS)
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS)
         );
 
         foreach ($iterator as $file) {

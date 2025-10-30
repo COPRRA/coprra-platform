@@ -8,10 +8,14 @@ use App\DTO\ProcessResult;
 use App\Services\ProcessService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Process;
-use Mockery;
 use Tests\TestCase;
 
-class ProcessServiceTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class ProcessServiceTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -20,16 +24,16 @@ class ProcessServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new ProcessService;
+        $this->service = new ProcessService();
     }
 
     protected function tearDown(): void
     {
-        Mockery::close();
+        \Mockery::close();
         parent::tearDown();
     }
 
-    public function test_runs_process_command_successfully()
+    public function testRunsProcessCommandSuccessfully()
     {
         // Arrange
         $command = 'ls -la';
@@ -37,31 +41,33 @@ class ProcessServiceTest extends TestCase
         $output = 'total 0';
         $errorOutput = '';
 
-        $processResult = Mockery::mock();
+        $processResult = \Mockery::mock();
         $processResult->shouldReceive('exitCode')->andReturn($exitCode);
         $processResult->shouldReceive('output')->andReturn($output);
         $processResult->shouldReceive('errorOutput')->andReturn($errorOutput);
 
         // Support chaining: Process::timeout(...)->run($command)
         Process::shouldReceive('timeout')
-            ->with(Mockery::type('int'))
-            ->andReturnSelf();
+            ->with(\Mockery::type('int'))
+            ->andReturnSelf()
+        ;
 
         Process::shouldReceive('run')
             ->with($command)
-            ->andReturn($processResult);
+            ->andReturn($processResult)
+        ;
 
         // Act
         $result = $this->service->run($command);
 
         // Assert
-        $this->assertInstanceOf(ProcessResult::class, $result);
-        $this->assertEquals($exitCode, $result->exitCode);
-        $this->assertEquals($output, $result->output);
-        $this->assertEquals($errorOutput, $result->errorOutput);
+        self::assertInstanceOf(ProcessResult::class, $result);
+        self::assertSame($exitCode, $result->exitCode);
+        self::assertSame($output, $result->output);
+        self::assertSame($errorOutput, $result->errorOutput);
     }
 
-    public function test_processes_data_successfully()
+    public function testProcessesDataSuccessfully()
     {
         // Arrange
         $data = [
@@ -73,23 +79,23 @@ class ProcessServiceTest extends TestCase
         $result = $this->service->process($data);
 
         // Assert
-        $this->assertIsArray($result);
-        $this->assertTrue($result['processed']);
-        $this->assertArrayHasKey('data', $result);
+        self::assertIsArray($result);
+        self::assertTrue($result['processed']);
+        self::assertArrayHasKey('data', $result);
     }
 
-    public function test_handles_null_data()
+    public function testHandlesNullData()
     {
         // Act
         $result = $this->service->process(null);
 
         // Assert
-        $this->assertIsArray($result);
-        $this->assertTrue($result['error']);
-        $this->assertEquals('Invalid data provided', $result['message']);
+        self::assertIsArray($result);
+        self::assertTrue($result['error']);
+        self::assertSame('Invalid data provided', $result['message']);
     }
 
-    public function test_validates_data_successfully()
+    public function testValidatesDataSuccessfully()
     {
         // Arrange
         $data = [
@@ -101,10 +107,10 @@ class ProcessServiceTest extends TestCase
         $result = $this->service->validate($data);
 
         // Assert
-        $this->assertTrue($result);
+        self::assertTrue($result);
     }
 
-    public function test_validates_data_with_empty_name()
+    public function testValidatesDataWithEmptyName()
     {
         // Arrange
         $data = [
@@ -116,12 +122,12 @@ class ProcessServiceTest extends TestCase
         $result = $this->service->validate($data);
 
         // Assert
-        $this->assertFalse($result);
+        self::assertFalse($result);
         $errors = $this->service->getErrors();
-        $this->assertArrayHasKey('name', $errors);
+        self::assertArrayHasKey('name', $errors);
     }
 
-    public function test_cleans_data_successfully()
+    public function testCleansDataSuccessfully()
     {
         // Arrange
         $data = [
@@ -133,11 +139,11 @@ class ProcessServiceTest extends TestCase
         $result = $this->service->clean($data);
 
         // Assert
-        $this->assertEquals('John Doe', $result['name']);
-        $this->assertEquals('john@example.com', $result['email']);
+        self::assertSame('John Doe', $result['name']);
+        self::assertSame('john@example.com', $result['email']);
     }
 
-    public function test_transforms_data_successfully()
+    public function testTransformsDataSuccessfully()
     {
         // Arrange
         $data = [
@@ -149,20 +155,20 @@ class ProcessServiceTest extends TestCase
         $result = $this->service->transform($data);
 
         // Assert
-        $this->assertEquals('John doe', $result['name']);
-        $this->assertEquals('John@example.com', $result['email']);
+        self::assertSame('John doe', $result['name']);
+        self::assertSame('John@example.com', $result['email']);
     }
 
-    public function test_gets_processing_status()
+    public function testGetsProcessingStatus()
     {
         // Act
         $status = $this->service->getStatus();
 
         // Assert
-        $this->assertEquals('idle', $status);
+        self::assertSame('idle', $status);
     }
 
-    public function test_resets_service()
+    public function testResetsService()
     {
         // Arrange
         $data = ['name' => ''];
@@ -172,11 +178,11 @@ class ProcessServiceTest extends TestCase
         $this->service->reset();
 
         // Assert
-        $this->assertEquals('idle', $this->service->getStatus());
-        $this->assertEmpty($this->service->getErrors());
+        self::assertSame('idle', $this->service->getStatus());
+        self::assertEmpty($this->service->getErrors());
     }
 
-    public function test_gets_processing_metrics()
+    public function testGetsProcessingMetrics()
     {
         // Arrange
         $data = ['name' => 'John Doe', 'email' => 'john@example.com'];
@@ -186,8 +192,8 @@ class ProcessServiceTest extends TestCase
         $metrics = $this->service->getMetrics();
 
         // Assert
-        $this->assertIsArray($metrics);
-        $this->assertArrayHasKey('processed_count', $metrics);
-        $this->assertArrayHasKey('error_count', $metrics);
+        self::assertIsArray($metrics);
+        self::assertArrayHasKey('processed_count', $metrics);
+        self::assertArrayHasKey('error_count', $metrics);
     }
 }

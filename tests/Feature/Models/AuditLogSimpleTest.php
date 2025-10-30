@@ -6,16 +6,22 @@ namespace Tests\Feature\Models;
 
 use App\Models\AuditLog;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class AuditLogSimpleTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class AuditLogSimpleTest extends TestCase
 {
     use RefreshDatabase;
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_has_correct_fillable_attributes(): void
+    #[Test]
+    public function testItHasCorrectFillableAttributes(): void
     {
-        $auditLog = new AuditLog;
+        $auditLog = new AuditLog();
 
         $expectedFillable = [
             'event',
@@ -31,13 +37,13 @@ class AuditLogSimpleTest extends TestCase
             'method',
         ];
 
-        $this->assertEquals($expectedFillable, $auditLog->getFillable());
+        self::assertSame($expectedFillable, $auditLog->getFillable());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_has_correct_casts(): void
+    #[Test]
+    public function testItHasCorrectCasts(): void
     {
-        $auditLog = new AuditLog;
+        $auditLog = new AuditLog();
 
         $expectedCasts = [
             'id' => 'int',
@@ -46,35 +52,35 @@ class AuditLogSimpleTest extends TestCase
             'metadata' => 'array',
         ];
 
-        $this->assertEquals($expectedCasts, $auditLog->getCasts());
+        self::assertSame($expectedCasts, $auditLog->getCasts());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_has_correct_table_name(): void
+    #[Test]
+    public function testItHasCorrectTableName(): void
     {
-        $auditLog = new AuditLog;
+        $auditLog = new AuditLog();
 
-        $this->assertEquals('audit_logs', $auditLog->getTable());
+        self::assertSame('audit_logs', $auditLog->getTable());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_uses_timestamps(): void
+    #[Test]
+    public function testItUsesTimestamps(): void
     {
-        $auditLog = new AuditLog;
+        $auditLog = new AuditLog();
 
-        $this->assertTrue($auditLog->usesTimestamps());
+        self::assertTrue($auditLog->usesTimestamps());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_formatted_event_attribute(): void
+    #[Test]
+    public function testGetFormattedEventAttribute(): void
     {
         $auditLog = new AuditLog(['event' => 'user_created']);
 
-        $this->assertEquals('User created', $auditLog->getFormattedEventAttribute());
+        self::assertSame('User created', $auditLog->getFormattedEventAttribute());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_changes_summary_attribute_with_changes(): void
+    #[Test]
+    public function testGetChangesSummaryAttributeWithChanges(): void
     {
         $auditLog = new AuditLog([
             'old_values' => ['name' => 'Old Name', 'price' => 100],
@@ -83,12 +89,12 @@ class AuditLogSimpleTest extends TestCase
 
         $summary = $auditLog->getChangesSummaryAttribute();
 
-        $this->assertStringContainsString('name: Old Name → New Name', $summary);
-        $this->assertStringContainsString('price: 100 → 150', $summary);
+        self::assertStringContainsString('name: Old Name → New Name', $summary);
+        self::assertStringContainsString('price: 100 → 150', $summary);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_changes_summary_attribute_without_changes(): void
+    #[Test]
+    public function testGetChangesSummaryAttributeWithoutChanges(): void
     {
         $auditLog = new AuditLog([
             'old_values' => null,
@@ -97,11 +103,11 @@ class AuditLogSimpleTest extends TestCase
 
         $summary = $auditLog->getChangesSummaryAttribute();
 
-        $this->assertEquals('No changes recorded', $summary);
+        self::assertSame('No changes recorded', $summary);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_changes_summary_attribute_with_no_old_values(): void
+    #[Test]
+    public function testGetChangesSummaryAttributeWithNoOldValues(): void
     {
         $auditLog = new AuditLog([
             'old_values' => null,
@@ -110,11 +116,11 @@ class AuditLogSimpleTest extends TestCase
 
         $summary = $auditLog->getChangesSummaryAttribute();
 
-        $this->assertStringContainsString('No changes recorded', $summary);
+        self::assertStringContainsString('No changes recorded', $summary);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_changes_summary_attribute_with_no_new_values(): void
+    #[Test]
+    public function testGetChangesSummaryAttributeWithNoNewValues(): void
     {
         $auditLog = new AuditLog([
             'old_values' => ['name' => 'Old Name'],
@@ -123,11 +129,11 @@ class AuditLogSimpleTest extends TestCase
 
         $summary = $auditLog->getChangesSummaryAttribute();
 
-        $this->assertStringContainsString('No changes recorded', $summary);
+        self::assertStringContainsString('No changes recorded', $summary);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_changes_summary_attribute_with_unchanged_values(): void
+    #[Test]
+    public function testGetChangesSummaryAttributeWithUnchangedValues(): void
     {
         $auditLog = new AuditLog([
             'old_values' => ['name' => 'Same Name', 'price' => 100],
@@ -136,11 +142,11 @@ class AuditLogSimpleTest extends TestCase
 
         $summary = $auditLog->getChangesSummaryAttribute();
 
-        $this->assertEquals('', $summary);
+        self::assertSame('', $summary);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_changes_summary_attribute_with_mixed_data_types(): void
+    #[Test]
+    public function testGetChangesSummaryAttributeWithMixedDataTypes(): void
     {
         $auditLog = new AuditLog([
             'old_values' => ['name' => 'Old Name', 'active' => true, 'count' => 5],
@@ -149,16 +155,16 @@ class AuditLogSimpleTest extends TestCase
 
         $summary = $auditLog->getChangesSummaryAttribute();
 
-        $this->assertStringContainsString('name: Old Name → New Name', $summary);
-        $this->assertStringContainsString('active: 1 → 0', $summary);
-        $this->assertStringContainsString('count: 5 → 10', $summary);
+        self::assertStringContainsString('name: Old Name → New Name', $summary);
+        self::assertStringContainsString('active: 1 → 0', $summary);
+        self::assertStringContainsString('count: 5 → 10', $summary);
     }
 
     /**
      * Test that AuditLogSimpleTest can be instantiated.
      */
-    public function test_can_be_instantiated(): void
+    public function testCanBeInstantiated(): void
     {
-        $this->assertInstanceOf(self::class, $this);
+        self::assertInstanceOf(self::class, $this);
     }
 }

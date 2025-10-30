@@ -24,7 +24,7 @@ final class SEORouteAuditor
         foreach ($routes->getRoutes() as $route) {
             if ($this->isValidPublicRoute($route)) {
                 $uri = $route->uri();
-                if (is_string($uri)) {
+                if (\is_string($uri)) {
                     $publicRoutes[] = $uri;
                 }
             }
@@ -36,7 +36,8 @@ final class SEORouteAuditor
     /**
      * Check for duplicate routes.
      *
-     * @param  array<string>  $routes
+     * @param array<string> $routes
+     *
      * @return array<int>
      *
      * @psalm-return array<string, int<2, max>>
@@ -45,7 +46,7 @@ final class SEORouteAuditor
     {
         $routeCounts = array_count_values($routes);
 
-        return array_filter($routeCounts, fn (int $count): bool => $count > 1);
+        return array_filter($routeCounts, static fn (int $count): bool => $count > 1);
     }
 
     /**
@@ -65,7 +66,7 @@ final class SEORouteAuditor
      */
     private function isGetRoute(IlluminateRoute $route): bool
     {
-        return in_array('GET', $route->methods(), true);
+        return \in_array('GET', $route->methods(), true);
     }
 
     /**
@@ -74,7 +75,7 @@ final class SEORouteAuditor
     private function isExcludedRoute(IlluminateRoute $route): bool
     {
         $uri = $route->uri();
-        if (! is_string($uri)) {
+        if (! \is_string($uri)) {
             return true;
         }
 

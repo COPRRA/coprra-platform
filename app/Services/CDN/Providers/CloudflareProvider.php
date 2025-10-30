@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace App\Services\CDN\Providers;
 
 use App\Services\CDN\Contracts\CDNProviderInterface;
-use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 /**
- * Cloudflare CDN Provider Implementation
+ * Cloudflare CDN Provider Implementation.
  */
 final readonly class CloudflareProvider implements CDNProviderInterface
 {
@@ -23,7 +22,7 @@ final readonly class CloudflareProvider implements CDNProviderInterface
     private string $baseUrl;
 
     /**
-     * @param  array<string, string|null>  $config
+     * @param  array<string, string|* @method static \App\Models\Brand create(array<string, string|bool|null>  $config
      */
     public function __construct(array $config)
     {
@@ -33,9 +32,6 @@ final readonly class CloudflareProvider implements CDNProviderInterface
         $this->baseUrl = (string) ($config['base_url'] ?? '');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     #[\Override]
     public function upload(string $content, string $path, string $mimeType): array
     {
@@ -47,15 +43,15 @@ final readonly class CloudflareProvider implements CDNProviderInterface
         ])->put($url, ['content' => $content]);
 
         if (! $response->successful()) {
-            throw new Exception('Cloudflare upload failed: '.$response->body());
+            throw new \Exception('Cloudflare upload failed: '.$response->body());
         }
 
         $data = $response->json() ?? [];
-        $result = isset($data['result']) && is_array($data['result']) ? $data['result'] : [];
-        $variants = isset($result['variants']) && is_array($result['variants']) ? $result['variants'] : [];
+        $result = isset($data['result']) && \is_array($data['result']) ? $data['result'] : [];
+        $variants = isset($result['variants']) && \is_array($result['variants']) ? $result['variants'] : [];
         $imageId = $result['id'] ?? null;
 
-        $url = is_string($variants[0] ?? null) ? $variants[0] : $this->getUrl($path);
+        $url = \is_string($variants[0] ?? null) ? $variants[0] : $this->getUrl($path);
 
         return [
             'url' => $url,
@@ -74,9 +70,6 @@ final readonly class CloudflareProvider implements CDNProviderInterface
         return $response->successful();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     #[\Override]
     public function purgeCache(array $urls): bool
     {
@@ -84,16 +77,13 @@ final readonly class CloudflareProvider implements CDNProviderInterface
             'Authorization' => 'Bearer '.$this->apiToken,
             'Content-Type' => 'application/json',
         ])->post('https://api.cloudflare.com/client/v4/zones/'.$this->zoneId.'/purge_cache', [
-            'purge_everything' => $urls === [],
+            'purge_everything' => [] === $urls,
             'files' => $urls,
         ]);
 
         return $response->successful();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     #[\Override]
     public function getStatistics(): array
     {
@@ -102,13 +92,13 @@ final readonly class CloudflareProvider implements CDNProviderInterface
         ])->get('https://api.cloudflare.com/client/v4/zones/'.$this->zoneId.'/analytics/dashboard');
 
         if (! $response->successful()) {
-            throw new Exception('Failed to get Cloudflare statistics');
+            throw new \Exception('Failed to get Cloudflare statistics');
         }
 
         /** @var array<string, mixed> $result */
         $result = $response->json();
 
-        return is_array($result) ? $result : [];
+        return \is_array($result) ? $result : [];
     }
 
     #[\Override]
@@ -127,7 +117,7 @@ final readonly class CloudflareProvider implements CDNProviderInterface
             }
 
             return false;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Cloudflare connection test failed', [
                 'error' => $e->getMessage(),
             ]);

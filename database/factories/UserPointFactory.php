@@ -23,9 +23,9 @@ class UserPointFactory extends Factory
     /**
      * Define the model's default state.
      *
-     * @return (UserFactory|\DateTime|int|mixed|null|string)[]
+     * @return (DateTime|int|mixed|string|UserFactory|null)[]
      *
-     * @psalm-return array{user_id: UserFactory, points: int, type: mixed, source: mixed, order_id: null, description: string, expires_at: \DateTime}
+     * @psalm-return array{user_id: UserFactory, points: int, type: mixed, source: mixed, order_id: null, description: string, expires_at: DateTime}
      */
     #[\Override]
     public function definition(): array

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use App\Models\Product;
 use App\Rules\DimensionSum;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -14,7 +15,7 @@ class ProductCreateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()?->can('create', \App\Models\Product::class) ?? false;
+        return $this->user()?->can('create', Product::class) ?? false;
     }
 
     /**
@@ -119,10 +120,11 @@ class ProductCreateRequest extends FormRequest
         $validated = parent::validated($key, $default);
 
         // Add computed fields
-        if (is_array($validated)) {
-            $validated['slug'] = str(is_string($validated['name'] ?? '') ? ($validated['name'] ?? '') : '')
+        if (\is_array($validated)) {
+            $validated['slug'] = str(\is_string($validated['name'] ?? '') ? ($validated['name'] ?? '') : '')
                 ->slug()
-                ->toString();
+                ->toString()
+            ;
             $validated['created_by'] = $this->user()?->id;
         }
 
@@ -137,10 +139,10 @@ class ProductCreateRequest extends FormRequest
     {
         // Clean and format data before validation
         $this->merge([
-            'name' => is_string($this->name) ? trim($this->name) : '',
-            'description' => is_string($this->description) ? trim($this->description) : '',
-            'sku' => is_string($this->sku) ? strtoupper(trim($this->sku)) : '',
-            'tags' => is_array($this->tags) ? array_map(static fn ($tag): string => is_string($tag) ? trim($tag) : '', $this->tags) : null,
+            'name' => \is_string($this->name) ? trim($this->name) : '',
+            'description' => \is_string($this->description) ? trim($this->description) : '',
+            'sku' => \is_string($this->sku) ? strtoupper(trim($this->sku)) : '',
+            'tags' => \is_array($this->tags) ? array_map(static fn ($tag): string => \is_string($tag) ? trim($tag) : '', $this->tags) : null,
         ]);
     }
 

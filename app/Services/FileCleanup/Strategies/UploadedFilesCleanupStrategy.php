@@ -18,7 +18,7 @@ final readonly class UploadedFilesCleanupStrategy implements CleanupStrategy
     private int $retentionDays;
 
     /**
-     * @param  array<string>  $directories
+     * @param array<string> $directories
      */
     public function __construct(DirectoryCleaner $cleaner, array $directories, int $retentionDays)
     {
@@ -28,7 +28,7 @@ final readonly class UploadedFilesCleanupStrategy implements CleanupStrategy
     }
 
     /**
-     * @return array<string, int|string|array<string>>
+     * @return array<string, array<string>|int|string>
      *
      * @psalm-return array<string, int|string|list<string>>
      */

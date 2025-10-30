@@ -9,10 +9,14 @@ use PHPUnit\Framework\TestCase;
 /**
  * Safe Laravel test base that preserves error handlers
  * to prevent PHPUnit risky test warnings.
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class SafeLaravelTest extends TestCase
+final class SafeLaravelTest extends TestCase
 {
-    use \Tests\DatabaseSetup;
+    use DatabaseSetup;
 
     public static function setUpBeforeClass(): void
     {
@@ -50,8 +54,8 @@ class SafeLaravelTest extends TestCase
     /**
      * Test that SafeLaravelTest can be instantiated.
      */
-    public function test_can_be_instantiated(): void
+    public function testCanBeInstantiated(): void
     {
-        $this->assertInstanceOf(self::class, $this);
+        self::assertInstanceOf(self::class, $this);
     }
 }

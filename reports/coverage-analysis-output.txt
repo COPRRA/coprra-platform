@@ -1,0 +1,99 @@
+PHP Warning:  Attempt to read property "lines" on null in C:\Users\Gaser\Desktop\COPRRA\analyze_coverage.php on line 48
+PHP Warning:  Attempt to read property "methods" on null in C:\Users\Gaser\Desktop\COPRRA\analyze_coverage.php on line 49
+PHP Warning:  Trying to access array offset on null in C:\Users\Gaser\Desktop\COPRRA\analyze_coverage.php on line 51
+PHP Warning:  Trying to access array offset on null in C:\Users\Gaser\Desktop\COPRRA\analyze_coverage.php on line 52
+PHP Warning:  Trying to access array offset on null in C:\Users\Gaser\Desktop\COPRRA\analyze_coverage.php on line 85
+PHP Warning:  Trying to access array offset on null in C:\Users\Gaser\Desktop\COPRRA\analyze_coverage.php on line 86
+PHP Warning:  Trying to access array offset on null in C:\Users\Gaser\Desktop\COPRRA\analyze_coverage.php on line 87
+PHP Warning:  Trying to access array offset on null in C:\Users\Gaser\Desktop\COPRRA\analyze_coverage.php on line 89
+PHP Warning:  Trying to access array offset on null in C:\Users\Gaser\Desktop\COPRRA\analyze_coverage.php on line 90
+PHP Warning:  Trying to access array offset on null in C:\Users\Gaser\Desktop\COPRRA\analyze_coverage.php on line 98
+PHP Warning:  Trying to access array offset on null in C:\Users\Gaser\Desktop\COPRRA\analyze_coverage.php on line 99
+PHP Warning:  Trying to access array offset on null in C:\Users\Gaser\Desktop\COPRRA\analyze_coverage.php on line 100
+PHP Warning:  Trying to access array offset on null in C:\Users\Gaser\Desktop\COPRRA\analyze_coverage.php on line 101
+
+═══════════════════════════════════════════════════════════════════════════
+                    COMPREHENSIVE COVERAGE ANALYSIS REPORT                  
+═══════════════════════════════════════════════════════════════════════════
+
+📊 OVERALL STATISTICS
+─────────────────────────────────────────────────────────────────────────────
+Total Files Analyzed:      198
+Total Lines:               24,560
+Lines Executed:            51
+Overall Line Coverage:     0.21%
+
+Total Methods:             890
+Methods Tested:            11
+Overall Method Coverage:   1.24%
+
+📁 COVERAGE BY CATEGORY
+─────────────────────────────────────────────────────────────────────────────
+❌ Controllers:                 40 files    0.44% coverage
+❌ Validators/Requests:         26 files    0.00% coverage
+❌ Others:                     132 files    0.16% coverage
+
+🔴 CRITICAL GAPS - FILES WITH <70% COVERAGE
+─────────────────────────────────────────────────────────────────────────────
+✅ No critical files with <70% coverage!
+
+⚠️  HIGH COMPLEXITY + LOW COVERAGE (CRAP > 30)
+─────────────────────────────────────────────────────────────────────────────
+❌ CRAP 10506  Coverage   0.0%  Services/BackupService.php
+❌ CRAP 9900  Coverage   0.0%  Services/StorageManagementService.php
+❌ CRAP 7656  Coverage   0.0%  Http/Controllers/BackupController.php
+❌ CRAP 7482  Coverage   0.0%  Services/SuspiciousActivityService.php
+❌ CRAP 5112  Coverage   0.0%  Http/Controllers/ErrorController.php
+❌ CRAP 4556  Coverage   0.0%  Services/CDNService.php
+❌ CRAP 3906  Coverage   0.0%  Services/FileCleanupService.php
+❌ CRAP 3782  Coverage   0.0%  Services/ReportService.php
+❌ CRAP 2970  Coverage   0.0%  Http/Controllers/Api/V2/BaseApiController.php
+❌ CRAP 2862  Coverage   0.0%  Services/AI/ContinuousQualityMonitor.php
+❌ CRAP 2352  Coverage   0.0%  Http/Controllers/Admin/DashboardController.php
+❌ CRAP 2256  Coverage   0.0%  Services/OptimizedQueryService.php
+❌ CRAP 2070  Coverage   0.0%  Http/Controllers/LogController.php
+❌ CRAP 1980  Coverage   0.0%  Services/PerformanceMonitoringService.php
+❌ CRAP 1892  Coverage   0.0%  Services/ExternalStoreService.php
+
+🔧 SERVICES LAYER COVERAGE ANALYSIS (Target: 90%+)
+─────────────────────────────────────────────────────────────────────────────
+No service files found in coverage data.
+
+❌ ZERO COVERAGE FILES (Priority for testing)
+─────────────────────────────────────────────────────────────────────────────
+[High]      Http/Controllers/Admin/AIControlPanelController.php
+[High]      Http/Controllers/Admin/DashboardController.php
+[High]      Http/Controllers/AdminController.php
+[High]      Http/Controllers/AnalyticsController.php
+[High]      Http/Controllers/Api/Admin/BrandController.php
+[High]      Http/Controllers/Api/Admin/CategoryController.php
+[High]      Http/Controllers/Api/AuthController.php
+[High]      Http/Controllers/Api/PriceSearchController.php
+[High]      Http/Controllers/Api/ProductController.php
+[High]      Http/Controllers/Api/V2/BaseApiController.php
+[High]      Http/Controllers/Auth/AuthController.php
+[High]      Http/Controllers/Auth/EmailVerificationController.php
+[High]      Http/Controllers/BackupController.php
+[High]      Http/Controllers/BrandController.php
+[High]      Http/Controllers/CartController.php
+[High]      Http/Controllers/CategoryController.php
+[High]      Http/Controllers/Controller.php
+[High]      Http/Controllers/ErrorController.php
+[High]      Http/Controllers/HealthController.php
+[High]      Http/Controllers/HomeController.php
+[High]      Http/Controllers/LocaleController.php
+[High]      Http/Controllers/LogController.php
+[High]      Http/Controllers/OrderController.php
+[High]      Http/Controllers/PaymentController.php
+[High]      Http/Controllers/PointsController.php
+[High]      Http/Controllers/PriceAlertController.php
+[High]      Http/Controllers/PriceComparisonController.php
+[High]      Http/Controllers/ProductController.php
+[High]      Http/Controllers/ProfileController.php
+[High]      Http/Controllers/RecommendationController.php
+
+═══════════════════════════════════════════════════════════════════════════
+                              END OF REPORT                                  
+═══════════════════════════════════════════════════════════════════════════
+
+✅ JSON report saved to: reports/coverage-analysis.json

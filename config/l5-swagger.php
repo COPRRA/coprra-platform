@@ -32,7 +32,8 @@ return [
 
                 // Absolute paths to directory containing the swagger annotations are stored.
                 'annotations' => [
-                    base_path('app'),
+                    base_path('app/Http/Controllers'),
+                    base_path('app/Schemas'),
                 ],
             ],
         ],
@@ -130,7 +131,21 @@ return [
              * @note This option overwrites `paths.excludes`
              * @see \OpenApi\scan
              */
-            'exclude' => [],
+            'exclude' => [
+                base_path('app/Contracts'),
+                base_path('app/DTO'),
+                base_path('app/Exceptions'),
+                base_path('app/Services'),
+                base_path('app/Models'),
+                base_path('app/Events'),
+                base_path('app/Listeners'),
+                base_path('app/Jobs'),
+                base_path('app/Mail'),
+                base_path('app/Notifications'),
+                base_path('app/Policies'),
+                base_path('app/Providers'),
+                base_path('app/Rules'),
+            ],
 
             /*
              * Allows to generate specs either for OpenAPI 3.0.0 or OpenAPI 3.1.0.

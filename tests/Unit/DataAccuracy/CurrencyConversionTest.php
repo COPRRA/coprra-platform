@@ -5,54 +5,18 @@ declare(strict_types=1);
 namespace Tests\Unit\DataAccuracy;
 
 use App\Models\Currency;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\DatabaseSetup;
 use Tests\TestCase;
 
-class CurrencyConversionTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class CurrencyConversionTest extends TestCase
 {
     use DatabaseSetup;
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_basic_conversion(): void
-    {
-        $currency = Currency::factory()->create(['exchange_rate' => 1.18]);
-        $this->assertEquals(118.0, round(100 * $currency->exchange_rate, 2));
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_inverse_conversion(): void
-    {
-        $currency = Currency::factory()->create(['exchange_rate' => 0.85]);
-        $this->assertEquals(100.0, round(85 / $currency->exchange_rate, 2));
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_zero_value_handling(): void
-    {
-        $currency = Currency::factory()->create(['exchange_rate' => 1.5]);
-        $this->assertEquals(0.0, round(0 * $currency->exchange_rate, 2));
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_basic_functionality(): void
-    {
-        // Test basic functionality
-        $this->assertTrue(true);
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_expected_behavior(): void
-    {
-        // Test expected behavior
-        $this->assertTrue(true);
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_validation(): void
-    {
-        // Test validation
-        $this->assertTrue(true);
-    }
 
     protected function setUp(): void
     {
@@ -64,5 +28,47 @@ class CurrencyConversionTest extends TestCase
     {
         $this->tearDownDatabase();
         parent::tearDown();
+    }
+
+    #[Test]
+    public function testBasicConversion(): void
+    {
+        $currency = Currency::factory()->create(['exchange_rate' => 1.18]);
+        self::assertSame(118.0, round(100 * $currency->exchange_rate, 2));
+    }
+
+    #[Test]
+    public function testInverseConversion(): void
+    {
+        $currency = Currency::factory()->create(['exchange_rate' => 0.85]);
+        self::assertSame(100.0, round(85 / $currency->exchange_rate, 2));
+    }
+
+    #[Test]
+    public function testZeroValueHandling(): void
+    {
+        $currency = Currency::factory()->create(['exchange_rate' => 1.5]);
+        self::assertSame(0.0, round(0 * $currency->exchange_rate, 2));
+    }
+
+    #[Test]
+    public function testBasicFunctionality(): void
+    {
+        // Test basic functionality
+        self::assertTrue(true);
+    }
+
+    #[Test]
+    public function testExpectedBehavior(): void
+    {
+        // Test expected behavior
+        self::assertTrue(true);
+    }
+
+    #[Test]
+    public function testValidation(): void
+    {
+        // Test validation
+        self::assertTrue(true);
     }
 }

@@ -7,138 +7,143 @@ namespace Tests\Unit\Enums;
 use App\Enums\OrderStatus;
 use PHPUnit\Framework\TestCase;
 
-class OrderStatusTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class OrderStatusTest extends TestCase
 {
-    public function test_enum_has_all_expected_cases(): void
+    public function testEnumHasAllExpectedCases(): void
     {
         $cases = OrderStatus::cases();
 
-        $this->assertCount(6, $cases);
-        $this->assertContains(OrderStatus::PENDING, $cases);
-        $this->assertContains(OrderStatus::PROCESSING, $cases);
-        $this->assertContains(OrderStatus::SHIPPED, $cases);
-        $this->assertContains(OrderStatus::DELIVERED, $cases);
-        $this->assertContains(OrderStatus::CANCELLED, $cases);
-        $this->assertContains(OrderStatus::REFUNDED, $cases);
+        self::assertCount(6, $cases);
+        self::assertContains(OrderStatus::PENDING, $cases);
+        self::assertContains(OrderStatus::PROCESSING, $cases);
+        self::assertContains(OrderStatus::SHIPPED, $cases);
+        self::assertContains(OrderStatus::DELIVERED, $cases);
+        self::assertContains(OrderStatus::CANCELLED, $cases);
+        self::assertContains(OrderStatus::REFUNDED, $cases);
     }
 
-    public function test_enum_values_are_correct(): void
+    public function testEnumValuesAreCorrect(): void
     {
-        $this->assertEquals('pending', OrderStatus::PENDING->value);
-        $this->assertEquals('processing', OrderStatus::PROCESSING->value);
-        $this->assertEquals('shipped', OrderStatus::SHIPPED->value);
-        $this->assertEquals('delivered', OrderStatus::DELIVERED->value);
-        $this->assertEquals('cancelled', OrderStatus::CANCELLED->value);
-        $this->assertEquals('refunded', OrderStatus::REFUNDED->value);
+        self::assertSame('pending', OrderStatus::PENDING->value);
+        self::assertSame('processing', OrderStatus::PROCESSING->value);
+        self::assertSame('shipped', OrderStatus::SHIPPED->value);
+        self::assertSame('delivered', OrderStatus::DELIVERED->value);
+        self::assertSame('cancelled', OrderStatus::CANCELLED->value);
+        self::assertSame('refunded', OrderStatus::REFUNDED->value);
     }
 
-    public function test_label_returns_correct_arabic_text(): void
+    public function testLabelReturnsCorrectArabicText(): void
     {
-        $this->assertEquals('قيد الانتظار', OrderStatus::PENDING->label());
-        $this->assertEquals('قيد المعالجة', OrderStatus::PROCESSING->label());
-        $this->assertEquals('تم الشحن', OrderStatus::SHIPPED->label());
-        $this->assertEquals('تم التسليم', OrderStatus::DELIVERED->label());
-        $this->assertEquals('ملغي', OrderStatus::CANCELLED->label());
-        $this->assertEquals('مسترد', OrderStatus::REFUNDED->label());
+        self::assertSame('قيد الانتظار', OrderStatus::PENDING->label());
+        self::assertSame('قيد المعالجة', OrderStatus::PROCESSING->label());
+        self::assertSame('تم الشحن', OrderStatus::SHIPPED->label());
+        self::assertSame('تم التسليم', OrderStatus::DELIVERED->label());
+        self::assertSame('ملغي', OrderStatus::CANCELLED->label());
+        self::assertSame('مسترد', OrderStatus::REFUNDED->label());
     }
 
-    public function test_color_returns_correct_values(): void
+    public function testColorReturnsCorrectValues(): void
     {
-        $this->assertEquals('yellow', OrderStatus::PENDING->color());
-        $this->assertEquals('blue', OrderStatus::PROCESSING->color());
-        $this->assertEquals('purple', OrderStatus::SHIPPED->color());
-        $this->assertEquals('green', OrderStatus::DELIVERED->color());
-        $this->assertEquals('red', OrderStatus::CANCELLED->color());
-        $this->assertEquals('orange', OrderStatus::REFUNDED->color());
+        self::assertSame('yellow', OrderStatus::PENDING->color());
+        self::assertSame('blue', OrderStatus::PROCESSING->color());
+        self::assertSame('purple', OrderStatus::SHIPPED->color());
+        self::assertSame('green', OrderStatus::DELIVERED->color());
+        self::assertSame('red', OrderStatus::CANCELLED->color());
+        self::assertSame('orange', OrderStatus::REFUNDED->color());
     }
 
-    public function test_allowed_transitions_from_pending(): void
+    public function testAllowedTransitionsFromPending(): void
     {
         $transitions = OrderStatus::PENDING->allowedTransitions();
 
-        $this->assertCount(2, $transitions);
-        $this->assertContains(OrderStatus::PROCESSING, $transitions);
-        $this->assertContains(OrderStatus::CANCELLED, $transitions);
+        self::assertCount(2, $transitions);
+        self::assertContains(OrderStatus::PROCESSING, $transitions);
+        self::assertContains(OrderStatus::CANCELLED, $transitions);
     }
 
-    public function test_allowed_transitions_from_processing(): void
+    public function testAllowedTransitionsFromProcessing(): void
     {
         $transitions = OrderStatus::PROCESSING->allowedTransitions();
 
-        $this->assertCount(2, $transitions);
-        $this->assertContains(OrderStatus::SHIPPED, $transitions);
-        $this->assertContains(OrderStatus::CANCELLED, $transitions);
+        self::assertCount(2, $transitions);
+        self::assertContains(OrderStatus::SHIPPED, $transitions);
+        self::assertContains(OrderStatus::CANCELLED, $transitions);
     }
 
-    public function test_allowed_transitions_from_shipped(): void
+    public function testAllowedTransitionsFromShipped(): void
     {
         $transitions = OrderStatus::SHIPPED->allowedTransitions();
 
-        $this->assertCount(1, $transitions);
-        $this->assertContains(OrderStatus::DELIVERED, $transitions);
+        self::assertCount(1, $transitions);
+        self::assertContains(OrderStatus::DELIVERED, $transitions);
     }
 
-    public function test_no_transitions_from_final_statuses(): void
+    public function testNoTransitionsFromFinalStatuses(): void
     {
-        $this->assertEmpty(OrderStatus::DELIVERED->allowedTransitions());
-        $this->assertEmpty(OrderStatus::CANCELLED->allowedTransitions());
-        $this->assertEmpty(OrderStatus::REFUNDED->allowedTransitions());
+        self::assertEmpty(OrderStatus::DELIVERED->allowedTransitions());
+        self::assertEmpty(OrderStatus::CANCELLED->allowedTransitions());
+        self::assertEmpty(OrderStatus::REFUNDED->allowedTransitions());
     }
 
-    public function test_can_transition_to_allowed_status(): void
+    public function testCanTransitionToAllowedStatus(): void
     {
-        $this->assertTrue(OrderStatus::PENDING->canTransitionTo(OrderStatus::PROCESSING));
-        $this->assertTrue(OrderStatus::PENDING->canTransitionTo(OrderStatus::CANCELLED));
-        $this->assertTrue(OrderStatus::PROCESSING->canTransitionTo(OrderStatus::SHIPPED));
-        $this->assertTrue(OrderStatus::SHIPPED->canTransitionTo(OrderStatus::DELIVERED));
+        self::assertTrue(OrderStatus::PENDING->canTransitionTo(OrderStatus::PROCESSING));
+        self::assertTrue(OrderStatus::PENDING->canTransitionTo(OrderStatus::CANCELLED));
+        self::assertTrue(OrderStatus::PROCESSING->canTransitionTo(OrderStatus::SHIPPED));
+        self::assertTrue(OrderStatus::SHIPPED->canTransitionTo(OrderStatus::DELIVERED));
     }
 
-    public function test_cannot_transition_to_disallowed_status(): void
+    public function testCannotTransitionToDisallowedStatus(): void
     {
-        $this->assertFalse(OrderStatus::PENDING->canTransitionTo(OrderStatus::SHIPPED));
-        $this->assertFalse(OrderStatus::PENDING->canTransitionTo(OrderStatus::DELIVERED));
-        $this->assertFalse(OrderStatus::PROCESSING->canTransitionTo(OrderStatus::DELIVERED));
-        $this->assertFalse(OrderStatus::DELIVERED->canTransitionTo(OrderStatus::PENDING));
+        self::assertFalse(OrderStatus::PENDING->canTransitionTo(OrderStatus::SHIPPED));
+        self::assertFalse(OrderStatus::PENDING->canTransitionTo(OrderStatus::DELIVERED));
+        self::assertFalse(OrderStatus::PROCESSING->canTransitionTo(OrderStatus::DELIVERED));
+        self::assertFalse(OrderStatus::DELIVERED->canTransitionTo(OrderStatus::PENDING));
     }
 
-    public function test_to_array_returns_correct_format(): void
+    public function testToArrayReturnsCorrectFormat(): void
     {
         $array = OrderStatus::toArray();
 
-        $this->assertIsArray($array);
-        $this->assertArrayHasKey('PENDING', $array);
-        $this->assertEquals('pending', $array['PENDING']);
-        $this->assertArrayHasKey('PROCESSING', $array);
-        $this->assertEquals('processing', $array['PROCESSING']);
+        self::assertIsArray($array);
+        self::assertArrayHasKey('PENDING', $array);
+        self::assertSame('pending', $array['PENDING']);
+        self::assertArrayHasKey('PROCESSING', $array);
+        self::assertSame('processing', $array['PROCESSING']);
     }
 
-    public function test_options_returns_value_label_pairs(): void
+    public function testOptionsReturnsValueLabelPairs(): void
     {
         $options = OrderStatus::options();
 
-        $this->assertIsArray($options);
-        $this->assertArrayHasKey('pending', $options);
-        $this->assertEquals('قيد الانتظار', $options['pending']);
-        $this->assertArrayHasKey('processing', $options);
-        $this->assertEquals('قيد المعالجة', $options['processing']);
+        self::assertIsArray($options);
+        self::assertArrayHasKey('pending', $options);
+        self::assertSame('قيد الانتظار', $options['pending']);
+        self::assertArrayHasKey('processing', $options);
+        self::assertSame('قيد المعالجة', $options['processing']);
     }
 
-    public function test_can_create_from_string(): void
+    public function testCanCreateFromString(): void
     {
         $status = OrderStatus::from('pending');
-        $this->assertEquals(OrderStatus::PENDING, $status);
+        self::assertSame(OrderStatus::PENDING, $status);
 
         $status = OrderStatus::from('shipped');
-        $this->assertEquals(OrderStatus::SHIPPED, $status);
+        self::assertSame(OrderStatus::SHIPPED, $status);
     }
 
-    public function test_try_from_returns_null_for_invalid_value(): void
+    public function testTryFromReturnsNullForInvalidValue(): void
     {
         $status = OrderStatus::tryFrom('invalid');
-        $this->assertNull($status);
+        self::assertNull($status);
     }
 
-    public function test_from_throws_exception_for_invalid_value(): void
+    public function testFromThrowsExceptionForInvalidValue(): void
     {
         $this->expectException(\ValueError::class);
         OrderStatus::from('invalid');

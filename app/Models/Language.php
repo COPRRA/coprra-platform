@@ -6,21 +6,23 @@ namespace App\Models;
 
 use Database\Factories\LanguageFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * @property int $id
+ * @property int    $id
  * @property string $code
  * @property string $name
  * @property string $native_name
  * @property string $direction
- * @property bool $is_active
- * @property int $sofinal rt_order
- * @property \Illuminate\Database\Eloquent\Collection<int, Currency> $currencies
- * @property \Illuminate\Database\Eloquent\Collection<int, UserLocaleSetting> $userLocaleSettings
+ ** @property bool $is_active
+ * @property int                                $sofinal            rt_order
+ * @property Collection<int, Currency>          $currencies
+ * @property Collection<int, UserLocaleSetting> $userLocaleSettings
  *
  * @method static LanguageFactory factory(...$parameters)
  *
@@ -32,9 +34,9 @@ class Language extends Model
     use HasFactory;
 
     /**
-     * @var class-string<\Illuminate\Database\Eloquent\Factories\Factory<Language>>
+     * @var class-string<Factory<Language>>
      */
-    protected static $factory = \Database\Factories\LanguageFactory::class;
+    protected static $factory = LanguageFactory::class;
 
     /**
      * @var array<int, string>
@@ -68,32 +70,28 @@ class Language extends Model
         return $this->casts;
     }
 
+    // --- Relationships ---
+
     /**
-     * العملات المرتبطة بهذه اللغة.
-     *
-     * @return BelongsToMany<Currency, Language>
+     * Get the currencies for this language.
      */
     public function currencies(): BelongsToMany
     {
-        return $this->belongsToMany(Currency::class, 'language_currency')
-            ->withPivot('is_default')
-            ->withTimestamps();
+        return $this->belongsToMany(Currency::class, 'language_currency');
     }
 
     /**
-     * User locale settings for this language.
-     *
-     * @return HasMany<UserLocaleSetting, Language>
+     * Get the user locale settings for this language.
      */
     public function userLocaleSettings(): HasMany
     {
-        return $this->hasMany(UserLocaleSetting::class, 'language_id');
+        return $this->hasMany(UserLocaleSetting::class);
     }
 
+    // --- Scopes ---
+
     /**
-     * Scope: only active languages.
-     *
-     * @psalm-return Builder<Model>
+     * Scope a query to only include active languages.
      */
     public function scopeActive(Builder $query): Builder
     {
@@ -101,40 +99,28 @@ class Language extends Model
     }
 
     /**
-     * Scope: ordered by sort_order then name.
-     *
-     * @psalm-return Builder<Model>
+     * Scope a query to order languages by sort_order and name.
      */
     public function scopeOrdered(Builder $query): Builder
     {
         return $query->orderBy('sort_order', 'asc')->orderBy('name', 'asc');
     }
 
+    // --- Methods ---
+
     /**
-     * Whether language direction is RTL.
+     * Check if the language is right-to-left.
      */
     public function isRtl(): bool
     {
-        return $this->direction === 'rtl';
+        return 'rtl' === $this->direction;
     }
 
     /**
-     * الحصول على اللغة بالكود.
-     */
-    public static function findByCode(string $code): ?self
-    {
-        return static::where('code', $code)->first();
-    }
-
-    /**
-     * Default currency for this language, if any.
-     *
-     * @return Currency&object|null
-     *
-     * @psalm-return Currency&object{pivot:\Illuminate\Database\Eloquent\Relations\Pivot}|null
+     * Get the default currency for this language.
      */
     public function defaultCurrency(): ?Currency
     {
-        return $this->currencies()->wherePivot('is_default', true)->first();
+        return $this->currencies()->where('is_default', true)->first();
     }
 }

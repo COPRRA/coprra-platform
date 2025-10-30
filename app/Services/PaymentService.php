@@ -24,7 +24,7 @@ final readonly class PaymentService
     }
 
     /**
-     * @param  array<string, string>  $paymentData
+     * @param array<string, string> $paymentData
      */
     public function processPayment(Order $order, string $paymentMethodId, array $paymentData): Payment
     {
@@ -45,10 +45,12 @@ final readonly class PaymentService
                     $result = $this->processStripePayment($payment, $paymentData);
 
                     break;
+
                 case 'paypal':
                     $result = $this->processPayPalPayment($payment);
 
                     break;
+
                 default:
                     throw new \Exception('Unsupported payment gateway');
             }
@@ -59,7 +61,7 @@ final readonly class PaymentService
                 'processed_at' => now(),
             ]);
 
-            if ($result['status'] === 'completed') {
+            if ('completed' === $result['status']) {
                 $order->update(['status' => 'processing']);
             }
         } catch (\Exception $e) {
@@ -89,8 +91,8 @@ final readonly class PaymentService
             switch ($payment->paymentMethod->gateway) {
                 case 'stripe':
                     $gatewayResponse = $payment->gateway_response;
-                    $paymentIntentId = is_array($gatewayResponse) && is_string($gatewayResponse['id'] ?? null) ? $gatewayResponse['id'] : '';
-                    if ($paymentIntentId !== '' && $paymentIntentId !== '0') {
+                    $paymentIntentId = \is_array($gatewayResponse) && \is_string($gatewayResponse['id'] ?? null) ? $gatewayResponse['id'] : '';
+                    if ('' !== $paymentIntentId && '0' !== $paymentIntentId) {
                         $this->stripe->refunds->create([
                             'payment_intent' => $paymentIntentId,
                             'amount' => (int) round($refundAmount * 100),
@@ -98,6 +100,7 @@ final readonly class PaymentService
                     }
 
                     break;
+
                 case 'paypal':
                     // PayPal refund would be implemented here
                     // $this->paypal->refundTransaction($payment->transaction_id, $refundAmount);
@@ -118,8 +121,9 @@ final readonly class PaymentService
     }
 
     /**
-     * @param  array<string, string>  $data
-     * @return array<string, array<string, int|string|list<string>>|string>
+     * @param array<string, string> $data
+     *
+     * @return array<string, array<string, int|list<string>|string>|string>
      */
     private function processStripePayment(Payment $payment, array $data): array
     {
@@ -127,19 +131,19 @@ final readonly class PaymentService
         $intent = $this->stripe->paymentIntents->create([
             'amount' => (int) ((is_numeric($payment->amount) ? $payment->amount : 0) * 100), // Convert to cents and cast to int
             'currency' => $payment->currency,
-            'payment_method' => is_string($paymentMethodId) ? $paymentMethodId : '',
+            'payment_method' => \is_string($paymentMethodId) ? $paymentMethodId : '',
             'confirmation_method' => 'manual',
             'confirm' => true,
         ]);
 
         return [
-            'status' => $intent->status === 'succeeded' ? 'completed' : 'failed',
+            'status' => 'succeeded' === $intent->status ? 'completed' : 'failed',
             'response' => $intent->toArray(),
         ];
     }
 
     /**
-     * @return array{status: string, response: array<string, string|int|float|array<string, array<string, string|int|float|null>>|bool|null>}
+     * @return array{status: string, response: array<string, string|int|float|array<string, array<string, string|int|float|* @method static \App\Models\Brand create(array<string, string|bool|null>>|bool|* @method static \App\Models\Brand create(array<string, string|bool|null>}
      */
     private function processPayPalPayment(Payment $payment): array
     {
@@ -155,11 +159,11 @@ final readonly class PaymentService
             ],
         ]);
 
-        $responseStatus = is_array($response) ? ($response['status'] ?? '') : '';
+        $responseStatus = \is_array($response) ? ($response['status'] ?? '') : '';
 
         return [
-            'status' => $responseStatus === 'COMPLETED' ? 'completed' : 'failed',
-            'response' => is_array($response) ? $response : [],
+            'status' => 'COMPLETED' === $responseStatus ? 'completed' : 'failed',
+            'response' => \is_array($response) ? $response : [],
         ];
     }
 

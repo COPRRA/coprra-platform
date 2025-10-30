@@ -47,14 +47,6 @@ class SecurityHeaderConfiguration
     }
 
     /**
-     * Remove a header configuration.
-     */
-    public function removeHeaderConfig(string $header): void
-    {
-        unset($this->headers[$header]);
-    }
-
-    /**
      * Load configuration from Laravel config files.
      */
     public function loadFromConfig(): void
@@ -62,46 +54,18 @@ class SecurityHeaderConfiguration
         $configHeaders = config('security.headers', []);
 
         foreach ($configHeaders as $header => $value) {
-            if (is_string($value)) {
+            if (\is_string($value)) {
                 $this->setHeaderConfig($header, ['value' => $value]);
-            } elseif (is_array($value)) {
+            } elseif (\is_array($value)) {
                 $this->setHeaderConfig($header, $value);
             }
         }
     }
 
     /**
-     * Enable a header.
-     */
-    public function enableHeader(string $header): void
-    {
-        if (isset($this->headers[$header])) {
-            $this->headers[$header]['enabled'] = true;
-        }
-    }
-
-    /**
-     * Disable a header.
-     */
-    public function disableHeader(string $header): void
-    {
-        if (isset($this->headers[$header])) {
-            $this->headers[$header]['enabled'] = false;
-        }
-    }
-
-    /**
-     * Check if a header is enabled.
-     */
-    public function isHeaderEnabled(string $header): bool
-    {
-        return $this->headers[$header]['enabled'] ?? false;
-    }
-
-    /**
      * Get the default header configuration structure.
      *
-     * @return array<array|bool|null>
+     * @return array<array|bool|* @method static \App\Models\Brand create(array<string, string|bool|null>
      *
      * @psalm-return array{enabled: true, value: null, dynamic: false, conditions: array<never, never>, route_overrides: array<never, never>}
      */

@@ -4,55 +4,62 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class SimpleMockeryTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class SimpleMockeryTest extends TestCase
 {
     protected function tearDown(): void
     {
-        Mockery::close();
+        \Mockery::close();
         parent::tearDown();
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_mock_basic_functionality(): void
+    #[Test]
+    public function testMockBasicFunctionality(): void
     {
         // Arrange
-        $mock = Mockery::mock();
+        $mock = \Mockery::mock();
         $mock->shouldReceive('getValue')->andReturn('mocked value');
 
         // Act
         $result = $mock->getValue();
 
         // Assert
-        $this->assertEquals('mocked value', $result);
+        self::assertSame('mocked value', $result);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_mock_expected_behavior_with_parameters(): void
+    #[Test]
+    public function testMockExpectedBehaviorWithParameters(): void
     {
         // Arrange
-        $mock = Mockery::mock();
+        $mock = \Mockery::mock();
         $mock->shouldReceive('processData')
             ->with('input')
-            ->andReturn('processed output');
+            ->andReturn('processed output')
+        ;
 
         // Act
         $result = $mock->processData('input');
 
         // Assert
-        $this->assertEquals('processed output', $result);
+        self::assertSame('processed output', $result);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_mock_validation_throws_exception(): void
+    #[Test]
+    public function testMockValidationThrowsException(): void
     {
         // Arrange
-        $mock = Mockery::mock();
+        $mock = \Mockery::mock();
         $mock->shouldReceive('validate')
             ->with('invalid')
-            ->andThrow(new \InvalidArgumentException('Invalid input'));
+            ->andThrow(new \InvalidArgumentException('Invalid input'))
+        ;
 
         // Act & Assert
         $this->expectException(\InvalidArgumentException::class);

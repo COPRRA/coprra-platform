@@ -6,14 +6,21 @@ namespace Tests\Feature\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Pagination\LengthAwarePaginator;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class AdminControllerTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class AdminControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_can_display_admin_dashboard(): void
+    #[Test]
+    public function itCanDisplayAdminDashboard(): void
     {
         // Arrange
         $admin = User::factory()->create(['is_admin' => true]);
@@ -27,13 +34,13 @@ class AdminControllerTest extends TestCase
         $response->assertViewIs('admin.dashboard');
         $response->assertViewHas(['stats', 'recentUsers', 'recentProducts']);
         $stats = $response->viewData('stats');
-        $this->assertIsArray($stats);
-        $this->assertArrayHasKey('users', $stats);
-        $this->assertArrayHasKey('products', $stats);
+        self::assertIsArray($stats);
+        self::assertArrayHasKey('users', $stats);
+        self::assertArrayHasKey('products', $stats);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_redirects_non_admin_users_from_dashboard(): void
+    #[Test]
+    public function itRedirectsNonAdminUsersFromDashboard(): void
     {
         // Arrange
         $user = User::factory()->create(['is_admin' => false]);
@@ -46,8 +53,8 @@ class AdminControllerTest extends TestCase
         $response->assertRedirect();
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_can_display_users_management_page(): void
+    #[Test]
+    public function itCanDisplayUsersManagementPage(): void
     {
         // Arrange
         $admin = User::factory()->create(['is_admin' => true]);
@@ -61,6 +68,6 @@ class AdminControllerTest extends TestCase
         $response->assertViewIs('admin.users');
         $response->assertViewHas('users');
         $users = $response->viewData('users');
-        $this->assertInstanceOf(\Illuminate\Pagination\LengthAwarePaginator::class, $users);
+        self::assertInstanceOf(LengthAwarePaginator::class, $users);
     }
 }

@@ -1,15 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
+use App\Http\Middleware\SecurityHeaders;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Http\Request;
+
 require __DIR__.'/../vendor/autoload.php';
 
 $app = require __DIR__.'/../bootstrap/app.php';
 
-/** @var \Illuminate\Contracts\Foundation\Application $app */
-$request = \Illuminate\Http\Request::create('/test', 'GET');
+/** @var Application $app */
+$request = Request::create('/test', 'GET');
 
-$middleware = $app->make(\App\Http\Middleware\SecurityHeaders::class);
+$middleware = $app->make(SecurityHeaders::class);
 
-$response = $middleware->handle($request, function ($req) {
+$response = $middleware->handle($request, static function ($req) {
     return response('OK', 200);
 });
 

@@ -7,10 +7,15 @@ namespace Tests\Unit\Recommendations;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-class UserBehaviorRecommendationTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class UserBehaviorRecommendationTest extends TestCase
 {
     #[Test]
-    public function it_analyzes_user_browsing_patterns(): void
+    public function itAnalyzesUserBrowsingPatterns(): void
     {
         $browsingHistory = [
             ['page' => 'electronics', 'time_spent' => 300, 'timestamp' => '2024-01-15 10:00:00'],
@@ -21,13 +26,13 @@ class UserBehaviorRecommendationTest extends TestCase
 
         $patterns = $this->analyzeBrowsingPatterns($browsingHistory);
 
-        $this->assertArrayHasKey('most_viewed_category', $patterns);
-        $this->assertArrayHasKey('average_session_time', $patterns);
-        $this->assertEquals('iphone', $patterns['most_viewed_category']);
+        self::assertArrayHasKey('most_viewed_category', $patterns);
+        self::assertArrayHasKey('average_session_time', $patterns);
+        self::assertSame('iphone', $patterns['most_viewed_category']);
     }
 
     #[Test]
-    public function it_tracks_user_purchase_frequency(): void
+    public function itTracksUserPurchaseFrequency(): void
     {
         $purchaseHistory = [
             ['date' => '2024-01-01', 'amount' => 100],
@@ -38,12 +43,12 @@ class UserBehaviorRecommendationTest extends TestCase
 
         $frequency = $this->calculatePurchaseFrequency($purchaseHistory);
 
-        $this->assertGreaterThan(0, $frequency);
-        $this->assertLessThan(1, $frequency); // Purchases per day
+        self::assertGreaterThan(0, $frequency);
+        self::assertLessThan(1, $frequency); // Purchases per day
     }
 
     #[Test]
-    public function it_identifies_user_preferences_from_behavior(): void
+    public function itIdentifiesUserPreferencesFromBehavior(): void
     {
         $userBehavior = [
             'browsed_categories' => ['Electronics', 'Electronics', 'Clothing', 'Electronics'],
@@ -54,14 +59,14 @@ class UserBehaviorRecommendationTest extends TestCase
 
         $preferences = $this->identifyUserPreferences($userBehavior);
 
-        $this->assertArrayHasKey('preferred_category', $preferences);
-        $this->assertArrayHasKey('preferred_brand', $preferences);
-        $this->assertEquals('Electronics', $preferences['preferred_category']);
-        $this->assertEquals('iPhone', $preferences['preferred_brand']);
+        self::assertArrayHasKey('preferred_category', $preferences);
+        self::assertArrayHasKey('preferred_brand', $preferences);
+        self::assertSame('Electronics', $preferences['preferred_category']);
+        self::assertSame('iPhone', $preferences['preferred_brand']);
     }
 
     #[Test]
-    public function it_predicts_user_intent(): void
+    public function itPredictsUserIntent(): void
     {
         $recentBehavior = [
             'searches' => ['iPhone 15', 'iPhone accessories', 'iPhone case'],
@@ -72,14 +77,14 @@ class UserBehaviorRecommendationTest extends TestCase
 
         $intent = $this->predictUserIntent($recentBehavior);
 
-        $this->assertArrayHasKey('intent_type', $intent);
-        $this->assertArrayHasKey('confidence', $intent);
-        $this->assertEquals('purchasing', $intent['intent_type']);
-        $this->assertGreaterThan(0.7, $intent['confidence']);
+        self::assertArrayHasKey('intent_type', $intent);
+        self::assertArrayHasKey('confidence', $intent);
+        self::assertSame('purchasing', $intent['intent_type']);
+        self::assertGreaterThan(0.7, $intent['confidence']);
     }
 
     #[Test]
-    public function it_analyzes_user_engagement_level(): void
+    public function itAnalyzesUserEngagementLevel(): void
     {
         $userMetrics = [
             'sessions_per_week' => 5,
@@ -91,13 +96,13 @@ class UserBehaviorRecommendationTest extends TestCase
 
         $engagementLevel = $this->calculateEngagementLevel($userMetrics);
 
-        $this->assertArrayHasKey('level', $engagementLevel);
-        $this->assertArrayHasKey('score', $engagementLevel);
-        $this->assertContains($engagementLevel['level'], ['low', 'medium', 'high']);
+        self::assertArrayHasKey('level', $engagementLevel);
+        self::assertArrayHasKey('score', $engagementLevel);
+        self::assertContains($engagementLevel['level'], ['low', 'medium', 'high']);
     }
 
     #[Test]
-    public function it_tracks_user_price_sensitivity(): void
+    public function itTracksUserPriceSensitivity(): void
     {
         $priceBehavior = [
             'viewed_products' => [
@@ -112,13 +117,13 @@ class UserBehaviorRecommendationTest extends TestCase
 
         $sensitivity = $this->calculatePriceSensitivity($priceBehavior);
 
-        $this->assertArrayHasKey('level', $sensitivity);
-        $this->assertArrayHasKey('threshold', $sensitivity);
-        $this->assertLessThan(200, $sensitivity['threshold']);
+        self::assertArrayHasKey('level', $sensitivity);
+        self::assertArrayHasKey('threshold', $sensitivity);
+        self::assertLessThan(200, $sensitivity['threshold']);
     }
 
     #[Test]
-    public function it_analyzes_user_device_preferences(): void
+    public function itAnalyzesUserDevicePreferences(): void
     {
         $deviceUsage = [
             'mobile' => ['sessions' => 15, 'purchases' => 3, 'time_spent' => 1800],
@@ -128,14 +133,14 @@ class UserBehaviorRecommendationTest extends TestCase
 
         $preferences = $this->analyzeDevicePreferences($deviceUsage);
 
-        $this->assertArrayHasKey('primary_device', $preferences);
-        $this->assertArrayHasKey('purchase_device', $preferences);
-        $this->assertEquals('mobile', $preferences['primary_device']);
-        $this->assertEquals('desktop', $preferences['purchase_device']);
+        self::assertArrayHasKey('primary_device', $preferences);
+        self::assertArrayHasKey('purchase_device', $preferences);
+        self::assertSame('mobile', $preferences['primary_device']);
+        self::assertSame('desktop', $preferences['purchase_device']);
     }
 
     #[Test]
-    public function it_tracks_user_seasonal_patterns(): void
+    public function itTracksUserSeasonalPatterns(): void
     {
         $seasonalData = [
             'Winter' => ['purchases' => 10, 'categories' => ['Winter Clothing', 'Heating']],
@@ -146,13 +151,13 @@ class UserBehaviorRecommendationTest extends TestCase
 
         $patterns = $this->analyzeSeasonalPatterns($seasonalData);
 
-        $this->assertArrayHasKey('peak_season', $patterns);
-        $this->assertArrayHasKey('preferred_categories', $patterns);
-        $this->assertEquals('Summer', $patterns['peak_season']);
+        self::assertArrayHasKey('peak_season', $patterns);
+        self::assertArrayHasKey('preferred_categories', $patterns);
+        self::assertSame('Summer', $patterns['peak_season']);
     }
 
     #[Test]
-    public function it_predicts_user_churn_risk(): void
+    public function itPredictsUserChurnRisk(): void
     {
         $userMetrics = [
             'days_since_last_visit' => 30,
@@ -164,13 +169,13 @@ class UserBehaviorRecommendationTest extends TestCase
 
         $churnRisk = $this->predictChurnRisk($userMetrics);
 
-        $this->assertArrayHasKey('risk_level', $churnRisk);
-        $this->assertArrayHasKey('probability', $churnRisk);
-        $this->assertContains($churnRisk['risk_level'], ['low', 'medium', 'high']);
+        self::assertArrayHasKey('risk_level', $churnRisk);
+        self::assertArrayHasKey('probability', $churnRisk);
+        self::assertContains($churnRisk['risk_level'], ['low', 'medium', 'high']);
     }
 
     #[Test]
-    public function it_generates_personalized_recommendations(): void
+    public function itGeneratesPersonalizedRecommendations(): void
     {
         $userProfile = [
             'preferences' => ['Electronics', 'Apple'],
@@ -187,12 +192,13 @@ class UserBehaviorRecommendationTest extends TestCase
 
         $recommendations = $this->generatePersonalizedRecommendations($userProfile, $availableProducts);
 
-        $this->assertContains('iPhone', array_column($recommendations, 'name'));
-        $this->assertNotContains('Nike Shoes', array_column($recommendations, 'name'));
+        self::assertContains('iPhone', array_column($recommendations, 'name'));
+        self::assertNotContains('Nike Shoes', array_column($recommendations, 'name'));
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $browsingHistory
+     * @param array<int, array<string, mixed>> $browsingHistory
+     *
      * @return array<string, mixed>
      */
     private function analyzeBrowsingPatterns(array $browsingHistory): array
@@ -201,7 +207,7 @@ class UserBehaviorRecommendationTest extends TestCase
         $totalTime = 0;
 
         foreach ($browsingHistory as $session) {
-            $category = is_string($session['page']) ? $session['page'] : '';
+            $category = \is_string($session['page']) ? $session['page'] : '';
             $time = is_numeric($session['time_spent']) ? (int) $session['time_spent'] : 0;
 
             $categoryTime[$category] = ($categoryTime[$category] ?? 0) + $time;
@@ -209,8 +215,8 @@ class UserBehaviorRecommendationTest extends TestCase
         }
 
         $maxTime = ! empty($categoryTime) ? max($categoryTime) : 0;
-        $mostViewedCategory = $maxTime > 0 ? array_keys($categoryTime, $maxTime)[0] : '';
-        $averageSessionTime = $totalTime / count($browsingHistory);
+        $mostViewedCategory = $maxTime > 0 ? array_keys($categoryTime, $maxTime, true)[0] : '';
+        $averageSessionTime = $totalTime / \count($browsingHistory);
 
         return [
             'most_viewed_category' => $mostViewedCategory,
@@ -220,7 +226,7 @@ class UserBehaviorRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $purchaseHistory
+     * @param array<int, array<string, mixed>> $purchaseHistory
      */
     private function calculatePurchaseFrequency(array $purchaseHistory): float
     {
@@ -228,24 +234,25 @@ class UserBehaviorRecommendationTest extends TestCase
             return 0;
         }
 
-        $firstDate = is_string($purchaseHistory[0]['date']) ? $purchaseHistory[0]['date'] : '2024-01-01';
-        $lastDate = is_string(end($purchaseHistory)['date']) ? end($purchaseHistory)['date'] : '2024-01-01';
+        $firstDate = \is_string($purchaseHistory[0]['date']) ? $purchaseHistory[0]['date'] : '2024-01-01';
+        $lastDate = \is_string(end($purchaseHistory)['date']) ? end($purchaseHistory)['date'] : '2024-01-01';
 
         $firstPurchase = new \DateTime($firstDate);
         $lastPurchase = new \DateTime($lastDate);
         $daysDiff = $lastPurchase->diff($firstPurchase)->days;
 
-        return $daysDiff > 0 ? count($purchaseHistory) / $daysDiff : 0;
+        return $daysDiff > 0 ? \count($purchaseHistory) / $daysDiff : 0;
     }
 
     /**
-     * @param  array<string, mixed>  $userBehavior
+     * @param array<string, mixed> $userBehavior
+     *
      * @return array<string, mixed>
      */
     private function identifyUserPreferences(array $userBehavior): array
     {
-        $browsedCategories = is_array($userBehavior['browsed_categories']) ? $userBehavior['browsed_categories'] : [];
-        $clickedProducts = is_array($userBehavior['clicked_products']) ? $userBehavior['clicked_products'] : [];
+        $browsedCategories = \is_array($userBehavior['browsed_categories']) ? $userBehavior['browsed_categories'] : [];
+        $clickedProducts = \is_array($userBehavior['clicked_products']) ? $userBehavior['clicked_products'] : [];
 
         $categoryCounts = array_count_values($browsedCategories);
         $brandCounts = array_count_values($clickedProducts);
@@ -253,8 +260,8 @@ class UserBehaviorRecommendationTest extends TestCase
         $maxCategoryCount = ! empty($categoryCounts) ? max($categoryCounts) : 0;
         $maxBrandCount = ! empty($brandCounts) ? max($brandCounts) : 0;
 
-        $preferredCategory = $maxCategoryCount > 0 ? array_keys($categoryCounts, $maxCategoryCount)[0] : '';
-        $preferredBrand = $maxBrandCount > 0 ? array_keys($brandCounts, $maxBrandCount)[0] : '';
+        $preferredCategory = $maxCategoryCount > 0 ? array_keys($categoryCounts, $maxCategoryCount, true)[0] : '';
+        $preferredBrand = $maxBrandCount > 0 ? array_keys($brandCounts, $maxBrandCount, true)[0] : '';
 
         return [
             'preferred_category' => $preferredCategory,
@@ -265,7 +272,8 @@ class UserBehaviorRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $recentBehavior
+     * @param array<string, mixed> $recentBehavior
+     *
      * @return array<string, mixed>
      */
     private function predictUserIntent(array $recentBehavior): array
@@ -273,11 +281,11 @@ class UserBehaviorRecommendationTest extends TestCase
         $intentScore = 0;
 
         // Analyze search patterns
-        $searches = is_array($recentBehavior['searches']) ? $recentBehavior['searches'] : [];
-        $productSearches = array_filter($searches, function ($search) {
-            return is_string($search) && strpos(strtolower($search), 'iphone') !== false;
+        $searches = \is_array($recentBehavior['searches']) ? $recentBehavior['searches'] : [];
+        $productSearches = array_filter($searches, static function ($search) {
+            return \is_string($search) && false !== strpos(strtolower($search), 'iphone');
         });
-        $intentScore += count($productSearches) * 0.2;
+        $intentScore += \count($productSearches) * 0.2;
 
         // Analyze browsing depth
         $pagesViewed = is_numeric($recentBehavior['pages_viewed']) ? (int) $recentBehavior['pages_viewed'] : 0;
@@ -296,7 +304,8 @@ class UserBehaviorRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $userMetrics
+     * @param array<string, mixed> $userMetrics
+     *
      * @return array<string, mixed>
      */
     private function calculateEngagementLevel(array $userMetrics): array
@@ -332,23 +341,24 @@ class UserBehaviorRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $priceBehavior
+     * @param array<string, mixed> $priceBehavior
+     *
      * @return array<string, mixed>
      */
     private function calculatePriceSensitivity(array $priceBehavior): array
     {
-        $viewedProducts = is_array($priceBehavior['viewed_products']) ? $priceBehavior['viewed_products'] : [];
+        $viewedProducts = \is_array($priceBehavior['viewed_products']) ? $priceBehavior['viewed_products'] : [];
 
-        $purchasedPrices = array_column(array_filter($viewedProducts, function ($p) {
-            return is_array($p) && ($p['purchased'] ?? false);
+        $purchasedPrices = array_column(array_filter($viewedProducts, static function ($p) {
+            return \is_array($p) && ($p['purchased'] ?? false);
         }), 'price');
 
-        $notPurchasedPrices = array_column(array_filter($viewedProducts, function ($p) {
-            return is_array($p) && ! ($p['purchased'] ?? false);
+        $notPurchasedPrices = array_column(array_filter($viewedProducts, static function ($p) {
+            return \is_array($p) && ! ($p['purchased'] ?? false);
         }), 'price');
 
         $maxPurchasedPrice = empty($purchasedPrices) ? 0 : max($purchasedPrices);
-        $minNotPurchasedPrice = empty($notPurchasedPrices) ? PHP_FLOAT_MAX : min($notPurchasedPrices);
+        $minNotPurchasedPrice = empty($notPurchasedPrices) ? \PHP_FLOAT_MAX : min($notPurchasedPrices);
 
         $threshold = $maxPurchasedPrice > 0 ? $maxPurchasedPrice : $minNotPurchasedPrice;
 
@@ -367,7 +377,8 @@ class UserBehaviorRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $deviceUsage
+     * @param array<string, mixed> $deviceUsage
+     *
      * @return array<string, mixed>
      */
     private function analyzeDevicePreferences(array $deviceUsage): array
@@ -378,18 +389,18 @@ class UserBehaviorRecommendationTest extends TestCase
         $maxPurchases = 0;
 
         foreach ($deviceUsage as $device => $metrics) {
-            if (is_array($metrics)) {
+            if (\is_array($metrics)) {
                 $sessions = is_numeric($metrics['sessions']) ? (int) $metrics['sessions'] : 0;
                 $purchases = is_numeric($metrics['purchases']) ? (int) $metrics['purchases'] : 0;
 
                 if ($sessions > $maxSessions) {
                     $maxSessions = $sessions;
-                    $primaryDevice = is_string($device) ? $device : '';
+                    $primaryDevice = \is_string($device) ? $device : '';
                 }
 
                 if ($purchases > $maxPurchases) {
                     $maxPurchases = $purchases;
-                    $purchaseDevice = is_string($device) ? $device : '';
+                    $purchaseDevice = \is_string($device) ? $device : '';
                 }
             }
         }
@@ -402,7 +413,8 @@ class UserBehaviorRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $seasonalData
+     * @param array<string, mixed> $seasonalData
+     *
      * @return array<string, mixed>
      */
     private function analyzeSeasonalPatterns(array $seasonalData): array
@@ -412,14 +424,14 @@ class UserBehaviorRecommendationTest extends TestCase
         $allCategories = [];
 
         foreach ($seasonalData as $season => $data) {
-            if (is_array($data)) {
+            if (\is_array($data)) {
                 $purchases = is_numeric($data['purchases']) ? (int) $data['purchases'] : 0;
                 if ($purchases > $maxPurchases) {
                     $maxPurchases = $purchases;
-                    $peakSeason = is_string($season) ? $season : '';
+                    $peakSeason = \is_string($season) ? $season : '';
                 }
 
-                $categories = is_array($data['categories']) ? $data['categories'] : [];
+                $categories = \is_array($data['categories']) ? $data['categories'] : [];
                 $allCategories = array_merge($allCategories, $categories);
             }
         }
@@ -429,12 +441,13 @@ class UserBehaviorRecommendationTest extends TestCase
 
         return [
             'peak_season' => $peakSeason,
-            'preferred_categories' => array_keys(array_slice($preferredCategories, 0, 3, true)),
+            'preferred_categories' => array_keys(\array_slice($preferredCategories, 0, 3, true)),
         ];
     }
 
     /**
-     * @param  array<string, mixed>  $userMetrics
+     * @param array<string, mixed> $userMetrics
+     *
      * @return array<string, mixed>
      */
     private function predictChurnRisk(array $userMetrics): array
@@ -471,13 +484,15 @@ class UserBehaviorRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $userProfile
+     * @param array<string, mixed> $userProfile
+     *
      * @return array<int, array<string, mixed>>
      */
 
     /**
-     * @param  array<string, mixed>  $userProfile
-     * @param  array<int, array<string, mixed>>  $availableProducts
+     * @param array<string, mixed>             $userProfile
+     * @param array<int, array<string, mixed>> $availableProducts
+     *
      * @return array<int, array<string, mixed>>
      */
     private function generatePersonalizedRecommendations(array $userProfile, array $availableProducts): array
@@ -488,21 +503,21 @@ class UserBehaviorRecommendationTest extends TestCase
             $score = 0;
 
             // Category preference
-            $preferences = is_array($userProfile['preferences']) ? $userProfile['preferences'] : [];
-            if (in_array($product['category'], $preferences)) {
+            $preferences = \is_array($userProfile['preferences']) ? $userProfile['preferences'] : [];
+            if (\in_array($product['category'], $preferences, true)) {
                 $score += 0.4;
             }
 
             // Brand preference
-            if (in_array($product['brand'], $preferences)) {
+            if (\in_array($product['brand'], $preferences, true)) {
                 $score += 0.3;
             }
 
             // Price range
-            $priceRange = is_array($userProfile['price_range']) ? $userProfile['price_range'] : [0, 1000];
+            $priceRange = \is_array($userProfile['price_range']) ? $userProfile['price_range'] : [0, 1000];
             if (
-                $product['price'] >= $priceRange[0] &&
-                $product['price'] <= $priceRange[1]
+                $product['price'] >= $priceRange[0]
+                && $product['price'] <= $priceRange[1]
             ) {
                 $score += 0.3;
             }
@@ -512,7 +527,7 @@ class UserBehaviorRecommendationTest extends TestCase
             }
         }
 
-        usort($recommendations, function ($a, $b) {
+        usort($recommendations, static function ($a, $b) {
             return $b['recommendation_score'] <=> $a['recommendation_score'];
         });
 

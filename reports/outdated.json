@@ -1,0 +1,93 @@
+{
+  "@vitest/coverage-v8": {
+    "current": "4.0.3",
+    "wanted": "4.0.4",
+    "latest": "4.0.4",
+    "dependent": "COPRRA",
+    "location": "C:\\Users\\Gaser\\Desktop\\COPRRA\\node_modules\\@vitest\\coverage-v8"
+  },
+  "@vitest/ui": {
+    "current": "4.0.3",
+    "wanted": "4.0.4",
+    "latest": "4.0.4",
+    "dependent": "COPRRA",
+    "location": "C:\\Users\\Gaser\\Desktop\\COPRRA\\node_modules\\@vitest\\ui"
+  },
+  "axios": {
+    "current": "1.12.2",
+    "wanted": "1.13.1",
+    "latest": "1.13.1",
+    "dependent": "COPRRA",
+    "location": "C:\\Users\\Gaser\\Desktop\\COPRRA\\node_modules\\axios"
+  },
+  "cross-env": {
+    "current": "7.0.3",
+    "wanted": "7.0.3",
+    "latest": "10.1.0",
+    "dependent": "COPRRA",
+    "location": "C:\\Users\\Gaser\\Desktop\\COPRRA\\node_modules\\cross-env"
+  },
+  "eslint-config-prettier": {
+    "current": "9.1.2",
+    "wanted": "9.1.2",
+    "latest": "10.1.8",
+    "dependent": "COPRRA",
+    "location": "C:\\Users\\Gaser\\Desktop\\COPRRA\\node_modules\\eslint-config-prettier"
+  },
+  "eslint-plugin-sonarjs": {
+    "current": "2.0.4",
+    "wanted": "2.0.4",
+    "latest": "3.0.5",
+    "dependent": "COPRRA",
+    "location": "C:\\Users\\Gaser\\Desktop\\COPRRA\\node_modules\\eslint-plugin-sonarjs"
+  },
+  "eslint-plugin-vue": {
+    "current": "9.33.0",
+    "wanted": "9.33.0",
+    "latest": "10.5.1",
+    "dependent": "COPRRA",
+    "location": "C:\\Users\\Gaser\\Desktop\\COPRRA\\node_modules\\eslint-plugin-vue"
+  },
+  "happy-dom": {
+    "current": "20.0.8",
+    "wanted": "20.0.10",
+    "latest": "20.0.10",
+    "dependent": "COPRRA",
+    "location": "C:\\Users\\Gaser\\Desktop\\COPRRA\\node_modules\\happy-dom"
+  },
+  "npm-check-updates": {
+    "current": "17.1.18",
+    "wanted": "17.1.18",
+    "latest": "19.1.2",
+    "dependent": "COPRRA",
+    "location": "C:\\Users\\Gaser\\Desktop\\COPRRA\\node_modules\\npm-check-updates"
+  },
+  "npm-run-all2": {
+    "current": "7.0.2",
+    "wanted": "7.0.2",
+    "latest": "8.0.4",
+    "dependent": "COPRRA",
+    "location": "C:\\Users\\Gaser\\Desktop\\COPRRA\\node_modules\\npm-run-all2"
+  },
+  "stylelint-config-recommended-scss": {
+    "current": "15.0.1",
+    "wanted": "15.0.1",
+    "latest": "16.0.2",
+    "dependent": "COPRRA",
+    "location": "C:\\Users\\Gaser\\Desktop\\COPRRA\\node_modules\\stylelint-config-recommended-scss"
+  },
+  "stylelint-order": {
+    "current": "6.0.4",
+    "wanted": "6.0.4",
+    "latest": "7.0.0",
+    "dependent": "COPRRA",
+    "location": "C:\\Users\\Gaser\\Desktop\\COPRRA\\node_modules\\stylelint-order"
+  },
+  "vitest": {
+    "current": "4.0.3",
+    "wanted": "4.0.4",
+    "latest": "4.0.4",
+    "dependent": "COPRRA",
+    "location": "C:\\Users\\Gaser\\Desktop\\COPRRA\\node_modules\\vitest"
+  }
+}

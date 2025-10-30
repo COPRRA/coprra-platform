@@ -34,18 +34,20 @@ class Payment extends Model
         'processed_at' => 'datetime',
     ];
 
+    // --- Relationships ---
+
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<Order, Payment>
+     * Get the order that owns the payment.
      */
-    public function order(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function order()
     {
         return $this->belongsTo(Order::class);
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<PaymentMethod, Payment>
+     * Get the payment method that owns the payment.
      */
-    public function paymentMethod(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function paymentMethod()
     {
         return $this->belongsTo(PaymentMethod::class);
     }
@@ -53,11 +55,12 @@ class Payment extends Model
     // --- Scopes ---
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Builder<Payment>  $query
+     * Scope a query to only include payments with a specific status.
      *
-     * @psalm-return \Illuminate\Database\Eloquent\Builder<self>
+     * @param mixed $query
+     * @param mixed $status
      */
-    public function scopeByStatus(\Illuminate\Database\Eloquent\Builder $query, string $status): \Illuminate\Database\Eloquent\Builder
+    public function scopeByStatus($query, $status)
     {
         return $query->where('status', $status);
     }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Middleware;
 
 use App\Enums\UserRole;
-use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -14,9 +13,9 @@ class CheckUserRole
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param \Closure(Request): (Response) $next
      */
-    public function handle(Request $request, Closure $next, string ...$roles): Response
+    public function handle(Request $request, \Closure $next, string ...$roles): Response
     {
         $user = $request->user();
 
@@ -31,7 +30,7 @@ class CheckUserRole
         );
 
         // Check if user has any of the allowed roles
-        if (! in_array($user->role, $allowedRoles, true)) {
+        if (! \in_array($user->role, $allowedRoles, true)) {
             abort(403, 'Forbidden - Insufficient permissions');
         }
 

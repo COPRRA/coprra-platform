@@ -12,7 +12,7 @@ class StoreClientFactory
     {
         $config = Config::get("external_stores.{$storeName}");
 
-        if (! is_array($config)) {
+        if (! \is_array($config)) {
             return null;
         }
 

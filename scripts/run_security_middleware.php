@@ -8,15 +8,17 @@ require __DIR__.'/../vendor/autoload.php';
 $app = require __DIR__.'/../bootstrap/app.php';
 $app->instance('env', 'local');
 
+use App\Http\Middleware\SecurityHeaders;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
-/** @var \Illuminate\Contracts\Container\Container $app */
+/** @var Container $app */
 $request = Request::create('/test', 'GET');
 
-$middleware = $app->make(\App\Http\Middleware\SecurityHeaders::class);
+$middleware = $app->make(SecurityHeaders::class);
 
-$response = $middleware->handle($request, function ($req) {
+$response = $middleware->handle($request, static function ($req) {
     return new Response('OK', 200);
 });
 

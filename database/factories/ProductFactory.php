@@ -17,7 +17,7 @@ class ProductFactory extends Factory
     protected $model = Product::class;
 
     /**
-     * @return (BrandFactory|CategoryFactory|float|int|null|string|true)[]
+     * @return (BrandFactory|CategoryFactory|float|int|string|true|null)[]
      *
      * @psalm-return array{name: string, slug: string, description: string, price: float, image: string, brand_id: BrandFactory, category_id: CategoryFactory, store_id: null, is_active: true, stock_quantity: int}
      */
@@ -29,7 +29,7 @@ class ProductFactory extends Factory
         $words = $faker->words(3, true);
 
         return [
-            'name' => (is_string($words) ? $words : '').' Product',
+            'name' => (\is_string($words) ? $words : '').' Product',
             'slug' => $faker->unique()->slug(3).'-'.$faker->unique()->numberBetween(1000, 9999),
             'description' => $faker->paragraph(),
             'price' => $faker->randomFloat(2, 10, 1000),

@@ -6,8 +6,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -15,7 +14,7 @@ return new class extends Migration
     {
         // Guard against duplicate creation if the table already exists.
         if (! Schema::hasTable('price_alerts')) {
-            Schema::create('price_alerts', function (Blueprint $table): void {
+            Schema::create('price_alerts', static function (Blueprint $table): void {
                 $table->id();
                 $table->foreignId('user_id')->constrained()->onDelete('cascade');
                 $table->foreignId('product_id')->constrained()->onDelete('cascade');

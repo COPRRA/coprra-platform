@@ -11,7 +11,12 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class OrderApiTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class OrderApiTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -23,19 +28,21 @@ class OrderApiTest extends TestCase
         $this->user = User::factory()->create();
     }
 
-    public function test_user_can_list_their_orders(): void
+    public function testUserCanListTheirOrders(): void
     {
         Order::factory()->count(3)->create(['user_id' => $this->user->id]);
         Order::factory()->count(2)->create(); // Other user's orders
 
         $response = $this->actingAs($this->user, 'sanctum')
-            ->getJson('/api/orders');
+            ->getJson('/api/orders')
+        ;
 
         $response->assertStatus(200)
-            ->assertJsonCount(3, 'data.data');
+            ->assertJsonCount(3, 'data.data')
+        ;
     }
 
-    public function test_user_can_filter_orders_by_status(): void
+    public function testUserCanFilterOrdersByStatus(): void
     {
         Order::factory()->create([
             'user_id' => $this->user->id,
@@ -47,36 +54,41 @@ class OrderApiTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->user, 'sanctum')
-            ->getJson('/api/orders?status=pending');
+            ->getJson('/api/orders?status=pending')
+        ;
 
         $response->assertStatus(200)
             ->assertJsonCount(1, 'data.data')
-            ->assertJsonPath('data.data.0.status.value', 'pending');
+            ->assertJsonPath('data.data.0.status.value', 'pending')
+        ;
     }
 
-    public function test_user_can_view_single_order(): void
+    public function testUserCanViewSingleOrder(): void
     {
         $order = Order::factory()->create(['user_id' => $this->user->id]);
 
         $response = $this->actingAs($this->user, 'sanctum')
-            ->getJson("/api/orders/{$order->id}");
+            ->getJson("/api/orders/{$order->id}")
+        ;
 
         $response->assertStatus(200)
             ->assertJsonPath('data.id', $order->id)
-            ->assertJsonPath('data.order_number', $order->order_number);
+            ->assertJsonPath('data.order_number', $order->order_number)
+        ;
     }
 
-    public function test_user_cannot_view_other_users_order(): void
+    public function testUserCannotViewOtherUsersOrder(): void
     {
         $otherOrder = Order::factory()->create();
 
         $response = $this->actingAs($this->user, 'sanctum')
-            ->getJson("/api/orders/{$otherOrder->id}");
+            ->getJson("/api/orders/{$otherOrder->id}")
+        ;
 
         $response->assertStatus(403);
     }
 
-    public function test_user_can_create_order(): void
+    public function testUserCanCreateOrder(): void
     {
         $product = Product::factory()->create(['price' => 100.00, 'stock_quantity' => 10]);
 
@@ -99,11 +111,13 @@ class OrderApiTest extends TestCase
                     'zip' => '10001',
                     'country' => 'USA',
                 ],
-            ]);
+            ])
+        ;
 
         $response->assertStatus(201)
             ->assertJsonPath('data.status.value', 'pending')
-            ->assertJsonPath('data.user_id', $this->user->id);
+            ->assertJsonPath('data.user_id', $this->user->id)
+        ;
 
         $this->assertDatabaseHas('orders', [
             'user_id' => $this->user->id,
@@ -111,16 +125,18 @@ class OrderApiTest extends TestCase
         ]);
     }
 
-    public function test_create_order_validates_required_fields(): void
+    public function testCreateOrderValidatesRequiredFields(): void
     {
         $response = $this->actingAs($this->user, 'sanctum')
-            ->postJson('/api/orders', []);
+            ->postJson('/api/orders', [])
+        ;
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['items', 'shipping_address', 'billing_address']);
+            ->assertJsonValidationErrors(['items', 'shipping_address', 'billing_address'])
+        ;
     }
 
-    public function test_create_order_validates_product_exists(): void
+    public function testCreateOrderValidatesProductExists(): void
     {
         $response = $this->actingAs($this->user, 'sanctum')
             ->postJson('/api/orders', [
@@ -129,20 +145,22 @@ class OrderApiTest extends TestCase
                 ],
                 'shipping_address' => ['street' => '123 Main St'],
                 'billing_address' => ['street' => '123 Main St'],
-            ]);
+            ])
+        ;
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['items.0.product_id']);
+            ->assertJsonValidationErrors(['items.0.product_id'])
+        ;
     }
 
-    public function test_guest_cannot_access_orders(): void
+    public function testGuestCannotAccessOrders(): void
     {
         $response = $this->getJson('/api/orders');
 
         $response->assertStatus(401);
     }
 
-    public function test_order_response_includes_status_details(): void
+    public function testOrderResponseIncludesStatusDetails(): void
     {
         $order = Order::factory()->create([
             'user_id' => $this->user->id,
@@ -150,7 +168,8 @@ class OrderApiTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->user, 'sanctum')
-            ->getJson("/api/orders/{$order->id}");
+            ->getJson("/api/orders/{$order->id}")
+        ;
 
         $response->assertStatus(200)
             ->assertJsonStructure([
@@ -161,15 +180,17 @@ class OrderApiTest extends TestCase
                     'total_amount',
                     'created_at',
                 ],
-            ]);
+            ])
+        ;
     }
 
-    public function test_order_list_is_paginated(): void
+    public function testOrderListIsPaginated(): void
     {
         Order::factory()->count(20)->create(['user_id' => $this->user->id]);
 
         $response = $this->actingAs($this->user, 'sanctum')
-            ->getJson('/api/orders?per_page=10');
+            ->getJson('/api/orders?per_page=10')
+        ;
 
         $response->assertStatus(200)
             ->assertJsonCount(10, 'data.data')

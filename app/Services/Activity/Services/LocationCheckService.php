@@ -7,7 +7,7 @@ namespace App\Services\Activity\Services;
 use App\Services\GeolocationService;
 
 /**
- * Service for checking location-based activities
+ * Service for checking location-based activities.
  */
 class LocationCheckService
 {
@@ -19,26 +19,27 @@ class LocationCheckService
     }
 
     /**
-     * Check if login location is unusual
+     * Check if login location is unusual.
      *
-     * @param  array{enabled: bool, time_window: int, threshold: int}  $rule
-     * @param  array<string, float>  $location
+     * @param array{enabled: bool, time_window: int, threshold: int} $rule
+     * @param array<string, float>                                   $location
+     *
      * @return array<array<float>>|null
      *
      * @psalm-return array{current_location: array<string, float>, previous_locations: never}|null
      */
-    public function checkUnusualLoginLocation(int $userId, array $location, string $ipAddress, array $rule): ?array
+    public function checkUnusualLoginLocation(int $userId, array $location, array $rule): ?array
     {
         if (! $rule['enabled']) {
             return null;
         }
 
-        if ($location === []) {
+        if ([] === $location) {
             return null;
         }
 
         $previousLocations = $this->getUserPreviousLocations();
-        if ($previousLocations === [] || ! $this->isLocationUnusual($location, $previousLocations)) {
+        if ([] === $previousLocations || ! $this->isLocationUnusual($location, $previousLocations)) {
             return null;
         }
 
@@ -49,9 +50,10 @@ class LocationCheckService
     }
 
     /**
-     * Validate location data
+     * Validate location data.
      *
-     * @param  array<string, mixed>  $location
+     * @param array<string, mixed> $location
+     *
      * @return array<float>
      *
      * @psalm-return array{latitude?: float, longitude?: float}
@@ -72,10 +74,10 @@ class LocationCheckService
     }
 
     /**
-     * Check if location is unusual compared to previous locations
+     * Check if location is unusual compared to previous locations.
      *
-     * @param  array<string, float>  $location
-     * @param  list<array<string, float>>  $previousLocations
+     * @param array<string, float>       $location
+     * @param list<array<string, float>> $previousLocations
      */
     private function isLocationUnusual(array $location, array $previousLocations): bool
     {
@@ -89,7 +91,7 @@ class LocationCheckService
     }
 
     /**
-     * Get user's previous locations
+     * Get user's previous locations.
      *
      * @psalm-return array<never, never>
      */

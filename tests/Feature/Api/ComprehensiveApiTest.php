@@ -5,14 +5,20 @@ declare(strict_types=1);
 namespace Tests\Feature\Api;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class ComprehensiveApiTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class ComprehensiveApiTest extends TestCase
 {
     use RefreshDatabase;
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_basic_functionality(): void
+    #[Test]
+    public function testBasicFunctionality(): void
     {
         // Test basic API functionality
         $response = $this->getJson('/api/test');
@@ -24,8 +30,8 @@ class ComprehensiveApiTest extends TestCase
         ]);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_expected_behavior(): void
+    #[Test]
+    public function testExpectedBehavior(): void
     {
         // Test expected behavior with health check
         $response = $this->getJson('/api/health');
@@ -39,8 +45,8 @@ class ComprehensiveApiTest extends TestCase
         $response->assertJson(['status' => 'healthy']);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_validation(): void
+    #[Test]
+    public function testValidation(): void
     {
         // Test validation with POST /test
         $response = $this->postJson('/api/test', [

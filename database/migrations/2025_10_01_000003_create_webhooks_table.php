@@ -6,14 +6,13 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('webhooks', function (Blueprint $table): void {
+        Schema::create('webhooks', static function (Blueprint $table): void {
             $table->id();
             $table->string('store_identifier', 50)->index();
             $table->string('event_type', 50)->index(); // price_update, stock_update, product_update
@@ -31,7 +30,7 @@ return new class extends Migration
             $table->index(['status', 'created_at']);
         });
 
-        Schema::create('webhook_logs', function (Blueprint $table): void {
+        Schema::create('webhook_logs', static function (Blueprint $table): void {
             $table->id();
             $table->foreignId('webhook_id')->constrained()->onDelete('cascade');
             $table->string('action', 50);

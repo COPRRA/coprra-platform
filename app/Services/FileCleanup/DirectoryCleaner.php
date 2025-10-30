@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Services\FileCleanup;
 
 use Carbon\Carbon;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 
 final class DirectoryCleaner
 {
@@ -25,16 +23,16 @@ final class DirectoryCleaner
             return ['files_deleted' => 0, 'size_deleted' => 0];
         }
 
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($directory, RecursiveDirectoryIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::CHILD_FIRST
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($directory, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
         );
 
         foreach ($iterator as $file) {
             if ($file instanceof \SplFileInfo && $file->isFile() && $file->getMTime() < $cutoffDate->timestamp) {
                 $size = $file->getSize();
                 if (unlink($file->getPathname())) {
-                    $filesDeleted++;
+                    ++$filesDeleted;
                     $sizeDeleted += $size;
                 }
             }

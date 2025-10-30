@@ -13,23 +13,40 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.2",
+        "php": "^8.2.0",
+        "ext-bcmath": "*",
+        "ext-ctype": "*",
+        "ext-curl": "*",
+        "ext-dom": "*",
+        "ext-fileinfo": "*",
+        "ext-filter": "*",
+        "ext-hash": "*",
+        "ext-intl": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*",
+        "ext-openssl": "*",
+        "ext-pcre": "*",
+        "ext-pdo": "*",
+        "ext-session": "*",
+        "ext-tokenizer": "*",
+        "ext-xml": "*",
+        "ext-zip": "*",
         "blade-ui-kit/blade-heroicons": "^2.0",
         "darkaonline/l5-swagger": "^9.0",
         "darryldecode/cart": "^4.2",
         "doctrine/dbal": "^4.3",
         "guzzlehttp/guzzle": "^7.2",
-        "intervention/image": "^2.7",
-        "laravel/framework": "^12.0",
+        "intervention/image": "^3.0",
+        "laravel/framework": "^11.0",
         "laravel/sanctum": "^3.3|^4.0",
         "laravel/tinker": "^2.8",
         "livewire/livewire": "^3.0",
-        "predis/predis": "^2.0",
+        "predis/predis": "^3.0",
         "sentry/sentry-laravel": "^4.18",
         "spatie/laravel-backup": "^9.3.4",
         "spatie/laravel-permission": "^6.21.0",
         "srmklive/paypal": "^3.0.40",
-        "stripe/stripe-php": "^17.6.0"
+        "stripe/stripe-php": "^18.0"
     },
     "require-dev": {
         "behat/behat": "^3.13",
@@ -49,11 +66,22 @@
         "phpcompatibility/php-compatibility": "^9.3",
         "phpmd/phpmd": "^2.15",
         "phpmetrics/phpmetrics": "^2.9",
-        "phpstan/phpstan": "^2.1",
-        "phpunit/phpunit": "^11",
+        "phpstan/phpstan": "^2.0",
+        "phpstan/phpstan-deprecation-rules": "^2.0",
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "phpstan/phpstan-phpunit": "^2.0",
+        "phpstan/extension-installer": "^1.4",
+        "phpunit/phpunit": "^12",
         "povils/phpmnd": "*",
-        "rector/rector": "^2.2",
-        "vimeo/psalm": "^6.0"
+        "rector/rector": "^2.0",
+        "roave/security-advisories": "dev-master",
+        "squizlabs/php_codesniffer": "^3.13",
+        "vimeo/psalm": "^6.0",
+        "psalm/plugin-laravel": "^2.11",
+        "psalm/plugin-phpunit": "^0.19",
+        "spatie/laravel-ray": "^1.37",
+        "spatie/pest-plugin-snapshots": "^2.0",
+        "spatie/phpunit-snapshot-assertions": "^5.1"
     },
     "autoload": {
         "psr-4": {
@@ -152,26 +180,48 @@
             "@test:comprehensive"
         ],
         "analyse:phpstan": [
-            "php -d memory_limit=1G ./vendor/bin/phpstan analyse"
+            "php -d memory_limit=2G ./vendor/bin/phpstan analyse --level=max --memory-limit=2G --error-format=table"
+        ],
+        "analyse:phpstan:baseline": [
+            "php -d memory_limit=2G ./vendor/bin/phpstan analyse --generate-baseline"
         ],
         "analyse:psalm": [
-            "./vendor/bin/psalm"
+            "./vendor/bin/psalm --show-info=true --stats --threads=4"
+        ],
+        "analyse:psalm:baseline": [
+            "./vendor/bin/psalm --set-baseline=psalm-baseline.xml"
         ],
         "analyse:full": [
-            "php vendor/bin/psalm --no-cache --show-info=true"
+            "php vendor/bin/psalm --no-cache --show-info=true --stats --find-unused-psalm-suppress --find-unused-code"
         ],
         "analyse:insights": [
-            "./vendor/bin/phpinsights"
+            "./vendor/bin/phpinsights --no-interaction --min-quality=90 --min-complexity=90 --min-architecture=90 --min-style=90"
         ],
         "analyse:security": [
-            "composer audit",
-            "./vendor/bin/security-checker security:check"
+            "composer audit --audit-format=table",
+            "./vendor/bin/security-checker security:check --format=table"
+        ],
+        "analyse:metrics": [
+            "./vendor/bin/phpmetrics --config=phpmetrics.json --report-html=reports/metrics app"
+        ],
+        "analyse:complexity": [
+            "./vendor/bin/phpmd app html cleancode,codesize,controversial,design,naming,unusedcode --reportfile reports/phpmd.html"
+        ],
+        "analyse:compatibility": [
+            "./vendor/bin/phpcs --standard=PHPCompatibility --runtime-set testVersion 8.2- app"
+        ],
+        "analyse:architecture": [
+            "./vendor/bin/deptrac analyse --config-file=deptrac.yaml --formatter=table"
         ],
         "analyse:all": [
             "@analyse:phpstan",
             "@analyse:psalm",
             "@analyse:insights",
-            "@analyse:security"
+            "@analyse:security",
+            "@analyse:metrics",
+            "@analyse:complexity",
+            "@analyse:compatibility",
+            "@analyse:architecture"
         ],
         "fix:style": [
             "./vendor/bin/php-cs-fixer fix"
@@ -220,6 +270,59 @@
         ],
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
+        ],
+        "security:audit": [
+            "composer audit --format=table --audit-format=table",
+            "./vendor/bin/security-checker security:check --format=table --end-point=https://security.symfony.com/check_lock"
+        ],
+        "security:update": [
+            "composer update --with-all-dependencies --audit"
+        ],
+        "security:roave": [
+            "composer require --dev roave/security-advisories:dev-master"
+        ],
+        "validate:composer": [
+            "composer validate --strict --no-check-all --no-check-lock"
+        ],
+        "validate:dependencies": [
+            "./vendor/bin/composer-unused --excludeDir=vendor --excludeDir=storage --excludeDir=bootstrap/cache"
+        ],
+        "validate:autoload": [
+            "composer dump-autoload --optimize --classmap-authoritative --strict-psr"
+        ],
+        "validate:platform": [
+            "composer check-platform-reqs --no-dev"
+        ],
+        "validate:lock": [
+            "composer validate --check-lock --strict"
+        ],
+        "validate:all": [
+            "@validate:composer",
+            "@validate:dependencies",
+            "@validate:autoload",
+            "@validate:platform",
+            "@validate:lock",
+            "@security:audit"
+        ],
+        "ci:install": [
+            "composer install --no-dev --optimize-autoloader --classmap-authoritative"
+        ],
+        "ci:test": [
+            "@validate:all",
+            "@quality:full"
+        ],
+        "production:optimize": [
+            "@php artisan config:cache",
+            "@php artisan route:cache",
+            "@php artisan view:cache",
+            "@php artisan event:cache",
+            "composer install --no-dev --optimize-autoloader --classmap-authoritative"
+        ],
+        "development:setup": [
+            "composer install",
+            "@php artisan key:generate",
+            "@php artisan migrate:fresh --seed",
+            "@php artisan storage:link"
         ]
     },
     "extra": {
@@ -233,13 +336,29 @@
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true,
+        "classmap-authoritative": true,
+        "apcu-autoloader": true,
+        "prepend-autoloader": false,
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "infection/extension-installer": true,
             "pestphp/pest-plugin": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "phpstan/extension-installer": true
         },
-        "process-timeout": 600
+        "process-timeout": 600,
+        "cache-ttl": 15552000,
+        "cache-files-ttl": 15552000,
+        "cache-files-maxsize": "300MiB",
+        "discard-changes": false,
+        "secure-http": true,
+        "secure-svn": true,
+        "use-include-path": false,
+        "vendor-dir": "vendor",
+        "bin-dir": "vendor/bin",
+        "data-dir": "~/.composer",
+        "cache-dir": "~/.composer/cache",
+        "htaccess-protect": true
     },
     "minimum-stability": "stable",
     "prefer-stable": true

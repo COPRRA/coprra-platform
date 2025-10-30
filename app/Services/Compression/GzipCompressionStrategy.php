@@ -11,7 +11,7 @@ class GzipCompressionStrategy implements CompressionStrategyInterface
     #[\Override]
     public function isSupported(): bool
     {
-        return function_exists('gzencode');
+        return \function_exists('gzencode');
     }
 
     #[\Override]
@@ -34,7 +34,7 @@ class GzipCompressionStrategy implements CompressionStrategyInterface
 
         $compressed = gzencode($content, self::COMPRESSION_LEVEL);
 
-        if ($compressed === false) {
+        if (false === $compressed) {
             return null;
         }
 

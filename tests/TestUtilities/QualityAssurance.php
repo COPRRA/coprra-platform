@@ -26,8 +26,8 @@ class QualityAssurance
 
     public function __construct()
     {
-        $this->validator = new TestSuiteValidator;
-        $this->config = new TestConfiguration;
+        $this->validator = new TestSuiteValidator();
+        $this->config = new TestConfiguration();
     }
 
     /**
@@ -71,6 +71,27 @@ class QualityAssurance
 
             throw $e;
         }
+    }
+
+    /**
+     * Generate quality assurance report.
+     */
+    public function generateQualityReport(): array
+    {
+        $results = $this->runQualityAssurance();
+
+        return [
+            'quality_summary' => [
+                'overall_valid' => $results['overall_assessment']['valid'],
+                'overall_score' => $results['overall_assessment']['score'],
+                'grade' => $results['overall_assessment']['grade'],
+                'total_issues' => $results['overall_assessment']['total_issues'],
+                'execution_time' => $results['execution_time'],
+            ],
+            'detailed_results' => $results,
+            'recommendations' => $results['overall_assessment']['recommendations'],
+            'generated_at' => now()->toISOString(),
+        ];
     }
 
     /**
@@ -273,7 +294,7 @@ class QualityAssurance
         $foundDocs = 0;
         foreach ($requiredDocs as $doc) {
             if (File::exists($doc)) {
-                $foundDocs++;
+                ++$foundDocs;
                 $results['documentation_files'][] = $doc;
             } else {
                 $results['issues'][] = "Missing documentation file: {$doc}";
@@ -281,7 +302,7 @@ class QualityAssurance
             }
         }
 
-        $results['coverage_percentage'] = ($foundDocs / count($requiredDocs)) * 100;
+        $results['coverage_percentage'] = ($foundDocs / \count($requiredDocs)) * 100;
 
         if ($results['coverage_percentage'] < 100) {
             $results['valid'] = false;
@@ -344,17 +365,17 @@ class QualityAssurance
             $results['best_practices']['score'],
         ];
 
-        $overallScore = array_sum($scores) / count($scores);
-        $allValid = $results['code_quality']['valid'] &&
-            $results['test_coverage']['valid'] &&
-            $results['security_quality']['valid'];
+        $overallScore = array_sum($scores) / \count($scores);
+        $allValid = $results['code_quality']['valid']
+            && $results['test_coverage']['valid']
+            && $results['security_quality']['valid'];
 
-        $totalIssues = count($results['code_quality']['issues']) +
-            count($results['test_coverage']['issues']) +
-            count($results['performance_quality']['issues']) +
-            count($results['security_quality']['issues']) +
-            count($results['documentation_quality']['issues']) +
-            count($results['best_practices']['issues']);
+        $totalIssues = \count($results['code_quality']['issues'])
+            + \count($results['test_coverage']['issues'])
+            + \count($results['performance_quality']['issues'])
+            + \count($results['security_quality']['issues'])
+            + \count($results['documentation_quality']['issues'])
+            + \count($results['best_practices']['issues']);
 
         $grade = $this->calculateGrade($overallScore);
 
@@ -470,8 +491,8 @@ class QualityAssurance
         exec('php -l '.escapeshellarg($file).' 2>&1', $output, $returnCode);
 
         return [
-            'valid' => $returnCode === 0,
-            'error' => $returnCode !== 0 ? implode("\n", $output) : null,
+            'valid' => 0 === $returnCode,
+            'error' => 0 !== $returnCode ? implode("\n", $output) : null,
         ];
     }
 
@@ -570,7 +591,7 @@ class QualityAssurance
         $content = File::get($readmeFile);
         $issues = [];
 
-        if (strlen($content) < 1000) {
+        if (\strlen($content) < 1000) {
             $issues[] = 'README.md is too short (less than 1000 characters)';
         }
 
@@ -645,27 +666,6 @@ class QualityAssurance
             'valid' => true,
             'penalty' => 0,
             'issues' => [],
-        ];
-    }
-
-    /**
-     * Generate quality assurance report.
-     */
-    public function generateQualityReport(): array
-    {
-        $results = $this->runQualityAssurance();
-
-        return [
-            'quality_summary' => [
-                'overall_valid' => $results['overall_assessment']['valid'],
-                'overall_score' => $results['overall_assessment']['score'],
-                'grade' => $results['overall_assessment']['grade'],
-                'total_issues' => $results['overall_assessment']['total_issues'],
-                'execution_time' => $results['execution_time'],
-            ],
-            'detailed_results' => $results,
-            'recommendations' => $results['overall_assessment']['recommendations'],
-            'generated_at' => now()->toISOString(),
         ];
     }
 }

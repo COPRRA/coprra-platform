@@ -4,15 +4,35 @@ declare(strict_types=1);
 
 namespace Tests\TestUtilities;
 
+use App\Jobs\ProcessBackup;
+use App\Models\PriceAlert;
+use App\Models\Product;
+use App\Models\User;
+use App\Models\Wishlist;
+use App\Notifications\OrderConfirmation;
+use App\Notifications\PriceDropNotification;
+use App\Services\AuditService;
+use App\Services\BackupService;
+use App\Services\CacheService;
+use App\Services\FinancialTransactionService;
+use App\Services\NotificationService;
+use App\Services\PasswordHistoryService;
+use App\Services\PasswordPolicyService;
+use App\Services\PasswordResetService;
+use App\Services\ReportService;
+use Carbon\Carbon;
+use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
-use Mockery;
 
 /**
  * Integration Test Suite for comprehensive integration testing.
@@ -86,6 +106,44 @@ class IntegrationTestSuite
     }
 
     /**
+     * Generate integration test report.
+     */
+    public function generateIntegrationReport(): array
+    {
+        $results = $this->runComprehensiveIntegrationTests();
+
+        $totalWorkflows = \count($this->workflowResults);
+        $successfulWorkflows = \count(array_filter($this->workflowResults, static fn ($w) => $w['workflow_success']));
+
+        $totalTests = 0;
+        $totalPassed = 0;
+        $totalFailed = 0;
+
+        foreach ($results as $category => $categoryResults) {
+            if (isset($categoryResults['total_tests'])) {
+                $totalTests += $categoryResults['total_tests'];
+                $totalPassed += $categoryResults['passed'];
+                $totalFailed += $categoryResults['failed'];
+            }
+        }
+
+        return [
+            'summary' => [
+                'total_workflows' => $totalWorkflows,
+                'successful_workflows' => $successfulWorkflows,
+                'workflow_success_rate' => $totalWorkflows > 0 ? ($successfulWorkflows / $totalWorkflows) * 100 : 0,
+                'total_tests' => $totalTests,
+                'passed_tests' => $totalPassed,
+                'failed_tests' => $totalFailed,
+                'test_success_rate' => $totalTests > 0 ? ($totalPassed / $totalTests) * 100 : 0,
+            ],
+            'detailed_results' => $results,
+            'workflow_results' => $this->workflowResults,
+            'recommendations' => $this->generateIntegrationRecommendations($results),
+        ];
+    }
+
+    /**
      * Test complete user registration workflow.
      */
     private function testUserRegistrationWorkflow(): array
@@ -107,7 +165,7 @@ class IntegrationTestSuite
             },
 
             'step_2_password_validation' => function () {
-                $passwordPolicy = new \App\Services\PasswordPolicyService;
+                $passwordPolicy = new PasswordPolicyService();
                 $result = $passwordPolicy->validatePassword('StrongPass123!');
 
                 $this->assertTrue($result['valid']);
@@ -115,24 +173,24 @@ class IntegrationTestSuite
             },
 
             'step_3_save_password_history' => function () {
-                $passwordHistory = new \App\Services\PasswordHistoryService;
+                $passwordHistory = new PasswordHistoryService();
                 $result = $passwordHistory->savePasswordToHistory(1, 'StrongPass123!');
 
                 $this->assertTrue($result);
             },
 
-            'step_4_send_verification_email' => function () {
+            'step_4_send_verification_email' => static function () {
                 Mail::fake();
 
-                $user = \App\Models\User::factory()->create();
+                $user = User::factory()->create();
                 $user->sendEmailVerificationNotification();
 
-                Mail::assertSent(\Illuminate\Auth\Notifications\VerifyEmail::class);
+                Mail::assertSent(VerifyEmail::class);
             },
 
             'step_5_audit_logging' => function () {
-                $auditService = new \App\Services\AuditService;
-                $user = Mockery::mock();
+                $auditService = new AuditService();
+                $user = \Mockery::mock();
                 $user->shouldReceive('getAttribute')->with('id')->andReturn(1);
                 \Illuminate\Support\Facades\Auth::shouldReceive('user')->andReturn($user);
 
@@ -152,14 +210,14 @@ class IntegrationTestSuite
     {
         $workflow = [
             'step_1_authenticate_user' => function () {
-                $user = \App\Models\User::factory()->create();
+                $user = User::factory()->create();
                 $this->actingAs($user);
 
                 $this->assertTrue(Auth::check());
             },
 
             'step_2_add_product_to_cart' => function () {
-                $product = \App\Models\Product::factory()->create();
+                $product = Product::factory()->create();
 
                 $response = $this->post('/api/cart/add', [
                     'product_id' => $product->id,
@@ -178,7 +236,7 @@ class IntegrationTestSuite
             },
 
             'step_4_process_payment' => function () {
-                $financialService = new \App\Services\FinancialTransactionService;
+                $financialService = new FinancialTransactionService();
 
                 DB::shouldReceive('beginTransaction')->andReturn(true);
                 DB::shouldReceive('commit')->andReturn(true);
@@ -210,22 +268,22 @@ class IntegrationTestSuite
                 ]);
             },
 
-            'step_6_send_confirmation' => function () {
+            'step_6_send_confirmation' => static function () {
                 Mail::fake();
 
-                $user = \App\Models\User::factory()->create();
-                $user->notify(new \App\Notifications\OrderConfirmation);
+                $user = User::factory()->create();
+                $user->notify(new OrderConfirmation());
 
-                Mail::assertSent(\App\Notifications\OrderConfirmation::class);
+                Mail::assertSent(OrderConfirmation::class);
             },
 
             'step_7_audit_transaction' => function () {
-                $auditService = new \App\Services\AuditService;
-                $user = Mockery::mock();
+                $auditService = new AuditService();
+                $user = \Mockery::mock();
                 $user->shouldReceive('getAttribute')->with('id')->andReturn(1);
                 \Illuminate\Support\Facades\Auth::shouldReceive('user')->andReturn($user);
 
-                $model = Mockery::mock(\Illuminate\Database\Eloquent\Model::class);
+                $model = \Mockery::mock(Model::class);
                 $model->shouldReceive('getKey')->andReturn(1);
                 $model->shouldReceive('getMorphClass')->andReturn('Order');
 
@@ -245,7 +303,7 @@ class IntegrationTestSuite
     {
         $workflow = [
             'step_1_request_reset' => function () {
-                $user = \App\Models\User::factory()->create();
+                $user = User::factory()->create();
 
                 $response = $this->post('/api/password/reset-request', [
                     'email' => $user->email,
@@ -255,19 +313,19 @@ class IntegrationTestSuite
             },
 
             'step_2_generate_token' => function () {
-                $passwordReset = new \App\Services\PasswordResetService;
+                $passwordReset = new PasswordResetService();
                 $result = $passwordReset->sendResetEmail('test@example.com');
 
                 $this->assertTrue($result);
             },
 
-            'step_3_send_reset_email' => function () {
+            'step_3_send_reset_email' => static function () {
                 Mail::fake();
 
-                $user = \App\Models\User::factory()->create();
+                $user = User::factory()->create();
                 $user->sendPasswordResetNotification('reset_token');
 
-                Mail::assertSent(\Illuminate\Auth\Notifications\ResetPassword::class);
+                Mail::assertSent(ResetPassword::class);
             },
 
             'step_4_validate_token' => function () {
@@ -277,17 +335,17 @@ class IntegrationTestSuite
                     'attempts' => 0,
                 ]);
 
-                $passwordReset = new \App\Services\PasswordResetService;
+                $passwordReset = new PasswordResetService();
                 $result = $passwordReset->resetPassword('test@example.com', 'valid_token', 'NewPass123!');
 
                 $this->assertTrue($result);
             },
 
             'step_5_update_password' => function () {
-                $user = \App\Models\User::factory()->create();
+                $user = User::factory()->create();
                 $oldPassword = $user->password;
 
-                $user->password = \Illuminate\Support\Facades\Hash::make('NewPass123!');
+                $user->password = Hash::make('NewPass123!');
                 $user->save();
 
                 $this->assertNotEquals($oldPassword, $user->password);
@@ -296,7 +354,7 @@ class IntegrationTestSuite
             'step_6_clear_token' => function () {
                 Cache::shouldReceive('forget')->andReturn(true);
 
-                $passwordReset = new \App\Services\PasswordResetService;
+                $passwordReset = new PasswordResetService();
                 $result = $passwordReset->resetPassword('test@example.com', 'valid_token', 'NewPass123!');
 
                 $this->assertTrue($result);
@@ -313,10 +371,10 @@ class IntegrationTestSuite
     {
         $workflow = [
             'step_1_create_price_alert' => function () {
-                $user = \App\Models\User::factory()->create();
-                $product = \App\Models\Product::factory()->create();
+                $user = User::factory()->create();
+                $product = Product::factory()->create();
 
-                $priceAlert = \App\Models\PriceAlert::create([
+                $priceAlert = PriceAlert::create([
                     'user_id' => $user->id,
                     'product_id' => $product->id,
                     'target_price' => 50.00,
@@ -330,10 +388,10 @@ class IntegrationTestSuite
             },
 
             'step_2_check_price_drop' => function () {
-                $notificationService = new \App\Services\NotificationService;
+                $notificationService = new NotificationService();
 
                 // Mock price drop scenario
-                $product = Mockery::mock();
+                $product = \Mockery::mock();
                 $product->shouldReceive('getAttribute')->with('price')->andReturn(45.00);
                 $product->shouldReceive('getAttribute')->with('id')->andReturn(1);
 
@@ -342,18 +400,18 @@ class IntegrationTestSuite
                 $this->assertIsArray($result);
             },
 
-            'step_3_send_notification' => function () {
+            'step_3_send_notification' => static function () {
                 Notification::fake();
 
-                $user = \App\Models\User::factory()->create();
-                $user->notify(new \App\Notifications\PriceDropNotification);
+                $user = User::factory()->create();
+                $user->notify(new PriceDropNotification());
 
-                Notification::assertSentTo($user, \App\Notifications\PriceDropNotification::class);
+                Notification::assertSentTo($user, PriceDropNotification::class);
             },
 
             'step_4_log_notification' => function () {
-                $auditService = new \App\Services\AuditService;
-                $user = Mockery::mock();
+                $auditService = new AuditService();
+                $user = \Mockery::mock();
                 $user->shouldReceive('getAttribute')->with('id')->andReturn(1);
                 \Illuminate\Support\Facades\Auth::shouldReceive('user')->andReturn($user);
 
@@ -373,7 +431,7 @@ class IntegrationTestSuite
     {
         $workflow = [
             'step_1_initiate_backup' => function () {
-                $backupService = new \App\Services\BackupService;
+                $backupService = new BackupService();
 
                 Storage::fake('backups');
 
@@ -383,7 +441,7 @@ class IntegrationTestSuite
             },
 
             'step_2_backup_database' => function () {
-                $backupService = new \App\Services\BackupService;
+                $backupService = new BackupService();
 
                 $result = $backupService->createDatabaseBackup();
 
@@ -391,7 +449,7 @@ class IntegrationTestSuite
             },
 
             'step_3_backup_files' => function () {
-                $backupService = new \App\Services\BackupService;
+                $backupService = new BackupService();
 
                 $result = $backupService->createFilesBackup();
 
@@ -399,7 +457,7 @@ class IntegrationTestSuite
             },
 
             'step_4_verify_backup' => function () {
-                $backupService = new \App\Services\BackupService;
+                $backupService = new BackupService();
 
                 $backups = $backupService->listBackups();
 
@@ -408,7 +466,7 @@ class IntegrationTestSuite
             },
 
             'step_5_cleanup_old_backups' => function () {
-                $backupService = new \App\Services\BackupService;
+                $backupService = new BackupService();
 
                 $result = $backupService->cleanOldBackups();
 
@@ -426,8 +484,8 @@ class IntegrationTestSuite
     {
         $workflow = [
             'step_1_log_user_action' => function () {
-                $auditService = new \App\Services\AuditService;
-                $user = Mockery::mock();
+                $auditService = new AuditService();
+                $user = \Mockery::mock();
                 $user->shouldReceive('getAttribute')->with('id')->andReturn(1);
                 \Illuminate\Support\Facades\Auth::shouldReceive('user')->andReturn($user);
 
@@ -437,8 +495,8 @@ class IntegrationTestSuite
             },
 
             'step_2_log_api_access' => function () {
-                $auditService = new \App\Services\AuditService;
-                $user = Mockery::mock();
+                $auditService = new AuditService();
+                $user = \Mockery::mock();
                 $user->shouldReceive('getAttribute')->with('id')->andReturn(1);
                 \Illuminate\Support\Facades\Auth::shouldReceive('user')->andReturn($user);
 
@@ -448,12 +506,12 @@ class IntegrationTestSuite
             },
 
             'step_3_log_sensitive_operation' => function () {
-                $auditService = new \App\Services\AuditService;
-                $user = Mockery::mock();
+                $auditService = new AuditService();
+                $user = \Mockery::mock();
                 $user->shouldReceive('getAttribute')->with('id')->andReturn(1);
                 \Illuminate\Support\Facades\Auth::shouldReceive('user')->andReturn($user);
 
-                $model = Mockery::mock(\Illuminate\Database\Eloquent\Model::class);
+                $model = \Mockery::mock(Model::class);
                 $model->shouldReceive('getKey')->andReturn(1);
                 $model->shouldReceive('getMorphClass')->andReturn('User');
 
@@ -463,11 +521,11 @@ class IntegrationTestSuite
             },
 
             'step_4_generate_audit_report' => function () {
-                $reportService = new \App\Services\ReportService;
+                $reportService = new ReportService();
 
                 $result = $reportService->generateAuditReport(
-                    \Carbon\Carbon::now()->subDays(30),
-                    \Carbon\Carbon::now()
+                    Carbon::now()->subDays(30),
+                    Carbon::now()
                 );
 
                 $this->assertIsArray($result);
@@ -501,7 +559,7 @@ class IntegrationTestSuite
             },
 
             'test_authentication_api_integration' => function () {
-                $user = \App\Models\User::factory()->create();
+                $user = User::factory()->create();
 
                 $response = $this->post('/api/auth/login', [
                     'email' => $user->email,
@@ -514,10 +572,10 @@ class IntegrationTestSuite
             },
 
             'test_cart_api_integration' => function () {
-                $user = \App\Models\User::factory()->create();
+                $user = User::factory()->create();
                 $this->actingAs($user);
 
-                $product = \App\Models\Product::factory()->create();
+                $product = Product::factory()->create();
 
                 $response = $this->post('/api/cart/add', [
                     'product_id' => $product->id,
@@ -538,7 +596,7 @@ class IntegrationTestSuite
     {
         $tests = [
             'test_user_model_integration' => function () {
-                $user = \App\Models\User::factory()->create();
+                $user = User::factory()->create();
 
                 $this->assertDatabaseHas('users', [
                     'id' => $user->id,
@@ -547,7 +605,7 @@ class IntegrationTestSuite
             },
 
             'test_product_model_integration' => function () {
-                $product = \App\Models\Product::factory()->create();
+                $product = Product::factory()->create();
 
                 $this->assertDatabaseHas('products', [
                     'id' => $product->id,
@@ -556,10 +614,10 @@ class IntegrationTestSuite
             },
 
             'test_relationship_integration' => function () {
-                $user = \App\Models\User::factory()->create();
-                $product = \App\Models\Product::factory()->create();
+                $user = User::factory()->create();
+                $product = Product::factory()->create();
 
-                $wishlist = \App\Models\Wishlist::create([
+                $wishlist = Wishlist::create([
                     'user_id' => $user->id,
                     'product_id' => $product->id,
                 ]);
@@ -572,8 +630,8 @@ class IntegrationTestSuite
                 DB::beginTransaction();
 
                 try {
-                    $user = \App\Models\User::factory()->create();
-                    $product = \App\Models\Product::factory()->create();
+                    $user = User::factory()->create();
+                    $product = Product::factory()->create();
 
                     DB::commit();
 
@@ -581,6 +639,7 @@ class IntegrationTestSuite
                     $this->assertDatabaseHas('products', ['id' => $product->id]);
                 } catch (\Exception $e) {
                     DB::rollback();
+
                     throw $e;
                 }
             },
@@ -596,18 +655,18 @@ class IntegrationTestSuite
     {
         $tests = [
             'test_cache_service_integration' => function () {
-                $cacheService = new \App\Services\CacheService;
+                $cacheService = new CacheService();
 
                 Cache::shouldReceive('get')->andReturn(null);
                 Cache::shouldReceive('put')->andReturn(true);
 
-                $result = $cacheService->remember('test_key', fn () => 'test_data', 3600);
+                $result = $cacheService->remember('test_key', static fn () => 'test_data', 3600);
 
                 $this->assertEquals('test_data', $result);
             },
 
             'test_cache_invalidation' => function () {
-                $cacheService = new \App\Services\CacheService;
+                $cacheService = new CacheService();
 
                 Cache::shouldReceive('forget')->andReturn(true);
 
@@ -617,7 +676,7 @@ class IntegrationTestSuite
             },
 
             'test_cache_tags_integration' => function () {
-                $cacheService = new \App\Services\CacheService;
+                $cacheService = new CacheService();
 
                 Cache::shouldReceive('tags')->with(['products'])->andReturnSelf();
                 Cache::shouldReceive('flush')->andReturn(true);
@@ -637,30 +696,30 @@ class IntegrationTestSuite
     private function testQueueIntegration(): array
     {
         $tests = [
-            'test_email_queue_integration' => function () {
+            'test_email_queue_integration' => static function () {
                 Queue::fake();
 
-                $user = \App\Models\User::factory()->create();
+                $user = User::factory()->create();
                 $user->sendEmailVerificationNotification();
 
-                Queue::assertPushed(\Illuminate\Auth\Notifications\VerifyEmail::class);
+                Queue::assertPushed(VerifyEmail::class);
             },
 
-            'test_notification_queue_integration' => function () {
+            'test_notification_queue_integration' => static function () {
                 Queue::fake();
 
-                $user = \App\Models\User::factory()->create();
-                $user->notify(new \App\Notifications\PriceDropNotification);
+                $user = User::factory()->create();
+                $user->notify(new PriceDropNotification());
 
-                Queue::assertPushed(\App\Notifications\PriceDropNotification::class);
+                Queue::assertPushed(PriceDropNotification::class);
             },
 
-            'test_background_job_integration' => function () {
+            'test_background_job_integration' => static function () {
                 Queue::fake();
 
-                \App\Jobs\ProcessBackup::dispatch();
+                ProcessBackup::dispatch();
 
-                Queue::assertPushed(\App\Jobs\ProcessBackup::class);
+                Queue::assertPushed(ProcessBackup::class);
             },
         ];
 
@@ -674,7 +733,7 @@ class IntegrationTestSuite
     {
         $results = [
             'workflow_name' => $workflowName,
-            'total_steps' => count($workflow),
+            'total_steps' => \count($workflow),
             'passed_steps' => 0,
             'failed_steps' => 0,
             'step_results' => [],
@@ -686,14 +745,14 @@ class IntegrationTestSuite
         foreach ($workflow as $stepName => $stepFunction) {
             try {
                 $stepFunction();
-                $results['passed_steps']++;
+                ++$results['passed_steps'];
                 $results['step_results'][$stepName] = [
                     'status' => 'passed',
                     'error' => null,
                 ];
             } catch (\Exception $e) {
                 $allStepsPassed = false;
-                $results['failed_steps']++;
+                ++$results['failed_steps'];
                 $results['step_results'][$stepName] = [
                     'status' => 'failed',
                     'error' => $e->getMessage(),
@@ -714,7 +773,7 @@ class IntegrationTestSuite
     {
         $results = [
             'category' => $testCategory,
-            'total_tests' => count($tests),
+            'total_tests' => \count($tests),
             'passed' => 0,
             'failed' => 0,
             'test_results' => [],
@@ -723,13 +782,13 @@ class IntegrationTestSuite
         foreach ($tests as $testName => $testFunction) {
             try {
                 $testFunction();
-                $results['passed']++;
+                ++$results['passed'];
                 $results['test_results'][$testName] = [
                     'status' => 'passed',
                     'error' => null,
                 ];
             } catch (\Exception $e) {
-                $results['failed']++;
+                ++$results['failed'];
                 $results['test_results'][$testName] = [
                     'status' => 'failed',
                     'error' => $e->getMessage(),
@@ -738,44 +797,6 @@ class IntegrationTestSuite
         }
 
         return $results;
-    }
-
-    /**
-     * Generate integration test report.
-     */
-    public function generateIntegrationReport(): array
-    {
-        $results = $this->runComprehensiveIntegrationTests();
-
-        $totalWorkflows = count($this->workflowResults);
-        $successfulWorkflows = count(array_filter($this->workflowResults, fn ($w) => $w['workflow_success']));
-
-        $totalTests = 0;
-        $totalPassed = 0;
-        $totalFailed = 0;
-
-        foreach ($results as $category => $categoryResults) {
-            if (isset($categoryResults['total_tests'])) {
-                $totalTests += $categoryResults['total_tests'];
-                $totalPassed += $categoryResults['passed'];
-                $totalFailed += $categoryResults['failed'];
-            }
-        }
-
-        return [
-            'summary' => [
-                'total_workflows' => $totalWorkflows,
-                'successful_workflows' => $successfulWorkflows,
-                'workflow_success_rate' => $totalWorkflows > 0 ? ($successfulWorkflows / $totalWorkflows) * 100 : 0,
-                'total_tests' => $totalTests,
-                'passed_tests' => $totalPassed,
-                'failed_tests' => $totalFailed,
-                'test_success_rate' => $totalTests > 0 ? ($totalPassed / $totalTests) * 100 : 0,
-            ],
-            'detailed_results' => $results,
-            'workflow_results' => $this->workflowResults,
-            'recommendations' => $this->generateIntegrationRecommendations($results),
-        ];
     }
 
     /**

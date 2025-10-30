@@ -1,0 +1,2 @@
+C:\Users\Gaser\Desktop\COPRRA\app\Models\Category.php:106  UnusedPrivateMethod  Avoid unused private methods such as 'handleCreatingEvent'.
+C:\Users\Gaser\Desktop\COPRRA\app\Models\Category.php:117  UnusedPrivateMethod  Avoid unused private methods such as 'handleUpdatingEvent'.

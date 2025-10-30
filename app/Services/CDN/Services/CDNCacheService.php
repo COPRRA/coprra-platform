@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace App\Services\CDN\Services;
 
 use App\Services\CDN\Contracts\CDNProviderInterface;
-use Exception;
 use Illuminate\Support\Facades\Log;
 
 /**
- * Service for handling CDN cache operations
+ * Service for handling CDN cache operations.
  */
 final readonly class CDNCacheService
 {
@@ -21,9 +20,9 @@ final readonly class CDNCacheService
     }
 
     /**
-     * Purge CDN cache for URLs
+     * Purge CDN cache for URLs.
      *
-     * @param  list<string>  $urls  URLs to purge
+     * @param list<string> $urls URLs to purge
      */
     public function purge(array $urls = []): bool
     {
@@ -36,7 +35,7 @@ final readonly class CDNCacheService
             ]);
 
             return $result;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Failed to purge CDN cache', [
                 'urls' => $urls,
                 'provider' => $this->provider->getName(),

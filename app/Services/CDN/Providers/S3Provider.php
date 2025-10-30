@@ -7,7 +7,7 @@ namespace App\Services\CDN\Providers;
 use App\Services\CDN\Contracts\CDNProviderInterface;
 
 /**
- * AWS S3 CDN Provider Implementation
+ * AWS S3 CDN Provider Implementation.
  */
 final readonly class S3Provider implements CDNProviderInterface
 {
@@ -18,7 +18,7 @@ final readonly class S3Provider implements CDNProviderInterface
     private string $baseUrl;
 
     /**
-     * @param  array<string, string|null>  $config
+     * @param  array<string, string|* @method static \App\Models\Brand create(array<string, string|bool|null>  $config
      */
     public function __construct(array $config)
     {
@@ -27,9 +27,6 @@ final readonly class S3Provider implements CDNProviderInterface
         $this->baseUrl = (string) ($config['base_url'] ?? '');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     #[\Override]
     public function upload(string $content, string $path, string $mimeType): array
     {
@@ -49,9 +46,6 @@ final readonly class S3Provider implements CDNProviderInterface
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     #[\Override]
     public function purgeCache(array $urls): bool
     {
@@ -60,9 +54,6 @@ final readonly class S3Provider implements CDNProviderInterface
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     #[\Override]
     public function getStatistics(): array
     {
@@ -89,7 +80,7 @@ final readonly class S3Provider implements CDNProviderInterface
     #[\Override]
     public function getUrl(string $path): string
     {
-        if ($this->baseUrl !== '' && $this->baseUrl !== '0') {
+        if ('' !== $this->baseUrl && '0' !== $this->baseUrl) {
             return rtrim($this->baseUrl, '/').'/'.ltrim($path, '/');
         }
 

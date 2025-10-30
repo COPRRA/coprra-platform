@@ -4,18 +4,23 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Middleware;
 
+use App\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Tests\TestCase;
 
 /**
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class ConvertEmptyStringsToNullTest extends TestCase
+final class ConvertEmptyStringsToNullTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_convert_empty_strings_middleware_converts_empty_strings_to_null(): void
+    public function testConvertEmptyStringsMiddlewareConvertsEmptyStringsToNull(): void
     {
         $request = Request::create('/test', 'POST', [
             'name' => '',
@@ -24,19 +29,19 @@ class ConvertEmptyStringsToNullTest extends TestCase
             'age' => 25,
         ]);
 
-        $middleware = new \App\Http\Middleware\ConvertEmptyStringsToNull;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new ConvertEmptyStringsToNull();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertNull($request->input('name'));
-        $this->assertEquals('test@example.com', $request->input('email'));
-        $this->assertNull($request->input('description'));
-        $this->assertEquals(25, $request->input('age'));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertNull($request->input('name'));
+        self::assertSame('test@example.com', $request->input('email'));
+        self::assertNull($request->input('description'));
+        self::assertSame(25, $request->input('age'));
     }
 
-    public function test_convert_empty_strings_middleware_handles_nested_arrays(): void
+    public function testConvertEmptyStringsMiddlewareHandlesNestedArrays(): void
     {
         $request = Request::create('/test', 'POST', [
             'user' => [
@@ -49,19 +54,19 @@ class ConvertEmptyStringsToNullTest extends TestCase
             ],
         ]);
 
-        $middleware = new \App\Http\Middleware\ConvertEmptyStringsToNull;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new ConvertEmptyStringsToNull();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertNull($request->input('user.name'));
-        $this->assertEquals('test@example.com', $request->input('user.email'));
-        $this->assertNull($request->input('address.street'));
-        $this->assertEquals('New York', $request->input('address.city'));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertNull($request->input('user.name'));
+        self::assertSame('test@example.com', $request->input('user.email'));
+        self::assertNull($request->input('address.street'));
+        self::assertSame('New York', $request->input('address.city'));
     }
 
-    public function test_convert_empty_strings_middleware_does_not_convert_non_string_values(): void
+    public function testConvertEmptyStringsMiddlewareDoesNotConvertNonStringValues(): void
     {
         $request = Request::create('/test', 'POST', [
             'age' => 0,
@@ -70,28 +75,28 @@ class ConvertEmptyStringsToNullTest extends TestCase
             'name' => '',
         ]);
 
-        $middleware = new \App\Http\Middleware\ConvertEmptyStringsToNull;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new ConvertEmptyStringsToNull();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals(0, $request->input('age'));
-        $this->assertFalse($request->input('is_active'));
-        $this->assertEquals([], $request->input('tags'));
-        $this->assertNull($request->input('name'));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(0, $request->input('age'));
+        self::assertFalse($request->input('is_active'));
+        self::assertSame([], $request->input('tags'));
+        self::assertNull($request->input('name'));
     }
 
-    public function test_convert_empty_strings_middleware_passes_request_successfully(): void
+    public function testConvertEmptyStringsMiddlewarePassesRequestSuccessfully(): void
     {
         $request = Request::create('/test', 'GET');
 
-        $middleware = new \App\Http\Middleware\ConvertEmptyStringsToNull;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new ConvertEmptyStringsToNull();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('OK', $response->getContent());
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('OK', $response->getContent());
     }
 }

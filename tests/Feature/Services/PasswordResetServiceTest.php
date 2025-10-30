@@ -6,181 +6,208 @@ namespace Tests\Feature\Services;
 
 use App\Services\PasswordResetService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use PHPUnit\Framework\TestCase;
+use Tests\Support\MockValidationTrait;
+use Tests\Support\TestIsolationTrait;
+use Tests\TestCase;
 
-class PasswordResetServiceTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class PasswordResetServiceTest extends TestCase
 {
+    use MockValidationTrait;
     use RefreshDatabase;
+    use TestIsolationTrait;
 
     private PasswordResetService $service;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new PasswordResetService;
+        $this->backupGlobalState();
+
+        // Validate service class and methods
+        $this->validateMockMethods(PasswordResetService::class, [
+            'sendResetEmail',
+            'resetPassword',
+            'validateToken',
+        ]);
+
+        $this->service = new PasswordResetService();
     }
 
-    public function test_can_be_instantiated(): void
+    protected function tearDown(): void
+    {
+        $this->restoreGlobalState();
+        $this->clearTestCaches();
+        $this->closeMockery();
+        $this->verifyTestIsolation();
+        parent::tearDown();
+    }
+
+    public function testCanBeInstantiated(): void
     {
         // Act & Assert
-        $this->assertInstanceOf(PasswordResetService::class, $this->service);
+        self::assertInstanceOf(PasswordResetService::class, $this->service);
     }
 
-    public function test_handles_send_reset_email_with_valid_email(): void
+    public function testHandlesSendResetEmailWithValidEmail(): void
     {
         // Test service instantiation and method existence
-        $this->assertInstanceOf(PasswordResetService::class, $this->service);
-        $this->assertTrue(method_exists($this->service, 'sendResetEmail'));
+        self::assertInstanceOf(PasswordResetService::class, $this->service);
+        self::assertTrue(method_exists($this->service, 'sendResetEmail'));
 
         // Test that the method exists and can be called
-        $this->assertIsCallable([$this->service, 'sendResetEmail']);
+        self::assertIsCallable([$this->service, 'sendResetEmail']);
 
         // Test method signature validation
         $reflection = new \ReflectionMethod($this->service, 'sendResetEmail');
-        $this->assertEquals(1, $reflection->getNumberOfParameters());
-        $this->assertEquals('string', $reflection->getParameters()[0]->getType()->getName());
-        $this->assertEquals('bool', $reflection->getReturnType()->getName());
+        self::assertSame(1, $reflection->getNumberOfParameters());
+        self::assertSame('string', $reflection->getParameters()[0]->getType()->getName());
+        self::assertSame('bool', $reflection->getReturnType()->getName());
     }
 
-    public function test_handles_send_reset_email_with_nonexistent_email(): void
+    public function testHandlesSendResetEmailWithNonexistentEmail(): void
     {
         // Test service instantiation and method existence
-        $this->assertInstanceOf(PasswordResetService::class, $this->service);
-        $this->assertTrue(method_exists($this->service, 'sendResetEmail'));
+        self::assertInstanceOf(PasswordResetService::class, $this->service);
+        self::assertTrue(method_exists($this->service, 'sendResetEmail'));
 
         // Test that the method exists and can be called
-        $this->assertIsCallable([$this->service, 'sendResetEmail']);
+        self::assertIsCallable([$this->service, 'sendResetEmail']);
 
         // Test method signature validation
         $reflection = new \ReflectionMethod($this->service, 'sendResetEmail');
-        $this->assertEquals(1, $reflection->getNumberOfParameters());
-        $this->assertEquals('string', $reflection->getParameters()[0]->getType()->getName());
-        $this->assertEquals('bool', $reflection->getReturnType()->getName());
+        self::assertSame(1, $reflection->getNumberOfParameters());
+        self::assertSame('string', $reflection->getParameters()[0]->getType()->getName());
+        self::assertSame('bool', $reflection->getReturnType()->getName());
     }
 
-    public function test_handles_reset_password_with_valid_token(): void
+    public function testHandlesResetPasswordWithValidToken(): void
     {
         // Test service instantiation and method existence
-        $this->assertInstanceOf(PasswordResetService::class, $this->service);
-        $this->assertTrue(method_exists($this->service, 'resetPassword'));
+        self::assertInstanceOf(PasswordResetService::class, $this->service);
+        self::assertTrue(method_exists($this->service, 'resetPassword'));
 
         // Test that the method exists and can be called
-        $this->assertIsCallable([$this->service, 'resetPassword']);
+        self::assertIsCallable([$this->service, 'resetPassword']);
 
         // Test method signature validation
         $reflection = new \ReflectionMethod($this->service, 'resetPassword');
-        $this->assertEquals(3, $reflection->getNumberOfParameters());
-        $this->assertEquals('string', $reflection->getParameters()[0]->getType()->getName());
-        $this->assertEquals('string', $reflection->getParameters()[1]->getType()->getName());
-        $this->assertEquals('string', $reflection->getParameters()[2]->getType()->getName());
-        $this->assertEquals('bool', $reflection->getReturnType()->getName());
+        self::assertSame(3, $reflection->getNumberOfParameters());
+        self::assertSame('string', $reflection->getParameters()[0]->getType()->getName());
+        self::assertSame('string', $reflection->getParameters()[1]->getType()->getName());
+        self::assertSame('string', $reflection->getParameters()[2]->getType()->getName());
+        self::assertSame('bool', $reflection->getReturnType()->getName());
     }
 
-    public function test_handles_reset_password_with_invalid_token(): void
+    public function testHandlesResetPasswordWithInvalidToken(): void
     {
         // Test service instantiation and method existence
-        $this->assertInstanceOf(PasswordResetService::class, $this->service);
-        $this->assertTrue(method_exists($this->service, 'resetPassword'));
+        self::assertInstanceOf(PasswordResetService::class, $this->service);
+        self::assertTrue(method_exists($this->service, 'resetPassword'));
 
         // Test that the method exists and can be called
-        $this->assertIsCallable([$this->service, 'resetPassword']);
+        self::assertIsCallable([$this->service, 'resetPassword']);
 
         // Test method signature validation
         $reflection = new \ReflectionMethod($this->service, 'resetPassword');
-        $this->assertEquals(3, $reflection->getNumberOfParameters());
-        $this->assertEquals('string', $reflection->getParameters()[0]->getType()->getName());
-        $this->assertEquals('string', $reflection->getParameters()[1]->getType()->getName());
-        $this->assertEquals('string', $reflection->getParameters()[2]->getType()->getName());
-        $this->assertEquals('bool', $reflection->getReturnType()->getName());
+        self::assertSame(3, $reflection->getNumberOfParameters());
+        self::assertSame('string', $reflection->getParameters()[0]->getType()->getName());
+        self::assertSame('string', $reflection->getParameters()[1]->getType()->getName());
+        self::assertSame('string', $reflection->getParameters()[2]->getType()->getName());
+        self::assertSame('bool', $reflection->getReturnType()->getName());
     }
 
-    public function test_checks_reset_token_exists(): void
+    public function testChecksResetTokenExists(): void
     {
         // Test service instantiation and method existence
-        $this->assertInstanceOf(PasswordResetService::class, $this->service);
-        $this->assertTrue(method_exists($this->service, 'hasResetToken'));
+        self::assertInstanceOf(PasswordResetService::class, $this->service);
+        self::assertTrue(method_exists($this->service, 'hasResetToken'));
 
         // Test that the method exists and can be called
-        $this->assertIsCallable([$this->service, 'hasResetToken']);
+        self::assertIsCallable([$this->service, 'hasResetToken']);
 
         // Test method signature validation
         $reflection = new \ReflectionMethod($this->service, 'hasResetToken');
-        $this->assertEquals(1, $reflection->getNumberOfParameters());
-        $this->assertEquals('string', $reflection->getParameters()[0]->getType()->getName());
-        $this->assertEquals('bool', $reflection->getReturnType()->getName());
+        self::assertSame(1, $reflection->getNumberOfParameters());
+        self::assertSame('string', $reflection->getParameters()[0]->getType()->getName());
+        self::assertSame('bool', $reflection->getReturnType()->getName());
     }
 
-    public function test_gets_reset_token_info(): void
+    public function testGetsResetTokenInfo(): void
     {
         // Test service instantiation and method existence
-        $this->assertInstanceOf(PasswordResetService::class, $this->service);
-        $this->assertTrue(method_exists($this->service, 'getResetTokenInfo'));
+        self::assertInstanceOf(PasswordResetService::class, $this->service);
+        self::assertTrue(method_exists($this->service, 'getResetTokenInfo'));
 
         // Test that the method exists and can be called
-        $this->assertIsCallable([$this->service, 'getResetTokenInfo']);
+        self::assertIsCallable([$this->service, 'getResetTokenInfo']);
 
         // Test method signature validation
         $reflection = new \ReflectionMethod($this->service, 'getResetTokenInfo');
-        $this->assertEquals(1, $reflection->getNumberOfParameters());
-        $this->assertEquals('string', $reflection->getParameters()[0]->getType()->getName());
-        $this->assertTrue($reflection->getReturnType()->allowsNull());
+        self::assertSame(1, $reflection->getNumberOfParameters());
+        self::assertSame('string', $reflection->getParameters()[0]->getType()->getName());
+        self::assertTrue($reflection->getReturnType()->allowsNull());
     }
 
-    public function test_handles_expired_token(): void
+    public function testHandlesExpiredToken(): void
     {
         // Test service instantiation and method existence
-        $this->assertInstanceOf(PasswordResetService::class, $this->service);
-        $this->assertTrue(method_exists($this->service, 'resetPassword'));
+        self::assertInstanceOf(PasswordResetService::class, $this->service);
+        self::assertTrue(method_exists($this->service, 'resetPassword'));
 
         // Test that the method exists and can be called
-        $this->assertIsCallable([$this->service, 'resetPassword']);
+        self::assertIsCallable([$this->service, 'resetPassword']);
 
         // Test method signature validation
         $reflection = new \ReflectionMethod($this->service, 'resetPassword');
-        $this->assertEquals(3, $reflection->getNumberOfParameters());
-        $this->assertEquals('string', $reflection->getParameters()[0]->getType()->getName());
-        $this->assertEquals('string', $reflection->getParameters()[1]->getType()->getName());
-        $this->assertEquals('string', $reflection->getParameters()[2]->getType()->getName());
-        $this->assertEquals('bool', $reflection->getReturnType()->getName());
+        self::assertSame(3, $reflection->getNumberOfParameters());
+        self::assertSame('string', $reflection->getParameters()[0]->getType()->getName());
+        self::assertSame('string', $reflection->getParameters()[1]->getType()->getName());
+        self::assertSame('string', $reflection->getParameters()[2]->getType()->getName());
+        self::assertSame('bool', $reflection->getReturnType()->getName());
     }
 
-    public function test_handles_too_many_attempts(): void
+    public function testHandlesTooManyAttempts(): void
     {
         // Test service instantiation and method existence
-        $this->assertInstanceOf(PasswordResetService::class, $this->service);
-        $this->assertTrue(method_exists($this->service, 'resetPassword'));
+        self::assertInstanceOf(PasswordResetService::class, $this->service);
+        self::assertTrue(method_exists($this->service, 'resetPassword'));
 
         // Test that the method exists and can be called
-        $this->assertIsCallable([$this->service, 'resetPassword']);
+        self::assertIsCallable([$this->service, 'resetPassword']);
 
         // Test method signature validation
         $reflection = new \ReflectionMethod($this->service, 'resetPassword');
-        $this->assertEquals(3, $reflection->getNumberOfParameters());
-        $this->assertEquals('string', $reflection->getParameters()[0]->getType()->getName());
-        $this->assertEquals('string', $reflection->getParameters()[1]->getType()->getName());
-        $this->assertEquals('string', $reflection->getParameters()[2]->getType()->getName());
-        $this->assertEquals('bool', $reflection->getReturnType()->getName());
+        self::assertSame(3, $reflection->getNumberOfParameters());
+        self::assertSame('string', $reflection->getParameters()[0]->getType()->getName());
+        self::assertSame('string', $reflection->getParameters()[1]->getType()->getName());
+        self::assertSame('string', $reflection->getParameters()[2]->getType()->getName());
+        self::assertSame('bool', $reflection->getReturnType()->getName());
     }
 
-    public function test_gets_statistics(): void
+    public function testGetsStatistics(): void
     {
         // Test service instantiation and method existence
-        $this->assertInstanceOf(PasswordResetService::class, $this->service);
-        $this->assertTrue(method_exists($this->service, 'getStatistics'));
+        self::assertInstanceOf(PasswordResetService::class, $this->service);
+        self::assertTrue(method_exists($this->service, 'getStatistics'));
 
         // Test that the method exists and can be called
-        $this->assertIsCallable([$this->service, 'getStatistics']);
+        self::assertIsCallable([$this->service, 'getStatistics']);
 
         // Test method signature validation
         $reflection = new \ReflectionMethod($this->service, 'getStatistics');
-        $this->assertEquals(0, $reflection->getNumberOfParameters());
-        $this->assertEquals('array', $reflection->getReturnType()->getName());
+        self::assertSame(0, $reflection->getNumberOfParameters());
+        self::assertSame('array', $reflection->getReturnType()->getName());
 
         // Test that the method returns an array
         $result = $this->service->getStatistics();
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('token_expiry_minutes', $result);
-        $this->assertArrayHasKey('max_attempts', $result);
-        $this->assertArrayHasKey('expired_tokens_cleaned', $result);
+        self::assertIsArray($result);
+        self::assertArrayHasKey('token_expiry_minutes', $result);
+        self::assertArrayHasKey('max_attempts', $result);
+        self::assertArrayHasKey('expired_tokens_cleaned', $result);
     }
 }

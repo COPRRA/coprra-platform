@@ -7,17 +7,22 @@ namespace Tests\Feature\Models;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /**
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class CategoryTest extends TestCase
+final class CategoryTest extends TestCase
 {
     use RefreshDatabase;
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_create_a_category(): void
+    #[Test]
+    public function testItCanCreateACategory(): void
     {
         // Arrange
         $attributes = [
@@ -32,15 +37,15 @@ class CategoryTest extends TestCase
         $category = Category::create($attributes);
 
         // Assert
-        $this->assertInstanceOf(Category::class, $category);
-        $this->assertEquals('Test Category', $category->name);
-        $this->assertEquals('test-category', $category->slug);
-        $this->assertEquals(0, $category->level);
-        $this->assertTrue($category->is_active);
+        self::assertInstanceOf(Category::class, $category);
+        self::assertSame('Test Category', $category->name);
+        self::assertSame('test-category', $category->slug);
+        self::assertSame(0, $category->level);
+        self::assertTrue($category->is_active);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_has_products_relationship(): void
+    #[Test]
+    public function testItHasProductsRelationship(): void
     {
         // Arrange
         $category = Category::factory()->create();
@@ -50,37 +55,37 @@ class CategoryTest extends TestCase
         $category->refresh();
 
         // Assert
-        $this->assertCount(1, $category->products);
-        $this->assertInstanceOf(Product::class, $category->products->first());
+        self::assertCount(1, $category->products);
+        self::assertInstanceOf(Product::class, $category->products->first());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_validate_required_fields(): void
+    #[Test]
+    public function testItCanValidateRequiredFields(): void
     {
         // Arrange
-        $category = new Category;
+        $category = new Category();
 
         // Act
         $rules = $category->getRules();
 
         // Assert
-        $this->assertArrayHasKey('name', $rules);
-        $this->assertEquals('required|string|max:255', $rules['name']);
+        self::assertArrayHasKey('name', $rules);
+        self::assertSame('required|string|max:255', $rules['name']);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_validate_name_length(): void
+    #[Test]
+    public function testItCanValidateNameLength(): void
     {
         // Arrange & Act
         $category = Category::factory()->make(['name' => str_repeat('a', 256)]);
 
         // Assert
-        $this->assertFalse($category->validate());
-        $this->assertArrayHasKey('name', $category->getErrors());
+        self::assertFalse($category->validate());
+        self::assertArrayHasKey('name', $category->getErrors());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_scope_active_categories(): void
+    #[Test]
+    public function testItCanScopeActiveCategories(): void
     {
         // Arrange
         Category::factory()->create(['is_active' => true]);
@@ -90,12 +95,12 @@ class CategoryTest extends TestCase
         $activeCategories = Category::active()->get();
 
         // Assert
-        $this->assertCount(1, $activeCategories);
-        $this->assertTrue($activeCategories->first()->is_active);
+        self::assertCount(1, $activeCategories);
+        self::assertTrue($activeCategories->first()->is_active);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_search_categories_by_name(): void
+    #[Test]
+    public function testItCanSearchCategoriesByName(): void
     {
         // Arrange
         Category::factory()->create(['name' => 'Electronics']);
@@ -105,12 +110,12 @@ class CategoryTest extends TestCase
         $results = Category::search('Electro')->get();
 
         // Assert
-        $this->assertCount(1, $results);
-        $this->assertEquals('Electronics', $results->first()->name);
+        self::assertCount(1, $results);
+        self::assertSame('Electronics', $results->first()->name);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_get_category_with_products_count(): void
+    #[Test]
+    public function testItCanGetCategoryWithProductsCount(): void
     {
         // Arrange
         $category = Category::factory()->create();
@@ -120,11 +125,11 @@ class CategoryTest extends TestCase
         $categoryWithCount = Category::withCount('products')->find($category->id);
 
         // Assert
-        $this->assertEquals(2, $categoryWithCount->products_count);
+        self::assertSame(2, $categoryWithCount->products_count);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_soft_delete_category(): void
+    #[Test]
+    public function testItCanSoftDeleteCategory(): void
     {
         // Arrange
         $category = Category::factory()->create();
@@ -134,11 +139,11 @@ class CategoryTest extends TestCase
 
         // Assert
         $this->assertSoftDeleted($category);
-        $this->assertNull(Category::find($category->id));
+        self::assertNull(Category::find($category->id));
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_restore_soft_deleted_category(): void
+    #[Test]
+    public function testItCanRestoreSoftDeletedCategory(): void
     {
         // Arrange
         $category = Category::factory()->create();
@@ -149,21 +154,21 @@ class CategoryTest extends TestCase
 
         // Assert
         $this->assertNotSoftDeleted($category);
-        $this->assertNotNull(Category::find($category->id));
+        self::assertNotNull(Category::find($category->id));
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_auto_generates_slug_from_name(): void
+    #[Test]
+    public function testItAutoGeneratesSlugFromName(): void
     {
         // Arrange & Act
         $category = Category::create(['name' => 'Test Category Name']);
 
         // Assert
-        $this->assertEquals('test-category-name', $category->slug);
+        self::assertSame('test-category-name', $category->slug);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_updates_slug_when_name_changes(): void
+    #[Test]
+    public function testItUpdatesSlugWhenNameChanges(): void
     {
         // Arrange
         $category = Category::factory()->create(['name' => 'Old Name']);
@@ -172,11 +177,11 @@ class CategoryTest extends TestCase
         $category->update(['name' => 'New Name']);
 
         // Assert
-        $this->assertEquals('new-name', $category->slug);
+        self::assertSame('new-name', $category->slug);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_category_hierarchy_parent_child(): void
+    #[Test]
+    public function testCategoryHierarchyParentChild(): void
     {
         // Arrange
         $parent = Category::factory()->create(['level' => 0]);
@@ -186,16 +191,16 @@ class CategoryTest extends TestCase
         $child->refresh();
 
         // Assert
-        $this->assertEquals(1, $child->level);
-        $this->assertEquals($parent->id, $child->parent_id);
-        $this->assertInstanceOf(Category::class, $child->parent);
-        $this->assertEquals($parent->id, $child->parent->id);
-        $this->assertCount(1, $parent->children);
-        $this->assertEquals($child->id, $parent->children->first()->id);
+        self::assertSame(1, $child->level);
+        self::assertSame($parent->id, $child->parent_id);
+        self::assertInstanceOf(Category::class, $child->parent);
+        self::assertSame($parent->id, $child->parent->id);
+        self::assertCount(1, $parent->children);
+        self::assertSame($child->id, $parent->children->first()->id);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_level_calculation_on_parent_change(): void
+    #[Test]
+    public function testLevelCalculationOnParentChange(): void
     {
         // Arrange
         $parent = Category::factory()->create(['level' => 0]);
@@ -206,6 +211,6 @@ class CategoryTest extends TestCase
         $grandchild->update(['parent_id' => $parent->id]);
 
         // Assert
-        $this->assertEquals(1, $grandchild->level);
+        self::assertSame(1, $grandchild->level);
     }
 }

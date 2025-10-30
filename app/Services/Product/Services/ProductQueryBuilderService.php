@@ -8,14 +8,15 @@ use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * Service for building product queries
+ * Service for building product queries.
  */
 final class ProductQueryBuilderService
 {
     /**
-     * Build search query
+     * Build search query.
      *
-     * @param  array<string, mixed>  $filters
+     * @param array<string, mixed> $filters
+     *
      * @return Builder<Product>
      */
     public function buildSearchQuery(string $query, array $filters): Builder
@@ -26,14 +27,16 @@ final class ProductQueryBuilderService
                 'category:id,name,slug',
                 'brand:id,name,slug',
             ])
-            ->where('is_active', true);
+            ->where('is_active', true)
+        ;
 
         // Apply search query
-        if ($query !== '' && $query !== '0') {
-            $productsQuery->where(function (Builder $q) use ($query): void {
+        if ('' !== $query && '0' !== $query) {
+            $productsQuery->where(static function (Builder $q) use ($query): void {
                 $searchTerm = '%'.addcslashes($query, '%_').'%';
                 $q->where('name', 'like', $searchTerm)
-                    ->orWhere('description', 'like', $searchTerm);
+                    ->orWhere('description', 'like', $searchTerm)
+                ;
             });
         }
 
@@ -45,7 +48,7 @@ final class ProductQueryBuilderService
     }
 
     /**
-     * Build related products query
+     * Build related products query.
      *
      * @psalm-return Builder<Product>
      */
@@ -57,11 +60,12 @@ final class ProductQueryBuilderService
             ->where('id', '!=', $product->id)
             ->where('is_active', true)
             ->inRandomOrder()
-            ->limit($limit);
+            ->limit($limit)
+        ;
     }
 
     /**
-     * Build active products query
+     * Build active products query.
      *
      * @psalm-return Builder<Product>
      */
@@ -70,11 +74,12 @@ final class ProductQueryBuilderService
         return Product::query()
             ->with(['category', 'brand'])
             ->where('is_active', true)
-            ->latest();
+            ->latest()
+        ;
     }
 
     /**
-     * Build product by slug query
+     * Build product by slug query.
      *
      * @psalm-return Builder<Product>
      */
@@ -83,14 +88,16 @@ final class ProductQueryBuilderService
         return Product::query()
             ->with(['category', 'brand', 'reviews'])
             ->where('slug', $slug)
-            ->where('is_active', true);
+            ->where('is_active', true)
+        ;
     }
 
     /**
-     * Apply filters to query
+     * Apply filters to query.
      *
-     * @param  Builder<Product>  $query
-     * @param  array<string, mixed>  $filters
+     * @param Builder<Product>     $query
+     * @param array<string, mixed> $filters
+     *
      * @return Builder<Product>
      */
     private function applyFilters(Builder $query, array $filters): Builder
@@ -115,9 +122,9 @@ final class ProductQueryBuilderService
     }
 
     /**
-     * Apply sorting to query
+     * Apply sorting to query.
      *
-     * @param  Builder<Product>  $query
+     * @param Builder<Product> $query
      *
      * @psalm-return Builder<Product>
      */

@@ -11,8 +11,12 @@ use Tests\TestCase;
 
 /**
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class CategoryControllerTest extends TestCase
+final class CategoryControllerTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -28,7 +32,7 @@ class CategoryControllerTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_can_list_categories()
+    public function testCanListCategories()
     {
         $admin = User::factory()->create(['is_admin' => true]);
         $this->actingAs($admin);
@@ -49,17 +53,18 @@ class CategoryControllerTest extends TestCase
                         'updated_at',
                     ],
                 ],
-            ]);
+            ])
+        ;
     }
 
-    public function test_requires_admin_authentication_to_list_categories()
+    public function testRequiresAdminAuthenticationToListCategories()
     {
         $response = $this->getJson('/api/admin/categories');
 
         $response->assertStatus(401);
     }
 
-    public function test_requires_admin_role_to_list_categories()
+    public function testRequiresAdminRoleToListCategories()
     {
         $user = User::factory()->create(['is_admin' => false]);
         $this->actingAs($user);
@@ -69,7 +74,7 @@ class CategoryControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
-    public function test_can_show_specific_category()
+    public function testCanShowSpecificCategory()
     {
         $admin = User::factory()->create(['is_admin' => true]);
         $this->actingAs($admin);
@@ -86,10 +91,11 @@ class CategoryControllerTest extends TestCase
                     'slug' => $category->slug,
                     'description' => $category->description,
                 ],
-            ]);
+            ])
+        ;
     }
 
-    public function test_returns_404_for_nonexistent_category()
+    public function testReturns404ForNonexistentCategory()
     {
         $admin = User::factory()->create(['is_admin' => true]);
         $this->actingAs($admin);
@@ -99,7 +105,7 @@ class CategoryControllerTest extends TestCase
         $response->assertStatus(404);
     }
 
-    public function test_can_create_category()
+    public function testCanCreateCategory()
     {
         $admin = User::factory()->create(['is_admin' => true]);
         $this->actingAs($admin);
@@ -117,7 +123,8 @@ class CategoryControllerTest extends TestCase
                     'name' => $categoryData['name'],
                     'description' => $categoryData['description'],
                 ],
-            ]);
+            ])
+        ;
 
         // Assert that the category was actually saved to the database
         $this->assertDatabaseHas('categories', [
@@ -126,7 +133,7 @@ class CategoryControllerTest extends TestCase
         ]);
     }
 
-    public function test_validates_category_creation_request()
+    public function testValidatesCategoryCreationRequest()
     {
         $admin = User::factory()->create(['is_admin' => true]);
         $this->actingAs($admin);
@@ -134,10 +141,11 @@ class CategoryControllerTest extends TestCase
         $response = $this->postJson('/api/admin/categories', []);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['name']);
+            ->assertJsonValidationErrors(['name'])
+        ;
     }
 
-    public function test_requires_admin_authentication_to_create_category()
+    public function testRequiresAdminAuthenticationToCreateCategory()
     {
         $categoryData = [
             'name' => 'Test Category',
@@ -149,7 +157,7 @@ class CategoryControllerTest extends TestCase
         $response->assertStatus(401);
     }
 
-    public function test_can_update_category()
+    public function testCanUpdateCategory()
     {
         $admin = User::factory()->create(['is_admin' => true]);
         $this->actingAs($admin);
@@ -170,10 +178,11 @@ class CategoryControllerTest extends TestCase
                     'name' => $updateData['name'],
                     'description' => $updateData['description'],
                 ],
-            ]);
+            ])
+        ;
     }
 
-    public function test_validates_category_update_request()
+    public function testValidatesCategoryUpdateRequest()
     {
         $admin = User::factory()->create(['is_admin' => true]);
         $this->actingAs($admin);
@@ -183,10 +192,11 @@ class CategoryControllerTest extends TestCase
         $response = $this->putJson("/api/admin/categories/{$category->id}", []);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['name']);
+            ->assertJsonValidationErrors(['name'])
+        ;
     }
 
-    public function test_requires_admin_authentication_to_update_category()
+    public function testRequiresAdminAuthenticationToUpdateCategory()
     {
         $category = Category::factory()->create();
 
@@ -200,7 +210,7 @@ class CategoryControllerTest extends TestCase
         $response->assertStatus(401);
     }
 
-    public function test_can_delete_category()
+    public function testCanDeleteCategory()
     {
         $admin = User::factory()->create(['is_admin' => true]);
         $this->actingAs($admin);
@@ -212,7 +222,7 @@ class CategoryControllerTest extends TestCase
         $response->assertStatus(204);
     }
 
-    public function test_returns_404_when_deleting_nonexistent_category()
+    public function testReturns404WhenDeletingNonexistentCategory()
     {
         $admin = User::factory()->create(['is_admin' => true]);
         $this->actingAs($admin);
@@ -222,7 +232,7 @@ class CategoryControllerTest extends TestCase
         $response->assertStatus(404);
     }
 
-    public function test_requires_admin_authentication_to_delete_category()
+    public function testRequiresAdminAuthenticationToDeleteCategory()
     {
         $category = Category::factory()->create();
 

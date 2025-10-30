@@ -6,6 +6,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Telescope\IncomingEntry;
 use Laravel\Telescope\Telescope;
@@ -26,12 +27,12 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
         $isLocal = $this->app->environment('local');
 
         Telescope::filter(static function (IncomingEntry $entry) use ($isLocal): bool {
-            return $isLocal ||
-                $entry->isReportableException() ||
-                $entry->isFailedRequest() ||
-                $entry->isFailedJob() ||
-                $entry->isScheduledTask() ||
-                $entry->hasMonitoredTag();
+            return $isLocal
+                || $entry->isReportableException()
+                || $entry->isFailedRequest()
+                || $entry->isFailedJob()
+                || $entry->isScheduledTask()
+                || $entry->hasMonitoredTag();
         });
     }
 
@@ -62,10 +63,10 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
     protected function gate(): void
     {
         Gate::define('viewTelescope', static function ($user): bool {
-            /** @var \App\Models\User $user */
-            $userEmail = is_string($user->email) ? $user->email : '';
+            /** @var User $user */
+            $userEmail = \is_string($user->email) ? $user->email : '';
 
-            return in_array($userEmail, []);
+            return \in_array($userEmail, [], true);
         });
     }
 }

@@ -8,6 +8,7 @@ namespace App\Providers;
 
 use App\Services\RouteConfigurationService;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -28,10 +29,10 @@ final class RouteServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $rateLimiter = $this->app->make(\Illuminate\Cache\RateLimiter::class);
-        $router = $this->app->make(\Illuminate\Contracts\Routing\Registrar::class);
+        $router = $this->app->make(Registrar::class);
 
         // Ensure a fallback 'public' rate limiter exists to prevent MissingRateLimiterException in tests
-        if (RateLimiter::limiter('public') === null) {
+        if (null === RateLimiter::limiter('public')) {
             RateLimiter::for('public', static function (Request $request) {
                 $ip = (string) $request->ip();
 

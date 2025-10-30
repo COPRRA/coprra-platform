@@ -24,7 +24,7 @@ interface PasswordResetService
     /**
      * Get reset token info.
      *
-     * @return array<string, string|int|null>|null
+     * @return array<string, string|int|* @method static \App\Models\Brand create(array<string, string|bool|null>|null
      */
     public function getResetTokenInfo(string $email): ?array;
 

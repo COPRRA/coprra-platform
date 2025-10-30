@@ -8,15 +8,6 @@ use Illuminate\Http\Request;
 
 class PermissionsPolicyHeaderStrategy implements SecurityHeaderStrategyInterface
 {
-    /**
-     * @psalm-return 'Permissions-Policy'
-     */
-    #[\Override]
-    public function getHeaderName(): string
-    {
-        return 'Permissions-Policy';
-    }
-
     #[\Override]
     public function getValue(Request $request, array $config): ?string
     {
@@ -30,11 +21,5 @@ class PermissionsPolicyHeaderStrategy implements SecurityHeaderStrategyInterface
     public function shouldApply(Request $request, array $config): bool
     {
         return $config['enabled'] ?? true;
-    }
-
-    #[\Override]
-    public function supportsDynamicValues(): bool
-    {
-        return true;
     }
 }

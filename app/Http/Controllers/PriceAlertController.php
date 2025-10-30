@@ -8,13 +8,15 @@ use App\Http\Requests\UpdatePriceAlertRequest;
 use App\Models\PriceAlert;
 use App\Models\Product;
 use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class PriceAlertController extends Controller
 {
     private const UNAUTHORIZED_MESSAGE = 'Unauthorized action.';
 
-    public function create(Request $request): \Illuminate\View\View
+    public function create(Request $request): View
     {
         $product = null;
         if ($request->has('product_id')) {
@@ -25,9 +27,24 @@ class PriceAlertController extends Controller
     }
 
     /**
+     * Display the specified price alert.
+     */
+    public function show(PriceAlert $priceAlert, Guard $auth): View
+    {
+        if ($priceAlert->user_id !== $auth->id()) {
+            abort(403, self::UNAUTHORIZED_MESSAGE);
+        }
+
+        // Eager load relationships to prevent N+1 queries
+        $priceAlert->load(['product.priceOffers']);
+
+        return view('price-alerts.show', compact('priceAlert'));
+    }
+
+    /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatePriceAlertRequest $request, PriceAlert $priceAlert, Guard $auth): \Illuminate\Http\RedirectResponse
+    public function update(UpdatePriceAlertRequest $request, PriceAlert $priceAlert, Guard $auth): RedirectResponse
     {
         if ($priceAlert->user_id !== $auth->id()) {
             abort(403, self::UNAUTHORIZED_MESSAGE);
@@ -39,6 +56,7 @@ class PriceAlertController extends Controller
         ]);
 
         return redirect()->route('price-alerts.index')
-            ->with('success', 'Price alert updated successfully!');
+            ->with('success', 'Price alert updated successfully!')
+        ;
     }
 }

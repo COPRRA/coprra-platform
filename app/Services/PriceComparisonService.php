@@ -8,12 +8,10 @@ use App\Models\Product;
 
 final readonly class PriceComparisonService
 {
-    public function __construct(private StoreAdapterManager $storeAdapterManager) {}
-
     /**
      * Fetch prices from all available stores.
      *
-     * @return array<int, array<string, string|float|bool|null>>
+     * @return array<int, array<string, string|float|bool|* @method static \App\Models\Brand create(array<string, string|bool|null>>
      */
     public function fetchPricesFromStores(Product $product): array
     {
@@ -22,7 +20,7 @@ final readonly class PriceComparisonService
         /** @var array<string, string>|null $storeMappings */
         $storeMappings = $product->store_mappings ?? null;
 
-        if (! is_array($storeMappings)) {
+        if (! \is_array($storeMappings)) {
             return $prices;
         }
 
@@ -34,8 +32,8 @@ final readonly class PriceComparisonService
 
             if ($productData) {
                 $price = isset($productData['price']) && is_numeric($productData['price']) ? (float) $productData['price'] : 0.0;
-                $currency = isset($productData['currency']) && is_string($productData['currency']) ? $productData['currency'] : '';
-                $inStock = isset($productData['availability']) && $productData['availability'] === 'in_stock';
+                $currency = isset($productData['currency']) && \is_string($productData['currency']) ? $productData['currency'] : '';
+                $inStock = isset($productData['availability']) && 'in_stock' === $productData['availability'];
 
                 $prices[] = [
                     'store_name' => $this->getStoreName($storeIdentifier),
@@ -61,23 +59,24 @@ final readonly class PriceComparisonService
     /**
      * Mark the best deal in prices array.
      *
-     * @param  array<int, array<string, string|float|bool|null>>  $deals
-     * @return array<int, array<string, string|float|bool|null>>
+     * @param  array<int, array<string, string|float|bool|* @method static \App\Models\Brand create(array<string, string|bool|null>>  $deals
+     *
+     * @return array<int, array<string, string|float|bool|* @method static \App\Models\Brand create(array<string, string|bool|null>>
      */
     public function markBestDeal(array $deals): array
     {
-        $filtered = array_filter($deals, fn (array $item): bool => isset($item['price'], $item['in_stock'], $item['is_best_deal']) &&
-            is_numeric($item['price']) &&
-            is_bool($item['in_stock']) &&
-            is_bool($item['is_best_deal']));
+        $filtered = array_filter($deals, static fn (array $item): bool => isset($item['price'], $item['in_stock'], $item['is_best_deal'])
+            && is_numeric($item['price'])
+            && \is_bool($item['in_stock'])
+            && \is_bool($item['is_best_deal']));
 
-        if ($filtered === []) {
+        if ([] === $filtered) {
             return $deals;
         }
 
-        $inStockPrices = array_filter($filtered, fn (array $item): bool => $item['in_stock'] ?? false);
+        $inStockPrices = array_filter($filtered, static fn (array $item): bool|float|string => $item['in_stock'] ?? false);
 
-        if ($inStockPrices === []) {
+        if ([] === $inStockPrices) {
             return $deals;
         }
 

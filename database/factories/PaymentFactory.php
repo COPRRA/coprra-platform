@@ -16,7 +16,7 @@ class PaymentFactory extends Factory
     /**
      * The name of the factory's corresponding model.
      *
-     * @var class-string<\App\Models\Payment>
+     * @var class-string<Payment>
      */
     protected $model = Payment::class;
 

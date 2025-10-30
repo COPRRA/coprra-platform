@@ -25,22 +25,14 @@ class SecurityHeaderStrategyFactory
     }
 
     /**
-     * Register a custom strategy for a header.
-     */
-    public function registerStrategy(string $header, SecurityHeaderStrategyInterface $strategy): void
-    {
-        $this->strategies[$header] = $strategy;
-    }
-
-    /**
      * Register default strategies for common security headers.
      */
     private function registerDefaultStrategies(): void
     {
         // Dynamic headers
-        $this->strategies['Content-Security-Policy'] = new ContentSecurityPolicyHeaderStrategy;
-        $this->strategies['Strict-Transport-Security'] = new StrictTransportSecurityHeaderStrategy;
-        $this->strategies['Permissions-Policy'] = new PermissionsPolicyHeaderStrategy;
+        $this->strategies['Content-Security-Policy'] = new ContentSecurityPolicyHeaderStrategy();
+        $this->strategies['Strict-Transport-Security'] = new StrictTransportSecurityHeaderStrategy();
+        $this->strategies['Permissions-Policy'] = new PermissionsPolicyHeaderStrategy();
 
         // Standard headers with defaults
         $standardHeaders = [

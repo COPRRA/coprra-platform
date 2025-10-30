@@ -23,9 +23,9 @@ class TestRunner
 
     public function __construct()
     {
-        $this->comprehensiveRunner = new ComprehensiveTestRunner;
-        $this->reportGenerator = new TestReportGenerator;
-        $this->config = new TestConfiguration;
+        $this->comprehensiveRunner = new ComprehensiveTestRunner();
+        $this->reportGenerator = new TestReportGenerator();
+        $this->config = new TestConfiguration();
     }
 
     /**
@@ -94,23 +94,64 @@ class TestRunner
         switch ($suiteName) {
             case 'unit':
                 return $this->runUnitTests($options);
+
             case 'integration':
                 return $this->runIntegrationTests($options);
+
             case 'performance':
                 return $this->runPerformanceTests($options);
+
             case 'security':
                 return $this->runSecurityTests($options);
+
             case 'api':
                 return $this->runApiTests($options);
+
             case 'database':
                 return $this->runDatabaseTests($options);
+
             case 'error':
                 return $this->runErrorHandlingTests($options);
+
             case 'validation':
                 return $this->runValidationTests($options);
+
             default:
                 throw new \InvalidArgumentException("Unknown test suite: {$suiteName}");
         }
+    }
+
+    /**
+     * Get test statistics.
+     */
+    public function getTestStatistics(): array
+    {
+        return [
+            'available_suites' => [
+                'unit' => 'Unit tests for individual services',
+                'integration' => 'Integration tests for workflows',
+                'performance' => 'Performance and load tests',
+                'security' => 'Security and vulnerability tests',
+                'api' => 'API endpoint tests',
+                'database' => 'Database and migration tests',
+                'error' => 'Error handling tests',
+                'validation' => 'Input validation tests',
+            ],
+            'configuration' => $this->config->getAllConfig(),
+            'requirements' => [
+                'coverage' => TestConfiguration::getCoverageRequirements('standard'),
+                'performance' => TestConfiguration::getPerformanceThresholds('unit'),
+                'security' => TestConfiguration::getSecurityRequirements('authentication'),
+            ],
+        ];
+    }
+
+    /**
+     * Cleanup resources.
+     */
+    public function cleanup(): void
+    {
+        $this->comprehensiveRunner->cleanup();
     }
 
     /**
@@ -118,7 +159,7 @@ class TestRunner
      */
     private function runUnitTests(array $options): array
     {
-        $serviceFactory = new ServiceTestFactory;
+        $serviceFactory = new ServiceTestFactory();
         $results = $serviceFactory->runComprehensiveTests();
 
         return [
@@ -133,7 +174,7 @@ class TestRunner
      */
     private function runIntegrationTests(array $options): array
     {
-        $integrationSuite = new IntegrationTestSuite;
+        $integrationSuite = new IntegrationTestSuite();
         $results = $integrationSuite->runComprehensiveIntegrationTests();
 
         return [
@@ -148,7 +189,7 @@ class TestRunner
      */
     private function runPerformanceTests(array $options): array
     {
-        $performanceSuite = new PerformanceTestSuite;
+        $performanceSuite = new PerformanceTestSuite();
         $results = $performanceSuite->runComprehensivePerformanceTests();
 
         return [
@@ -163,7 +204,7 @@ class TestRunner
      */
     private function runSecurityTests(array $options): array
     {
-        $securitySuite = new SecurityTestSuite;
+        $securitySuite = new SecurityTestSuite();
         $results = $securitySuite->runComprehensiveSecurityTests();
 
         return [
@@ -303,14 +344,14 @@ class TestRunner
 
         // Performance recommendations
         if ($executionMetrics['total_execution_time'] > 300000) { // 5 minutes
-            $recommendations[] = 'Consider optimizing test execution time - currently taking '.
-                round($executionMetrics['total_execution_time'] / 1000, 2).' seconds';
+            $recommendations[] = 'Consider optimizing test execution time - currently taking '
+                .round($executionMetrics['total_execution_time'] / 1000, 2).' seconds';
         }
 
         // Memory recommendations
         if ($executionMetrics['peak_memory_usage'] > 500 * 1024 * 1024) { // 500MB
-            $recommendations[] = 'Consider optimizing memory usage - peak usage was '.
-                round($executionMetrics['peak_memory_usage'] / (1024 * 1024), 2).' MB';
+            $recommendations[] = 'Consider optimizing memory usage - peak usage was '
+                .round($executionMetrics['peak_memory_usage'] / (1024 * 1024), 2).' MB';
         }
 
         // Coverage recommendations
@@ -333,38 +374,5 @@ class TestRunner
         }
 
         return $recommendations;
-    }
-
-    /**
-     * Get test statistics.
-     */
-    public function getTestStatistics(): array
-    {
-        return [
-            'available_suites' => [
-                'unit' => 'Unit tests for individual services',
-                'integration' => 'Integration tests for workflows',
-                'performance' => 'Performance and load tests',
-                'security' => 'Security and vulnerability tests',
-                'api' => 'API endpoint tests',
-                'database' => 'Database and migration tests',
-                'error' => 'Error handling tests',
-                'validation' => 'Input validation tests',
-            ],
-            'configuration' => $this->config->getAllConfig(),
-            'requirements' => [
-                'coverage' => TestConfiguration::getCoverageRequirements('standard'),
-                'performance' => TestConfiguration::getPerformanceThresholds('unit'),
-                'security' => TestConfiguration::getSecurityRequirements('authentication'),
-            ],
-        ];
-    }
-
-    /**
-     * Cleanup resources.
-     */
-    public function cleanup(): void
-    {
-        $this->comprehensiveRunner->cleanup();
     }
 }

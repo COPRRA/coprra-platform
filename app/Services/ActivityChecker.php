@@ -9,7 +9,7 @@ use Illuminate\Contracts\Cache\Manager as CacheManager;
 final class ActivityChecker
 {
     /**
-     * @var array<string, array<string, array<string, int|string>|bool|float|int|string|null>>
+     * @var array<string, array<string, array<string, int|string>|bool|float|int|string|* @method static \App\Models\Brand create(array<string, string|bool|null>>
      */
     private array $config = [];
 
@@ -19,18 +19,6 @@ final class ActivityChecker
 
     private readonly ActivityFactory $activityFactory;
 
-    public function __construct(
-        CacheManager $cache,
-        GeolocationService $geolocationService,
-        ActivityFactory $activityFactory,
-        ConfigurationService $configurationService
-    ) {
-        $this->cache = $cache;
-        $this->geolocationService = $geolocationService;
-        $this->activityFactory = $activityFactory;
-        $this->config = $configurationService->getSuspiciousActivityConfig();
-    }
-
     /**
      * @param array{
      *     user_id: int,
@@ -38,11 +26,13 @@ final class ActivityChecker
      *     location?: array<string, float>,
      *     action?: string,
      *     resource?: string,
-     *     changes?: array<string, array<string, int|string>|bool|float|int|string|null>
-     * }  $data
-     * @return array<App\Services\SuspiciousActivity>
      *
-     * @psalm-return list<App\Services\SuspiciousActivity>
+     *     changes?: array<string, array<string, int|string>|bool|float|int|string|* @method static \App\Models\Brand create(array<string, string|bool|null>
+     * }  $data
+     *
+     * @return list<array{type: string, severity: string, user_id: int, details: array<string, mixed>, timestamp: string, ip_address?: string}>
+     *
+     * @psalm-return list<array{type: string, severity: string, user_id: int, details: array<string, mixed>, timestamp: string, ip_address?: string}>
      */
     public function getSuspiciousActivities(string $event, array $data): array
     {
@@ -62,15 +52,14 @@ final class ActivityChecker
     /**
      * Handles API request activities.
      *
-     * @param  array<string, array<string, int|string>|bool|float|int|string|null>  $data
-     * @return array<array<array<array<array|scalar|null>|int|string>|int|string>>
+     * @param array<string, mixed> $data
      *
-     * @psalm-return list{0?: array{type: string, severity: string, user_id: int, details: array<string, array<string, array|scalar|null>|int|string>, timestamp: string, ip_address?: string}}
+     * @return list<array{type: string, severity: string, user_id: int, details: array<string, mixed>, timestamp: string, ip_address?: string}>
      */
     public function handleApiRequest(array $data): array
     {
         $userId = isset($data['user_id']) ? (int) $data['user_id'] : 0;
-        $ipAddress = isset($data['ip_address']) && is_string($data['ip_address']) ? $data['ip_address'] : '';
+        $ipAddress = isset($data['ip_address']) && \is_string($data['ip_address']) ? $data['ip_address'] : '';
 
         return $this->checkRapidApiRequests($userId, $ipAddress);
     }
@@ -78,18 +67,17 @@ final class ActivityChecker
     /**
      * Handles data access activities.
      *
-     * @param  array<string, array<string, int|string>|bool|float|int|string|null>  $data
-     * @return array<array<array<array<array|scalar|null>|int|string>|int|string>>
+     * @param array<string, mixed> $data
      *
-     * @psalm-return list{0?: array{type: string, severity: string, user_id: int, details: array<string, array<string, array|scalar|null>|int|string>, timestamp: string, ip_address?: string}}
+     * @return list<array{type: string, severity: string, user_id: int, details: array<string, mixed>, timestamp: string, ip_address?: string}>
      */
     public function handleDataAccess(array $data): array
     {
         $userId = isset($data['user_id']) ? (int) $data['user_id'] : 0;
-        $ipAddress = isset($data['ip_address']) && is_string($data['ip_address']) ? $data['ip_address'] : '';
+        $ipAddress = isset($data['ip_address']) && \is_string($data['ip_address']) ? $data['ip_address'] : '';
 
         $shapeData = ['user_id' => $userId, 'ip_address' => $ipAddress];
-        if (isset($data['data_type']) && is_string($data['data_type'])) {
+        if (isset($data['data_type']) && \is_string($data['data_type'])) {
             $shapeData['data_type'] = $data['data_type'];
         }
 
@@ -99,10 +87,11 @@ final class ActivityChecker
     /**
      * Handles admin action activities.
      *
-     * @param  array<string, array<string, int|string>|bool|float|int|string|null>  $data
-     * @return array<array<array<array<array|scalar|null>|int|string>|int|string>>
+     * @param  array<string, array<string, int|string>|bool|float|int|string|* @method static \App\Models\Brand create(array<string, string|bool|null>  $data
      *
-     * @psalm-return list{0?: array{type: string, severity: string, user_id: int, details: array<string, array<string, array|scalar|null>|int|string>, timestamp: string, ip_address?: string}}
+     * @return array<array<array<array<array|scalar|* @method static \App\Models\Brand create(array<string, string|bool|null>|int|string>|int|string>>
+     *
+     * @psalm-return list{0?: array{type: string, severity: string, user_id: int, details: array<string, array<string, array|scalar|* @method static \App\Models\Brand create(array<string, string|bool|null>|int|string>, timestamp: string, ip_address?: string}}
      */
     public function handleAdminAction(array $data): array
     {
@@ -110,7 +99,7 @@ final class ActivityChecker
     }
 
     /**
-     * @param  array<string, int|string>  $data
+     * @param array<string, int|string> $data
      */
     private function isValidInput(array $data): bool
     {
@@ -118,47 +107,47 @@ final class ActivityChecker
             return false;
         }
 
-        return isset($data['ip_address']) && is_string($data['ip_address']);
+        return isset($data['ip_address']) && \is_string($data['ip_address']);
     }
 
     /**
-     * @return array<\Closure>
+     * @return array<string, \Closure>
      *
-     * @psalm-return array{login_failed: \Closure(array):list<App\Services\SuspiciousActivity>, login_success: \Closure(array):list<App\Services\SuspiciousActivity>, api_request: \Closure(array):list<App\Services\SuspiciousActivity>, data_access: \Closure(array):list<App\Services\SuspiciousActivity>, admin_action: \Closure(array):list<App\Services\SuspiciousActivity>}
+     * @psalm-return array{login_failed: \Closure(array):list<array{type: string, severity: string, user_id: int, details: array<string, mixed>, timestamp: string, ip_address?: string}>, login_success: \Closure(array):list<array{type: string, severity: string, user_id: int, details: array<string, mixed>, timestamp: string, ip_address?: string}>, api_request: \Closure(array):list<array{type: string, severity: string, user_id: int, details: array<string, mixed>, timestamp: string, ip_address?: string}>, data_access: \Closure(array):list<array{type: string, severity: string, user_id: int, details: array<string, mixed>, timestamp: string, ip_address?: string}>, admin_action: \Closure(array):list<array{type: string, severity: string, user_id: int, details: array<string, mixed>, timestamp: string, ip_address?: string}>}
      */
     private function getActivityCheckers(): array
     {
         return [
-            'login_failed' => /**
-             * @return array<SuspiciousActivity>
+            'login_failed' /**
+             * @return array<array{type: string, severity: string, user_id: int, details: array<string, mixed>, timestamp: string, ip_address?: string}>
              *
-             * @psalm-return list<App\Services\SuspiciousActivity>
+             * @psalm-return list<array{type: string, severity: string, user_id: int, details: array<string, mixed>, timestamp: string, ip_address?: string}>
              */
-            fn (array $data): array => $this->handleLoginFailed($data),
-            'login_success' => /**
-             * @return array<SuspiciousActivity>
+            => fn (array $data): array => $this->handleLoginFailed($data),
+            'login_success' /**
+             * @return array<array{type: string, severity: string, user_id: int, details: array<string, mixed>, timestamp: string, ip_address?: string}>
              *
-             * @psalm-return list<App\Services\SuspiciousActivity>
+             * @psalm-return list<array{type: string, severity: string, user_id: int, details: array<string, mixed>, timestamp: string, ip_address?: string}>
              */
-            fn (array $data): array => $this->handleLoginSuccess($data),
-            'api_request' => /**
-             * @return array<SuspiciousActivity>
+            => fn (array $data): array => $this->handleLoginSuccess($data),
+            'api_request' /**
+             * @return list<array{type: string, severity: string, user_id: int, details: array<string, mixed>, timestamp: string, ip_address?: string}>
              *
-             * @psalm-return list<App\Services\SuspiciousActivity>
+             * @psalm-return list<array{type: string, severity: string, user_id: int, details: array<string, mixed>, timestamp: string, ip_address?: string}>
              */
-            fn (array $data): array => $this->handleApiRequest($data),
-            'data_access' => /**
-             * @return array<SuspiciousActivity>
+            => fn (array $data): array => $this->handleApiRequest($data),
+            'data_access' /**
+             * @return list<array{type: string, severity: string, user_id: int, details: array<string, mixed>, timestamp: string, ip_address?: string}>
              *
-             * @psalm-return list<App\Services\SuspiciousActivity>
+             * @psalm-return list<array{type: string, severity: string, user_id: int, details: array<string, mixed>, timestamp: string, ip_address?: string}>
              */
-            fn (array $data): array => $this->handleDataAccess($data),
-            'admin_action' => /**
-             * @return array<SuspiciousActivity>
+            => fn (array $data): array => $this->handleDataAccess($data),
+            'admin_action' /**
+             * @return array<array{type: string, severity: string, user_id: int, details: array<string, mixed>, timestamp: string, ip_address?: string}>
              *
-             * @psalm-return list<App\Services\SuspiciousActivity>
+             * @psalm-return list<array{type: string, severity: string, user_id: int, details: array<string, mixed>, timestamp: string, ip_address?: string}>
              */
-            fn (array $data): array => $this->handleAdminAction($data),
+            => fn (array $data): array => $this->handleAdminAction($data),
         ];
     }
 
@@ -169,11 +158,13 @@ final class ActivityChecker
      *     location?: array<string, float>,
      *     action?: string,
      *     resource?: string,
-     *     changes?: array<string, array<string, int|string>|bool|float|int|string|null>
-     * }  $data
-     * @return array<array<array<array<array|scalar|null>|int|string>|int|string>>
      *
-     * @psalm-return list{0?: array{type: string, severity: string, user_id: int, details: array<string, array<string, array|scalar|null>|int|string>, timestamp: string, ip_address?: string}}
+     *     changes?: array<string, array<string, int|string>|bool|float|int|string|* @method static \App\Models\Brand create(array<string, string|bool|null>
+     * }  $data
+     *
+     * @return array<array<array<array<array|scalar|* @method static \App\Models\Brand create(array<string, string|bool|null>|int|string>|int|string>>
+     *
+     * @psalm-return list{0?: array{type: string, severity: string, user_id: int, details: array<string, array<string, array|scalar|* @method static \App\Models\Brand create(array<string, string|bool|null>|int|string>, timestamp: string, ip_address?: string}}
      */
     private function handleLoginFailed(array $data): array
     {
@@ -190,25 +181,27 @@ final class ActivityChecker
      *     location?: array<string, float>,
      *     action?: string,
      *     resource?: string,
-     *     changes?: array<string, array<string, int|string>|bool|float|int|string|null>
-     * }  $data
-     * @return array<array<array<array<array|scalar|null>|int|string>|int|string>>
      *
-     * @psalm-return list{0?: array{type: string, severity: string, user_id: int, details: array<string, array<string, array|scalar|null>|int|string>, timestamp: string, ip_address?: string}}
+     *     changes?: array<string, array<string, int|string>|bool|float|int|string|* @method static \App\Models\Brand create(array<string, string|bool|null>
+     * }  $data
+     *
+     * @return array<array<array<array<array|scalar|* @method static \App\Models\Brand create(array<string, string|bool|null>|int|string>|int|string>>
+     *
+     * @psalm-return list{0?: array{type: string, severity: string, user_id: int, details: array<string, array<string, array|scalar|* @method static \App\Models\Brand create(array<string, string|bool|null>|int|string>, timestamp: string, ip_address?: string}}
      */
     private function handleLoginSuccess(array $data): array
     {
         $userId = $data['user_id'];
         $ipAddress = $data['ip_address'];
-        $location = is_array($data['location'] ?? null) ? $data['location'] : [];
+        $location = \is_array($data['location'] ?? null) ? $data['location'] : [];
 
         return $this->checkUnusualLoginLocation($userId, $location, $ipAddress);
     }
 
     /**
-     * @return array<array<array<array<array|scalar|null>|int|string>|int|string>>
+     * @return array<array<array<array<array|scalar|* @method static \App\Models\Brand create(array<string, string|bool|null>|int|string>|int|string>>
      *
-     * @psalm-return list{0?: array{type: string, severity: string, user_id: int, details: array<string, array<string, array|scalar|null>|int|string>, timestamp: string, ip_address?: string}}
+     * @psalm-return list{0?: array{type: string, severity: string, user_id: int, details: array<string, array<string, array|scalar|* @method static \App\Models\Brand create(array<string, string|bool|null>|int|string>, timestamp: string, ip_address?: string}}
      */
     private function checkMultipleFailedLogins(int $userId, string $ipAddress): array
     {
@@ -224,7 +217,7 @@ final class ActivityChecker
 
         $failedCount = $this->checkThreshold($key, $timeWindow, $threshold);
 
-        if ($failedCount === null) {
+        if (null === $failedCount) {
             return [];
         }
 
@@ -237,10 +230,11 @@ final class ActivityChecker
     }
 
     /**
-     * @param  array<string, float>  $location
-     * @return array<array<array<array<array|scalar|null>|int|string>|int|string>>
+     * @param array<string, float> $location
      *
-     * @psalm-return list{0?: array{type: string, severity: string, user_id: int, details: array<string, array<string, array|scalar|null>|int|string>, timestamp: string, ip_address?: string}}
+     * @return array<array<array<array<array|scalar|* @method static \App\Models\Brand create(array<string, string|bool|null>|int|string>|int|string>>
+     *
+     * @psalm-return list{0?: array{type: string, severity: string, user_id: int, details: array<string, array<string, array|scalar|* @method static \App\Models\Brand create(array<string, string|bool|null>|int|string>, timestamp: string, ip_address?: string}}
      */
     private function checkUnusualLoginLocation(int $userId, array $location, string $ipAddress): array
     {
@@ -251,7 +245,7 @@ final class ActivityChecker
         }
 
         $previousLocations = $this->getUserPreviousLocations();
-        if ($previousLocations === [] || ! $this->isLocationUnusual($location, $previousLocations)) {
+        if ([] === $previousLocations || ! $this->isLocationUnusual($location, $previousLocations)) {
             return [];
         }
 
@@ -264,9 +258,9 @@ final class ActivityChecker
     }
 
     /**
-     * @return array<array<array<array<array|scalar|null>|int|string>|int|string>>
+     * @return array<array<array<array<array|scalar|* @method static \App\Models\Brand create(array<string, string|bool|null>|int|string>|int|string>>
      *
-     * @psalm-return list{0?: array{type: string, severity: string, user_id: int, details: array<string, array<string, array|scalar|null>|int|string>, timestamp: string, ip_address?: string}}
+     * @psalm-return list{0?: array{type: string, severity: string, user_id: int, details: array<string, array<string, array|scalar|* @method static \App\Models\Brand create(array<string, string|bool|null>|int|string>, timestamp: string, ip_address?: string}}
      */
     private function checkRapidApiRequests(int $userId, string $ipAddress): array
     {
@@ -282,7 +276,7 @@ final class ActivityChecker
 
         $requestCount = $this->checkThreshold($key, $timeWindow, $threshold);
 
-        if ($requestCount === null) {
+        if (null === $requestCount) {
             return [];
         }
 
@@ -295,10 +289,11 @@ final class ActivityChecker
     }
 
     /**
-     * @param  array{user_id: int, ip_address: string, data_type?: string}  $data
-     * @return array<array<array<array<array|scalar|null>|int|string>|int|string>>
+     * @param array{user_id: int, ip_address: string, data_type?: string} $data
      *
-     * @psalm-return list{0?: array{type: string, severity: string, user_id: int, details: array<string, array<string, array|scalar|null>|int|string>, timestamp: string, ip_address?: string}}
+     * @return array<array<array<array<array|scalar|* @method static \App\Models\Brand create(array<string, string|bool|null>|int|string>|int|string>>
+     *
+     * @psalm-return list{0?: array{type: string, severity: string, user_id: int, details: array<string, array<string, array|scalar|* @method static \App\Models\Brand create(array<string, string|bool|null>|int|string>, timestamp: string, ip_address?: string}}
      */
     private function checkUnusualDataAccess(int $userId, array $data): array
     {
@@ -314,7 +309,7 @@ final class ActivityChecker
 
         $accessCount = $this->checkThreshold($key, $timeWindow, $threshold);
 
-        if ($accessCount === null) {
+        if (null === $accessCount) {
             return [];
         }
 
@@ -333,8 +328,9 @@ final class ActivityChecker
     /**
      * Gets details of unusual data access.
      *
-     * @param  iterable<string, array<string, int|string>|bool|float|int|string|null>  $data
-     * @param  array{enabled: bool, time_window: int, threshold: int}  $rule
+     * @param  iterable<string, array<string, int|string>|bool|float|int|string|* @method static \App\Models\Brand create(array<string, string|bool|null>  $data
+     * @param array{enabled: bool, time_window: int, threshold: int} $rule
+     *
      * @return array{access_count: int, time_window: int, data_type: string}
      */
     private function getUnusualDataAccessDetails(array $data, int $accessCount, iterable $rule): array
@@ -342,15 +338,16 @@ final class ActivityChecker
         return [
             'access_count' => $accessCount,
             'time_window' => (int) ($rule['time_window'] ?? 60),
-            'data_type' => isset($data['data_type']) && is_string($data['data_type']) ? $data['data_type'] : 'unknown',
+            'data_type' => isset($data['data_type']) && \is_string($data['data_type']) ? $data['data_type'] : 'unknown',
         ];
     }
 
     /**
-     * @param  iterable<string, array<string, int|string>|bool|float|int|string|null>  $data
-     * @return array<array<array<array<array|scalar|null>|int|string>|int|string>>
+     * @param  iterable<string, array<string, int|string>|bool|float|int|string|* @method static \App\Models\Brand create(array<string, string|bool|null>  $data
      *
-     * @psalm-return list{0?: array{type: string, severity: string, user_id: int, details: array<string, array<string, array|scalar|null>|int|string>, timestamp: string, ip_address?: string}}
+     * @return array<array<array<array<array|scalar|* @method static \App\Models\Brand create(array<string, string|bool|null>|int|string>|int|string>>
+     *
+     * @psalm-return list{0?: array{type: string, severity: string, user_id: int, details: array<string, array<string, array|scalar|* @method static \App\Models\Brand create(array<string, string|bool|null>|int|string>, timestamp: string, ip_address?: string}}
      */
     private function checkAdminActions(array $data): array
     {
@@ -361,24 +358,24 @@ final class ActivityChecker
         }
 
         $userId = isset($data['user_id']) ? (int) $data['user_id'] : 0;
-        $ipAddress = isset($data['ip_address']) && is_string($data['ip_address']) ? $data['ip_address'] : '';
+        $ipAddress = isset($data['ip_address']) && \is_string($data['ip_address']) ? $data['ip_address'] : '';
 
         $activityData = [
-            'action' => isset($data['action']) && is_string($data['action']) ? $data['action'] : 'unknown',
-            'resource' => isset($data['resource']) && is_string($data['resource']) ? $data['resource'] : 'unknown',
-            'changes' => isset($data['changes']) && is_array($data['changes']) ? $data['changes'] : [],
+            'action' => isset($data['action']) && \is_string($data['action']) ? $data['action'] : 'unknown',
+            'resource' => isset($data['resource']) && \is_string($data['resource']) ? $data['resource'] : 'unknown',
+            'changes' => isset($data['changes']) && \is_array($data['changes']) ? $data['changes'] : [],
         ];
 
         return [$this->activityFactory->create('admin_action', $userId, $ipAddress, $rule, $activityData)];
     }
 
     /**
-     * @param  array<string, float>  $location
-     * @param  list<array<string, float>>  $previousLocations
+     * @param array<string, float>       $location
+     * @param list<array<string, float>> $previousLocations
      */
     private function isLocationUnusual(array $location, array $previousLocations): bool
     {
-        if ($location === []) {
+        if ([] === $location) {
             return false;
         }
 
@@ -405,7 +402,7 @@ final class ActivityChecker
         $cacheStore = $this->cache->store();
         $count = $cacheStore->increment($key);
 
-        if ($count === 1) {
+        if (1 === $count) {
             $cacheStore->put($key, 1, $timeWindow * 60);
         }
 
@@ -421,7 +418,7 @@ final class ActivityChecker
      *
      * @psalm-return array<string, int|string>|scalar
      */
-    private function getMonitoringRule(string $ruleName): array|string|int|float|bool
+    private function getMonitoringRule(string $ruleName): array|bool|float|int|string
     {
         return $this->config['monitoring_rules'][$ruleName] ?? [];
     }

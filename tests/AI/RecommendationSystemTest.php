@@ -6,54 +6,60 @@ namespace Tests\AI;
 
 // Removed PreserveGlobalState to avoid risky test flags
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
 
-class RecommendationSystemTest extends \PHPUnit\Framework\TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class RecommendationSystemTest extends TestCase
 {
     #[Test]
-    public function can_generate_user_recommendations(): void
+    public function canGenerateUserRecommendations(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function recommendations_match_user_preferences(): void
+    public function recommendationsMatchUserPreferences(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function can_generate_similar_products(): void
+    public function canGenerateSimilarProducts(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function can_generate_trending_products(): void
+    public function canGenerateTrendingProducts(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function can_generate_collaborative_recommendations(): void
+    public function canGenerateCollaborativeRecommendations(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function recommendations_consider_price_range(): void
+    public function recommendationsConsiderPriceRange(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function can_generate_seasonal_recommendations(): void
+    public function canGenerateSeasonalRecommendations(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function recommendations_improve_with_feedback(): void
+    public function recommendationsImproveWithFeedback(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 }

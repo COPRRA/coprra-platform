@@ -10,8 +10,12 @@ use Tests\TestCase;
 
 /**
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class UserControllerTest extends TestCase
+final class UserControllerTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -27,7 +31,7 @@ class UserControllerTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_can_display_user_profile()
+    public function testCanDisplayUserProfile()
     {
         $user = User::factory()->create();
         $this->actingAs($user);
@@ -36,18 +40,20 @@ class UserControllerTest extends TestCase
 
         $response->assertStatus(200)
             ->assertViewIs('user.profile')
-            ->assertViewHas('user', $user);
+            ->assertViewHas('user', $user)
+        ;
     }
 
-    public function test_requires_authentication_to_view_profile()
+    public function testRequiresAuthenticationToViewProfile()
     {
         $response = $this->get('/profile');
 
         $response->assertStatus(302)
-            ->assertRedirect('/login');
+            ->assertRedirect('/login')
+        ;
     }
 
-    public function test_can_update_user_profile()
+    public function testCanUpdateUserProfile()
     {
         $user = User::factory()->create();
         $this->actingAs($user);
@@ -61,10 +67,11 @@ class UserControllerTest extends TestCase
             ->assertJson([
                 'success' => true,
                 'message' => 'Profile updated successfully.',
-            ]);
+            ])
+        ;
     }
 
-    public function test_validates_profile_update_request()
+    public function testValidatesProfileUpdateRequest()
     {
         $user = User::factory()->create();
         $this->actingAs($user);
@@ -72,10 +79,11 @@ class UserControllerTest extends TestCase
         $response = $this->put('/profile', []);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['name', 'email']);
+            ->assertJsonValidationErrors(['name', 'email'])
+        ;
     }
 
-    public function test_requires_authentication_to_update_profile()
+    public function testRequiresAuthenticationToUpdateProfile()
     {
         $response = $this->put('/profile', [
             'name' => 'Updated Name',
@@ -83,10 +91,11 @@ class UserControllerTest extends TestCase
         ]);
 
         $response->assertStatus(302)
-            ->assertRedirect('/login');
+            ->assertRedirect('/login')
+        ;
     }
 
-    public function test_can_change_user_password()
+    public function testCanChangeUserPassword()
     {
         $user = User::factory()->create();
         $this->actingAs($user);
@@ -101,10 +110,11 @@ class UserControllerTest extends TestCase
             ->assertJson([
                 'success' => true,
                 'message' => 'Password changed successfully.',
-            ]);
+            ])
+        ;
     }
 
-    public function test_validates_password_change_request()
+    public function testValidatesPasswordChangeRequest()
     {
         $user = User::factory()->create();
         $this->actingAs($user);
@@ -112,10 +122,11 @@ class UserControllerTest extends TestCase
         $response = $this->put('/profile/password', []);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['current_password', 'password']);
+            ->assertJsonValidationErrors(['current_password', 'password'])
+        ;
     }
 
-    public function test_requires_authentication_to_change_password()
+    public function testRequiresAuthenticationToChangePassword()
     {
         $response = $this->put('/profile/password', [
             'current_password' => 'password',

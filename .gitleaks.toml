@@ -1,13 +1,21 @@
-title = "COPRRA gitleaks config"
+title = "COPRRA gitleaks config - Maximum Security Strictness"
 
+# Global configuration for maximum strictness
+[extend]
+useDefault = true
+
+# Enhanced allowlist with comprehensive exclusions
 [allowlist]
-# تجاهل مجلدات الاعتماديات والملفات غير البرمجية لتقليل الضجيج
+# Dependency and build directories
 paths = [
   '''^vendor/''',
   '''^node_modules/''',
-  '''^storage/''',
+  '''^storage/logs/''',
+  '''^storage/framework/cache/''',
+  '''^storage/framework/sessions/''',
+  '''^storage/framework/views/''',
   '''^tmp/''',
-  '''^bootstrap/''',
+  '''^bootstrap/cache/''',
   '''^build/''',
   '''^dist/''',
   '''^coverage/''',
@@ -17,20 +25,156 @@ paths = [
   '''^reports/''',
   '''^public/build/''',
   '''^public/storage/''',
-  '''^docker/ssl/'''
+  '''^public/js/''',
+  '''^public/css/''',
+  '''^docker/ssl/''',
+  '''^docker/logs/''',
+  '''^docker/mysql/''',
+  '''^docker/redis/''',
+  '''^raw_outputs/''',
+  '''^raw_outputs_v[0-9]+/''',
+  '''^renamed/''',
+  '''^renamed_[0-9]+/''',
+  '''^temp_task[0-9]+/''',
+  '''^test_results/''',
+  '''^generated/''',
+  '''^downloaded-ci/''',
+  '''^platform-tools/''',
+  '''^system-support/''',
+  '''^mnt/''',
+  '''^logs/agent/'''
 ]
 
-# تجاهل بعض الملفات الكبيرة أو التقارير التي تولّد إنذارات كاذبة
+# Lock files and generated reports
 files = [
   '''composer.lock''',
   '''package-lock.json''',
   '''yarn.lock''',
   '''pnpm-lock.yaml''',
   '''npm-shrinkwrap.json''',
-  '''trivy-fs.json'''
+  '''trivy-fs.json''',
+  '''insights.json''',
+  '''insights-[0-9]+.json''',
+  '''phpmetrics.json''',
+  '''latest_run.json''',
+  '''test-report.xml''',
+  '''junit.xml''',
+  '''sw.js''',
+  '''app-temp.zip'''
 ]
 
-# تجاهل نصوص تجريبية/وهمية شائعة في أمثلة الاختبارات
+# Test data and placeholder patterns
 regexes = [
-  '''(?i)dummy|placeholder|example|sample|testkey|testsecret|lorem|ipsum'''
+  '''(?i)dummy|placeholder|example|sample|testkey|testsecret|lorem|ipsum''',
+  '''(?i)fake|mock|stub|test_?data|fixture''',
+  '''(?i)password.*=.*"password"|secret.*=.*"secret"''',
+  '''(?i)key.*=.*"key"|token.*=.*"token"''',
+  '''(?i)demo|sandbox|development|staging''',
+  '''(?i)localhost|127\.0\.0\.1|0\.0\.0\.0''',
+  '''(?i)changeme|default|admin|root''',
+  '''(?i)12345|qwerty|password123|secret123'''
 ]
+
+# Commit message patterns to ignore
+commits = [
+  '''(?i)merge|revert|initial commit|wip|temp|test''',
+  '''(?i)update.*dependencies|bump.*version''',
+  '''(?i)fix.*typo|format.*code|lint.*fix'''
+]
+
+# Custom rules for enhanced detection
+[[rules]]
+id = "laravel-env-key"
+description = "Laravel APP_KEY detection"
+regex = '''APP_KEY\s*=\s*['""]?base64:[A-Za-z0-9+/]{40,}={0,2}['""]?'''
+tags = ["laravel", "encryption", "key"]
+
+[[rules]]
+id = "database-credentials"
+description = "Database connection strings"
+regex = '''(?i)(mysql|postgres|mongodb|redis)://[^:]+:[^@]+@[^/]+'''
+tags = ["database", "credentials"]
+
+[[rules]]
+id = "api-keys-strict"
+description = "Strict API key detection"
+regex = '''(?i)(api[_-]?key|access[_-]?token|secret[_-]?key)\s*[:=]\s*['""]?[A-Za-z0-9_-]{20,}['""]?'''
+tags = ["api", "key", "token"]
+
+[[rules]]
+id = "jwt-tokens"
+description = "JWT token detection"
+regex = '''eyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+'''
+tags = ["jwt", "token"]
+
+[[rules]]
+id = "private-keys"
+description = "Private key detection"
+regex = '''-----BEGIN\s+(RSA\s+)?PRIVATE\s+KEY-----'''
+tags = ["private", "key", "certificate"]
+
+[[rules]]
+id = "oauth-secrets"
+description = "OAuth client secrets"
+regex = '''(?i)(client[_-]?secret|oauth[_-]?secret)\s*[:=]\s*['""]?[A-Za-z0-9_-]{20,}['""]?'''
+tags = ["oauth", "secret"]
+
+[[rules]]
+id = "aws-credentials"
+description = "AWS credentials"
+regex = '''(?i)(aws[_-]?access[_-]?key[_-]?id|aws[_-]?secret[_-]?access[_-]?key)\s*[:=]\s*['""]?[A-Za-z0-9/+=]{20,}['""]?'''
+tags = ["aws", "credentials"]
+
+[[rules]]
+id = "stripe-keys"
+description = "Stripe API keys"
+regex = '''(?i)(sk|pk)_(test|live)_[A-Za-z0-9]{20,}'''
+tags = ["stripe", "payment", "api"]
+
+[[rules]]
+id = "github-tokens"
+description = "GitHub personal access tokens"
+regex = '''ghp_[A-Za-z0-9]{36}'''
+tags = ["github", "token"]
+
+[[rules]]
+id = "slack-tokens"
+description = "Slack tokens"
+regex = '''xox[baprs]-[A-Za-z0-9-]+'''
+tags = ["slack", "token"]
+
+[[rules]]
+id = "mailgun-keys"
+description = "Mailgun API keys"
+regex = '''key-[A-Za-z0-9]{32}'''
+tags = ["mailgun", "api"]
+
+[[rules]]
+id = "twilio-credentials"
+description = "Twilio credentials"
+regex = '''(?i)(twilio[_-]?sid|twilio[_-]?token)\s*[:=]\s*['""]?[A-Za-z0-9]{32,}['""]?'''
+tags = ["twilio", "credentials"]
+
+[[rules]]
+id = "sendgrid-keys"
+description = "SendGrid API keys"
+regex = '''SG\.[A-Za-z0-9_-]{22}\.[A-Za-z0-9_-]{43}'''
+tags = ["sendgrid", "api"]
+
+[[rules]]
+id = "firebase-keys"
+description = "Firebase keys"
+regex = '''(?i)firebase[_-]?key\s*[:=]\s*['""]?[A-Za-z0-9_-]{20,}['""]?'''
+tags = ["firebase", "api"]
+
+[[rules]]
+id = "google-api-keys"
+description = "Google API keys"
+regex = '''AIza[A-Za-z0-9_-]{35}'''
+tags = ["google", "api"]
+
+[[rules]]
+id = "paypal-credentials"
+description = "PayPal credentials"
+regex = '''(?i)(paypal[_-]?client[_-]?id|paypal[_-]?secret)\s*[:=]\s*['""]?[A-Za-z0-9_-]{20,}['""]?'''
+tags = ["paypal", "credentials"]

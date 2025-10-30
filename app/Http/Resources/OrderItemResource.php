@@ -15,7 +15,7 @@ class OrderItemResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @return array<mixed|null>
+     * @return array<mixed|* @method static \App\Models\Brand create(array<string, string|bool|null>
      *
      * @psalm-return array{id: mixed, product_id: mixed, quantity: mixed, price: mixed|null, subtotal: mixed|null}
      *
@@ -28,8 +28,8 @@ class OrderItemResource extends JsonResource
             'id' => $this->id,
             'product_id' => $this->product_id,
             'quantity' => $this->quantity,
-            'price' => is_object($this->resource) && isset($this->resource->price) ? $this->resource->price : null,
-            'subtotal' => is_object($this->resource) && isset($this->resource->subtotal) ? $this->resource->subtotal : null,
+            'price' => \is_object($this->resource) && isset($this->resource->price) ? $this->resource->price : null,
+            'subtotal' => \is_object($this->resource) && isset($this->resource->subtotal) ? $this->resource->subtotal : null,
         ];
     }
 }

@@ -105,7 +105,13 @@
       "Bash(python:*)",
       "Bash(git check-ignore:*)",
       "Bash(/dev/null -exec rm -f {} ;)",
-      "Bash(xargs:*)"
+      "Bash(xargs:*)",
+      "Bash(for file in tests/AI/ImageProcessingTest.php tests/AI/AIErrorHandlingTest.php tests/AI/AITest.php)",
+      "Bash(do echo \"=== $file ===\")",
+      "Bash(git log:*)",
+      "Bash(for file in .github/workflows/*.yml)",
+      "Bash(head:*)",
+      "Bash(mv:*)"
     ],
     "deny": [],
     "ask": []

@@ -4,12 +4,18 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Services;
 
+use App\Models\User;
 use App\Services\UserBanService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Mockery;
 use Tests\TestCase;
 
-class UserBanServiceTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class UserBanServiceTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -18,37 +24,22 @@ class UserBanServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new UserBanService;
+        $this->service = new UserBanService();
     }
 
     protected function tearDown(): void
     {
-        Mockery::close();
+        \Mockery::close();
         parent::tearDown();
     }
 
-    private function createUser(int $id = 1, bool $isBlocked = false): \App\Models\User
-    {
-        $user = new \App\Models\User;
-        $user->id = $id;
-        $user->name = 'Test User';
-        $user->email = 'test@example.com';
-        $user->password = 'password';
-        $user->is_blocked = $isBlocked;
-        $user->ban_reason = null;
-        $user->ban_description = null;
-        $user->ban_expires_at = null;
-
-        return $user;
-    }
-
-    public function test_can_be_instantiated()
+    public function testCanBeInstantiated()
     {
         // Act & Assert
-        $this->assertInstanceOf(UserBanService::class, $this->service);
+        self::assertInstanceOf(UserBanService::class, $this->service);
     }
 
-    public function test_checks_user_is_not_banned_by_default()
+    public function testChecksUserIsNotBannedByDefault()
     {
         // Arrange
         $user = $this->createUser();
@@ -57,10 +48,10 @@ class UserBanServiceTest extends TestCase
         $result = $this->service->isUserBanned($user);
 
         // Assert
-        $this->assertFalse($result);
+        self::assertFalse($result);
     }
 
-    public function test_handles_ban_user_with_valid_reason()
+    public function testHandlesBanUserWithValidReason()
     {
         // Arrange
         $user = $this->createUser();
@@ -71,10 +62,10 @@ class UserBanServiceTest extends TestCase
         $result = $this->service->banUser($user, $reason, null, now()->addDays($duration));
 
         // Assert
-        $this->assertTrue($result);
+        self::assertTrue($result);
     }
 
-    public function test_handles_ban_user_with_invalid_reason()
+    public function testHandlesBanUserWithInvalidReason()
     {
         // Arrange
         $user = $this->createUser();
@@ -85,10 +76,10 @@ class UserBanServiceTest extends TestCase
         $result = $this->service->banUser($user, $reason, null, now()->addDays($duration));
 
         // Assert
-        $this->assertFalse($result);
+        self::assertFalse($result);
     }
 
-    public function test_handles_permanent_ban()
+    public function testHandlesPermanentBan()
     {
         // Arrange
         $user = $this->createUser();
@@ -99,10 +90,10 @@ class UserBanServiceTest extends TestCase
         $result = $this->service->banUser($user, $reason, null, now()->addDays($duration));
 
         // Assert
-        $this->assertTrue($result);
+        self::assertTrue($result);
     }
 
-    public function test_handles_unban_user()
+    public function testHandlesUnbanUser()
     {
         // Arrange
         $user = $this->createUser();
@@ -111,10 +102,10 @@ class UserBanServiceTest extends TestCase
         $result = $this->service->unbanUser($user);
 
         // Assert
-        $this->assertTrue($result);
+        self::assertTrue($result);
     }
 
-    public function test_gets_ban_info_for_user()
+    public function testGetsBanInfoForUser()
     {
         // Arrange
         $user = $this->createUser();
@@ -123,10 +114,10 @@ class UserBanServiceTest extends TestCase
         $result = $this->service->getBanInfo($user);
 
         // Assert
-        $this->assertNull($result); // No ban info by default
+        self::assertNull($result); // No ban info by default
     }
 
-    public function test_handles_auto_unban_expired_user()
+    public function testHandlesAutoUnbanExpiredUser()
     {
         // Arrange
         $user = $this->createUser();
@@ -135,60 +126,60 @@ class UserBanServiceTest extends TestCase
         $result = $this->service->cleanupExpiredBans();
 
         // Assert
-        $this->assertIsInt($result);
+        self::assertIsInt($result);
     }
 
-    public function test_gets_banned_users()
+    public function testGetsBannedUsers()
     {
         // Act
         $result = $this->service->getBannedUsers();
 
         // Assert
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $result);
+        self::assertInstanceOf(Collection::class, $result);
     }
 
-    public function test_gets_users_with_expired_bans()
+    public function testGetsUsersWithExpiredBans()
     {
         // Act
         $result = $this->service->getUsersWithExpiredBans();
 
         // Assert
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $result);
+        self::assertInstanceOf(Collection::class, $result);
     }
 
-    public function test_cleans_up_expired_bans()
+    public function testCleansUpExpiredBans()
     {
         // Act
         $result = $this->service->cleanupExpiredBans();
 
         // Assert
-        $this->assertIsInt($result);
-        $this->assertGreaterThanOrEqual(0, $result);
+        self::assertIsInt($result);
+        self::assertGreaterThanOrEqual(0, $result);
     }
 
-    public function test_gets_ban_statistics()
+    public function testGetsBanStatistics()
     {
         // Act
         $result = $this->service->getBanStatistics();
 
         // Assert
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('total_banned', $result);
-        $this->assertArrayHasKey('permanent_bans', $result);
-        $this->assertArrayHasKey('temporary_bans', $result);
-        $this->assertArrayHasKey('expired_bans', $result);
+        self::assertIsArray($result);
+        self::assertArrayHasKey('total_banned', $result);
+        self::assertArrayHasKey('permanent_bans', $result);
+        self::assertArrayHasKey('temporary_bans', $result);
+        self::assertArrayHasKey('expired_bans', $result);
     }
 
-    public function test_gets_ban_reasons()
+    public function testGetsBanReasons()
     {
         // Act
         $result = $this->service->getBanReasons();
 
         // Assert
-        $this->assertIsArray($result);
+        self::assertIsArray($result);
     }
 
-    public function test_checks_can_ban_user()
+    public function testChecksCanBanUser()
     {
         // Arrange
         $user = $this->createUser();
@@ -197,10 +188,10 @@ class UserBanServiceTest extends TestCase
         $result = $this->service->canBanUser($user);
 
         // Assert
-        $this->assertTrue($result);
+        self::assertTrue($result);
     }
 
-    public function test_checks_can_unban_user()
+    public function testChecksCanUnbanUser()
     {
         // Arrange
         $user = $this->createUser();
@@ -209,10 +200,10 @@ class UserBanServiceTest extends TestCase
         $result = $this->service->canUnbanUser($user);
 
         // Assert
-        $this->assertFalse($result);
+        self::assertFalse($result);
     }
 
-    public function test_gets_ban_history()
+    public function testGetsBanHistory()
     {
         // Arrange
         $user = $this->createUser();
@@ -221,10 +212,10 @@ class UserBanServiceTest extends TestCase
         $result = $this->service->getBanHistory($user);
 
         // Assert
-        $this->assertIsArray($result);
+        self::assertIsArray($result);
     }
 
-    public function test_handles_extend_ban()
+    public function testHandlesExtendBan()
     {
         // Arrange
         $user = $this->createUser();
@@ -234,10 +225,10 @@ class UserBanServiceTest extends TestCase
         $result = $this->service->extendBan($user, $additionalDays);
 
         // Assert
-        $this->assertFalse($result);
+        self::assertFalse($result);
     }
 
-    public function test_handles_reduce_ban()
+    public function testHandlesReduceBan()
     {
         // Arrange
         $user = $this->createUser();
@@ -247,6 +238,21 @@ class UserBanServiceTest extends TestCase
         $result = $this->service->reduceBan($user, $reduceDays);
 
         // Assert
-        $this->assertFalse($result);
+        self::assertFalse($result);
+    }
+
+    private function createUser(int $id = 1, bool $isBlocked = false): User
+    {
+        $user = new User();
+        $user->id = $id;
+        $user->name = 'Test User';
+        $user->email = 'test@example.com';
+        $user->password = 'password';
+        $user->is_blocked = $isBlocked;
+        $user->ban_reason = null;
+        $user->ban_description = null;
+        $user->ban_expires_at = null;
+
+        return $user;
     }
 }

@@ -12,14 +12,16 @@ use Tests\TestCase;
 
 /**
  * Unit tests for the PaymentMethod model.
+ *
+ * @internal
  */
 #[CoversClass(PaymentMethod::class)]
-class PaymentMethodTest extends TestCase
+final class PaymentMethodTest extends TestCase
 {
     /**
      * Test fillable attributes.
      */
-    public function test_fillable_attributes(): void
+    public function testFillableAttributes(): void
     {
         $fillable = [
             'name',
@@ -30,13 +32,13 @@ class PaymentMethodTest extends TestCase
             'is_default',
         ];
 
-        $this->assertEquals($fillable, (new PaymentMethod)->getFillable());
+        self::assertSame($fillable, (new PaymentMethod())->getFillable());
     }
 
     /**
      * Test casts.
      */
-    public function test_casts(): void
+    public function testCasts(): void
     {
         $casts = [
             'config' => 'array',
@@ -44,41 +46,41 @@ class PaymentMethodTest extends TestCase
             'is_default' => 'boolean',
         ];
 
-        $this->assertEquals($casts, (new PaymentMethod)->getCasts());
+        self::assertSame($casts, (new PaymentMethod())->getCasts());
     }
 
     /**
      * Test payments relation is a HasMany instance.
      */
-    public function test_payments_relation(): void
+    public function testPaymentsRelation(): void
     {
-        $paymentMethod = new PaymentMethod;
+        $paymentMethod = new PaymentMethod();
 
         $relation = $paymentMethod->payments();
 
-        $this->assertInstanceOf(HasMany::class, $relation);
-        $this->assertEquals(Payment::class, $relation->getRelated()::class);
+        self::assertInstanceOf(HasMany::class, $relation);
+        self::assertSame(Payment::class, $relation->getRelated()::class);
     }
 
     /**
      * Test scopeActive applies correct where clause.
      */
-    public function test_scope_active(): void
+    public function testScopeActive(): void
     {
         $query = PaymentMethod::query()->active();
 
-        $this->assertEquals('select * from "payment_methods" where "is_active" = ?', $query->toSql());
-        $this->assertEquals([true], $query->getBindings());
+        self::assertSame('select * from "payment_methods" where "is_active" = ?', $query->toSql());
+        self::assertSame([true], $query->getBindings());
     }
 
     /**
      * Test scopeDefault applies correct where clause.
      */
-    public function test_scope_default(): void
+    public function testScopeDefault(): void
     {
         $query = PaymentMethod::query()->default();
 
-        $this->assertEquals('select * from "payment_methods" where "is_default" = ?', $query->toSql());
-        $this->assertEquals([true], $query->getBindings());
+        self::assertSame('select * from "payment_methods" where "is_default" = ?', $query->toSql());
+        self::assertSame([true], $query->getBindings());
     }
 }

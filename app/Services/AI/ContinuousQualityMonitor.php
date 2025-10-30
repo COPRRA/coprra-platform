@@ -27,8 +27,6 @@ final class ContinuousQualityMonitor
      */
     private array $alerts = [];
 
-    private int $checkInterval = 300; // 5 minutes
-
     private readonly HealthScoreCalculator $scoreCalculator;
 
     private readonly LoggerInterface $logger;
@@ -41,36 +39,15 @@ final class ContinuousQualityMonitor
         ?CacheRepository $cache = null,
     ) {
         $this->monitoringRules = $this->createMonitoringRules();
-        $this->scoreCalculator = $scoreCalculator ?? new HealthScoreCalculator;
+        $this->scoreCalculator = $scoreCalculator ?? new HealthScoreCalculator();
         $this->logger = $logger ?? app(LoggerInterface::class);
         $this->cache = $cache ?? Cache::store();
     }
 
     /**
-     * Start continuous monitoring.
-     */
-    public function startMonitoring(): void
-    {
-        $this->logger->info('🔍 بدء المراقبة المستمرة للجودة...');
-
-        $running = true;
-        $iterations = 0;
-        while ($running) {
-            $this->performQualityCheck();
-            sleep($this->checkInterval);
-            // In a real implementation, you would have a way to stop this loop
-            // For now, we'll add a break after a reasonable number of iterations
-            $iterations++;
-            if ($iterations > 1000) {
-                $running = false;
-            }
-        }
-    }
-
-    /**
      * Perform quality check.
      *
-     * @return array<array<array<scalar|array<string>>>|int>
+     * @return array<array<array<array<string>|scalar>>|int>
      *
      * @psalm-return array{overall_health: int<min, 100>, rules: array<string, array{name: string, success: bool, health_score: int, duration: float, output: string, errors: array<int, string>, timestamp: string, critical: bool}>, alerts: list<array{details: array<int, string>, message: string, rule: string, timestamp: string, type: string}>}
      */
@@ -89,91 +66,16 @@ final class ContinuousQualityMonitor
     }
 
     /**
-     * Get current health status.
-     *
-     * @return array{
-     *     score: int,
-     *     last_check: string|null,
-     *     detailed_results: array<string, array{
-     *         name: string,
-     *         success: bool,
-     *         health_score: int,
-     *         duration: float,
-     *         output: string,
-     *         errors: array<int, string>,
-     *         timestamp: string,
-     *         critical: bool
-     *     }>,
-     *     alerts: list<array{
-     *         type: string,
-     *         rule: string,
-     *         message: string,
-     *         details: array<int, string>,
-     *         timestamp: string
-     *     }>
-     * }
-     */
-    public function getHealthStatus(): array
-    {
-        $score = $this->cache->get('quality_health_score', 0);
-        $lastCheck = $this->cache->get('quality_last_check');
-        $detailedResults = $this->cache->get('quality_detailed_results', []);
-
-        return [
-            'score' => $this->validateHealthScore($score),
-            'last_check' => $this->validateLastCheck($lastCheck),
-            'detailed_results' => $this->validateDetailedResults($detailedResults),
-            'alerts' => $this->alerts,
-        ];
-    }
-
-    /**
-     * Get alerts summary.
-     *
-     * @return array<array<array<string|array<string>>>|int>
-     *
-     * @psalm-return array{total: int<0, max>, critical: int<0, max>, warnings: int<0, max>, alerts: list<array{details: array<int, string>, message: string, rule: string, timestamp: string, type: string}>}
-     */
-    public function getAlertsSummary(): array
-    {
-        $criticalAlerts = array_filter(
-            $this->alerts,
-            static fn (array $alert): bool => ($alert['type'] ?? '') === 'critical'
-        );
-
-        $warningAlerts = array_filter(
-            $this->alerts,
-            static fn (array $alert): bool => ($alert['type'] ?? '') === 'warning'
-        );
-
-        return [
-            'total' => count($this->alerts),
-            'critical' => count($criticalAlerts),
-            'warnings' => count($warningAlerts),
-            'alerts' => $this->alerts,
-        ];
-    }
-
-    /**
-     * Clear alerts.
-     */
-    public function clearAlerts(): void
-    {
-        $this->alerts = [];
-        $this->logger->info('🗑️ تم مسح جميع التنبيهات');
-    }
-
-    /**
      * Validate rule configuration.
      *
-     * @param  array<string, mixed>  $rule
+     * @param array<string, mixed> $rule
      */
     private function validateRule(array $rule): bool
     {
         return isset($rule['name'], $rule['threshold'], $rule['command'])
-            && is_string($rule['name'])
+            && \is_string($rule['name'])
             && is_numeric($rule['threshold'])
-            && is_string($rule['command']);
+            && \is_string($rule['command']);
     }
 
     /**
@@ -201,7 +103,7 @@ final class ContinuousQualityMonitor
                 continue;
             }
 
-            $ruleIdStr = is_string($ruleId) ? $ruleId : (string) $ruleId;
+            $ruleIdStr = \is_string($ruleId) ? $ruleId : (string) $ruleId;
             $results[$ruleIdStr] = $this->checkRule($rule, $ruleIdStr);
         }
 
@@ -296,54 +198,6 @@ final class ContinuousQualityMonitor
     }
 
     /**
-     * Validate health score value.
-     *
-     * @psalm-return int<0, 100>
-     */
-    private function validateHealthScore(mixed $score): int
-    {
-        if (! is_numeric($score)) {
-            return 0;
-        }
-
-        $intScore = (int) $score;
-
-        return max(0, min(100, $intScore));
-    }
-
-    /**
-     * Validate last check timestamp.
-     */
-    private function validateLastCheck(mixed $lastCheck): ?string
-    {
-        return is_string($lastCheck) && $this->isValidIso8601($lastCheck) ? $lastCheck : null;
-    }
-
-    /**
-     * Validate detailed results.
-     *
-     * @return array<string, mixed>
-     */
-    private function validateDetailedResults(mixed $results): array
-    {
-        return is_array($results) ? $results : [];
-    }
-
-    /**
-     * Check if string is valid ISO8601 format.
-     */
-    private function isValidIso8601(string $date): bool
-    {
-        try {
-            Carbon::parse($date);
-
-            return true;
-        } catch (\Exception) {
-            return false;
-        }
-    }
-
-    /**
      * Create monitoring rules configuration.
      *
      * @return array<array<bool|int|string>>
@@ -395,6 +249,7 @@ final class ContinuousQualityMonitor
      *     command: string,
      *     critical: bool
      * } $rule
+     *
      * @return array{
      *     name: string,
      *     success: bool,
@@ -431,9 +286,9 @@ final class ContinuousQualityMonitor
      */
     private function executeRuleCommand(array $rule): ?ProcessResult
     {
-        $command = is_string($rule['command'] ?? null) ? $rule['command'] : '';
+        $command = \is_string($rule['command'] ?? null) ? $rule['command'] : '';
 
-        if ($command === '' || $command === '0') {
+        if ('' === $command || '0' === $command) {
             return null;
         }
 
@@ -449,6 +304,7 @@ final class ContinuousQualityMonitor
      *     command: string,
      *     critical: bool
      * } $rule
+     *
      * @return array{
      *     name: string,
      *     success: bool,
@@ -481,12 +337,12 @@ final class ContinuousQualityMonitor
         $duration = round($endTime - $startTime, 2);
 
         return [
-            'name' => is_string($rule['name'] ?? null) ? $rule['name'] : 'Unknown',
-            'success' => $result instanceof \Illuminate\Contracts\Process\ProcessResult && $result->successful(),
-            'health_score' => $result instanceof \Illuminate\Contracts\Process\ProcessResult ? $this->scoreCalculator->calculate($ruleId, $result) : 0,
+            'name' => \is_string($rule['name'] ?? null) ? $rule['name'] : 'Unknown',
+            'success' => $result instanceof ProcessResult && $result->successful(),
+            'health_score' => $result instanceof ProcessResult ? $this->scoreCalculator->calculate($ruleId, $result) : 0,
             'duration' => $duration,
-            'output' => $result instanceof \Illuminate\Contracts\Process\ProcessResult ? $result->output() : '',
-            'errors' => $result instanceof \Illuminate\Contracts\Process\ProcessResult ? $this->normalizeErrors($result->errorOutput()) : [],
+            'output' => $result instanceof ProcessResult ? $result->output() : '',
+            'errors' => $result instanceof ProcessResult ? $this->normalizeErrors($result->errorOutput()) : [],
             'timestamp' => Carbon::now()->toIso8601String(),
             'critical' => (bool) ($rule['critical'] ?? false),
         ];
@@ -501,6 +357,7 @@ final class ContinuousQualityMonitor
      *     command: string,
      *     critical: bool
      * } $rule
+     *
      * @return array{
      *     name: string,
      *     success: false,
@@ -526,7 +383,7 @@ final class ContinuousQualityMonitor
     private function createErrorResult(array $rule, string $errorMessage): array
     {
         return [
-            'name' => is_string($rule['name'] ?? null) ? $rule['name'] : 'Unknown',
+            'name' => \is_string($rule['name'] ?? null) ? $rule['name'] : 'Unknown',
             'success' => false,
             'health_score' => 0,
             'duration' => 0,
@@ -553,12 +410,12 @@ final class ContinuousQualityMonitor
      */
     private function triggerCriticalAlert(string $ruleId, array $result): void
     {
-        $ruleName = is_string($result['name'] ?? null) ? $result['name'] : '';
+        $ruleName = \is_string($result['name'] ?? null) ? $result['name'] : '';
         $alert = [
             'type' => 'critical',
             'rule' => $ruleId,
             'message' => 'تنبيه حرج: فشل في '.$ruleName,
-            'details' => is_array($result['errors'] ?? null) ? $result['errors'] : [],
+            'details' => \is_array($result['errors'] ?? null) ? $result['errors'] : [],
             'timestamp' => Carbon::now()->toIso8601String(),
         ];
 
@@ -585,12 +442,12 @@ final class ContinuousQualityMonitor
      */
     private function triggerWarningAlert(string $ruleId, array $result): void
     {
-        $ruleName = is_string($result['name'] ?? null) ? $result['name'] : '';
+        $ruleName = \is_string($result['name'] ?? null) ? $result['name'] : '';
         $alert = [
             'type' => 'warning',
             'rule' => $ruleId,
             'message' => 'تحذير: مشكلة في '.$ruleName,
-            'details' => is_array($result['errors'] ?? null) ? $result['errors'] : [],
+            'details' => \is_array($result['errors'] ?? null) ? $result['errors'] : [],
             'timestamp' => Carbon::now()->toISOString(),
         ];
 
@@ -635,7 +492,7 @@ final class ContinuousQualityMonitor
     private function sendNotification(array $alert): void
     {
         // Implement notification logic (email, Slack, etc.)
-        $message = is_string($alert['message'] ?? null) ? $alert['message'] : '';
+        $message = \is_string($alert['message'] ?? null) ? $alert['message'] : '';
         $this->logger->info('📧 إرسال إشعار: '.$message);
     }
 
@@ -646,7 +503,7 @@ final class ContinuousQualityMonitor
      */
     private function normalizeErrors(string $errors): array
     {
-        $lines = array_filter(array_map('trim', explode("\n", $errors)), static fn ($line) => $line !== '');
+        $lines = array_filter(array_map('trim', explode("\n", $errors)), static fn ($line) => '' !== $line);
 
         return array_values($lines);
     }

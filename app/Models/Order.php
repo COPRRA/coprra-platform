@@ -5,27 +5,29 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\OrderStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
- * @property int $id
- * @property string $order_number
- * @property int $user_id
- * @property string $status
- * @property-read \App\Enums\OrderStatus $status_enum
- * @property float $total_amount
- * @property float $subtotal
- * @property float $tax_amount
- * @property float $shipping_amount
- * @property float|null $discount_amount
+ * @property int         $id
+ * @property string      $order_number
+ * @property int         $user_id
+ * @property string      $status
+ * @property OrderStatus $status_enum
+ * @property float       $total_amount
+ * @property float       $subtotal
+ * @property float       $tax_amount
+ * @property float       $shipping_amount
+ ** @property float|null $discount_amount
  * @property array<string, mixed> $shipping_address
  * @property array<string, mixed> $billing_address
- * @property string|null $notes
- * @property \Illuminate\Support\Carbon|null $shipped_at
- * @property \Illuminate\Support\Carbon|null $delivered_at
+ * @property string|null          $notes
+ * @property Carbon|null          $shipped_at
+ * @property Carbon|null          $delivered_at
  */
 class Order extends Model
 {
@@ -63,6 +65,7 @@ class Order extends Model
      * @var array<string, string>
      */
     protected $casts = [
+        'status' => OrderStatus::class,
         'total_amount' => 'decimal:2',
         'subtotal' => 'decimal:2',
         'shipping_address' => 'array',
@@ -96,131 +99,22 @@ class Order extends Model
         return $this->hasMany(Payment::class);
     }
 
-    /**
-     * Recalculate subtotal and total_amount based on current items.
-     */
-    public function recalculateTotals(): void
-    {
-        try {
-            $conn = (string) ($this->getConnectionName() ?? config('database.default'));
-            $subtotal = (float) (\DB::connection($conn)
-                ->table('order_items')
-                ->where('order_id', $this->getKey())
-                ->selectRaw('COALESCE(SUM(quantity * CAST(price AS NUMERIC)), 0) as subtotal')
-                ->value('subtotal') ?? 0.0);
-
-            if ($subtotal <= 0.0) {
-                $subtotal = (float) (\DB::connection($conn)
-                    ->table('order_items')
-                    ->where('order_id', $this->getKey())
-                    ->selectRaw('COALESCE(SUM(quantity * CAST(unit_price AS NUMERIC)), 0) as subtotal')
-                    ->value('subtotal') ?? 0.0);
-            }
-
-            if ($subtotal <= 0.0) {
-                $subtotal = (float) (\DB::connection($conn)
-                    ->table('order_items')
-                    ->where('order_id', $this->getKey())
-                    ->sum('total'));
-            }
-
-            if ($subtotal <= 0.0) {
-                $subtotal = (float) (\DB::connection($conn)
-                    ->table('order_items')
-                    ->where('order_id', $this->getKey())
-                    ->sum('total_price'));
-            }
-
-            $this->attributes['subtotal'] = round($subtotal, 2);
-
-            $tax = (float) ($this->tax_amount ?? 0.0);
-            $shipping = (float) ($this->shipping_amount ?? 0.0);
-            $discount = (float) ($this->discount_amount ?? 0.0);
-            $this->attributes['total_amount'] = round($subtotal + $tax + $shipping - $discount, 2);
-        } catch (\Throwable $e) {
-            // Keep silent; fallbacks in accessor will handle
-        }
-    }
-
     // --- Scopes ---
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Builder<Order>  $query
-     *
-     * @psalm-return \Illuminate\Database\Eloquent\Builder<self>
+     * Scope a query to filter by status.
      */
-    public function scopeByStatus(\Illuminate\Database\Eloquent\Builder $query, string $status): \Illuminate\Database\Eloquent\Builder
+    public function scopeByStatus(Builder $query, string $status): Builder
     {
         return $query->where('status', $status);
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Builder<Order>  $query
-     *
-     * @psalm-return \Illuminate\Database\Eloquent\Builder<self>
+     * Scope a query to filter by user.
      */
-    public function scopeForUser(\Illuminate\Database\Eloquent\Builder $query, int $userId): \Illuminate\Database\Eloquent\Builder
+    public function scopeForUser(Builder $query, int $userId): Builder
     {
         return $query->where('user_id', $userId);
-    }
-
-    /**
-     * Accessor: computed total based on order items.
-     *
-     * Note: Returns items subtotal only (without tax/shipping/discount).
-     */
-    public function getTotalAttribute(): float
-    {
-        try {
-            $calculator = app(\App\Services\Order\OrderTotalsCalculator::class);
-
-            return $calculator->calculateSubtotal($this);
-        } catch (\Throwable $e) {
-            return round((float) ($this->attributes['subtotal'] ?? 0.0), 2);
-        }
-    }
-
-    /**
-     * Normalize incoming status values to supported enum backing values.
-     */
-    public function setStatusAttribute($value): void
-    {
-        if ($value instanceof OrderStatus) {
-            $this->attributes['status'] = $value->value;
-
-            return;
-        }
-
-        if (is_string($value)) {
-            $normalized = strtolower($value);
-
-            // Preserve legacy alias "completed" in storage for tests that assert raw string
-            $this->attributes['status'] = $normalized;
-
-            return;
-        }
-
-        // Fallback assignment for unexpected types
-        $this->attributes['status'] = $value;
-    }
-
-    /**
-     * Expose an enum accessor that safely maps aliases.
-     */
-    public function getStatusEnumAttribute(): OrderStatus
-    {
-        $raw = is_string($this->attributes['status'] ?? '') ? strtolower((string) $this->attributes['status']) : ($this->attributes['status'] ?? '');
-
-        if ($raw === 'completed') {
-            return OrderStatus::DELIVERED;
-        }
-
-        // When stored as enum instance from service updates
-        if ($raw instanceof OrderStatus) {
-            return $raw;
-        }
-
-        return OrderStatus::from((string) $raw);
     }
 
     /**
@@ -229,7 +123,7 @@ class Order extends Model
     #[\Override]
     protected static function booted(): void
     {
-        static::saving(function (self $order): void {
+        static::saving(static function (self $order): void {
             $subtotal = (float) ($order->subtotal ?? 0.0);
             $tax = (float) ($order->tax_amount ?? 0.0);
             $shipping = (float) ($order->shipping_amount ?? 0.0);

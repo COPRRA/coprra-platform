@@ -7,7 +7,6 @@ namespace App\Services;
 use App\Services\FileCleanup\CleanupStrategyFactory;
 use App\Services\FileCleanup\DirectoryCleaner;
 use Carbon\Carbon;
-use Exception;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 
@@ -28,11 +27,11 @@ class FileCleanupService
             'max_storage_size_mb' => 1024, // 1GB
             'cleanup_schedule' => 'daily',
         ]);
-        $this->cleaner = $cleaner ?? new DirectoryCleaner;
+        $this->cleaner = $cleaner ?? new DirectoryCleaner();
     }
 
     /**
-     * @return array<int|string|array<string>>
+     * @return array<array<string>|int|string>
      *
      * @psalm-return array<string, int|list<string>|string>
      */
@@ -43,7 +42,7 @@ class FileCleanupService
             Log::info('Temp files cleanup completed', $result);
 
             return $result;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Temp files cleanup failed', ['error' => $e->getMessage()]);
 
             return [
@@ -55,7 +54,7 @@ class FileCleanupService
     }
 
     /**
-     * @return array<int|string|array<string>>
+     * @return array<array<string>|int|string>
      *
      * @psalm-return array<string, int|list<string>|string>
      */
@@ -66,7 +65,7 @@ class FileCleanupService
             Log::info('Log files cleanup completed', $result);
 
             return $result;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Log files cleanup failed', ['error' => $e->getMessage()]);
 
             return [
@@ -78,7 +77,7 @@ class FileCleanupService
     }
 
     /**
-     * @return array<int|string|array<string>>
+     * @return array<array<string>|int|string>
      *
      * @psalm-return array<string, int|list<string>|string>
      */
@@ -89,7 +88,7 @@ class FileCleanupService
             Log::info('Cache files cleanup completed', $result);
 
             return $result;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Cache files cleanup failed', ['error' => $e->getMessage()]);
 
             return [
@@ -101,7 +100,7 @@ class FileCleanupService
     }
 
     /**
-     * @return array<int|string|array<string>>
+     * @return array<array<string>|int|string>
      *
      * @psalm-return array<string, int|list<string>|string>
      */
@@ -112,7 +111,7 @@ class FileCleanupService
             Log::info('Backup files cleanup completed', $result);
 
             return $result;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Backup files cleanup failed', ['error' => $e->getMessage()]);
 
             return [
@@ -124,7 +123,7 @@ class FileCleanupService
     }
 
     /**
-     * @return array<int|string|array<string>>
+     * @return array<array<string>|int|string>
      *
      * @psalm-return array<string, int|list<string>|string>
      */
@@ -135,7 +134,7 @@ class FileCleanupService
             Log::info('Uploaded files cleanup completed', $result);
 
             return $result;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Uploaded files cleanup failed', ['error' => $e->getMessage()]);
 
             return [
@@ -147,7 +146,7 @@ class FileCleanupService
     }
 
     /**
-     * @return array<array<int|string|array<string>>|float|int>
+     * @return array<array<array<string>|int|string>|float|int>
      *
      * @psalm-return array{temp_files: array<string, array<int, string>|int|string>, log_files: array<string, array<int, string>|int|string>, cache_files: array<string, array<int, string>|int|string>, backup_files: array<string, array<int, string>|int|string>, uploaded_files: array<string, array<int, string>|int|string>, total_files_deleted: float|int, total_size_deleted: int}
      */
@@ -191,7 +190,7 @@ class FileCleanupService
     }
 
     /**
-     * @return array<array<scalar>|string|null>
+     * @return array<array<scalar>|string|* @method static \App\Models\Brand create(array<string, string|bool|null>
      *
      * @psalm-return array{storage_usage: array<string, bool|float|int>, config: array<string, int|string>, last_cleanup: string|null, next_cleanup: string|null}
      */
@@ -209,13 +208,13 @@ class FileCleanupService
     {
         $schedule = (string) ($this->config['cleanup_schedule'] ?? 'daily');
 
-        if ($schedule === 'daily') {
+        if ('daily' === $schedule) {
             Artisan::call('schedule:run');
 
             return;
         }
 
-        if ($schedule === 'weekly') {
+        if ('weekly' === $schedule) {
             $now = now();
             if (method_exists($now, 'isSunday') ? $now->isSunday() : Carbon::now()->isSunday()) {
                 Artisan::call('schedule:run');
@@ -224,7 +223,7 @@ class FileCleanupService
     }
 
     /**
-     * @return array<int|string|array<string>>
+     * @return array<array<string>|int|string>
      *
      * @psalm-return array<string, int|list<string>|string>
      */
@@ -239,7 +238,8 @@ class FileCleanupService
     }
 
     /**
-     * @param  array<string, array<string, int|string>>  $results
+     * @param array<string, array<string, int|string>> $results
+     *
      * @return array<float|int>
      *
      * @psalm-return array{total_files_deleted: float|int<min, max>, total_size_deleted: int<min, max>}
@@ -250,7 +250,7 @@ class FileCleanupService
         $totalSizeDeleted = 0;
 
         foreach ($results as $result) {
-            if (is_array($result)) {
+            if (\is_array($result)) {
                 $totalFilesDeleted += array_sum(array_intersect_key($result, array_flip(preg_grep('/_files$/', array_keys($result)))));
                 $totalSizeDeleted += $result['deleted_size'] ?? 0;
             }
@@ -273,20 +273,20 @@ class FileCleanupService
         }
 
         $items = scandir($directory);
-        if ($items === false) {
+        if (false === $items) {
             return $size;
         }
 
         foreach ($items as $item) {
-            if ($item === '.' || $item === '..') {
+            if ('.' === $item || '..' === $item) {
                 continue;
             }
 
-            $path = $directory.DIRECTORY_SEPARATOR.$item;
+            $path = $directory.\DIRECTORY_SEPARATOR.$item;
 
             if (is_file($path)) {
                 $fileSize = filesize($path);
-                if ($fileSize !== false) {
+                if (false !== $fileSize) {
                     $size += $fileSize;
                 }
             } elseif (is_dir($path)) {
@@ -297,7 +297,7 @@ class FileCleanupService
         return $size;
     }
 
-    private function getLastCleanupTime(): string|false|null
+    private function getLastCleanupTime(): false|string|null
     {
         $lastCleanupFile = storage_path('logs/last_cleanup.log');
 
@@ -312,7 +312,7 @@ class FileCleanupService
     {
         $lastCleanup = $this->getLastCleanupTime();
 
-        if ($lastCleanup !== null) {
+        if (null !== $lastCleanup) {
             try {
                 return Carbon::parse($lastCleanup)->addDay()->toISOString();
             } catch (\Exception $e) {

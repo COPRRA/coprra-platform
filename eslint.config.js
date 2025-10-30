@@ -1,6 +1,7 @@
 // eslint.config.js
 import pluginJs from "@eslint/js";
 import unicorn from "eslint-plugin-unicorn";
+import prettier from "eslint-config-prettier";
 import globals from "globals";
 
 export default [
@@ -23,7 +24,7 @@ export default [
     rules: {
       ...unicorn.configs.recommended.rules,
 
-      // Maximum strictness rules
+      // Maximum strictness rules (non-formatting)
       "no-console": "error",
       "no-debugger": "error",
       "no-alert": "error",
@@ -68,38 +69,39 @@ export default [
       "radix": "error",
       "wrap-iife": "error",
       "yoda": "error",
-      "no-catch-shadow": "error",
       "no-delete-var": "error",
       "no-label-var": "error",
       "no-shadow": "error",
       "no-shadow-restricted-names": "error",
       "no-use-before-define": "error",
-      "array-bracket-spacing": "error",
-      "comma-dangle": "error",
-      "comma-spacing": "error",
-      "comma-style": "error",
-      "computed-property-spacing": "error",
-      "func-call-spacing": "error",
-      "indent": ["error", 2],
-      "key-spacing": "error",
-      "keyword-spacing": "error",
-      "linebreak-style": "error",
-      "no-mixed-spaces-and-tabs": "error",
-      "no-multiple-empty-lines": "error",
-      "no-trailing-spaces": "error",
-      "object-curly-spacing": "error",
-      "one-var": "error",
-      "padded-blocks": "error",
-      "quote-props": "error",
-      "quotes": ["error", "single"],
-      "semi": "error",
-      "semi-spacing": "error",
-      "space-before-blocks": "error",
-      "space-before-function-paren": "error",
-      "space-in-parens": "error",
-      "space-infix-ops": "error",
-      "space-unary-ops": "error",
-      "spaced-comment": "error",
+
+      // Disable formatting rules that conflict with Prettier
+      "array-bracket-spacing": "off",
+      "comma-dangle": "off",
+      "comma-spacing": "off",
+      "comma-style": "off",
+      "computed-property-spacing": "off",
+      "func-call-spacing": "off",
+      "indent": "off",
+      "key-spacing": "off",
+      "keyword-spacing": "off",
+      "linebreak-style": "off",
+      "no-mixed-spaces-and-tabs": "off",
+      "no-multiple-empty-lines": "off",
+      "no-trailing-spaces": "off",
+      "object-curly-spacing": "off",
+      "one-var": "off",
+      "padded-blocks": "off",
+      "quote-props": "off",
+      "quotes": "off",
+      "semi": "off",
+      "semi-spacing": "off",
+      "space-before-blocks": "off",
+      "space-before-function-paren": "off",
+      "space-in-parens": "off",
+      "space-infix-ops": "off",
+      "space-unary-ops": "off",
+      "spaced-comment": "off",
 
       // Unicorn specific strict rules
       "unicorn/filename-case": ["error", { "case": "kebabCase" }],
@@ -127,6 +129,8 @@ export default [
       "unicorn/throw-new-error": "error"
     }
   },
+  // Apply Prettier config to disable conflicting rules
+  prettier,
   {
     ignores: [
       "vendor/**",

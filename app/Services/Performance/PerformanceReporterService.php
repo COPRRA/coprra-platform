@@ -43,7 +43,7 @@ final readonly class PerformanceReporterService
     {
         $cacheStats = $this->cache->get('stats') ?? [];
         $dbStats = $this->cache->get('db_stats') ?? [];
-        $opcacheStats = function_exists('opcache_get_status') ? opcache_get_status() : [];
+        $opcacheStats = \function_exists('opcache_get_status') ? opcache_get_status() : [];
         $memoryUsage = memory_get_usage(true);
         $peakMemoryUsage = memory_get_peak_usage(true);
 

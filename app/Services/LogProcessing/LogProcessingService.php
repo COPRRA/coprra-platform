@@ -14,9 +14,10 @@ class LogProcessingService
     ) {}
 
     /**
-     * Process log files and extract recent errors
+     * Process log files and extract recent errors.
      *
-     * @param  list<string>  $logFiles
+     * @param list<string> $logFiles
+     *
      * @return list<array{
      *     id: string,
      *     timestamp: string,
@@ -38,9 +39,10 @@ class LogProcessingService
     }
 
     /**
-     * Process error statistics for log files
+     * Process error statistics for log files.
      *
-     * @param  list<string>  $logFiles
+     * @param list<string> $logFiles
+     *
      * @return array{
      *     total_errors: int,
      *     critical_errors: int,
@@ -55,7 +57,7 @@ class LogProcessingService
     }
 
     /**
-     * Get system health status
+     * Get system health status.
      *
      * @return array{
      *     database: array{status: string, message: string},
@@ -71,9 +73,10 @@ class LogProcessingService
     }
 
     /**
-     * Get error by ID from log files
+     * Get error by ID from log files.
      *
-     * @param  list<string>  $logFiles
+     * @param list<string> $logFiles
+     *
      * @return array{
      *     id: string,
      *     timestamp: string,
@@ -87,7 +90,7 @@ class LogProcessingService
     {
         foreach ($logFiles as $logFile) {
             $error = $this->searchErrorInLogFile($logFile, $id);
-            if ($error !== null) {
+            if (null !== $error) {
                 return $error;
             }
         }
@@ -96,7 +99,7 @@ class LogProcessingService
     }
 
     /**
-     * Calculate overall health from individual health checks
+     * Calculate overall health from individual health checks.
      *
      * @param array{
      *     database: array{status: string},
@@ -112,10 +115,10 @@ class LogProcessingService
     {
         $overallHealth = 'healthy';
         foreach ($health as $status) {
-            if ($status['status'] === 'critical') {
+            if ('critical' === $status['status']) {
                 return 'critical';
             }
-            if ($status['status'] === 'warning') {
+            if ('warning' === $status['status']) {
                 $overallHealth = 'warning';
             }
         }
@@ -124,7 +127,7 @@ class LogProcessingService
     }
 
     /**
-     * Process a single log file and extract errors
+     * Process a single log file and extract errors.
      *
      * @return list<array{
      *     id: string,
@@ -138,7 +141,7 @@ class LogProcessingService
     private function processSingleLogFile(string $logFile): array
     {
         $content = $this->fileReader->readFile($logFile);
-        if ($content === '' || $content === '0') {
+        if ('' === $content || '0' === $content) {
             return [];
         }
 
@@ -148,9 +151,10 @@ class LogProcessingService
     }
 
     /**
-     * Extract error lines from log content
+     * Extract error lines from log content.
      *
-     * @param  list<string>  $lines
+     * @param list<string> $lines
+     *
      * @return list<array{
      *     id: string,
      *     timestamp: string,
@@ -174,7 +178,7 @@ class LogProcessingService
     }
 
     /**
-     * Search for an error in a specific log file
+     * Search for an error in a specific log file.
      *
      * @return array{
      *     id: string,
@@ -188,7 +192,7 @@ class LogProcessingService
     private function searchErrorInLogFile(string $logFile, string $id): ?array
     {
         $content = $this->fileReader->readFile($logFile);
-        if ($content === '' || $content === '0') {
+        if ('' === $content || '0' === $content) {
             return null;
         }
 
@@ -198,9 +202,10 @@ class LogProcessingService
     }
 
     /**
-     * Find error in array of log lines
+     * Find error in array of log lines.
      *
-     * @param  list<string>  $lines
+     * @param list<string> $lines
+     *
      * @return array{
      *     id: string,
      *     timestamp: string,

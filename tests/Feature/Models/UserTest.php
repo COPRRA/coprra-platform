@@ -12,9 +12,15 @@ use App\Models\UserLocaleSetting;
 use App\Models\Wishlist;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class UserTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class UserTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -23,8 +29,8 @@ class UserTest extends TestCase
         parent::setUp();
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_create_a_user(): void
+    #[Test]
+    public function testItCanCreateAUser(): void
     {
         $user = User::factory()->create([
             'name' => 'John Doe',
@@ -36,13 +42,13 @@ class UserTest extends TestCase
             'role' => 'admin',
         ]);
 
-        $this->assertInstanceOf(User::class, $user);
-        $this->assertEquals('John Doe', $user->name);
-        $this->assertEquals('john@example.com', $user->email);
-        $this->assertTrue($user->is_admin);
-        $this->assertTrue($user->is_active);
-        $this->assertFalse($user->is_blocked);
-        $this->assertEquals('admin', $user->role);
+        self::assertInstanceOf(User::class, $user);
+        self::assertSame('John Doe', $user->name);
+        self::assertSame('john@example.com', $user->email);
+        self::assertTrue($user->is_admin);
+        self::assertTrue($user->is_active);
+        self::assertFalse($user->is_blocked);
+        self::assertSame('admin', $user->role);
 
         $this->assertDatabaseHas('users', [
             'name' => 'John Doe',
@@ -54,8 +60,8 @@ class UserTest extends TestCase
         ]);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_casts_attributes_correctly(): void
+    #[Test]
+    public function testItCastsAttributesCorrectly(): void
     {
         $user = User::factory()->create([
             'email_verified_at' => '2023-01-01 00:00:00',
@@ -66,116 +72,106 @@ class UserTest extends TestCase
             'ban_expires_at' => '2023-01-02 00:00:00',
         ]);
 
-        $this->assertInstanceOf(Carbon::class, $user->email_verified_at);
-        $this->assertIsBool($user->is_admin);
-        $this->assertIsBool($user->is_active);
-        $this->assertIsBool($user->is_blocked);
-        $this->assertInstanceOf(Carbon::class, $user->banned_at);
-        $this->assertInstanceOf(Carbon::class, $user->ban_expires_at);
-        $this->assertTrue($user->is_admin);
-        $this->assertFalse($user->is_active);
-        $this->assertTrue($user->is_blocked);
+        self::assertInstanceOf(Carbon::class, $user->email_verified_at);
+        self::assertIsBool($user->is_admin);
+        self::assertIsBool($user->is_active);
+        self::assertIsBool($user->is_blocked);
+        self::assertInstanceOf(Carbon::class, $user->banned_at);
+        self::assertInstanceOf(Carbon::class, $user->ban_expires_at);
+        self::assertTrue($user->is_admin);
+        self::assertFalse($user->is_active);
+        self::assertTrue($user->is_blocked);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_hides_sensitive_attributes(): void
+    #[Test]
+    public function testItHidesSensitiveAttributes(): void
     {
         $user = User::factory()->make();
 
         $array = $user->toArray();
 
-        $this->assertArrayNotHasKey('password', $array);
-        $this->assertArrayNotHasKey('remember_token', $array);
+        self::assertArrayNotHasKey('password', $array);
+        self::assertArrayNotHasKey('remember_token', $array);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_has_many_reviews(): void
+    #[Test]
+    public function testUserHasManyRelationships(): void
     {
+        // Arrange
         $user = User::factory()->create(['email' => 'user@example.com']);
         $product1 = Product::factory()->create();
         $product2 = Product::factory()->create();
+
+        // Create related records
         $review1 = Review::factory()->create(['user_id' => $user->id, 'product_id' => $product1->id]);
         $review2 = Review::factory()->create(['user_id' => $user->id, 'product_id' => $product2->id]);
 
-        $this->assertCount(2, $user->reviews);
-        $this->assertTrue($user->reviews->contains($review1));
-        $this->assertTrue($user->reviews->contains($review2));
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_has_many_wishlists(): void
-    {
-        $user = User::factory()->create(['email' => 'user@example.com']);
-        $product1 = Product::factory()->create();
-        $product2 = Product::factory()->create();
         $wishlist1 = Wishlist::factory()->create(['user_id' => $user->id, 'product_id' => $product1->id]);
         $wishlist2 = Wishlist::factory()->create(['user_id' => $user->id, 'product_id' => $product2->id]);
 
-        $this->assertCount(2, $user->wishlists);
-        $this->assertTrue($user->wishlists->contains($wishlist1));
-        $this->assertTrue($user->wishlists->contains($wishlist2));
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_has_many_price_alerts(): void
-    {
-        $user = User::factory()->create(['email' => 'user@example.com']);
-        $product1 = Product::factory()->create();
-        $product2 = Product::factory()->create();
         $alert1 = PriceAlert::factory()->create(['user_id' => $user->id, 'product_id' => $product1->id]);
         $alert2 = PriceAlert::factory()->create(['user_id' => $user->id, 'product_id' => $product2->id]);
 
-        $this->assertCount(2, $user->priceAlerts);
-        $this->assertTrue($user->priceAlerts->contains($alert1));
-        $this->assertTrue($user->priceAlerts->contains($alert2));
+        // Assert all hasMany relationships
+        self::assertCount(2, $user->reviews, 'User should have 2 reviews');
+        self::assertTrue($user->reviews->contains($review1));
+        self::assertTrue($user->reviews->contains($review2));
+
+        self::assertCount(2, $user->wishlists, 'User should have 2 wishlists');
+        self::assertTrue($user->wishlists->contains($wishlist1));
+        self::assertTrue($user->wishlists->contains($wishlist2));
+
+        self::assertCount(2, $user->priceAlerts, 'User should have 2 price alerts');
+        self::assertTrue($user->priceAlerts->contains($alert1));
+        self::assertTrue($user->priceAlerts->contains($alert2));
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_has_one_locale_setting(): void
+    #[Test]
+    public function testItHasOneLocaleSetting(): void
     {
         $user = User::factory()->create(['email' => 'user@example.com']);
         $localeSetting = UserLocaleSetting::factory()->create(['user_id' => $user->id]);
 
-        $this->assertInstanceOf(UserLocaleSetting::class, $user->localeSetting);
-        $this->assertEquals($localeSetting->id, $user->localeSetting->id);
+        self::assertInstanceOf(UserLocaleSetting::class, $user->localeSetting);
+        self::assertSame($localeSetting->id, $user->localeSetting->id);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_is_admin_method(): void
+    #[Test]
+    public function testIsAdminMethod(): void
     {
         $adminUser = User::factory()->create(['is_admin' => true]);
         $regularUser = User::factory()->create(['is_admin' => false]);
 
-        $this->assertTrue($adminUser->isAdmin());
-        $this->assertFalse($regularUser->isAdmin());
+        self::assertTrue($adminUser->isAdmin());
+        self::assertFalse($regularUser->isAdmin());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_is_banned_method(): void
+    #[Test]
+    public function testIsBannedMethod(): void
     {
         $bannedUser = User::factory()->create(['is_blocked' => true]);
         $activeUser = User::factory()->create(['is_blocked' => false]);
 
-        $this->assertTrue($bannedUser->isBanned());
-        $this->assertFalse($activeUser->isBanned());
+        self::assertTrue($bannedUser->isBanned());
+        self::assertFalse($activeUser->isBanned());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_is_ban_expired_method(): void
+    #[Test]
+    public function testIsBanExpiredMethod(): void
     {
         $userNotBlocked = User::factory()->create(['is_blocked' => false]);
         $userBlockedNoExpiry = User::factory()->create(['is_blocked' => true, 'ban_expires_at' => null]);
         $userBlockedFutureExpiry = User::factory()->create(['is_blocked' => true, 'ban_expires_at' => Carbon::now()->addDay()]);
         $userBlockedPastExpiry = User::factory()->create(['is_blocked' => true, 'ban_expires_at' => Carbon::now()->subDay()]);
 
-        $this->assertFalse($userNotBlocked->isBanExpired());
-        $this->assertFalse($userBlockedNoExpiry->isBanExpired());
-        $this->assertFalse($userBlockedFutureExpiry->isBanExpired());
-        $this->assertTrue($userBlockedPastExpiry->isBanExpired());
+        self::assertFalse($userNotBlocked->isBanExpired());
+        self::assertFalse($userBlockedNoExpiry->isBanExpired());
+        self::assertFalse($userBlockedFutureExpiry->isBanExpired());
+        self::assertTrue($userBlockedPastExpiry->isBanExpired());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_fillable_attributes(): void
+    #[Test]
+    public function testFillableAttributes(): void
     {
         $fillable = [
             'name',
@@ -193,21 +189,21 @@ class UserTest extends TestCase
             'password_confirmed_at',
         ];
 
-        $this->assertEquals($fillable, (new User)->getFillable());
+        self::assertSame($fillable, (new User())->getFillable());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_factory_creates_valid_user(): void
+    #[Test]
+    public function testFactoryCreatesValidUser(): void
     {
         $user = User::factory()->make();
 
-        $this->assertInstanceOf(User::class, $user);
-        $this->assertNotEmpty($user->name);
-        $this->assertNotEmpty($user->email);
-        $this->assertNotEmpty($user->password);
-        $this->assertIsBool($user->is_admin);
-        $this->assertIsBool($user->is_active);
-        $this->assertIsBool($user->is_blocked);
-        $this->assertNotEmpty($user->role);
+        self::assertInstanceOf(User::class, $user);
+        self::assertNotEmpty($user->name);
+        self::assertNotEmpty($user->email);
+        self::assertNotEmpty($user->password);
+        self::assertIsBool($user->is_admin);
+        self::assertIsBool($user->is_active);
+        self::assertIsBool($user->is_blocked);
+        self::assertNotEmpty($user->role);
     }
 }

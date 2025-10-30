@@ -36,13 +36,13 @@ final class PerformanceAnalysisService
     /**
      * Check cache configuration.
      *
-     * @param  array<string>  $issues
+     * @param array<string> $issues
      *
      * @psalm-return 0|25
      */
     private function checkCacheConfiguration(array &$issues): int
     {
-        if (config('cache.default') !== 'file') {
+        if ('file' !== config('cache.default')) {
             return 25;
         }
 
@@ -54,19 +54,19 @@ final class PerformanceAnalysisService
     /**
      * Check database indexes.
      *
-     * @param  array<string>  $issues
+     * @param array<string> $issues
      *
      * @psalm-return 0|25
      */
     private function checkDatabaseIndexes(array &$issues): int
     {
         $migrationFiles = glob(database_path('migrations/*.php'));
-        if ($migrationFiles === false) {
+        if (false === $migrationFiles) {
             $migrationFiles = [];
         }
         foreach ($migrationFiles as $file) {
             $content = file_get_contents($file);
-            if ($content !== false && (str_contains($content, '->index(') || str_contains($content, '->unique('))) {
+            if (false !== $content && (str_contains($content, '->index(') || str_contains($content, '->unique('))) {
                 return 25;
             }
         }
@@ -79,7 +79,7 @@ final class PerformanceAnalysisService
     /**
      * Check asset compilation.
      *
-     * @param  array<string>  $issues
+     * @param array<string> $issues
      *
      * @psalm-return 0|25
      */
@@ -97,13 +97,13 @@ final class PerformanceAnalysisService
     /**
      * Check queue configuration.
      *
-     * @param  array<string>  $issues
+     * @param array<string> $issues
      *
      * @psalm-return 0|25
      */
     private function checkQueueConfiguration(array &$issues): int
     {
-        if (config('queue.default') !== 'sync') {
+        if ('sync' !== config('queue.default')) {
             return 25;
         }
 

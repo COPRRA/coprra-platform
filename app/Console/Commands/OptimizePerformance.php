@@ -97,8 +97,6 @@ final class OptimizePerformance extends Command
         $this->systemOptimizer->optimizeConfig();
     }
 
-    /**
-     * Display performance recommendations.
-     */
+    // Display performance recommendations.
     // Removed unused private methods to satisfy PHPMD UnusedPrivateMethod
 }

@@ -21,16 +21,11 @@ class CompressionServiceProvider extends ServiceProvider
 
         $this->app->singleton(CompressionService::class);
 
-        $this->app->singleton(CompressionResponseService::class, function ($app): \App\Services\Compression\CompressionResponseService {
+        $this->app->singleton(CompressionResponseService::class, static function ($app): CompressionResponseService {
             return new CompressionResponseService(
                 $app->make(CompressionService::class),
                 $app->make(ContentTypeService::class)
             );
         });
     }
-
-    /**
-     * Bootstrap services.
-     */
-    public function boot(): void {}
 }

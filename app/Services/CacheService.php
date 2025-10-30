@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 /**
- * Enhanced Cache Service
+ * Enhanced Cache Service.
  *
  * This service provides advanced caching functionality with support for:
  * - Cache tagging for efficient cache invalidation
@@ -26,12 +26,13 @@ use Illuminate\Support\Facades\Log;
 final class CacheService implements CacheServiceContract
 {
     /**
-     * Enhanced remember method with tagging support
+     * Enhanced remember method with tagging support.
      *
-     * @param  string  $key  Cache key (will be prefixed automatically)
-     * @param  int  $ttl  Time to live in seconds
-     * @param  callable(): T  $callback  Function to generate data if cache miss
-     * @param  array<int, string>  $tags  Optional cache tags for grouped invalidation
+     * @param string             $key      Cache key (will be prefixed automatically)
+     * @param int                $ttl      Time to live in seconds
+     * @param callable(): T      $callback Function to generate data if cache miss
+     * @param array<int, string> $tags     Optional cache tags for grouped invalidation
+     *
      * @return T
      *
      * @template T of \Illuminate\Contracts\Cache\Repository
@@ -43,17 +44,19 @@ final class CacheService implements CacheServiceContract
 
         try {
             // Use cache tags if supported and tags are provided
-            if ($tags !== [] && $this->supportsTags()) {
+            if ([] !== $tags && $this->supportsTags()) {
                 // Try to get existing value via tag-aware cache
                 $tagged = Cache::tags($tags);
                 $existing = $tagged->get($prefixedKey);
-                if ($existing !== null) {
+                if (null !== $existing) {
                     return $existing;
                 }
 
                 // Cache miss with tags: generate and store
                 $value = $callback();
-                Log::debug('Cache miss - data generated', ['key' => $key, 'tags' => $tags, 'execution_time' => microtime(true)]);
+                if (config('app.debug')) {
+                    Log::debug('Cache miss - data generated', ['key' => $key, 'tags' => $tags, 'execution_time' => microtime(true)]);
+                }
                 $tagged->put($prefixedKey, $value, $ttl);
 
                 return $value;
@@ -61,12 +64,14 @@ final class CacheService implements CacheServiceContract
 
             // Standard cache flow: get then put on miss
             $existing = Cache::get($prefixedKey);
-            if ($existing !== null) {
+            if (null !== $existing) {
                 return $existing;
             }
 
             $value = $callback();
-            Log::debug('Cache miss - data generated', ['key' => $key, 'execution_time' => microtime(true)]);
+            if (config('app.debug')) {
+                Log::debug('Cache miss - data generated', ['key' => $key, 'execution_time' => microtime(true)]);
+            }
             Cache::put($prefixedKey, $value, $ttl);
 
             return $value;
@@ -108,7 +113,8 @@ final class CacheService implements CacheServiceContract
     /**
      * @template T
      *
-     * @param  T  $default
+     * @param T $default
+     *
      * @return T|null
      */
     #[\Override]
@@ -148,44 +154,7 @@ final class CacheService implements CacheServiceContract
     }
 
     /**
-     * @param  array<int, string>  $tags
-     */
-    #[\Override]
-    public function forgetByTags(array $tags): bool
-    {
-        try {
-            $cache = Cache::getFacadeRoot();
-
-            if (! is_object($cache)) {
-                return false;
-            }
-
-            if (method_exists($cache, 'getStore')) {
-                $store = $cache->getStore();
-
-                if (! is_object($store)) {
-                    return false;
-                }
-
-                if (method_exists($store, 'tags') && method_exists($cache, 'tags')) {
-                    $taggedCache = $cache->tags($tags);
-
-                    if (is_object($taggedCache) && method_exists($taggedCache, 'flush')) {
-                        $taggedCache->flush();
-
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        } catch (\Exception) {
-            return false;
-        }
-    }
-
-    /**
-     * Generate product cache key
+     * Generate product cache key.
      */
     public function getProductKey(int $id): string
     {
@@ -193,23 +162,7 @@ final class CacheService implements CacheServiceContract
     }
 
     /**
-     * Generate category cache key
-     */
-    public function getCategoryKey(int $id): string
-    {
-        return 'category:'.$id;
-    }
-
-    /**
-     * Generate store cache key
-     */
-    public function getStoreKey(int $id): string
-    {
-        return 'store:'.$id;
-    }
-
-    /**
-     * Generate price comparison cache key
+     * Generate price comparison cache key.
      */
     public function getPriceComparisonKey(int $id): string
     {
@@ -217,7 +170,23 @@ final class CacheService implements CacheServiceContract
     }
 
     /**
-     * Generate exchange rate cache key
+     * Generate category cache key.
+     */
+    public function getCategoryKey(int $id): string
+    {
+        return 'category:'.$id;
+    }
+
+    /**
+     * Generate store cache key.
+     */
+    public function getStoreKey(int $id): string
+    {
+        return 'store:'.$id;
+    }
+
+    /**
+     * Generate exchange rate cache key.
      */
     public function getExchangeRateKey(string $from, string $to): string
     {
@@ -225,26 +194,21 @@ final class CacheService implements CacheServiceContract
     }
 
     /**
-     * Generate search cache key
-     *
-     * @param  array<string, string|int|float|bool|null>  $filters
+     * Generate search cache key.
      */
     public function getSearchKey(string $query, array $filters = []): string
     {
-        $key = 'search:'.md5($query);
-        if ($filters !== []) {
-            $key .= '_'.md5(serialize($filters));
-        }
+        $filterHash = empty($filters) ? '' : ':'.md5(serialize($filters));
 
-        return $key;
+        return 'search:'.md5($query).$filterHash;
     }
 
     /**
-     * Cache product data
+     * Cache product data.
      *
      * @template T
      *
-     * @param  T  $data
+     * @param T $data
      */
     public function cacheProduct(int $id, $data, ?int $ttl = null): bool
     {
@@ -256,7 +220,7 @@ final class CacheService implements CacheServiceContract
     }
 
     /**
-     * Get cached product data
+     * Get cached product data.
      *
      * @template T
      *
@@ -270,11 +234,41 @@ final class CacheService implements CacheServiceContract
     }
 
     /**
-     * Cache price comparison data
+     * Cache search results.
      *
      * @template T
      *
-     * @param  T  $data
+     * @param T $data
+     */
+    public function cacheSearchResults(string $query, array $filters, $data, ?int $ttl = null): bool
+    {
+        $key = $this->getSearchKey($query, $filters);
+        $defaultTtl = (int) config('coprra.cache.durations.search', 3600);
+        Cache::put($key, $data, $ttl ?? $defaultTtl);
+
+        return true;
+    }
+
+    /**
+     * Get cached search results.
+     *
+     * @template T
+     *
+     * @return T|null
+     */
+    public function getCachedSearchResults(string $query, array $filters = [])
+    {
+        $key = $this->getSearchKey($query, $filters);
+
+        return Cache::get($key);
+    }
+
+    /**
+     * Cache price comparison data.
+     *
+     * @template T
+     *
+     * @param T $data
      */
     public function cachePriceComparison(int $id, $data, ?int $ttl = null): bool
     {
@@ -286,7 +280,7 @@ final class CacheService implements CacheServiceContract
     }
 
     /**
-     * Get cached price comparison data
+     * Get cached price comparison data.
      *
      * @template T
      *
@@ -300,39 +294,7 @@ final class CacheService implements CacheServiceContract
     }
 
     /**
-     * Cache search results
-     *
-     * @param  array<string, string|int|float|bool|null>  $filters
-     * @param  T  $results
-     *
-     * @template T
-     */
-    public function cacheSearchResults(string $query, array $filters, $results, ?int $ttl = null): bool
-    {
-        $key = $this->getSearchKey($query, $filters);
-        $defaultTtl = (int) config('coprra.cache.durations.search', 3600);
-        Cache::put($key, $results, $ttl ?? $defaultTtl);
-
-        return true;
-    }
-
-    /**
-     * Get cached search results
-     *
-     * @param  array<string, string|int|float|bool|null>  $filters
-     * @return T|null
-     *
-     * @template T
-     */
-    public function getCachedSearchResults(string $query, array $filters = [])
-    {
-        $key = $this->getSearchKey($query, $filters);
-
-        return Cache::get($key);
-    }
-
-    /**
-     * Invalidate product cache
+     * Invalidate product cache.
      */
     public function invalidateProduct(int $id): bool
     {
@@ -343,7 +305,7 @@ final class CacheService implements CacheServiceContract
     }
 
     /**
-     * Invalidate category cache
+     * Invalidate category cache.
      */
     public function invalidateCategory(int $id): bool
     {
@@ -354,7 +316,7 @@ final class CacheService implements CacheServiceContract
     }
 
     /**
-     * Invalidate store cache
+     * Invalidate store cache.
      */
     public function invalidateStore(int $id): bool
     {
@@ -365,7 +327,7 @@ final class CacheService implements CacheServiceContract
     }
 
     /**
-     * Clear all cache
+     * Clear all cache.
      */
     #[\Override]
     public function clearAll(): bool
@@ -376,13 +338,13 @@ final class CacheService implements CacheServiceContract
     }
 
     /**
-     * Check if the current cache driver supports tags
+     * Check if the current cache driver supports tags.
      */
     private function supportsTags(): bool
     {
         $driver = config('cache.default');
 
         // Drivers that support tags
-        return in_array($driver, ['redis', 'memcached', 'database']);
+        return \in_array($driver, ['redis', 'memcached', 'database'], true);
     }
 }

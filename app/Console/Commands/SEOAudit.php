@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\Store;
 use App\Services\SEO\SEOAuditor;
 use App\Services\SEO\SEOAuditReporter;
+use App\Services\SEO\SEOAuditResult;
 use App\Services\SEO\SEOIssueFixer;
 use App\Services\SEO\SEORouteAuditor;
 use App\Services\SEOService;
@@ -92,10 +93,10 @@ final class SEOAudit extends Command
         $this->info('🌐 Auditing Routes...');
 
         $publicRoutes = $this->routeAuditor->getPublicRoutes();
-        $this->info('  Found '.count($publicRoutes).' public routes');
+        $this->info('  Found '.\count($publicRoutes).' public routes');
 
         $duplicates = $this->routeAuditor->findDuplicateRoutes($publicRoutes);
-        $this->totalIssues += count($duplicates);
+        $this->totalIssues += \count($duplicates);
 
         $this->reporter->displayDuplicateRoutes($duplicates, $this->option('details'));
     }
@@ -103,7 +104,7 @@ final class SEOAudit extends Command
     /**
      * Audit multiple model types.
      *
-     * @param  array<string, string>  $modelMap  Map of model classes to their labels
+     * @param array<string, string> $modelMap Map of model classes to their labels
      */
     protected function auditModelsByType(array $modelMap): void
     {
@@ -118,13 +119,16 @@ final class SEOAudit extends Command
     protected function auditModels(string $modelClass, string $label): void
     {
         $this->info("📦 Auditing {$label}...");
-        $models = $modelClass::all();
-        $progressBar = $this->output->createProgressBar($models->count());
+        $totalCount = $modelClass::count();
+        $progressBar = $this->output->createProgressBar($totalCount);
 
-        foreach ($models as $model) {
-            $this->processAuditResult($this->seoAuditor->auditModel($model));
-            $progressBar->advance();
-        }
+        // Use chunk for memory efficiency with large datasets
+        $modelClass::chunk(100, function ($models) use ($progressBar) {
+            foreach ($models as $model) {
+                $this->processAuditResult($this->seoAuditor->auditModel($model));
+                $progressBar->advance();
+            }
+        });
 
         $progressBar->finish();
         $this->newLine();
@@ -136,7 +140,7 @@ final class SEOAudit extends Command
     protected function auditSpecificModel(string $model): void
     {
         $modelClass = $this->issueFixer->getModelClassFromType($model);
-        if ($modelClass === null) {
+        if (null === $modelClass) {
             $this->error("Unknown model: {$model}");
 
             return;
@@ -162,14 +166,14 @@ final class SEOAudit extends Command
         $this->seoService = $seoService;
         $this->seoAuditor = new SEOAuditor($seoService);
         $this->reporter = new SEOAuditReporter($this);
-        $this->routeAuditor = new SEORouteAuditor;
-        $this->issueFixer = new SEOIssueFixer;
+        $this->routeAuditor = new SEORouteAuditor();
+        $this->issueFixer = new SEOIssueFixer();
     }
 
     /**
      * Process an audit result.
      */
-    private function processAuditResult(\App\Services\SEO\SEOAuditResult $result): void
+    private function processAuditResult(SEOAuditResult $result): void
     {
         if ($result->hasIssues()) {
             $this->totalIssues += $result->getIssueCount();
@@ -187,10 +191,10 @@ final class SEOAudit extends Command
     /**
      * Fix issues found in an audit result.
      */
-    private function fixAuditResult(\App\Services\SEO\SEOAuditResult $result): void
+    private function fixAuditResult(SEOAuditResult $result): void
     {
         if ($this->issueFixer->fixModelIssues($result->getModel(), $result->getMetaData())) {
-            $this->fixedIssues++;
+            ++$this->fixedIssues;
 
             if ($this->option('details')) {
                 $this->reporter->displayFixConfirmation(
@@ -229,6 +233,6 @@ final class SEOAudit extends Command
      */
     private function shouldAuditSpecificModel(): bool
     {
-        return $this->option('model') !== null;
+        return null !== $this->option('model');
     }
 }

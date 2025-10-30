@@ -4,45 +4,47 @@ declare(strict_types=1);
 
 namespace App\Contracts;
 
+use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 
 interface UserBanService
 {
     /**
      * Ban a user.
      */
-    public function banUser(\App\Models\User $user, string $reason, ?string $description = null, ?Carbon $expiresAt = null): bool;
+    public function banUser(User $user, string $reason, ?string $description = null, ?Carbon $expiresAt = null): bool;
 
     /**
      * Unban a user.
      */
-    public function unbanUser(\App\Models\User $user, ?string $reason = null): bool;
+    public function unbanUser(User $user, ?string $reason = null): bool;
 
     /**
      * Check if user is banned.
      */
-    public function isUserBanned(\App\Models\User $user): bool;
+    public function isUserBanned(User $user): bool;
 
     /**
      * Get ban information.
      *
-     * @return array<string, bool|string|null>|null
+     * @return array<string, bool|string|* @method static \App\Models\Brand create(array<string, string|bool|null>|null
      */
-    public function getBanInfo(\App\Models\User $user): ?array;
+    public function getBanInfo(User $user): ?array;
 
     /**
      * Get all banned users.
      *
-     * @return \Illuminate\Database\Eloquent\Collection<int, \App\Models\User>
+     * @return Collection<int, User>
      */
-    public function getBannedUsers(): \Illuminate\Database\Eloquent\Collection;
+    public function getBannedUsers(): Collection;
 
     /**
      * Get users with expired bans.
      *
-     * @return \Illuminate\Database\Eloquent\Collection<int, \App\Models\User>
+     * @return Collection<int, User>
      */
-    public function getUsersWithExpiredBans(): \Illuminate\Database\Eloquent\Collection;
+    public function getUsersWithExpiredBans(): Collection;
 
     /**
      * Clean up expired bans.
@@ -52,7 +54,7 @@ interface UserBanService
     /**
      * Get ban statistics.
      *
-     * @return array<string, int|array<string, string>>
+     * @return array<string, array<string, string>|int>
      */
     public function getBanStatistics(): array;
 
@@ -66,27 +68,27 @@ interface UserBanService
     /**
      * Check if user can be banned.
      */
-    public function canBanUser(\App\Models\User $user): bool;
+    public function canBanUser(User $user): bool;
 
     /**
      * Check if user can be unbanned.
      */
-    public function canUnbanUser(\App\Models\User $user): bool;
+    public function canUnbanUser(User $user): bool;
 
     /**
      * Get ban history for user.
      *
-     * @return list<array<string, bool|string|null>>
+     * @return list<array<string, bool|string|* @method static \App\Models\Brand create(array<string, string|bool|null>>
      */
-    public function getBanHistory(\App\Models\User $user): array;
+    public function getBanHistory(User $user): array;
 
     /**
      * Extend ban duration.
      */
-    public function extendBan(\App\Models\User $user, Carbon $newExpiresAt, ?string $reason = null): bool;
+    public function extendBan(User $user, Carbon $newExpiresAt, ?string $reason = null): bool;
 
     /**
      * Reduce ban duration.
      */
-    public function reduceBan(\App\Models\User $user, Carbon $newExpiresAt, ?string $reason = null): bool;
+    public function reduceBan(User $user, Carbon $newExpiresAt, ?string $reason = null): bool;
 }

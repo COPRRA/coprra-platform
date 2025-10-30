@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace App\Services\CDN\Services;
 
 use App\Services\CDN\Contracts\CDNProviderInterface;
-use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 /**
- * Service for handling CDN file operations
+ * Service for handling CDN file operations.
  */
 final readonly class CDNFileService
 {
@@ -22,14 +21,15 @@ final readonly class CDNFileService
     }
 
     /**
-     * Upload file to CDN
+     * Upload file to CDN.
      *
-     * @param  string  $content  File content
-     * @param  string  $remotePath  Remote path
-     * @param  string  $mimeType  MIME type
-     * @return array<string, string|null>
+     * @param string $content    File content
+     * @param string $remotePath Remote path
+     * @param string $mimeType   MIME type
      *
-     * @throws Exception
+     * @return array<string, string|* @method static \App\Models\Brand create(array<string, string|bool|null>
+     *
+     * @throws \Exception
      */
     public function upload(string $content, string $remotePath, string $mimeType): array
     {
@@ -43,7 +43,7 @@ final readonly class CDNFileService
             ]);
 
             return $result;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Failed to upload file to CDN', [
                 'remote_path' => $remotePath,
                 'provider' => $this->provider->getName(),
@@ -55,9 +55,9 @@ final readonly class CDNFileService
     }
 
     /**
-     * Delete file from CDN
+     * Delete file from CDN.
      *
-     * @param  string  $remotePath  Remote path
+     * @param string $remotePath Remote path
      */
     public function delete(string $remotePath): bool
     {
@@ -70,7 +70,7 @@ final readonly class CDNFileService
             ]);
 
             return $result;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Failed to delete file from CDN', [
                 'remote_path' => $remotePath,
                 'provider' => $this->provider->getName(),
@@ -82,9 +82,9 @@ final readonly class CDNFileService
     }
 
     /**
-     * Check if file exists on CDN
+     * Check if file exists on CDN.
      *
-     * @param  string  $remotePath  Remote path
+     * @param string $remotePath Remote path
      */
     public function exists(string $remotePath): bool
     {
@@ -93,7 +93,7 @@ final readonly class CDNFileService
             $response = Http::head($url);
 
             return $response->successful();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Failed to check file existence on CDN', [
                 'remote_path' => $remotePath,
                 'error' => $e->getMessage(),
@@ -104,9 +104,10 @@ final readonly class CDNFileService
     }
 
     /**
-     * Get file metadata from CDN
+     * Get file metadata from CDN.
      *
-     * @param  string  $remotePath  Remote path
+     * @param string $remotePath Remote path
+     *
      * @return array<string>
      *
      * @psalm-return array{url?: string, size?: string, mime_type?: string, last_modified?: string, etag?: string, cache_control?: string}
@@ -118,7 +119,7 @@ final readonly class CDNFileService
             $response = Http::head($url);
 
             if (! $response->successful()) {
-                throw new Exception('File not found on CDN');
+                throw new \Exception('File not found on CDN');
             }
 
             return [
@@ -129,7 +130,7 @@ final readonly class CDNFileService
                 'etag' => $response->header('ETag'),
                 'cache_control' => $response->header('Cache-Control'),
             ];
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Failed to get file metadata from CDN', [
                 'remote_path' => $remotePath,
                 'error' => $e->getMessage(),

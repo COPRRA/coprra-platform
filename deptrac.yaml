@@ -1,15 +1,52 @@
 deptrac:
+  # Enhanced paths with comprehensive coverage
   paths:
     - ./app
     - ./config
     - ./database
     - ./routes
+    - ./resources
+    - ./bootstrap
+  
+  # Strict exclusion patterns
   exclude_files:
     - '#.*test.*#'
     - '#.*Test.*#'
     - '#.*Factory.*#'
     - '#.*Seeder.*#'
     - '#.*Migration.*#'
+    - '#.*Fixture.*#'
+    - '#.*Mock.*#'
+    - '#.*Stub.*#'
+    - '#vendor/.*#'
+    - '#storage/.*#'
+    - '#bootstrap/cache/.*#'
+    - '#public/build/.*#'
+  
+  # Enhanced analysis configuration
+  analyser:
+    types:
+      - class
+      - class_superglobal
+      - file
+      - function
+      - function_superglobal
+    
+  # Strict baseline configuration
+  baseline: null
+  
+  # Enhanced output configuration
+  formatters:
+    - codeclimate
+    - graphviz
+    - mermaidjs
+  
+  # Skip violations configuration
+  skip_violations:
+    - App\Models\User+App\Contracts\UserRepositoryInterface
+  
+  # Ignore uncovered internal classes
+  ignore_uncovered_internal_classes: false
   layers:
     - name: Controller
       collectors:
@@ -107,6 +144,242 @@ deptrac:
       collectors:
         - type: classLike
           value: .*Utility.*
+    
+    # Enhanced architectural layers
+    - name: Provider
+      collectors:
+        - type: classLike
+          value: .*Provider.*
+    - name: Observer
+      collectors:
+        - type: classLike
+          value: .*Observer.*
+    - name: Policy
+      collectors:
+        - type: classLike
+          value: .*Policy.*
+    - name: Rule
+      collectors:
+        - type: classLike
+          value: .*Rule.*
+    - name: Cast
+      collectors:
+        - type: classLike
+          value: .*Cast.*
+    - name: Command
+      collectors:
+        - type: classLike
+          value: .*Command.*
+    - name: Console
+      collectors:
+        - type: directory
+          value: ./app/Console
+    - name: Facade
+      collectors:
+        - type: classLike
+          value: .*Facade.*
+    - name: Scope
+      collectors:
+        - type: classLike
+          value: .*Scope.*
+    - name: Builder
+      collectors:
+        - type: classLike
+          value: .*Builder.*
+    - name: Collection
+      collectors:
+        - type: classLike
+          value: .*Collection.*
+    - name: Schema
+      collectors:
+        - type: classLike
+          value: .*Schema.*
+    - name: DataObject
+      collectors:
+        - type: classLike
+          value: .*DataObject.*
+    - name: ValueObject
+      collectors:
+        - type: classLike
+          value: .*ValueObject.*
+    - name: Specification
+      collectors:
+        - type: classLike
+          value: .*Specification.*
+    - name: Strategy
+      collectors:
+        - type: classLike
+          value: .*Strategy.*
+    - name: Adapter
+      collectors:
+        - type: classLike
+          value: .*Adapter.*
+    - name: Decorator
+      collectors:
+        - type: classLike
+          value: .*Decorator.*
+    - name: Gateway
+      collectors:
+        - type: classLike
+          value: .*Gateway.*
+    - name: Transformer
+      collectors:
+        - type: classLike
+          value: .*Transformer.*
+    - name: Validator
+      collectors:
+        - type: classLike
+          value: .*Validator.*
+    - name: Serializer
+      collectors:
+        - type: classLike
+          value: .*Serializer.*
+    - name: Parser
+      collectors:
+        - type: classLike
+          value: .*Parser.*
+    - name: Formatter
+      collectors:
+        - type: classLike
+          value: .*Formatter.*
+    - name: Handler
+      collectors:
+        - type: classLike
+          value: .*Handler.*
+    - name: Processor
+      collectors:
+        - type: classLike
+          value: .*Processor.*
+    - name: Manager
+      collectors:
+        - type: classLike
+          value: .*Manager.*
+    - name: Driver
+      collectors:
+        - type: classLike
+          value: .*Driver.*
+    - name: Client
+      collectors:
+        - type: classLike
+          value: .*Client.*
+    - name: Connector
+      collectors:
+        - type: classLike
+          value: .*Connector.*
+    - name: Bridge
+      collectors:
+        - type: classLike
+          value: .*Bridge.*
+    - name: Proxy
+      collectors:
+        - type: classLike
+          value: .*Proxy.*
+    - name: Filter
+      collectors:
+        - type: classLike
+          value: .*Filter.*
+    - name: Interceptor
+      collectors:
+        - type: classLike
+          value: .*Interceptor.*
+    - name: Resolver
+      collectors:
+        - type: classLike
+          value: .*Resolver.*
+    - name: Dispatcher
+      collectors:
+        - type: classLike
+          value: .*Dispatcher.*
+    - name: Aggregator
+      collectors:
+        - type: classLike
+          value: .*Aggregator.*
+    - name: Calculator
+      collectors:
+        - type: classLike
+          value: .*Calculator.*
+    - name: Generator
+      collectors:
+        - type: classLike
+          value: .*Generator.*
+    - name: Exporter
+      collectors:
+        - type: classLike
+          value: .*Exporter.*
+    - name: Importer
+      collectors:
+        - type: classLike
+          value: .*Importer.*
+    - name: Converter
+      collectors:
+        - type: classLike
+          value: .*Converter.*
+    - name: Mapper
+      collectors:
+        - type: classLike
+          value: .*Mapper.*
+    - name: Normalizer
+      collectors:
+        - type: classLike
+          value: .*Normalizer.*
+    - name: Sanitizer
+      collectors:
+        - type: classLike
+          value: .*Sanitizer.*
+    - name: Encoder
+      collectors:
+        - type: classLike
+          value: .*Encoder.*
+    - name: Decoder
+      collectors:
+        - type: classLike
+          value: .*Decoder.*
+    - name: Compressor
+      collectors:
+        - type: classLike
+          value: .*Compressor.*
+    - name: Extractor
+      collectors:
+        - type: classLike
+          value: .*Extractor.*
+    - name: Analyzer
+      collectors:
+        - type: classLike
+          value: .*Analyzer.*
+    - name: Monitor
+      collectors:
+        - type: classLike
+          value: .*Monitor.*
+    - name: Logger
+      collectors:
+        - type: classLike
+          value: .*Logger.*
+    - name: Auditor
+      collectors:
+        - type: classLike
+          value: .*Auditor.*
+    - name: Tracker
+      collectors:
+        - type: classLike
+          value: .*Tracker.*
+    - name: Profiler
+      collectors:
+        - type: classLike
+          value: .*Profiler.*
+    - name: Debugger
+      collectors:
+        - type: classLike
+          value: .*Debugger.*
+    - name: Tester
+      collectors:
+        - type: classLike
+          value: .*Tester.*
+    - name: Benchmark
+      collectors:
+        - type: classLike
+          value: .*Benchmark.*
+    
+    # Directory-based layers
     - name: Config
       collectors:
         - type: directory
@@ -119,6 +392,36 @@ deptrac:
       collectors:
         - type: directory
           value: ./database
+    - name: Resources
+      collectors:
+        - type: directory
+          value: ./resources
+    - name: Bootstrap
+      collectors:
+        - type: directory
+          value: ./bootstrap
+    
+    # Namespace-based layers
+    - name: AI
+      collectors:
+        - type: className
+          value: App\\Services\\AI\\.*
+    - name: API
+      collectors:
+        - type: className
+          value: App\\Services\\Api\\.*
+    - name: CDN
+      collectors:
+        - type: className
+          value: App\\Services\\CDN\\.*
+    - name: SEO
+      collectors:
+        - type: className
+          value: App\\Services\\SEO\\.*
+    - name: COPRRA
+      collectors:
+        - type: className
+          value: App\\COPRRA\\.*
   ruleset:
     Controller:
       - Service

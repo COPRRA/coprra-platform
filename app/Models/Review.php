@@ -5,22 +5,22 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Database\Factories\ReviewFactory;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * @property int $id
- * @property int $user_id
- * @property int $product_id
- * @property string $title
- * @property string $content
- * @property int $rating
- * @property bool $is_verified_purchase
- * @property bool $is_approved
+ * @property int                $id
+ * @property int                $user_id
+ * @property int                $product_id
+ * @property string             $title
+ * @property string             $content
+ * @property int                $rating
+ * @property bool               $is_verified_purchase
+ * @property bool               $is_approved
  * @property array<string, int> $helpful_votes
- * @property int $helpful_count
- * @property \App\Models\User $user
+ ** @property nt
+ * @property User    $user
  * @property Product $product
  *
  * @method static ReviewFactory factory(...$parameters)
@@ -35,9 +35,9 @@ class Review extends Model
     use HasFactory;
 
     /**
-     * @var class-string<\Illuminate\Database\Eloquent\Factories\Factory<Review>>
+     * @var class-string<Factory<Review>>
      */
-    protected static $factory = \Database\Factories\ReviewFactory::class;
+    protected static $factory = ReviewFactory::class;
 
     /**
      * @var array<int, string>
@@ -65,31 +65,31 @@ class Review extends Model
         'rating' => 'integer',
     ];
 
+    // --- Relationships ---
+
     /**
      * Get the user that owns the review.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<User, Review>
      */
-    public function user(): BelongsTo
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
 
     /**
      * Get the product that the review belongs to.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<Product, Review>
      */
-    public function product(): BelongsTo
+    public function product()
     {
         return $this->belongsTo(Product::class);
     }
 
+    // --- Accessors ---
+
     /**
-     * Accessor to get review text (content).
+     * Get the review text attribute.
      */
-    public function getReviewTextAttribute(): string
+    public function getReviewTextAttribute()
     {
-        return (string) ($this->content ?? '');
+        return $this->content;
     }
 }

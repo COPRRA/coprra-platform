@@ -12,104 +12,249 @@ use Tests\TestCase;
 
 /**
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class HealthControllerTest extends TestCase
+final class HealthControllerTest extends TestCase
 {
     use RefreshDatabase;
 
     #[Test]
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function it_returns_healthy_status_when_all_systems_operational(): void
+    public function itReturnsHealthyStatusWhenAllSystemsOperational(): void
     {
-        $this->assertTrue(true);
+        $response = $this->get('/health');
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'status',
+                'timestamp',
+                'checks' => [
+                    'database',
+                    'cache',
+                    'storage',
+                ],
+            ])
+            ->assertJson([
+                'status' => 'healthy',
+            ])
+        ;
     }
 
     #[Test]
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function it_returns_unhealthy_status_when_database_fails(): void
+    public function itReturnsUnhealthyStatusWhenDatabaseFails(): void
     {
-        $this->assertTrue(true);
+        // Simulate database failure by using wrong connection
+        config(['database.default' => 'invalid_connection']);
+
+        $response = $this->get('/health');
+
+        $response->assertStatus(503)
+            ->assertJsonStructure([
+                'status',
+                'timestamp',
+                'checks',
+                'errors',
+            ])
+        ;
+
+        $data = $response->json();
+        self::assertSame('unhealthy', $data['status']);
+        self::assertArrayHasKey('errors', $data);
     }
 
     #[Test]
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function it_returns_unhealthy_status_when_storage_is_not_writable(): void
+    public function itReturnsUnhealthyStatusWhenStorageIsNotWritable(): void
     {
-        $this->assertTrue(true);
+        $response = $this->get('/health');
+
+        // Health check should test storage writability
+        $response->assertJsonStructure([
+            'status',
+            'checks' => [
+                'storage',
+            ],
+        ]);
+
+        $data = $response->json();
+        self::assertArrayHasKey('checks', $data);
+        self::assertArrayHasKey('storage', $data['checks']);
     }
 
     #[Test]
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function it_returns_unhealthy_status_when_cache_fails(): void
+    public function itReturnsUnhealthyStatusWhenCacheFails(): void
     {
-        $this->assertTrue(true);
+        // Simulate cache failure
+        config(['cache.default' => 'invalid_driver']);
+
+        $response = $this->get('/health');
+
+        $response->assertJsonStructure([
+            'status',
+            'checks' => [
+                'cache',
+            ],
+        ]);
+
+        $data = $response->json();
+        self::assertArrayHasKey('checks', $data);
     }
 
     #[Test]
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function it_includes_timestamp_in_response(): void
+    public function itIncludesTimestampInResponse(): void
     {
-        $this->assertTrue(true);
+        $response = $this->get('/health');
+
+        $response->assertStatus(200)
+            ->assertJsonStructure(['timestamp'])
+        ;
+
+        $data = $response->json();
+        self::assertArrayHasKey('timestamp', $data);
+        self::assertIsString($data['timestamp']);
+        self::assertNotEmpty($data['timestamp']);
     }
 
     #[Test]
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function it_includes_version_in_response(): void
+    public function itIncludesVersionInResponse(): void
     {
-        $this->assertTrue(true);
+        $response = $this->get('/health');
+
+        $response->assertStatus(200);
+
+        $data = $response->json();
+        // Version might be included in response or checks
+        self::assertTrue(
+            isset($data['version']) || isset($data['app_version']) || isset($data['checks']['version']),
+            'Response should include version information'
+        );
     }
 
     #[Test]
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function it_includes_environment_in_response(): void
+    public function itIncludesEnvironmentInResponse(): void
     {
-        $this->assertTrue(true);
+        $response = $this->get('/health');
+
+        $response->assertStatus(200);
+
+        $data = $response->json();
+        // Environment might be included in response or checks
+        self::assertTrue(
+            isset($data['environment']) || isset($data['env']) || isset($data['checks']['environment']),
+            'Response should include environment information'
+        );
     }
 
     #[Test]
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function it_tests_database_connection(): void
+    public function itTestsDatabaseConnection(): void
     {
-        $this->assertTrue(true);
+        $response = $this->get('/health');
+
+        $response->assertJsonStructure([
+            'checks' => [
+                'database',
+            ],
+        ]);
+
+        $data = $response->json();
+        self::assertArrayHasKey('database', $data['checks']);
+        self::assertIsArray($data['checks']['database']) || self::assertIsString($data['checks']['database']);
     }
 
     #[Test]
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function it_tests_cache_functionality(): void
+    public function itTestsCacheFunctionality(): void
     {
-        $this->assertTrue(true);
+        $response = $this->get('/health');
+
+        $response->assertJsonStructure([
+            'checks' => [
+                'cache',
+            ],
+        ]);
+
+        $data = $response->json();
+        self::assertArrayHasKey('cache', $data['checks']);
     }
 
     #[Test]
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function it_tests_storage_writability(): void
+    public function itTestsStorageWritability(): void
     {
-        $this->assertTrue(true);
+        $response = $this->get('/health');
+
+        $response->assertJsonStructure([
+            'checks' => [
+                'storage',
+            ],
+        ]);
+
+        $data = $response->json();
+        self::assertArrayHasKey('storage', $data['checks']);
     }
 
     #[Test]
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function it_handles_multiple_system_failures(): void
+    public function itHandlesMultipleSystemFailures(): void
     {
-        $this->assertTrue(true);
+        // Simulate multiple failures
+        config(['database.default' => 'invalid_connection']);
+        config(['cache.default' => 'invalid_driver']);
+
+        $response = $this->get('/health');
+
+        $response->assertStatus(503)
+            ->assertJsonStructure([
+                'status',
+                'checks',
+                'errors',
+            ])
+        ;
+
+        $data = $response->json();
+        self::assertSame('unhealthy', $data['status']);
+        self::assertArrayHasKey('errors', $data);
+        self::assertIsArray($data['errors']);
     }
 
     #[Test]
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function it_handles_cache_test_failure(): void
+    public function itHandlesCacheTestFailure(): void
     {
-        $this->assertTrue(true);
+        $response = $this->get('/health');
+
+        $response->assertJsonStructure([
+            'status',
+            'checks',
+        ]);
+
+        $data = $response->json();
+        self::assertArrayHasKey('checks', $data);
+
+        // Verify cache check exists and has proper structure
+        if (isset($data['checks']['cache'])) {
+            self::assertNotNull($data['checks']['cache']);
+        }
     }
 }

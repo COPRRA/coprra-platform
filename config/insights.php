@@ -8,7 +8,9 @@ use NunoMaduro\PhpInsights\Domain\Insights\ForbiddenNormalClasses;
 use NunoMaduro\PhpInsights\Domain\Insights\ForbiddenPrivateMethods;
 use NunoMaduro\PhpInsights\Domain\Insights\ForbiddenTraits;
 use NunoMaduro\PhpInsights\Domain\Metrics\Architecture\Classes;
+use SlevomatCodingStandard\Sniffs\Commenting\DocCommentSpacingSniff;
 use SlevomatCodingStandard\Sniffs\Commenting\UselessFunctionDocCommentSniff;
+use SlevomatCodingStandard\Sniffs\Functions\StaticClosureSniff;
 use SlevomatCodingStandard\Sniffs\Namespaces\AlphabeticallySortedUsesSniff;
 use SlevomatCodingStandard\Sniffs\TypeHints\DeclareStrictTypesSniff;
 use SlevomatCodingStandard\Sniffs\TypeHints\DisallowMixedTypeHintSniff;
@@ -17,7 +19,6 @@ use SlevomatCodingStandard\Sniffs\TypeHints\PropertyTypeHintSniff;
 use SlevomatCodingStandard\Sniffs\TypeHints\ReturnTypeHintSniff;
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Default Preset
@@ -87,8 +88,8 @@ return [
         ReturnTypeHintSniff::class,
         UselessFunctionDocCommentSniff::class,
         // The following rules are disabled to avoid conflicts with Pint.
-        \SlevomatCodingStandard\Sniffs\Functions\StaticClosureSniff::class,
-        \SlevomatCodingStandard\Sniffs\Commenting\DocCommentSpacingSniff::class,
+        StaticClosureSniff::class,
+        DocCommentSpacingSniff::class,
     ],
 
     'config' => [
@@ -107,11 +108,11 @@ return [
     */
 
     'requirements' => [
-        //        'min-quality' => 0,
-        //        'min-complexity' => 0,
-        //        'min-architecture' => 0,
-        //        'min-style' => 0,
-        //        'disable-security-check' => false,
+        'min-quality' => 90,
+        'min-complexity' => 80,
+        'min-architecture' => 85,
+        'min-style' => 95,
+        'disable-security-check' => false,
     ],
 
     /*
@@ -119,9 +120,10 @@ return [
     | Threads
     |--------------------------------------------------------------------------
     |
-    | Here you may adjust how many threads (core) PHPInsights can use to perform
-    | the analysis. This is optional, don't provide it and the tool will guess
-    | the max core number available. It accepts null value or integer > 0.
+    | Here you may adjust how many threads (core) PHPInsights can use to run
+    | the analysis. This is optional, should be a integer and if null,
+    | the tool will guess the max core number available. The default
+    | is null.
     |
     */
 
@@ -133,10 +135,51 @@ return [
     |--------------------------------------------------------------------------
     | Here you may adjust the timeout (in seconds) for PHPInsights to run before
     | a ProcessTimedOutException is thrown.
-    | This accepts an int > 0. Default is 60 seconds, which is the default value
-    | of Symfony's setTimeout function.
+    | This is optional, should be an integer and defaults to 60 seconds.
     |
     */
 
-    'timeout' => 60,
+    'timeout' => 120,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Memory Limit
+    |--------------------------------------------------------------------------
+    | Here you may adjust the memory limit for PHPInsights analysis.
+    | This is useful for large codebases that require more memory.
+    |
+    */
+
+    'memory_limit' => '2G',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Output Format
+    |--------------------------------------------------------------------------
+    | Here you may define the output format for PHPInsights reports.
+    | Available formats: console, json, checkstyle, github, gitlab
+    |
+    */
+
+    'output_format' => 'console',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Verbose Mode
+    |--------------------------------------------------------------------------
+    | Enable verbose output for detailed analysis information.
+    |
+    */
+
+    'verbose' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Show Progress
+    |--------------------------------------------------------------------------
+    | Show progress bar during analysis.
+    |
+    */
+
+    'show_progress' => true,
 ];

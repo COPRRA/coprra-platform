@@ -1,0 +1,83 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Build outputs
+build/
+dist/
+public/build/
+public/hot
+public/storage/
+
+# Storage and cache
+storage/
+bootstrap/cache/
+.cache/
+
+# Logs
+*.log
+logs/
+
+# Coverage reports
+coverage/
+.nyc_output/
+
+# Environment files
+.env*
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Minified files
+*.min.js
+*.min.css
+*.min.scss
+
+# Generated files
+*.generated.*
+*.auto.*
+
+# Documentation builds
+docs/_build/
+docs/build/
+
+# Test artifacts
+.phpunit.result.cache
+junit.xml
+
+# Reports
+reports/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Lock files
+package-lock.json
+composer.lock
+yarn.lock
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+.circleci/
+
+# Laravel specific
+artisan
+server.php

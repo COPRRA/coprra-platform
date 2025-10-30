@@ -1,0 +1,1 @@
+C:\Users\Gaser\Desktop\COPRRA\app\Providers\CoprraServiceProvider.php:30  UnusedPrivateMethod  Avoid unused private methods such as 'registerBladeDirectives'.

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use App\Models\PriceHistory;
+use App\Models\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -15,7 +16,7 @@ class PriceHistoryFactory extends Factory
     protected $model = PriceHistory::class;
 
     /**
-     * @return (ProductFactory|\DateTime|float)[]
+     * @return (\DateTime|float|ProductFactory)[]
      *
      * @psalm-return array{product_id: ProductFactory, price: float, effective_date: \DateTime}
      */
@@ -23,7 +24,7 @@ class PriceHistoryFactory extends Factory
     public function definition()
     {
         return [
-            'product_id' => \App\Models\Product::factory(),
+            'product_id' => Product::factory(),
             'price' => $this->faker->randomFloat(2, 10, 1000),
             'effective_date' => $this->faker->dateTimeThisYear(),
         ];

@@ -6,23 +6,13 @@ namespace Tests\Performance;
 
 use Tests\TestCase;
 
-class CachePerformanceTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class CachePerformanceTest extends TestCase
 {
-    public function test_cache_performance(): void
-    {
-        $this->assertTrue(true);
-    }
-
-    public function test_cache_hit_ratio(): void
-    {
-        $this->assertTrue(true);
-    }
-
-    public function test_cache_memory_usage(): void
-    {
-        $this->assertTrue(true);
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -31,5 +21,20 @@ class CachePerformanceTest extends TestCase
     protected function tearDown(): void
     {
         parent::tearDown();
+    }
+
+    public function testCachePerformance(): void
+    {
+        self::assertTrue(true);
+    }
+
+    public function testCacheHitRatio(): void
+    {
+        self::assertTrue(true);
+    }
+
+    public function testCacheMemoryUsage(): void
+    {
+        self::assertTrue(true);
     }
 }

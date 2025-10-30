@@ -30,17 +30,19 @@ interface StoreAdapter
     /**
      * Fetch product data by product identifier.
      *
-     * @param  string  $productIdentifier  The product ID/SKU/ASIN
-     * @return array<string, string|float|int|array<string, string>|null>|null
+     * @param string $productIdentifier The product ID/SKU/ASIN
+     *
+     * @return array<string, string|float|int|array<string, string>|* @method static \App\Models\Brand create(array<string, string|bool|null>|null
      */
     public function fetchProduct(string $productIdentifier): ?array;
 
     /**
      * Search for products by query.
      *
-     * @param  string  $query  Search query
-     * @param  array<string, string|int|float|bool|null>  $options  Search options (limit, page, filters, etc.)
-     * @return array<int, array<string, string|float|int|array<string, string>|null>>
+     * @param string $query Search query
+     * @param  array<string, string|int|float|bool|* @method static \App\Models\Brand create(array<string, string|bool|null>  $options  Search options (limit, page, filters, etc.)
+     *
+     * @return array<int, array<string, string|float|int|array<string, string>|* @method static \App\Models\Brand create(array<string, string|bool|null>>
      */
     public function searchProducts(string $query, array $options = []): array;
 

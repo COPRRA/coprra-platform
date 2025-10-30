@@ -8,15 +8,33 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\Product;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\DatabaseSetup;
 use Tests\TestCase;
 
-class DataConsistencyTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class DataConsistencyTest extends TestCase
 {
     use DatabaseSetup;
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_order_total_matches_items_sum(): void
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->setUpDatabase();
+    }
+
+    protected function tearDown(): void
+    {
+        $this->tearDownDatabase();
+        parent::tearDown();
+    }
+
+    #[Test]
+    public function testOrderTotalMatchesItemsSum(): void
     {
         $product = Product::factory()->create(['price' => 100]);
         $order = Order::factory()->create([
@@ -36,13 +54,13 @@ class DataConsistencyTest extends TestCase
         ]);
 
         $expectedTotal = 200; // 2 * 100
-        $this->assertEquals($expectedTotal, $order->total_amount);
+        self::assertSame($expectedTotal, $order->total_amount);
     }
 
     // Removed stock consistency test as stock decrement logic is not implemented
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_order_items_product_reference(): void
+    #[Test]
+    public function testOrderItemsProductReference(): void
     {
         $product = Product::factory()->create();
         $order = Order::factory()->create();
@@ -52,12 +70,12 @@ class DataConsistencyTest extends TestCase
             'product_id' => $product->id,
         ]);
 
-        $this->assertTrue($orderItem->product()->exists());
-        $this->assertEquals($product->id, $orderItem->product->id);
+        self::assertTrue($orderItem->product()->exists());
+        self::assertSame($product->id, $orderItem->product->id);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_order_status_consistency(): void
+    #[Test]
+    public function testOrderStatusConsistency(): void
     {
         $order = Order::factory()->create(['status' => 'completed']);
         $payment = Payment::factory()->create([
@@ -66,19 +84,7 @@ class DataConsistencyTest extends TestCase
             'status' => 'completed',
         ]);
 
-        $this->assertEquals('completed', $order->status);
-        $this->assertEquals(100.00, $payment->amount);
-    }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->setUpDatabase();
-    }
-
-    protected function tearDown(): void
-    {
-        $this->tearDownDatabase();
-        parent::tearDown();
+        self::assertSame('completed', $order->status);
+        self::assertSame(100.00, $payment->amount);
     }
 }

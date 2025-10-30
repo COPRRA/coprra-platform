@@ -8,9 +8,15 @@ use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class ReviewTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class ReviewTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -19,8 +25,8 @@ class ReviewTest extends TestCase
         parent::setUp();
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_create_a_review(): void
+    #[Test]
+    public function testItCanCreateAReview(): void
     {
         $user = User::factory()->create(['email' => 'user@example.com']);
         $product = Product::factory()->create();
@@ -36,14 +42,14 @@ class ReviewTest extends TestCase
             'helpful_count' => 10,
         ]);
 
-        $this->assertInstanceOf(Review::class, $review);
-        $this->assertEquals('Great Product', $review->title);
-        $this->assertEquals('I really liked this product.', $review->content);
-        $this->assertEquals(5, $review->rating);
-        $this->assertTrue($review->is_verified_purchase);
-        $this->assertTrue($review->is_approved);
-        $this->assertEquals(10, $review->helpful_count);
-        $this->assertIsArray($review->helpful_votes);
+        self::assertInstanceOf(Review::class, $review);
+        self::assertSame('Great Product', $review->title);
+        self::assertSame('I really liked this product.', $review->content);
+        self::assertSame(5, $review->rating);
+        self::assertTrue($review->is_verified_purchase);
+        self::assertTrue($review->is_approved);
+        self::assertSame(10, $review->helpful_count);
+        self::assertIsArray($review->helpful_votes);
 
         $this->assertDatabaseHas('reviews', [
             'user_id' => $user->id,
@@ -57,8 +63,8 @@ class ReviewTest extends TestCase
         ]);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_casts_attributes_correctly(): void
+    #[Test]
+    public function testItCastsAttributesCorrectly(): void
     {
         $review = Review::factory()->create([
             'rating' => '5',
@@ -68,51 +74,51 @@ class ReviewTest extends TestCase
             'helpful_votes' => ['user1', 'user2'],
         ]);
 
-        $this->assertIsInt($review->rating);
-        $this->assertIsBool($review->is_verified_purchase);
-        $this->assertIsBool($review->is_approved);
-        $this->assertIsInt($review->helpful_count);
-        $this->assertIsArray($review->helpful_votes);
-        $this->assertEquals(5, $review->rating);
-        $this->assertTrue($review->is_verified_purchase);
-        $this->assertFalse($review->is_approved);
-        $this->assertEquals(10, $review->helpful_count);
-        $this->assertEquals(['user1', 'user2'], $review->helpful_votes);
+        self::assertIsInt($review->rating);
+        self::assertIsBool($review->is_verified_purchase);
+        self::assertIsBool($review->is_approved);
+        self::assertIsInt($review->helpful_count);
+        self::assertIsArray($review->helpful_votes);
+        self::assertSame(5, $review->rating);
+        self::assertTrue($review->is_verified_purchase);
+        self::assertFalse($review->is_approved);
+        self::assertSame(10, $review->helpful_count);
+        self::assertSame(['user1', 'user2'], $review->helpful_votes);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_belongs_to_user(): void
+    #[Test]
+    public function testItBelongsToUser(): void
     {
         $user = User::factory()->create(['email' => 'user@example.com']);
         $product = Product::factory()->create();
         $review = Review::factory()->create(['user_id' => $user->id, 'product_id' => $product->id]);
 
-        $this->assertInstanceOf(User::class, $review->user);
-        $this->assertEquals($user->id, $review->user->id);
+        self::assertInstanceOf(User::class, $review->user);
+        self::assertSame($user->id, $review->user->id);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_belongs_to_product(): void
+    #[Test]
+    public function testItBelongsToProduct(): void
     {
         $user = User::factory()->create(['email' => 'user@example.com']);
         $product = Product::factory()->create();
         $review = Review::factory()->create(['user_id' => $user->id, 'product_id' => $product->id]);
 
-        $this->assertInstanceOf(Product::class, $review->product);
-        $this->assertEquals($product->id, $review->product->id);
+        self::assertInstanceOf(Product::class, $review->product);
+        self::assertSame($product->id, $review->product->id);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_get_review_text_attribute(): void
+    #[Test]
+    public function testGetReviewTextAttribute(): void
     {
         $content = 'This is the review content.';
         $review = Review::factory()->create(['content' => $content]);
 
-        $this->assertEquals($content, $review->getReviewTextAttribute());
+        self::assertSame($content, $review->getReviewTextAttribute());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_fillable_attributes(): void
+    #[Test]
+    public function testFillableAttributes(): void
     {
         $fillable = [
             'user_id',
@@ -126,21 +132,21 @@ class ReviewTest extends TestCase
             'helpful_count',
         ];
 
-        $this->assertEquals($fillable, (new Review)->getFillable());
+        self::assertSame($fillable, (new Review())->getFillable());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_factory_creates_valid_review(): void
+    #[Test]
+    public function testFactoryCreatesValidReview(): void
     {
         $review = Review::factory()->make();
 
-        $this->assertInstanceOf(Review::class, $review);
-        $this->assertNotEmpty($review->title);
-        $this->assertNotEmpty($review->content);
-        $this->assertIsInt($review->rating);
-        $this->assertIsBool($review->is_verified_purchase);
-        $this->assertIsBool($review->is_approved);
-        $this->assertIsArray($review->helpful_votes);
-        $this->assertIsInt($review->helpful_count);
+        self::assertInstanceOf(Review::class, $review);
+        self::assertNotEmpty($review->title);
+        self::assertNotEmpty($review->content);
+        self::assertIsInt($review->rating);
+        self::assertIsBool($review->is_verified_purchase);
+        self::assertIsBool($review->is_approved);
+        self::assertIsArray($review->helpful_votes);
+        self::assertIsInt($review->helpful_count);
     }
 }

@@ -24,7 +24,7 @@ class LogProcessingServiceProvider extends ServiceProvider
         $this->app->singleton(ErrorStatisticsCalculator::class);
         $this->app->singleton(SystemHealthChecker::class);
 
-        $this->app->singleton(LogProcessingService::class, function ($app): \App\Services\LogProcessing\LogProcessingService {
+        $this->app->singleton(LogProcessingService::class, static function ($app): LogProcessingService {
             return new LogProcessingService(
                 $app->make(LogFileReader::class),
                 $app->make(LogLineParser::class),
@@ -33,9 +33,4 @@ class LogProcessingServiceProvider extends ServiceProvider
             );
         });
     }
-
-    /**
-     * Bootstrap services.
-     */
-    public function boot(): void {}
 }

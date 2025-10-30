@@ -5,33 +5,37 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Database\Factories\StoreFactory;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\MessageBag;
 
 /**
- * @property int $id
- * @property string $name
- * @property string $slug
- * @property string|null $description
- * @property string|null $logo_url
- * @property string|null $website_url
- * @property string|null $country_code
+ * @property int                $id
+ * @property string             $name
+ * @property string             $slug
+ * @property string|null        $description
+ * @property string|null        $logo_url
+ * @property string|null        $website_url
+ * @property string|null        $country_code
  * @property array<string>|null $supported_countries
- * @property bool $is_active
- * @property int $priority
- * @property string|null $affiliate_base_url
- * @property string|null $affiliate_code
- * @property array<string, string|null>|null $api_config
+ * @property bool               $is_active
+ * @property int                $priority
+ * @property string|null        $affiliate_base_url
+ * @property string|null        $affiliate_code
+ * @property array<string, string|* @method static \App\Models\Brand create(array<string, string|bool|null>|null $api_config
  * @property int|null $currency_id
- * @property \Carbon\Carbon|null $created_at
- * @property \Carbon\Carbon|null $updated_at
- * @property \Carbon\Carbon|null $deleted_at
+ ** @property Carbon|nullCarbon|null $created_at
+ ** @property Carbon|nullCarbon|null $updated_at
+ ** @property Carbon|nullCarbon|null $deleted_at
  * @property int $price_offers_count
- * @property \Illuminate\Database\Eloquent\Collection<int, PriceOffer> $priceOffers
- * @property \Illuminate\Database\Eloquent\Collection<int, Product> $products
- * @property Currency|null $currency
+ ** @property $priceOffers
+ * @property Collection<int, Product> $products
+ * @property Currency|null            $currency
  *
  * @method static StoreFactory factory(...$parameters)
  *
@@ -47,9 +51,9 @@ class Store extends ValidatableModel
     use SoftDeletes;
 
     /**
-     * @var class-string<\Illuminate\Database\Eloquent\Factories\Factory<Store>>
+     * @var class-string<Factory<Store>>
      */
-    protected static $factory = \Database\Factories\StoreFactory::class;
+    protected static $factory = StoreFactory::class;
 
     /**
      * @var array<int, string>
@@ -80,7 +84,7 @@ class Store extends ValidatableModel
         'priority' => 'integer',
     ];
 
-    protected ?\Illuminate\Support\MessageBag $errors = null;
+    protected ?MessageBag $errors = null;
 
     /**
      * The attributes that should be validated.
@@ -103,123 +107,10 @@ class Store extends ValidatableModel
         'currency_id' => 'nullable|exists:currencies,id',
     ];
 
-    public function generateAffiliateUrl(string $productUrl): string
-    {
-        if ($this->affiliate_base_url === null || $this->affiliate_base_url === '' || ($this->affiliate_code === null || $this->affiliate_code === '')) {
-            return $productUrl;
-        }
-
-        $affiliateCode = (string) $this->affiliate_code;
-        $affiliateBaseUrl = (string) $this->affiliate_base_url;
-
-        $affiliateUrl = str_replace('{AFFILIATE_CODE}', $affiliateCode, $affiliateBaseUrl);
-
-        // Keep slashes unencoded to match test expectations
-        $encoded = str_replace('%2F', '/', rawurlencode($productUrl));
-
-        return str_replace('{URL}', $encoded, $affiliateUrl);
-    }
+    // --- Relationships ---
 
     /**
-     * Ensure supported_countries is always returned as an array.
-     * Handles cases where the database stores a JSON string.
-     *
-     * @return array<int, string>|null
-     */
-    public function getSupportedCountriesAttribute($value): ?array
-    {
-        if ($value === null) {
-            return null;
-        }
-        if (is_array($value)) {
-            return $value;
-        }
-        if (is_string($value)) {
-            $decoded = json_decode($value, true);
-
-            return is_array($decoded) ? $decoded : [];
-        }
-
-        return [];
-    }
-
-    /**
-     * Normalize supported_countries on write to avoid double-encoded JSON.
-     */
-    public function setSupportedCountriesAttribute($value): void
-    {
-        if (is_string($value)) {
-            $decoded = json_decode($value, true);
-            $this->attributes['supported_countries'] = is_array($decoded) ? json_encode($decoded) : json_encode([$value]);
-
-            return;
-        }
-        $this->attributes['supported_countries'] = json_encode($value ?? []);
-    }
-
-    /**
-     * Ensure api_config is always returned as an array.
-     * Handles cases where the database stores a JSON string.
-     *
-     * @return array<string, mixed>|null
-     */
-    public function getApiConfigAttribute($value): ?array
-    {
-        if ($value === null) {
-            return null;
-        }
-        if (is_array($value)) {
-            return $value;
-        }
-        if (is_string($value)) {
-            $decoded = json_decode($value, true);
-
-            return is_array($decoded) ? $decoded : [];
-        }
-
-        return [];
-    }
-
-    /**
-     * Normalize api_config on write to avoid double-encoded JSON.
-     */
-    public function setApiConfigAttribute($value): void
-    {
-        if (is_string($value)) {
-            $decoded = json_decode($value, true);
-            $this->attributes['api_config'] = is_array($decoded) ? json_encode($decoded) : json_encode([$value]);
-
-            return;
-        }
-        $this->attributes['api_config'] = json_encode($value ?? []);
-    }
-
-    // --- Scopes ---
-
-    /**
-     * @param  \Illuminate\Database\Eloquent\Builder<Store>  $query
-     *
-     * @psalm-return \Illuminate\Database\Eloquent\Builder<self>
-     */
-    public function scopeActive(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
-    {
-        return $query->where('is_active', true);
-    }
-
-    /**
-     * @param  \Illuminate\Database\Eloquent\Builder<Store>  $query
-     *
-     * @psalm-return \Illuminate\Database\Eloquent\Builder<self>
-     */
-    public function scopeSearch(\Illuminate\Database\Eloquent\Builder $query, string $searchTerm): \Illuminate\Database\Eloquent\Builder
-    {
-        return $query->where('name', 'like', "%{$searchTerm}%");
-    }
-
-    /**
-     * Get the price offers associated with the store.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<PriceOffer>
+     * Get the price offers for this store.
      */
     public function priceOffers(): HasMany
     {
@@ -227,9 +118,7 @@ class Store extends ValidatableModel
     }
 
     /**
-     * Get the products associated with the store.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<Product>
+     * Get the products for this store.
      */
     public function products(): HasMany
     {
@@ -237,13 +126,57 @@ class Store extends ValidatableModel
     }
 
     /**
-     * Get the currency associated with the store.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<Currency, Store>
+     * Get the currency for this store.
      */
     public function currency(): BelongsTo
     {
         return $this->belongsTo(Currency::class);
+    }
+
+    // --- Scopes ---
+
+    /**
+     * Scope a query to only include active stores.
+     */
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('is_active', true);
+    }
+
+    /**
+     * Scope a query to search stores by name.
+     */
+    public function scopeSearch(Builder $query, string $search): Builder
+    {
+        return $query->where('name', 'like', "%{$search}%");
+    }
+
+    // --- Methods ---
+
+    /**
+     * Generate affiliate URL for a product URL.
+     */
+    public function generateAffiliateUrl(string $productUrl): string
+    {
+        if (empty($this->affiliate_base_url) || empty($this->affiliate_code)) {
+            return $productUrl;
+        }
+
+        $encodedUrl = str_replace(':', '%3A', $productUrl);
+
+        return str_replace(
+            ['{AFFILIATE_CODE}', '{URL}'],
+            [$this->affiliate_code, $encodedUrl],
+            $this->affiliate_base_url
+        );
+    }
+
+    /**
+     * Get the validation rules for this model.
+     */
+    public function getRules(): array
+    {
+        return $this->rules;
     }
 
     /**

@@ -11,7 +11,7 @@ class TrustHosts extends Middleware
     /**
      * Get the host patterns that should be trusted.
      *
-     * @return array<string|null>
+     * @return array<string|* @method static \App\Models\Brand create(array<string, string|bool|null>
      *
      * @psalm-return list{string|null}
      */

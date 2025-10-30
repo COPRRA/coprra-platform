@@ -10,13 +10,8 @@ final readonly class ConfigurationService
 {
     private Repository $configRepository;
 
-    public function __construct(Repository $configRepository)
-    {
-        $this->configRepository = $configRepository;
-    }
-
     /**
-     * @return array<string, bool|array<string, bool>|array<string, array<string, bool|int|string>>>
+     * @return array<string, array<string, array<string, bool|int|string>>|array<string, bool>|bool>
      */
     public function getSuspiciousActivityConfig(): array
     {

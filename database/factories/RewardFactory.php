@@ -35,25 +35,4 @@ class RewardFactory extends Factory
             'valid_until' => $now->copy()->addDays(7),
         ];
     }
-
-    public function inactive(): self
-    {
-        return $this->state(fn () => [
-            'is_active' => false,
-        ]);
-    }
-
-    public function expired(): self
-    {
-        return $this->state(fn () => [
-            'valid_until' => Carbon::now()->subDay(),
-        ]);
-    }
-
-    public function future(): self
-    {
-        return $this->state(fn () => [
-            'valid_from' => Carbon::now()->addDay(),
-        ]);
-    }
 }

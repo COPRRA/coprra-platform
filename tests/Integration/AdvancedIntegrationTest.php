@@ -7,41 +7,13 @@ namespace Tests\Integration;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class AdvancedIntegrationTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class AdvancedIntegrationTest extends TestCase
 {
-    #[Test]
-    public function full_workflow_integration(): void
-    {
-        // Test full workflow integration
-        $response = $this->get('/');
-        $this->assertTrue(in_array($response->status(), [200, 302, 404, 500]));
-
-        $response = $this->get('/api/products');
-        $this->assertTrue(in_array($response->status(), [200, 401, 404, 500]));
-    }
-
-    #[Test]
-    public function api_database_integration(): void
-    {
-        // Test API database integration
-        $response = $this->getJson('/api/products');
-        $this->assertTrue(in_array($response->status(), [200, 401, 404, 500]));
-
-        $response = $this->getJson('/api/categories');
-        $this->assertTrue(in_array($response->status(), [200, 401, 404, 500]));
-    }
-
-    #[Test]
-    public function frontend_backend_integration(): void
-    {
-        // Test frontend-backend integration
-        $response = $this->get('/');
-        $this->assertTrue(in_array($response->status(), [200, 302, 404, 500]));
-
-        $response = $this->post('/api/test', ['test' => 'data']);
-        $this->assertTrue(in_array($response->status(), [200, 302, 404, 422, 500]));
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -50,5 +22,38 @@ class AdvancedIntegrationTest extends TestCase
     protected function tearDown(): void
     {
         parent::tearDown();
+    }
+
+    #[Test]
+    public function fullWorkflowIntegration(): void
+    {
+        // Test full workflow integration
+        $response = $this->get('/');
+        self::assertTrue(\in_array($response->status(), [200, 302, 404, 500], true));
+
+        $response = $this->get('/api/products');
+        self::assertTrue(\in_array($response->status(), [200, 401, 404, 500], true));
+    }
+
+    #[Test]
+    public function apiDatabaseIntegration(): void
+    {
+        // Test API database integration
+        $response = $this->getJson('/api/products');
+        self::assertTrue(\in_array($response->status(), [200, 401, 404, 500], true));
+
+        $response = $this->getJson('/api/categories');
+        self::assertTrue(\in_array($response->status(), [200, 401, 404, 500], true));
+    }
+
+    #[Test]
+    public function frontendBackendIntegration(): void
+    {
+        // Test frontend-backend integration
+        $response = $this->get('/');
+        self::assertTrue(\in_array($response->status(), [200, 302, 404, 500], true));
+
+        $response = $this->post('/api/test', ['test' => 'data']);
+        self::assertTrue(\in_array($response->status(), [200, 302, 404, 422, 500], true));
     }
 }

@@ -10,7 +10,6 @@ use App\Services\Backup\Services\BackupDatabaseService;
 use App\Services\Backup\Services\BackupFileSystemService;
 use App\Services\Backup\Services\BackupValidatorService;
 use App\Services\Backup\Strategies\BackupStrategyInterface;
-use Exception;
 use Illuminate\Support\Facades\Log;
 
 final class BackupManagerService
@@ -30,20 +29,6 @@ final class BackupManagerService
      */
     private array $strategies = [];
 
-    public function __construct(
-        BackupValidatorService $validatorService,
-        BackupCompressionService $compressionService,
-        BackupDatabaseService $databaseService,
-        BackupFileSystemService $fileSystemService,
-        BackupConfigurationService $configurationService
-    ) {
-        $this->validatorService = $validatorService;
-        $this->compressionService = $compressionService;
-        $this->databaseService = $databaseService;
-        $this->fileSystemService = $fileSystemService;
-        $this->configurationService = $configurationService;
-    }
-
     /**
      * Register a backup strategy.
      */
@@ -55,12 +40,13 @@ final class BackupManagerService
     /**
      * Create a backup.
      *
-     * @param  array{type: string, name: string, directories?: array, tables?: array, compress?: bool}  $options
-     * @return array<array<array<array<int|string|array<string>>>|float|int|string>|int|string>
+     * @param array{type: string, name: string, directories?: array, tables?: array, compress?: bool} $options
+     *
+     * @return array<array<array<array<array<string>|int|string>>|float|int|string>|int|string>
      *
      * @psalm-return array{path: string, size: int, manifest: array{components: array{database?: array{filename: string, size: int, status: string}, files?: array{directories: list<string>, size: int, status: string}, config?: array{files: list<string>, size: int, status: string}}, size: int, status: 'completed', name: string, type: string, created_at: string, compressed_size?: int, compression_time?: float, compressed_path?: string}}
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function createBackup(array $options): array
     {
@@ -97,7 +83,7 @@ final class BackupManagerService
                 'size' => $manifest['size'],
                 'manifest' => $manifest,
             ];
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->cleanupFailedBackup($backupDir);
 
             throw $e;
@@ -107,12 +93,13 @@ final class BackupManagerService
     /**
      * Restore from backup.
      *
-     * @param  array{components?: array, overwrite?: bool}  $options
+     * @param array{components?: array, overwrite?: bool} $options
+     *
      * @return array<array<array>|string>
      *
      * @psalm-return array{components: array<string, array<string, mixed>>, status: 'completed'}
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function restoreBackup(string $backupPath, array $options): array
     {
@@ -131,7 +118,7 @@ final class BackupManagerService
                 'components' => $restoreResults,
                 'status' => 'completed',
             ];
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->cleanupExtractedDirectory($extractDir);
 
             throw $e;
@@ -141,23 +128,23 @@ final class BackupManagerService
     /**
      * Execute backup components.
      *
-     * @return array<array<array<int|string|array<string>>>|int|string>
+     * @return array<array<array<array<string>|int|string>>|int|string>
      *
      * @psalm-return array{components: array{database?: array{filename: string, size: int, status: string}, files?: array{directories: list<string>, size: int, status: string}, config?: array{files: list<string>, size: int, status: string}}, size: int, status: 'completed'}
      *
-     * @throws Exception
+     * @throws \Exception
      */
     private function executeBackupComponents(string $backupDir, string $type): array
     {
         $components = [];
         $totalSize = 0;
 
-        if ($type === 'full' || $type === 'database') {
+        if ('full' === $type || 'database' === $type) {
             $components['database'] = $this->databaseService->backupDatabase($backupDir);
             $totalSize += $components['database']['size'];
         }
 
-        if ($type === 'full' || $type === 'files') {
+        if ('full' === $type || 'files' === $type) {
             $components['files'] = $this->fileSystemService->backupFiles($backupDir);
             $totalSize += $components['files']['size'];
 
@@ -175,12 +162,13 @@ final class BackupManagerService
     /**
      * Execute restore components.
      *
-     * @param  array{components?: array, overwrite?: bool}  $options
+     * @param array{components?: array, overwrite?: bool} $options
+     *
      * @return array<array>
      *
      * @psalm-return array<string, array<string, mixed>>
      *
-     * @throws Exception
+     * @throws \Exception
      */
     private function executeRestoreComponents(string $extractDir, array $manifest, array $options): array
     {
@@ -190,7 +178,7 @@ final class BackupManagerService
         foreach ($requestedComponents as $component) {
             if (isset($manifest['components'][$component])) {
                 $strategy = $this->findStrategyForComponent($component);
-                if ($strategy instanceof \App\Services\Backup\Strategies\BackupStrategyInterface) {
+                if ($strategy instanceof BackupStrategyInterface) {
                     $results[$component] = $strategy->restore($extractDir, $manifest['components'][$component]);
                 }
             }
@@ -216,7 +204,7 @@ final class BackupManagerService
     /**
      * Create backup directory.
      *
-     * @throws Exception
+     * @throws \Exception
      */
     private function createBackupDirectory(string $name): string
     {
@@ -224,7 +212,7 @@ final class BackupManagerService
 
         // If the directory already exists, reuse it to align with tests
         if (! is_dir($backupDir) && ! mkdir($backupDir, 0o755, true)) {
-            throw new Exception("Failed to create backup directory: {$backupDir}");
+            throw new \Exception("Failed to create backup directory: {$backupDir}");
         }
 
         return $backupDir;
@@ -233,14 +221,14 @@ final class BackupManagerService
     /**
      * Create backup manifest.
      *
-     * @throws Exception
+     * @throws \Exception
      */
     private function createBackupManifest(string $backupDir, array $manifest): void
     {
         $manifestPath = $backupDir.'/manifest.json';
 
-        if (file_put_contents($manifestPath, json_encode($manifest, JSON_PRETTY_PRINT)) === false) {
-            throw new Exception("Failed to create backup manifest: {$manifestPath}");
+        if (false === file_put_contents($manifestPath, json_encode($manifest, \JSON_PRETTY_PRINT))) {
+            throw new \Exception("Failed to create backup manifest: {$manifestPath}");
         }
     }
 
@@ -249,24 +237,24 @@ final class BackupManagerService
      *
      * @return array{type: string, name: string, created_at: string, size: int, components: array}
      *
-     * @throws Exception
+     * @throws \Exception
      */
     private function readBackupManifest(string $extractDir): array
     {
         $manifestPath = $extractDir.'/manifest.json';
 
         if (! file_exists($manifestPath)) {
-            throw new Exception("Backup manifest not found: {$manifestPath}");
+            throw new \Exception("Backup manifest not found: {$manifestPath}");
         }
 
         $content = file_get_contents($manifestPath);
-        if ($content === false) {
-            throw new Exception("Failed to read backup manifest: {$manifestPath}");
+        if (false === $content) {
+            throw new \Exception("Failed to read backup manifest: {$manifestPath}");
         }
 
         $manifest = json_decode($content, true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new Exception('Invalid backup manifest JSON: '.json_last_error_msg());
+        if (\JSON_ERROR_NONE !== json_last_error()) {
+            throw new \Exception('Invalid backup manifest JSON: '.json_last_error_msg());
         }
 
         return $manifest;
@@ -275,7 +263,7 @@ final class BackupManagerService
     /**
      * Prepare restore directory.
      *
-     * @throws Exception
+     * @throws \Exception
      */
     private function prepareRestoreDirectory(string $backupPath): string
     {
@@ -287,7 +275,7 @@ final class BackupManagerService
             return $backupPath;
         }
 
-        throw new Exception("Invalid backup path: {$backupPath}");
+        throw new \Exception("Invalid backup path: {$backupPath}");
     }
 
     /**
@@ -299,7 +287,7 @@ final class BackupManagerService
             if (is_dir($backupDir)) {
                 $this->deleteDirectory($backupDir);
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Failed to cleanup failed backup', ['backup_dir' => $backupDir, 'error' => $e->getMessage()]);
         }
     }
@@ -313,7 +301,7 @@ final class BackupManagerService
             if (str_contains($extractDir, 'extracted_') && is_dir($extractDir)) {
                 $this->deleteDirectory($extractDir);
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Failed to cleanup extracted directory', ['extract_dir' => $extractDir, 'error' => $e->getMessage()]);
         }
     }
@@ -333,7 +321,7 @@ final class BackupManagerService
         );
 
         foreach ($iterator as $file) {
-            if (! ($file instanceof \SplFileInfo)) {
+            if (! $file instanceof \SplFileInfo) {
                 continue;
             }
 
@@ -345,7 +333,7 @@ final class BackupManagerService
                 continue;
             }
 
-            if (PHP_OS_FAMILY === 'Windows') {
+            if (\PHP_OS_FAMILY === 'Windows') {
                 chmod($path, 0o666);
             }
 

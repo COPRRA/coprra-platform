@@ -7,10 +7,15 @@ namespace Tests\Unit\Recommendations;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-class BestDealRecommendationTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class BestDealRecommendationTest extends TestCase
 {
     #[Test]
-    public function it_identifies_best_deals(): void
+    public function itIdentifiesBestDeals(): void
     {
         $products = [
             ['id' => 1, 'name' => 'iPhone 15', 'price' => 999.00, 'original_price' => 1199.00, 'discount' => 200.00],
@@ -20,12 +25,12 @@ class BestDealRecommendationTest extends TestCase
         ];
 
         $bestDeals = $this->getBestDeals($products, 2);
-        $this->assertCount(2, $bestDeals);
-        $this->assertEquals(1, $bestDeals[0]['id']); // iPhone 15 has highest discount
+        self::assertCount(2, $bestDeals);
+        self::assertSame(1, $bestDeals[0]['id']); // iPhone 15 has highest discount
     }
 
     #[Test]
-    public function it_calculates_deal_score(): void
+    public function itCalculatesDealScore(): void
     {
         $product = [
             'id' => 1,
@@ -38,12 +43,12 @@ class BestDealRecommendationTest extends TestCase
         ];
 
         $dealScore = $this->calculateDealScore($product);
-        $this->assertGreaterThan(0, $dealScore);
-        $this->assertLessThanOrEqual(100, $dealScore);
+        self::assertGreaterThan(0, $dealScore);
+        self::assertLessThanOrEqual(100, $dealScore);
     }
 
     #[Test]
-    public function it_identifies_percentage_discounts(): void
+    public function itIdentifiesPercentageDiscounts(): void
     {
         $products = [
             ['id' => 1, 'name' => 'iPhone 15', 'price' => 800.00, 'original_price' => 1000.00],
@@ -52,12 +57,12 @@ class BestDealRecommendationTest extends TestCase
         ];
 
         $percentageDiscounts = $this->getPercentageDiscounts($products);
-        $this->assertCount(3, $percentageDiscounts);
-        $this->assertEquals(30.0, $percentageDiscounts[0]['discount_percentage']); // 30% discount
+        self::assertCount(3, $percentageDiscounts);
+        self::assertSame(30.0, $percentageDiscounts[0]['discount_percentage']); // 30% discount
     }
 
     #[Test]
-    public function it_identifies_absolute_discounts(): void
+    public function itIdentifiesAbsoluteDiscounts(): void
     {
         $products = [
             ['id' => 1, 'name' => 'iPhone 15', 'price' => 800.00, 'original_price' => 1000.00],
@@ -66,12 +71,12 @@ class BestDealRecommendationTest extends TestCase
         ];
 
         $absoluteDiscounts = $this->getAbsoluteDiscounts($products);
-        $this->assertCount(3, $absoluteDiscounts);
-        $this->assertEquals(300.00, $absoluteDiscounts[0]['discount_amount']); // $300 discount
+        self::assertCount(3, $absoluteDiscounts);
+        self::assertSame(300.00, $absoluteDiscounts[0]['discount_amount']); // $300 discount
     }
 
     #[Test]
-    public function it_identifies_value_for_money_deals(): void
+    public function itIdentifiesValueForMoneyDeals(): void
     {
         $products = [
             ['id' => 1, 'name' => 'iPhone 15', 'price' => 999.00, 'rating' => 4.5, 'features' => 10],
@@ -80,12 +85,12 @@ class BestDealRecommendationTest extends TestCase
         ];
 
         $valueDeals = $this->getValueForMoneyDeals($products);
-        $this->assertCount(3, $valueDeals);
-        $this->assertEquals(3, $valueDeals[0]['id']); // Google Pixel 8 has best value
+        self::assertCount(3, $valueDeals);
+        self::assertSame(3, $valueDeals[0]['id']); // Google Pixel 8 has best value
     }
 
     #[Test]
-    public function it_identifies_limited_time_deals(): void
+    public function itIdentifiesLimitedTimeDeals(): void
     {
         $deals = [
             ['id' => 1, 'name' => 'Flash Sale', 'discount' => 30.0, 'end_date' => '2024-12-31', 'is_limited' => true],
@@ -94,12 +99,12 @@ class BestDealRecommendationTest extends TestCase
         ];
 
         $limitedDeals = $this->getLimitedTimeDeals($deals, '2024-12-20');
-        $this->assertCount(2, $limitedDeals);
-        $this->assertEquals(1, $limitedDeals[0]['id']); // Highest discount
+        self::assertCount(2, $limitedDeals);
+        self::assertSame(1, $limitedDeals[0]['id']); // Highest discount
     }
 
     #[Test]
-    public function it_identifies_bulk_deals(): void
+    public function itIdentifiesBulkDeals(): void
     {
         $products = [
             ['id' => 1, 'name' => 'iPhone 15', 'price' => 999.00, 'bulk_discount' => 0.0],
@@ -108,12 +113,12 @@ class BestDealRecommendationTest extends TestCase
         ];
 
         $bulkDeals = $this->getBulkDeals($products);
-        $this->assertCount(2, $bulkDeals);
-        $this->assertEquals(3, $bulkDeals[0]['id']); // Highest bulk discount
+        self::assertCount(2, $bulkDeals);
+        self::assertSame(3, $bulkDeals[0]['id']); // Highest bulk discount
     }
 
     #[Test]
-    public function it_identifies_bundle_deals(): void
+    public function itIdentifiesBundleDeals(): void
     {
         $bundles = [
             ['id' => 1, 'name' => 'Phone + Case', 'price' => 1099.00, 'individual_price' => 1199.00, 'savings' => 100.00],
@@ -122,12 +127,12 @@ class BestDealRecommendationTest extends TestCase
         ];
 
         $bundleDeals = $this->getBundleDeals($bundles);
-        $this->assertCount(3, $bundleDeals);
-        $this->assertEquals(3, $bundleDeals[0]['id']); // Highest savings
+        self::assertCount(3, $bundleDeals);
+        self::assertSame(3, $bundleDeals[0]['id']); // Highest savings
     }
 
     #[Test]
-    public function it_identifies_cashback_deals(): void
+    public function itIdentifiesCashbackDeals(): void
     {
         $products = [
             ['id' => 1, 'name' => 'iPhone 15', 'price' => 999.00, 'cashback' => 50.00],
@@ -136,12 +141,12 @@ class BestDealRecommendationTest extends TestCase
         ];
 
         $cashbackDeals = $this->getCashbackDeals($products);
-        $this->assertCount(3, $cashbackDeals);
-        $this->assertEquals(2, $cashbackDeals[0]['id']); // Highest cashback
+        self::assertCount(3, $cashbackDeals);
+        self::assertSame(2, $cashbackDeals[0]['id']); // Highest cashback
     }
 
     #[Test]
-    public function it_identifies_free_shipping_deals(): void
+    public function itIdentifiesFreeShippingDeals(): void
     {
         $products = [
             ['id' => 1, 'name' => 'iPhone 15', 'price' => 999.00, 'shipping_cost' => 0.00, 'free_shipping' => true],
@@ -150,12 +155,12 @@ class BestDealRecommendationTest extends TestCase
         ];
 
         $freeShippingDeals = $this->getFreeShippingDeals($products);
-        $this->assertCount(2, $freeShippingDeals);
-        $this->assertEquals(1, $freeShippingDeals[0]['id']);
+        self::assertCount(2, $freeShippingDeals);
+        self::assertSame(1, $freeShippingDeals[0]['id']);
     }
 
     #[Test]
-    public function it_identifies_clearance_deals(): void
+    public function itIdentifiesClearanceDeals(): void
     {
         $products = [
             ['id' => 1, 'name' => 'Old Model Phone', 'price' => 499.00, 'original_price' => 999.00, 'is_clearance' => true],
@@ -164,12 +169,12 @@ class BestDealRecommendationTest extends TestCase
         ];
 
         $clearanceDeals = $this->getClearanceDeals($products);
-        $this->assertCount(2, $clearanceDeals);
-        $this->assertEquals(3, $clearanceDeals[0]['id']); // Highest discount
+        self::assertCount(2, $clearanceDeals);
+        self::assertSame(3, $clearanceDeals[0]['id']); // Highest discount
     }
 
     #[Test]
-    public function it_identifies_seasonal_deals(): void
+    public function itIdentifiesSeasonalDeals(): void
     {
         $products = [
             ['id' => 1, 'name' => 'Winter Jacket', 'price' => 199.00, 'original_price' => 299.00, 'season' => 'winter'],
@@ -178,12 +183,12 @@ class BestDealRecommendationTest extends TestCase
         ];
 
         $seasonalDeals = $this->getSeasonalDeals($products, 'winter');
-        $this->assertCount(1, $seasonalDeals);
-        $this->assertEquals(1, $seasonalDeals[0]['id']);
+        self::assertCount(1, $seasonalDeals);
+        self::assertSame(1, $seasonalDeals[0]['id']);
     }
 
     #[Test]
-    public function it_identifies_best_overall_deals(): void
+    public function itIdentifiesBestOverallDeals(): void
     {
         $products = [
             ['id' => 1, 'name' => 'iPhone 15', 'price' => 999.00, 'original_price' => 1199.00, 'rating' => 4.5, 'reviews_count' => 1000],
@@ -192,16 +197,18 @@ class BestDealRecommendationTest extends TestCase
         ];
 
         $bestOverallDeals = $this->getBestOverallDeals($products, 2);
-        $this->assertCount(2, $bestOverallDeals);
-        $this->assertEquals(1, $bestOverallDeals[0]['id']); // Best overall deal
+        self::assertCount(2, $bestOverallDeals);
+        self::assertSame(1, $bestOverallDeals[0]['id']); // Best overall deal
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $products
+     * @param array<int, array<string, mixed>> $products
+     *
      * @return array<int, array<string, mixed>>
      */
     /**
-     * @param  array<int, array<string, mixed>>  $products
+     * @param array<int, array<string, mixed>> $products
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getBestDeals(array $products, int $limit): array
@@ -212,15 +219,15 @@ class BestDealRecommendationTest extends TestCase
         }
 
         // Sort by deal score descending
-        usort($products, function ($a, $b) {
+        usort($products, static function ($a, $b) {
             return $b['deal_score'] <=> $a['deal_score'];
         });
 
-        return array_slice($products, 0, $limit);
+        return \array_slice($products, 0, $limit);
     }
 
     /**
-     * @param  array<string, mixed>  $product
+     * @param array<string, mixed> $product
      */
     private function calculateDealScore(array $product): float
     {
@@ -244,7 +251,8 @@ class BestDealRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $products
+     * @param array<int, array<string, mixed>> $products
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getPercentageDiscounts(array $products): array
@@ -269,7 +277,7 @@ class BestDealRecommendationTest extends TestCase
         }
 
         // Sort by discount percentage descending
-        usort($discounts, function ($a, $b) {
+        usort($discounts, static function ($a, $b) {
             return $b['discount_percentage'] <=> $a['discount_percentage'];
         });
 
@@ -277,7 +285,8 @@ class BestDealRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $products
+     * @param array<int, array<string, mixed>> $products
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getAbsoluteDiscounts(array $products): array
@@ -300,7 +309,7 @@ class BestDealRecommendationTest extends TestCase
         }
 
         // Sort by discount amount descending
-        usort($discounts, function ($a, $b) {
+        usort($discounts, static function ($a, $b) {
             return $b['discount_amount'] <=> $a['discount_amount'];
         });
 
@@ -308,7 +317,8 @@ class BestDealRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $products
+     * @param array<int, array<string, mixed>> $products
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getValueForMoneyDeals(array $products): array
@@ -336,7 +346,7 @@ class BestDealRecommendationTest extends TestCase
         }
 
         // Sort by value score descending
-        usort($valueDeals, function ($a, $b) {
+        usort($valueDeals, static function ($a, $b) {
             return $b['value_score'] <=> $a['value_score'];
         });
 
@@ -344,19 +354,20 @@ class BestDealRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $deals
+     * @param array<int, array<string, mixed>> $deals
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getLimitedTimeDeals(array $deals, string $currentDate): array
     {
-        $limitedDeals = array_filter($deals, function ($deal) use ($currentDate) {
+        $limitedDeals = array_filter($deals, static function ($deal) use ($currentDate) {
             $endDate = $deal['end_date'] ?? '';
 
-            return $deal['is_limited'] === true && is_string($endDate) && strtotime($endDate) >= strtotime($currentDate);
+            return true === $deal['is_limited'] && \is_string($endDate) && strtotime($endDate) >= strtotime($currentDate);
         });
 
         // Sort by discount descending
-        usort($limitedDeals, function ($a, $b) {
+        usort($limitedDeals, static function ($a, $b) {
             return $b['discount'] <=> $a['discount'];
         });
 
@@ -364,17 +375,18 @@ class BestDealRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $products
+     * @param array<int, array<string, mixed>> $products
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getBulkDeals(array $products): array
     {
-        $bulkDeals = array_filter($products, function ($product) {
+        $bulkDeals = array_filter($products, static function ($product) {
             return ($product['bulk_discount'] ?? 0) > 0;
         });
 
         // Sort by bulk discount descending
-        usort($bulkDeals, function ($a, $b) {
+        usort($bulkDeals, static function ($a, $b) {
             return $b['bulk_discount'] <=> $a['bulk_discount'];
         });
 
@@ -382,13 +394,14 @@ class BestDealRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $bundles
+     * @param array<int, array<string, mixed>> $bundles
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getBundleDeals(array $bundles): array
     {
         // Sort by savings descending
-        usort($bundles, function ($a, $b) {
+        usort($bundles, static function ($a, $b) {
             return $b['savings'] <=> $a['savings'];
         });
 
@@ -396,17 +409,18 @@ class BestDealRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $products
+     * @param array<int, array<string, mixed>> $products
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getCashbackDeals(array $products): array
     {
-        $cashbackDeals = array_filter($products, function ($product) {
+        $cashbackDeals = array_filter($products, static function ($product) {
             return ($product['cashback'] ?? 0) > 0;
         });
 
         // Sort by cashback amount descending
-        usort($cashbackDeals, function ($a, $b) {
+        usort($cashbackDeals, static function ($a, $b) {
             return $b['cashback'] <=> $a['cashback'];
         });
 
@@ -414,17 +428,18 @@ class BestDealRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $products
+     * @param array<int, array<string, mixed>> $products
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getFreeShippingDeals(array $products): array
     {
-        $freeShippingDeals = array_filter($products, function ($product) {
-            return $product['free_shipping'] === true;
+        $freeShippingDeals = array_filter($products, static function ($product) {
+            return true === $product['free_shipping'];
         });
 
         // Sort by price descending (most expensive first)
-        usort($freeShippingDeals, function ($a, $b) {
+        usort($freeShippingDeals, static function ($a, $b) {
             return $b['price'] <=> $a['price'];
         });
 
@@ -432,17 +447,18 @@ class BestDealRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $products
+     * @param array<int, array<string, mixed>> $products
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getClearanceDeals(array $products): array
     {
-        $clearanceDeals = array_filter($products, function ($product) {
-            return $product['is_clearance'] === true;
+        $clearanceDeals = array_filter($products, static function ($product) {
+            return true === $product['is_clearance'];
         });
 
         // Sort by discount percentage descending
-        usort($clearanceDeals, function ($a, $b) {
+        usort($clearanceDeals, static function ($a, $b) {
             $originalPriceA = is_numeric($a['original_price']) ? (float) $a['original_price'] : 0.0;
             $priceA = is_numeric($a['price']) ? (float) $a['price'] : 0.0;
             $originalPriceB = is_numeric($b['original_price']) ? (float) $b['original_price'] : 0.0;
@@ -458,22 +474,24 @@ class BestDealRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $products
+     * @param array<int, array<string, mixed>> $products
+     *
      * @return array<int, array<string, mixed>>
      */
 
     /**
-     * @param  array<int, array<string, mixed>>  $products
+     * @param array<int, array<string, mixed>> $products
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getSeasonalDeals(array $products, string $season): array
     {
-        $seasonalDeals = array_filter($products, function ($product) use ($season) {
+        $seasonalDeals = array_filter($products, static function ($product) use ($season) {
             return $product['season'] === $season;
         });
 
         // Sort by discount percentage descending
-        usort($seasonalDeals, function ($a, $b) {
+        usort($seasonalDeals, static function ($a, $b) {
             $originalPriceA = is_numeric($a['original_price']) ? (float) $a['original_price'] : 0.0;
             $priceA = is_numeric($a['price']) ? (float) $a['price'] : 0.0;
             $originalPriceB = is_numeric($b['original_price']) ? (float) $b['original_price'] : 0.0;
@@ -489,12 +507,14 @@ class BestDealRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $products
+     * @param array<int, array<string, mixed>> $products
+     *
      * @return array<int, array<string, mixed>>
      */
 
     /**
-     * @param  array<int, array<string, mixed>>  $products
+     * @param array<int, array<string, mixed>> $products
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getBestOverallDeals(array $products, int $limit): array
@@ -505,10 +525,10 @@ class BestDealRecommendationTest extends TestCase
         }
 
         // Sort by overall score descending
-        usort($products, function ($a, $b) {
+        usort($products, static function ($a, $b) {
             return $b['overall_score'] <=> $a['overall_score'];
         });
 
-        return array_slice($products, 0, $limit);
+        return \array_slice($products, 0, $limit);
     }
 }

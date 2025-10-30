@@ -1,109 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
-    /**
-     * @param  array<string>  $columns
-     */
-    private function hasColumns(string $table, array $columns): bool
-    {
-        if (! Schema::hasTable($table)) {
-            return false;
-        }
-        foreach ($columns as $column) {
-            if (! Schema::hasColumn($table, $column)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * @param  array<string>  $columns
-     */
-    private function tryAddIndex(string $table, string $indexName, array $columns): void
-    {
-        if (! $this->hasColumns($table, $columns)) {
-            return;
-        }
-
-        // Check if index already exists
-        if ($this->indexExists($table, $indexName)) {
-            return;
-        }
-
-        $driver = DB::getDriverName();
-        if ($driver === 'sqlite') {
-            // SQLite uses CREATE INDEX rather than ALTER TABLE ADD INDEX
-            $cols = implode('\", \"', $columns);
-            $sql = "CREATE INDEX \"{$indexName}\" ON \"{$table}\" (\"{$cols}\")";
-        } else {
-            // MySQL and others where ALTER TABLE ADD INDEX is valid
-            $cols = implode('`, `', $columns);
-            $sql = "ALTER TABLE `{$table}` ADD INDEX `{$indexName}` (`{$cols}`)";
-        }
-
-        try {
-            DB::statement($sql);
-        } catch (\Throwable $e) {
-            // Ignore if index already exists or other non-fatal issues
-        }
-    }
-
-    private function indexExists(string $table, string $indexName): bool
-    {
-        $driver = DB::getDriverName();
-
-        if ($driver === 'sqlite') {
-            // For SQLite, check indexes using PRAGMA index_list
-            /** @var array<int, object{name: string}> $result */
-            $result = DB::select("PRAGMA index_list(\"{$table}\")");
-            foreach ($result as $index) {
-                if ($index->name === $indexName) {
-                    return true;
-                }
-            }
-
-            return false;
-        } else {
-            // For MySQL and other databases, use information_schema
-            $result = DB::select('
-                SELECT COUNT(*) as count 
-                FROM information_schema.statistics 
-                WHERE table_schema = DATABASE() 
-                AND table_name = ? 
-                AND index_name = ?
-            ', [$table, $indexName]);
-
-            if (empty($result)) {
-                return false;
-            }
-
-            /** @var object{count: int} $firstResult */
-            $firstResult = $result[0];
-
-            return $firstResult->count > 0;
-        }
-    }
-
-    private function tryDropIndex(string $table, string $indexName): void
-    {
-        if (! Schema::hasTable($table)) {
-            return;
-        }
-        $sql = "ALTER TABLE `{$table}` DROP INDEX `{$indexName}`";
-        try {
-            DB::statement($sql);
-        } catch (\Throwable $e) {
-            // Ignore if index does not exist
-        }
-    }
-
+return new class extends Migration {
     public function up(): void
     {
         // Orders
@@ -172,5 +75,103 @@ return new class extends Migration
         $this->tryDropIndex('order_items', 'idx_order_items_order_id');
 
         $this->tryDropIndex('orders', 'idx_orders_user_id');
+    }
+
+    /**
+     * @param array<string> $columns
+     */
+    private function hasColumns(string $table, array $columns): bool
+    {
+        if (! Schema::hasTable($table)) {
+            return false;
+        }
+        foreach ($columns as $column) {
+            if (! Schema::hasColumn($table, $column)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param array<string> $columns
+     */
+    private function tryAddIndex(string $table, string $indexName, array $columns): void
+    {
+        if (! $this->hasColumns($table, $columns)) {
+            return;
+        }
+
+        // Check if index already exists
+        if ($this->indexExists($table, $indexName)) {
+            return;
+        }
+
+        $driver = DB::getDriverName();
+        if ('sqlite' === $driver) {
+            // SQLite uses CREATE INDEX rather than ALTER TABLE ADD INDEX
+            $cols = implode('\", \"', $columns);
+            $sql = "CREATE INDEX \"{$indexName}\" ON \"{$table}\" (\"{$cols}\")";
+        } else {
+            // MySQL and others where ALTER TABLE ADD INDEX is valid
+            $cols = implode('`, `', $columns);
+            $sql = "ALTER TABLE `{$table}` ADD INDEX `{$indexName}` (`{$cols}`)";
+        }
+
+        try {
+            DB::statement($sql);
+        } catch (Throwable $e) {
+            // Ignore if index already exists or other non-fatal issues
+        }
+    }
+
+    private function indexExists(string $table, string $indexName): bool
+    {
+        $driver = DB::getDriverName();
+
+        if ('sqlite' === $driver) {
+            // For SQLite, check indexes using PRAGMA index_list
+            /** @var array<int, object{name: string}> $result */
+            $result = DB::select("PRAGMA index_list(\"{$table}\")");
+            foreach ($result as $index) {
+                if ($index->name === $indexName) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        // For MySQL and other databases, use information_schema
+        $result = DB::select('
+                SELECT COUNT(*) as count
+                FROM information_schema.statistics
+                WHERE table_schema = DATABASE()
+                AND table_name = ?
+                AND index_name = ?
+            ', [$table, $indexName]);
+
+        if (empty($result)) {
+            return false;
+        }
+
+        /** @var object{count: int} $firstResult */
+        $firstResult = $result[0];
+
+        return $firstResult->count > 0;
+    }
+
+    private function tryDropIndex(string $table, string $indexName): void
+    {
+        if (! Schema::hasTable($table)) {
+            return;
+        }
+        $sql = "ALTER TABLE `{$table}` DROP INDEX `{$indexName}`";
+
+        try {
+            DB::statement($sql);
+        } catch (Throwable $e) {
+            // Ignore if index does not exist
+        }
     }
 };

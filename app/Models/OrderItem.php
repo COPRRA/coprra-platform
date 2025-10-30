@@ -7,6 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Schema;
 
 class OrderItem extends Model
 {
@@ -58,20 +59,22 @@ class OrderItem extends Model
         return $this->casts;
     }
 
-    /**
-     * @return BelongsTo<Product, OrderItem>
-     */
-    public function product(): BelongsTo
-    {
-        return $this->belongsTo(Product::class);
-    }
+    // --- Relationships ---
 
     /**
-     * @return BelongsTo<Order, OrderItem>
+     * Get the order that owns this order item.
      */
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
+    }
+
+    /**
+     * Get the product for this order item.
+     */
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class);
     }
 
     /**
@@ -80,51 +83,7 @@ class OrderItem extends Model
     #[\Override]
     public function isFillable($key): bool
     {
-        return parent::isFillable($key) || in_array($key, ['price', 'total'], true);
-    }
-
-    /**
-     * Map unit_price to underlying database column `price`.
-     */
-    public function setUnitPriceAttribute($value): void
-    {
-        $table = $this->getTable();
-        $hasUnitPrice = \Illuminate\Support\Facades\Schema::hasColumn($table, 'unit_price');
-        $hasPrice = \Illuminate\Support\Facades\Schema::hasColumn($table, 'price');
-
-        if ($hasUnitPrice) {
-            $this->attributes['unit_price'] = $value;
-        }
-        if ($hasPrice) {
-            $this->attributes['price'] = $value;
-        }
-    }
-
-    public function getUnitPriceAttribute(): mixed
-    {
-        return $this->attributes['unit_price'] ?? $this->attributes['price'] ?? null;
-    }
-
-    /**
-     * Map total_price to underlying database column `total`.
-     */
-    public function setTotalPriceAttribute($value): void
-    {
-        $table = $this->getTable();
-        $hasTotalPrice = \Illuminate\Support\Facades\Schema::hasColumn($table, 'total_price');
-        $hasTotal = \Illuminate\Support\Facades\Schema::hasColumn($table, 'total');
-
-        if ($hasTotalPrice) {
-            $this->attributes['total_price'] = $value;
-        }
-        if ($hasTotal) {
-            $this->attributes['total'] = $value;
-        }
-    }
-
-    public function getTotalPriceAttribute(): mixed
-    {
-        return $this->attributes['total_price'] ?? $this->attributes['total'] ?? null;
+        return parent::isFillable($key) || \in_array($key, ['price', 'total'], true);
     }
 
     /**
@@ -133,16 +92,16 @@ class OrderItem extends Model
     #[\Override]
     protected static function booted(): void
     {
-        static::creating(function (self $item): void {
+        static::creating(static function (self $item): void {
             $price = (float) ($item->unit_price ?? $item->price ?? 0);
             $qty = (int) ($item->quantity ?? 1);
 
             // Decide which columns exist and set appropriately
             $table = $item->getTable();
-            $hasUnitPrice = \Illuminate\Support\Facades\Schema::hasColumn($table, 'unit_price');
-            $hasPrice = \Illuminate\Support\Facades\Schema::hasColumn($table, 'price');
-            $hasTotalPrice = \Illuminate\Support\Facades\Schema::hasColumn($table, 'total_price');
-            $hasTotal = \Illuminate\Support\Facades\Schema::hasColumn($table, 'total');
+            $hasUnitPrice = Schema::hasColumn($table, 'unit_price');
+            $hasPrice = Schema::hasColumn($table, 'price');
+            $hasTotalPrice = Schema::hasColumn($table, 'total_price');
+            $hasTotal = Schema::hasColumn($table, 'total');
 
             // Ensure price columns are set based on schema
             if ($hasUnitPrice) {
@@ -164,7 +123,7 @@ class OrderItem extends Model
             }
         });
 
-        $recalculate = function (self $item): void {
+        $recalculate = static function (self $item): void {
             $order = $item->order;
             if ($order) {
                 // Recalculate subtotal directly from the table to avoid relation caching
@@ -197,10 +156,11 @@ class OrderItem extends Model
 
                 if ($subtotal <= 0.0) {
                     try {
-                        $subtotal = (float) (\DB::connection($connName)
+                        $subtotal = (float) \DB::connection($connName)
                             ->table($item->getTable())
                             ->where('order_id', $orderId)
-                            ->sum('total'));
+                            ->sum('total')
+                        ;
                     } catch (\Throwable $e) {
                         // ignore
                     }
@@ -208,10 +168,11 @@ class OrderItem extends Model
 
                 if ($subtotal <= 0.0) {
                     try {
-                        $subtotal = (float) (\DB::connection($connName)
+                        $subtotal = (float) \DB::connection($connName)
                             ->table($item->getTable())
                             ->where('order_id', $orderId)
-                            ->sum('total_price'));
+                            ->sum('total_price')
+                        ;
                     } catch (\Throwable $e) {
                         // ignore
                     }

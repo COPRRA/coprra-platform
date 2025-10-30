@@ -8,12 +8,17 @@ use App\Models\Brand;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /**
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class BrandControllerTest extends TestCase
+final class BrandControllerTest extends TestCase
 {
     use RefreshDatabase;
     use WithFaker;
@@ -30,8 +35,8 @@ class BrandControllerTest extends TestCase
         parent::tearDown();
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_can_display_brands_index()
+    #[Test]
+    public function itCanDisplayBrandsIndex()
     {
         $user = User::factory()->create(['is_admin' => true]);
         $this->actingAs($user);
@@ -39,11 +44,12 @@ class BrandControllerTest extends TestCase
         $response = $this->get('/brands');
 
         $response->assertStatus(200)
-            ->assertViewIs('brands.index');
+            ->assertViewIs('brands.index')
+        ;
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_can_display_create_brand_form()
+    #[Test]
+    public function itCanDisplayCreateBrandForm()
     {
         $user = User::factory()->create(['is_admin' => true]);
         $this->actingAs($user);
@@ -51,11 +57,12 @@ class BrandControllerTest extends TestCase
         $response = $this->get('/brands/create');
 
         $response->assertStatus(200)
-            ->assertViewIs('brands.create');
+            ->assertViewIs('brands.create')
+        ;
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_can_store_new_brand()
+    #[Test]
+    public function itCanStoreNewBrand()
     {
         $user = User::factory()->create(['is_admin' => true]);
         $this->actingAs($user);
@@ -71,7 +78,8 @@ class BrandControllerTest extends TestCase
         $response = $this->post('/brands', $brandData);
 
         $response->assertStatus(302)
-            ->assertRedirect('/brands');
+            ->assertRedirect('/brands')
+        ;
 
         $this->assertDatabaseHas('brands', [
             'name' => 'Test Brand',
@@ -81,8 +89,8 @@ class BrandControllerTest extends TestCase
         ]);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_validates_brand_creation_request()
+    #[Test]
+    public function itValidatesBrandCreationRequest()
     {
         $user = User::factory()->create(['is_admin' => true]);
         $this->actingAs($user);
@@ -90,11 +98,12 @@ class BrandControllerTest extends TestCase
         $response = $this->post('/brands', []);
 
         $response->assertStatus(302)
-            ->assertSessionHasErrors(['name']);
+            ->assertSessionHasErrors(['name'])
+        ;
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_can_display_brand_details()
+    #[Test]
+    public function itCanDisplayBrandDetails()
     {
         $user = User::factory()->create(['is_admin' => true]);
         $this->actingAs($user);
@@ -105,11 +114,12 @@ class BrandControllerTest extends TestCase
 
         $response->assertStatus(200)
             ->assertViewIs('brands.show')
-            ->assertViewHas('brand', $brand);
+            ->assertViewHas('brand', $brand)
+        ;
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_returns_404_for_nonexistent_brand()
+    #[Test]
+    public function itReturns404ForNonexistentBrand()
     {
         $user = User::factory()->create(['is_admin' => true]);
         $this->actingAs($user);
@@ -119,8 +129,8 @@ class BrandControllerTest extends TestCase
         $response->assertStatus(404);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_can_display_edit_brand_form()
+    #[Test]
+    public function itCanDisplayEditBrandForm()
     {
         $user = User::factory()->create(['is_admin' => true]);
         $this->actingAs($user);
@@ -131,11 +141,12 @@ class BrandControllerTest extends TestCase
 
         $response->assertStatus(200)
             ->assertViewIs('brands.edit')
-            ->assertViewHas('brand', $brand);
+            ->assertViewHas('brand', $brand)
+        ;
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_can_update_brand()
+    #[Test]
+    public function itCanUpdateBrand()
     {
         $user = User::factory()->create(['is_admin' => true]);
         $this->actingAs($user);
@@ -153,7 +164,8 @@ class BrandControllerTest extends TestCase
         $response = $this->put('/brands/'.$brand->id, $updateData);
 
         $response->assertStatus(302)
-            ->assertRedirect('/brands');
+            ->assertRedirect('/brands')
+        ;
 
         $this->assertDatabaseHas('brands', [
             'id' => $brand->id,
@@ -164,8 +176,8 @@ class BrandControllerTest extends TestCase
         ]);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_validates_brand_update_request()
+    #[Test]
+    public function itValidatesBrandUpdateRequest()
     {
         $user = User::factory()->create(['is_admin' => true]);
         $this->actingAs($user);
@@ -177,11 +189,12 @@ class BrandControllerTest extends TestCase
         ]);
 
         $response->assertStatus(302)
-            ->assertSessionHasErrors(['name']);
+            ->assertSessionHasErrors(['name'])
+        ;
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_can_delete_brand()
+    #[Test]
+    public function itCanDeleteBrand()
     {
         $user = User::factory()->create(['is_admin' => true]);
         $this->actingAs($user);
@@ -191,15 +204,16 @@ class BrandControllerTest extends TestCase
         $response = $this->delete('/brands/'.$brand->id);
 
         $response->assertStatus(302)
-            ->assertRedirect('/brands');
+            ->assertRedirect('/brands')
+        ;
 
         $this->assertDatabaseMissing('brands', [
             'id' => $brand->id,
         ]);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_returns_404_when_deleting_nonexistent_brand()
+    #[Test]
+    public function itReturns404WhenDeletingNonexistentBrand()
     {
         $user = User::factory()->create(['is_admin' => true]);
         $this->actingAs($user);
@@ -209,8 +223,8 @@ class BrandControllerTest extends TestCase
         $response->assertStatus(404);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_requires_authentication_for_all_brand_routes()
+    #[Test]
+    public function itRequiresAuthenticationForAllBrandRoutes()
     {
         $response = $this->get('/brands');
         $response->assertStatus(302); // Redirect to login
@@ -234,8 +248,8 @@ class BrandControllerTest extends TestCase
         $response->assertStatus(302);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_handles_brand_creation_errors_gracefully()
+    #[Test]
+    public function itHandlesBrandCreationErrorsGracefully()
     {
         $user = User::factory()->create(['is_admin' => true]);
         $this->actingAs($user);
@@ -251,8 +265,8 @@ class BrandControllerTest extends TestCase
         $response->assertSessionHasErrors(['name', 'slug']);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_handles_brand_update_errors_gracefully()
+    #[Test]
+    public function itHandlesBrandUpdateErrorsGracefully()
     {
         $user = User::factory()->create(['is_admin' => true]);
         $this->actingAs($user);
@@ -270,8 +284,8 @@ class BrandControllerTest extends TestCase
         $response->assertSessionHasErrors(['name', 'slug']);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_handles_brand_deletion_errors_gracefully()
+    #[Test]
+    public function itHandlesBrandDeletionErrorsGracefully()
     {
         $user = User::factory()->create(['is_admin' => true]);
         $this->actingAs($user);
@@ -279,9 +293,10 @@ class BrandControllerTest extends TestCase
         $brand = Brand::factory()->create();
 
         // Mock a database error
-        $this->mock(\App\Models\Brand::class, function ($mock) {
+        $this->mock(Brand::class, static function ($mock) {
             $mock->shouldReceive('findOrFail')
-                ->andThrow(new \Exception('Database error'));
+                ->andThrow(new \Exception('Database error'))
+            ;
         });
 
         $response = $this->delete('/brands/'.$brand->id);
@@ -289,8 +304,8 @@ class BrandControllerTest extends TestCase
         $response->assertStatus(500);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_can_display_brands_with_pagination()
+    #[Test]
+    public function itCanDisplayBrandsWithPagination()
     {
         $user = User::factory()->create(['is_admin' => true]);
         $this->actingAs($user);
@@ -301,11 +316,12 @@ class BrandControllerTest extends TestCase
         $response = $this->get('/brands');
 
         $response->assertStatus(200)
-            ->assertViewIs('brands.index');
+            ->assertViewIs('brands.index')
+        ;
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_can_search_brands()
+    #[Test]
+    public function itCanSearchBrands()
     {
         $user = User::factory()->create(['is_admin' => true]);
         $this->actingAs($user);
@@ -316,11 +332,12 @@ class BrandControllerTest extends TestCase
         $response = $this->get('/brands?search=Apple');
 
         $response->assertStatus(200)
-            ->assertViewIs('brands.index');
+            ->assertViewIs('brands.index')
+        ;
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_can_sort_brands()
+    #[Test]
+    public function itCanSortBrands()
     {
         $user = User::factory()->create(['is_admin' => true]);
         $this->actingAs($user);

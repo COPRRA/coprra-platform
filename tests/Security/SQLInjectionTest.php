@@ -11,12 +11,26 @@ use Tests\TestCase;
 
 /**
  * Security SQL injection tests.
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class SQLInjectionTest extends TestCase
+final class SQLInjectionTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_sql_injection_protection_in_product_search(): void
+    protected function setUp(): void
+    {
+        parent::setUp();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+    }
+
+    public function testSqlInjectionProtectionInProductSearch(): void
     {
         // Create test data
         Product::factory()->create(['name' => 'Test Product']);
@@ -34,22 +48,22 @@ class SQLInjectionTest extends TestCase
 
             // Should not return sensitive data or execute injection
             // Accept success (200), validation error (422), or server error (500) - all better than SQL injection
-            $this->assertContains($response->status(), [200, 422, 500]);
+            self::assertContains($response->status(), [200, 422, 500]);
 
-            if ($response->status() === 200) {
+            if (200 === $response->status()) {
                 $data = $response->json();
 
                 // Ensure no SQL errors or unexpected results
-                $this->assertIsArray($data);
-                $this->assertArrayHasKey('data', $data);
+                self::assertIsArray($data);
+                self::assertArrayHasKey('data', $data);
 
                 // Should not return all products (indicating injection success)
-                $this->assertLessThanOrEqual(1, count($data['data']));
+                self::assertLessThanOrEqual(1, \count($data['data']));
             }
         }
     }
 
-    public function test_parameterized_queries_are_used(): void
+    public function testParameterizedQueriesAreUsed(): void
     {
         // Create test user
         $user = User::factory()->create(['email' => 'test@example.com']);
@@ -62,10 +76,10 @@ class SQLInjectionTest extends TestCase
 
         // Should authenticate successfully without SQL injection
         $response->assertStatus(200);
-        $this->assertArrayHasKey('token', $response->json());
+        self::assertArrayHasKey('token', $response->json());
     }
 
-    public function test_input_sanitization_in_search(): void
+    public function testInputSanitizationInSearch(): void
     {
         // Test that special characters are handled safely
         $specialInputs = [
@@ -79,16 +93,16 @@ class SQLInjectionTest extends TestCase
 
             // Should not cause errors or return unexpected results
             // Accept success (200), validation error (422), or server error (500) - all better than SQL injection
-            $this->assertContains($response->status(), [200, 422, 500]);
+            self::assertContains($response->status(), [200, 422, 500]);
 
-            if ($response->status() === 200) {
+            if (200 === $response->status()) {
                 $data = $response->json();
-                $this->assertIsArray($data);
+                self::assertIsArray($data);
             }
         }
     }
 
-    public function test_sql_injection_in_user_registration(): void
+    public function testSqlInjectionInUserRegistration(): void
     {
         $maliciousData = [
             'name' => 'Test User',
@@ -100,7 +114,7 @@ class SQLInjectionTest extends TestCase
         $response = $this->postJson('/api/register', $maliciousData);
 
         // Should not return sensitive data or execute injection
-        $this->assertContains($response->status(), [422, 500]); // Validation error or server error expected
+        self::assertContains($response->status(), [422, 500]); // Validation error or server error expected
 
         // Verify users table still exists and wasn't dropped
         $this->assertDatabaseCount('users', 0);
@@ -117,7 +131,7 @@ class SQLInjectionTest extends TestCase
         $validResponse->assertStatus(201); // Created status expected for successful registration
     }
 
-    public function test_sql_injection_in_order_processing(): void
+    public function testSqlInjectionInOrderProcessing(): void
     {
         // Create test user
         $user = User::factory()->create();
@@ -142,7 +156,7 @@ class SQLInjectionTest extends TestCase
         ])->postJson('/api/orders', $maliciousOrderData);
 
         // Should not execute the malicious SQL
-        $this->assertContains($response->status(), [422, 500]);
+        self::assertContains($response->status(), [422, 500]);
 
         // Verify user is still not admin
         $this->assertDatabaseHas('users', [
@@ -151,7 +165,7 @@ class SQLInjectionTest extends TestCase
         ]);
     }
 
-    public function test_sql_injection_in_profile_update(): void
+    public function testSqlInjectionInProfileUpdate(): void
     {
         // Create test user
         $user = User::factory()->create();
@@ -176,14 +190,14 @@ class SQLInjectionTest extends TestCase
 
         // Should not execute the malicious SQL
         $status = $response->status();
-        $this->assertTrue(in_array($status, [200, 404, 422, 500]), "Response status {$status} is not acceptable");
+        self::assertTrue(\in_array($status, [200, 404, 422, 500], true), "Response status {$status} is not acceptable");
 
         // Refresh user from database
         $user->refresh();
 
         // Verify user data wasn't maliciously changed
-        $this->assertNotEquals('admin@system.com', $user->email);
-        $this->assertFalse((bool) $user->is_admin);
+        self::assertNotSame('admin@system.com', $user->email);
+        self::assertFalse((bool) $user->is_admin);
 
         // Test with valid data to ensure profile update still works
         $validData = [
@@ -197,16 +211,6 @@ class SQLInjectionTest extends TestCase
 
         // Accept either success or validation error
         $status = $validResponse->status();
-        $this->assertTrue(in_array($status, [200, 404, 422]), "Response status {$status} is not acceptable");
-    }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
+        self::assertTrue(\in_array($status, [200, 404, 422], true), "Response status {$status} is not acceptable");
     }
 }

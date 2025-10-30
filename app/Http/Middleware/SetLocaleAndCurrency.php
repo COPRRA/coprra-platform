@@ -4,27 +4,33 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
+use Symfony\Component\HttpFoundation\Response;
+
 class SetLocaleAndCurrency
 {
-    // تم حذف الدوال غير المستخدمة configureLocale و configureCurrency
-    public function handle(\Illuminate\Http\Request $request, \Closure $next)
+    /**
+     * Handle an incoming request.
+     */
+    public function handle(Request $request, \Closure $next): Response
     {
-        try {
-            // اضبط اللغة من الجلسة إن توفّرت
-            $session = app('session');
-            $locale = is_string($session->get('locale_language')) ? $session->get('locale_language') : null;
-            if (is_string($locale) && $locale !== '') {
-                \Illuminate\Support\Facades\App::setLocale($locale);
-            }
+        // Set locale from user preference, session, or default
+        $locale = $request->user()?->locale
+            ?? session('locale')
+            ?? config('app.locale');
 
-            // اضبط العملة من الجلسة إن توفّرت (استخدام بسيط بدون تأثيرات جانبية)
-            $currency = $session->get('currency_code');
-            if (is_string($currency) && $currency !== '') {
-                // يمكن حفظها في الحاوية لقراءتها لاحقًا إن لزم
-                app()->instance('app.currency', $currency);
-            }
-        } catch (\Throwable $e) {
-            // أكمل السلسلة بصمت
+        if ($locale && \in_array($locale, config('app.supported_locales', ['en']), true)) {
+            App::setLocale($locale);
+        }
+
+        // Set currency from user preference, session, or default
+        $currency = $request->user()?->currency
+            ?? session('currency')
+            ?? config('app.default_currency', 'USD');
+
+        if ($currency) {
+            session(['currency' => $currency]);
         }
 
         return $next($request);

@@ -18,7 +18,7 @@ class UserResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @return array<int|mixed|string|null>
+     * @return array<int|mixed|string|* @method static \App\Models\Brand create(array<string, string|bool|null>
      *
      * @psalm-return array{id: int, name: string, email: string, role: string, avatar: string|null, phone: string|null, email_verified_at: string|null, created_at: mixed|null, updated_at: mixed|null}
      *

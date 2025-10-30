@@ -7,10 +7,15 @@ namespace Tests\Unit\Recommendations;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-class BrandRecommendationTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class BrandRecommendationTest extends TestCase
 {
     #[Test]
-    public function it_recommends_brands_based_on_user_preferences(): void
+    public function itRecommendsBrandsBasedOnUserPreferences(): void
     {
         $userPreferences = [
             'Apple' => 0.9,
@@ -21,14 +26,14 @@ class BrandRecommendationTest extends TestCase
 
         $recommendations = $this->getBrandRecommendations($userPreferences, 3);
 
-        $this->assertContains('Apple', $recommendations);
-        $this->assertContains('Samsung', $recommendations);
-        $this->assertContains('Sony', $recommendations);
-        $this->assertCount(3, $recommendations);
+        self::assertContains('Apple', $recommendations);
+        self::assertContains('Samsung', $recommendations);
+        self::assertContains('Sony', $recommendations);
+        self::assertCount(3, $recommendations);
     }
 
     #[Test]
-    public function it_recommends_popular_brands_in_category(): void
+    public function itRecommendsPopularBrandsInCategory(): void
     {
         $category = 'Electronics';
         $brandPopularity = [
@@ -47,13 +52,13 @@ class BrandRecommendationTest extends TestCase
 
         $recommendations = $this->getPopularBrandsInCategory($category, $brandPopularity, 2);
 
-        $this->assertContains('Apple', $recommendations);
-        $this->assertContains('Samsung', $recommendations);
-        $this->assertCount(2, $recommendations);
+        self::assertContains('Apple', $recommendations);
+        self::assertContains('Samsung', $recommendations);
+        self::assertCount(2, $recommendations);
     }
 
     #[Test]
-    public function it_recommends_similar_brands(): void
+    public function itRecommendsSimilarBrands(): void
     {
         $currentBrand = 'Apple';
         $brandSimilarity = [
@@ -64,13 +69,13 @@ class BrandRecommendationTest extends TestCase
 
         $recommendations = $this->getSimilarBrandRecommendations($currentBrand, $brandSimilarity);
 
-        $this->assertContains('Samsung', $recommendations);
-        $this->assertContains('Google', $recommendations);
-        $this->assertContains('Microsoft', $recommendations);
+        self::assertContains('Samsung', $recommendations);
+        self::assertContains('Google', $recommendations);
+        self::assertContains('Microsoft', $recommendations);
     }
 
     #[Test]
-    public function it_recommends_brands_based_on_price_range(): void
+    public function itRecommendsBrandsBasedOnPriceRange(): void
     {
         $userBudget = 500;
         $brandPriceRanges = [
@@ -82,13 +87,13 @@ class BrandRecommendationTest extends TestCase
 
         $recommendations = $this->getBrandsInPriceRange($userBudget, $brandPriceRanges);
 
-        $this->assertContains('Samsung', $recommendations);
-        $this->assertContains('Xiaomi', $recommendations);
-        $this->assertNotContains('Apple', $recommendations);
+        self::assertContains('Samsung', $recommendations);
+        self::assertContains('Xiaomi', $recommendations);
+        self::assertNotContains('Apple', $recommendations);
     }
 
     #[Test]
-    public function it_recommends_brands_based_on_quality_rating(): void
+    public function itRecommendsBrandsBasedOnQualityRating(): void
     {
         $brandRatings = [
             'Apple' => 4.8,
@@ -101,15 +106,15 @@ class BrandRecommendationTest extends TestCase
         $minRating = 4.2;
         $recommendations = $this->getHighRatedBrands($brandRatings, $minRating);
 
-        $this->assertContains('Apple', $recommendations);
-        $this->assertContains('Samsung', $recommendations);
-        $this->assertContains('Sony', $recommendations);
-        $this->assertNotContains('LG', $recommendations);
-        $this->assertNotContains('Xiaomi', $recommendations);
+        self::assertContains('Apple', $recommendations);
+        self::assertContains('Samsung', $recommendations);
+        self::assertContains('Sony', $recommendations);
+        self::assertNotContains('LG', $recommendations);
+        self::assertNotContains('Xiaomi', $recommendations);
     }
 
     #[Test]
-    public function it_handles_brand_availability_by_region(): void
+    public function itHandlesBrandAvailabilityByRegion(): void
     {
         $userRegion = 'US';
         $brandAvailability = [
@@ -121,14 +126,14 @@ class BrandRecommendationTest extends TestCase
 
         $availableBrands = $this->getAvailableBrandsInRegion($userRegion, $brandAvailability);
 
-        $this->assertContains('Apple', $availableBrands);
-        $this->assertContains('Samsung', $availableBrands);
-        $this->assertNotContains('Xiaomi', $availableBrands);
-        $this->assertNotContains('Huawei', $availableBrands);
+        self::assertContains('Apple', $availableBrands);
+        self::assertContains('Samsung', $availableBrands);
+        self::assertNotContains('Xiaomi', $availableBrands);
+        self::assertNotContains('Huawei', $availableBrands);
     }
 
     #[Test]
-    public function it_recommends_brands_based_on_user_purchase_history(): void
+    public function itRecommendsBrandsBasedOnUserPurchaseHistory(): void
     {
         $purchaseHistory = [
             ['brand' => 'Apple', 'amount' => 1200, 'date' => '2024-01-15'],
@@ -139,13 +144,13 @@ class BrandRecommendationTest extends TestCase
 
         $recommendations = $this->getBrandsFromPurchaseHistory($purchaseHistory, 2);
 
-        $this->assertContains('Apple', $recommendations);
-        $this->assertContains('Samsung', $recommendations);
-        $this->assertCount(2, $recommendations);
+        self::assertContains('Apple', $recommendations);
+        self::assertContains('Samsung', $recommendations);
+        self::assertCount(2, $recommendations);
     }
 
     #[Test]
-    public function it_calculates_brand_loyalty_score(): void
+    public function itCalculatesBrandLoyaltyScore(): void
     {
         $userPurchases = [
             'Apple' => 5,
@@ -156,11 +161,11 @@ class BrandRecommendationTest extends TestCase
         $brand = 'Apple';
         $loyaltyScore = $this->calculateBrandLoyaltyScore($userPurchases, $brand);
 
-        $this->assertGreaterThan(0.6, $loyaltyScore);
+        self::assertGreaterThan(0.6, $loyaltyScore);
     }
 
     #[Test]
-    public function it_recommends_trending_brands(): void
+    public function itRecommendsTrendingBrands(): void
     {
         $brandTrends = [
             'Apple' => ['trend' => 'stable', 'growth' => 0.05],
@@ -171,13 +176,13 @@ class BrandRecommendationTest extends TestCase
 
         $trendingBrands = $this->getTrendingBrands($brandTrends);
 
-        $this->assertContains('Samsung', $trendingBrands);
-        $this->assertContains('Xiaomi', $trendingBrands);
-        $this->assertNotContains('LG', $trendingBrands);
+        self::assertContains('Samsung', $trendingBrands);
+        self::assertContains('Xiaomi', $trendingBrands);
+        self::assertNotContains('LG', $trendingBrands);
     }
 
     #[Test]
-    public function it_handles_brand_recommendation_weights(): void
+    public function itHandlesBrandRecommendationWeights(): void
     {
         $brands = [
             'Apple' => ['preference' => 0.8, 'popularity' => 0.9, 'quality' => 0.95],
@@ -189,25 +194,27 @@ class BrandRecommendationTest extends TestCase
 
         $rankedBrands = $this->rankBrandsByWeightedScore($brands, $weights);
 
-        $this->assertIsArray($rankedBrands[0]);
-        $this->assertEquals('Apple', $rankedBrands[0]['brand']);
-        $this->assertIsArray($rankedBrands[1]);
-        $this->assertGreaterThan($rankedBrands[1]['score'], $rankedBrands[0]['score']);
+        self::assertIsArray($rankedBrands[0]);
+        self::assertSame('Apple', $rankedBrands[0]['brand']);
+        self::assertIsArray($rankedBrands[1]);
+        self::assertGreaterThan($rankedBrands[1]['score'], $rankedBrands[0]['score']);
     }
 
     /**
-     * @param  array<string, mixed>  $userPreferences
+     * @param array<string, mixed> $userPreferences
+     *
      * @return list<string>
      */
     private function getBrandRecommendations(array $userPreferences, int $limit): array
     {
         arsort($userPreferences);
 
-        return array_slice(array_keys($userPreferences), 0, $limit);
+        return \array_slice(array_keys($userPreferences), 0, $limit);
     }
 
     /**
-     * @param  array<string, array<string, mixed>>  $brandPopularity
+     * @param array<string, array<string, mixed>> $brandPopularity
+     *
      * @return list<string>
      */
     private function getPopularBrandsInCategory(string $category, array $brandPopularity, int $limit): array
@@ -219,11 +226,12 @@ class BrandRecommendationTest extends TestCase
         $categoryBrands = $brandPopularity[$category];
         arsort($categoryBrands);
 
-        return array_slice(array_keys($categoryBrands), 0, $limit);
+        return \array_slice(array_keys($categoryBrands), 0, $limit);
     }
 
     /**
-     * @param  array<string, list<string>>  $brandSimilarity
+     * @param array<string, list<string>> $brandSimilarity
+     *
      * @return list<string>
      */
     private function getSimilarBrandRecommendations(string $currentBrand, array $brandSimilarity): array
@@ -232,7 +240,8 @@ class BrandRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, array<string, mixed>>  $brandPriceRanges
+     * @param array<string, array<string, mixed>> $brandPriceRanges
+     *
      * @return list<string>
      */
     private function getBrandsInPriceRange(float $budget, array $brandPriceRanges): array
@@ -249,18 +258,20 @@ class BrandRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $brandRatings
+     * @param array<string, mixed> $brandRatings
+     *
      * @return list<string>
      */
     private function getHighRatedBrands(array $brandRatings, float $minRating): array
     {
-        return array_keys(array_filter($brandRatings, function ($rating) use ($minRating) {
+        return array_keys(array_filter($brandRatings, static function ($rating) use ($minRating) {
             return $rating >= $minRating;
         }));
     }
 
     /**
-     * @param  array<string, list<string>>  $brandAvailability
+     * @param array<string, list<string>> $brandAvailability
+     *
      * @return list<string>
      */
     private function getAvailableBrandsInRegion(string $region, array $brandAvailability): array
@@ -268,7 +279,7 @@ class BrandRecommendationTest extends TestCase
         $availableBrands = [];
 
         foreach ($brandAvailability as $brand => $regions) {
-            if (in_array($region, $regions)) {
+            if (\in_array($region, $regions, true)) {
                 $availableBrands[] = $brand;
             }
         }
@@ -277,7 +288,8 @@ class BrandRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $purchaseHistory
+     * @param array<int, array<string, mixed>> $purchaseHistory
+     *
      * @return list<string>
      */
     private function getBrandsFromPurchaseHistory(array $purchaseHistory, int $limit): array
@@ -286,18 +298,18 @@ class BrandRecommendationTest extends TestCase
 
         foreach ($purchaseHistory as $purchase) {
             $brand = $purchase['brand'] ?? '';
-            if (is_string($brand) && $brand !== '') {
+            if (\is_string($brand) && '' !== $brand) {
                 $brandCounts[$brand] = ($brandCounts[$brand] ?? 0) + 1;
             }
         }
 
         arsort($brandCounts);
 
-        return array_slice(array_keys($brandCounts), 0, $limit);
+        return \array_slice(array_keys($brandCounts), 0, $limit);
     }
 
     /**
-     * @param  array<string, int>  $userPurchases
+     * @param array<string, int> $userPurchases
      */
     private function calculateBrandLoyaltyScore(array $userPurchases, string $brand): float
     {
@@ -308,7 +320,8 @@ class BrandRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<string, array<string, mixed>>  $brandTrends
+     * @param array<string, array<string, mixed>> $brandTrends
+     *
      * @return list<string>
      */
     private function getTrendingBrands(array $brandTrends): array
@@ -316,7 +329,7 @@ class BrandRecommendationTest extends TestCase
         $trending = [];
 
         foreach ($brandTrends as $brand => $data) {
-            if ($data['trend'] === 'up' && $data['growth'] > 0.1) {
+            if ('up' === $data['trend'] && $data['growth'] > 0.1) {
                 $trending[] = $brand;
             }
         }
@@ -325,13 +338,15 @@ class BrandRecommendationTest extends TestCase
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $brands
+     * @param array<int, array<string, mixed>> $brands
+     *
      * @return list<string>
      */
 
     /**
-     * @param  array<string, array<string, float>>  $brands
-     * @param  array<string, float>  $weights
+     * @param array<string, array<string, float>> $brands
+     * @param array<string, float>                $weights
+     *
      * @return list<array{brand: string, score: float}>
      */
     private function rankBrandsByWeightedScore(array $brands, array $weights): array
@@ -353,7 +368,7 @@ class BrandRecommendationTest extends TestCase
             ];
         }
 
-        usort($rankedBrands, function ($a, $b) {
+        usort($rankedBrands, static function ($a, $b) {
             return $b['score'] <=> $a['score'];
         });
 

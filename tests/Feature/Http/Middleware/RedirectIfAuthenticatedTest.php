@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Middleware;
 
+use App\Http\Middleware\RedirectIfAuthenticated;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
@@ -11,85 +12,89 @@ use Tests\TestCase;
 
 /**
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class RedirectIfAuthenticatedTest extends TestCase
+final class RedirectIfAuthenticatedTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_redirect_if_authenticated_middleware_redirects_authenticated_users(): void
+    public function testRedirectIfAuthenticatedMiddlewareRedirectsAuthenticatedUsers(): void
     {
         $user = User::factory()->create();
         $this->actingAs($user);
 
         $request = Request::create('/login', 'GET');
-        $request->setUserResolver(fn () => $user);
+        $request->setUserResolver(static fn () => $user);
 
-        $middleware = new \App\Http\Middleware\RedirectIfAuthenticated;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new RedirectIfAuthenticated();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(302, $response->getStatusCode());
-        $this->assertStringContainsString('/', $response->headers->get('Location'));
+        self::assertSame(302, $response->getStatusCode());
+        self::assertStringContainsString('/', $response->headers->get('Location'));
     }
 
-    public function test_redirect_if_authenticated_middleware_allows_unauthenticated_users(): void
+    public function testRedirectIfAuthenticatedMiddlewareAllowsUnauthenticatedUsers(): void
     {
         $request = Request::create('/login', 'GET');
 
-        $middleware = new \App\Http\Middleware\RedirectIfAuthenticated;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new RedirectIfAuthenticated();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('OK', $response->getContent());
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('OK', $response->getContent());
     }
 
-    public function test_redirect_if_authenticated_middleware_handles_api_requests(): void
+    public function testRedirectIfAuthenticatedMiddlewareHandlesApiRequests(): void
     {
         $user = User::factory()->create();
         $this->actingAs($user);
 
         $request = Request::create('/api/login', 'GET');
         $request->headers->set('Accept', 'application/json');
-        $request->setUserResolver(fn () => $user);
+        $request->setUserResolver(static fn () => $user);
 
-        $middleware = new \App\Http\Middleware\RedirectIfAuthenticated;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new RedirectIfAuthenticated();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(302, $response->getStatusCode());
+        self::assertSame(302, $response->getStatusCode());
     }
 
-    public function test_redirect_if_authenticated_middleware_handles_different_routes(): void
+    public function testRedirectIfAuthenticatedMiddlewareHandlesDifferentRoutes(): void
     {
         $user = User::factory()->create();
         $this->actingAs($user);
 
         $request = Request::create('/register', 'GET');
-        $request->setUserResolver(fn () => $user);
+        $request->setUserResolver(static fn () => $user);
 
-        $middleware = new \App\Http\Middleware\RedirectIfAuthenticated;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new RedirectIfAuthenticated();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(302, $response->getStatusCode());
+        self::assertSame(302, $response->getStatusCode());
     }
 
-    public function test_redirect_if_authenticated_middleware_handles_null_user(): void
+    public function testRedirectIfAuthenticatedMiddlewareHandlesNullUser(): void
     {
         $request = Request::create('/login', 'GET');
-        $request->setUserResolver(fn () => null);
+        $request->setUserResolver(static fn () => null);
 
-        $middleware = new \App\Http\Middleware\RedirectIfAuthenticated;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new RedirectIfAuthenticated();
+        $response = $middleware->handle($request, static function ($req) {
             return response('OK', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('OK', $response->getContent());
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('OK', $response->getContent());
     }
 }

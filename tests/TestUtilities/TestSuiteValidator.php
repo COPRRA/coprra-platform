@@ -22,7 +22,7 @@ class TestSuiteValidator
 
     public function __construct()
     {
-        $this->config = new TestConfiguration;
+        $this->config = new TestConfiguration();
     }
 
     /**
@@ -51,6 +51,96 @@ class TestSuiteValidator
     }
 
     /**
+     * Validate test files exist.
+     */
+    public function validateTestFiles(): array
+    {
+        $testDirectories = [
+            'tests/Unit/Services',
+            'tests/Feature',
+            'tests/Integration',
+            'tests/Performance',
+            'tests/Security',
+        ];
+
+        $results = [
+            'valid' => true,
+            'missing_directories' => [],
+            'missing_files' => [],
+            'total_test_files' => 0,
+        ];
+
+        foreach ($testDirectories as $directory) {
+            if (! File::exists($directory)) {
+                $results['missing_directories'][] = $directory;
+                $results['valid'] = false;
+            } else {
+                $files = File::allFiles($directory);
+                $testFiles = array_filter($files, static fn ($file) => str_ends_with($file->getFilename(), 'Test.php'));
+                $results['total_test_files'] += \count($testFiles);
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * Validate test configuration files.
+     */
+    public function validateTestConfiguration(): array
+    {
+        $configFiles = [
+            'phpunit.xml',
+            'tests/TestUtilities/TestConfiguration.php',
+        ];
+
+        $results = [
+            'valid' => true,
+            'missing_files' => [],
+            'invalid_files' => [],
+        ];
+
+        foreach ($configFiles as $file) {
+            if (! File::exists($file)) {
+                $results['missing_files'][] = $file;
+                $results['valid'] = false;
+            } else {
+                // Basic validation of file content
+                $content = File::get($file);
+                if (empty($content)) {
+                    $results['invalid_files'][] = $file;
+                    $results['valid'] = false;
+                }
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * Generate validation report.
+     */
+    public function generateValidationReport(array $testResults): array
+    {
+        $validation = $this->validateTestSuite($testResults);
+        $testFiles = $this->validateTestFiles();
+        $config = $this->validateTestConfiguration();
+
+        return [
+            'validation_summary' => [
+                'overall_valid' => $validation['overall']['valid'],
+                'overall_score' => $validation['overall']['score'],
+                'total_issues' => \count($validation['overall']['issues']),
+                'total_recommendations' => \count($validation['overall']['recommendations']),
+            ],
+            'detailed_validation' => $validation,
+            'test_files_validation' => $testFiles,
+            'configuration_validation' => $config,
+            'generated_at' => now()->toISOString(),
+        ];
+    }
+
+    /**
      * Validate configuration.
      */
     private function validateConfiguration(): array
@@ -60,7 +150,7 @@ class TestSuiteValidator
         return [
             'valid' => empty($errors),
             'errors' => $errors,
-            'score' => empty($errors) ? 100 : max(0, 100 - (count($errors) * 10)),
+            'score' => empty($errors) ? 100 : max(0, 100 - (\count($errors) * 10)),
         ];
     }
 
@@ -140,8 +230,8 @@ class TestSuiteValidator
         // Check memory usage
         $maxMemoryUsage = TestConfiguration::get('performance_thresholds.memory_limit_mb', 50) * 1024 * 1024; // Convert to bytes
         if (($executionMetrics['peak_memory_usage'] ?? 0) > $maxMemoryUsage) {
-            $issues[] = 'Peak memory usage '.round(($executionMetrics['peak_memory_usage'] ?? 0) / (1024 * 1024), 2).'MB exceeds threshold '.
-                round($maxMemoryUsage / (1024 * 1024), 2).'MB';
+            $issues[] = 'Peak memory usage '.round(($executionMetrics['peak_memory_usage'] ?? 0) / (1024 * 1024), 2).'MB exceeds threshold '
+                .round($maxMemoryUsage / (1024 * 1024), 2).'MB';
             $score -= 20;
         }
 
@@ -174,7 +264,7 @@ class TestSuiteValidator
         $totalVulnerabilities = 0;
         foreach ($securityTests as $category => $results) {
             if (isset($results['vulnerabilities'])) {
-                $totalVulnerabilities += count($results['vulnerabilities']);
+                $totalVulnerabilities += \count($results['vulnerabilities']);
             }
         }
 
@@ -258,11 +348,11 @@ class TestSuiteValidator
             $validationResults['quality']['score'],
         ];
 
-        $overallScore = array_sum($scores) / count($scores);
-        $valid = $overallScore >= 80 &&
-            $validationResults['configuration']['valid'] &&
-            $validationResults['coverage']['valid'] &&
-            $validationResults['security']['valid'];
+        $overallScore = array_sum($scores) / \count($scores);
+        $valid = $overallScore >= 80
+            && $validationResults['configuration']['valid']
+            && $validationResults['coverage']['valid']
+            && $validationResults['security']['valid'];
 
         $issues = array_merge(
             $validationResults['configuration']['errors'] ?? [],
@@ -315,95 +405,5 @@ class TestSuiteValidator
         }
 
         return $recommendations;
-    }
-
-    /**
-     * Validate test files exist.
-     */
-    public function validateTestFiles(): array
-    {
-        $testDirectories = [
-            'tests/Unit/Services',
-            'tests/Feature',
-            'tests/Integration',
-            'tests/Performance',
-            'tests/Security',
-        ];
-
-        $results = [
-            'valid' => true,
-            'missing_directories' => [],
-            'missing_files' => [],
-            'total_test_files' => 0,
-        ];
-
-        foreach ($testDirectories as $directory) {
-            if (! File::exists($directory)) {
-                $results['missing_directories'][] = $directory;
-                $results['valid'] = false;
-            } else {
-                $files = File::allFiles($directory);
-                $testFiles = array_filter($files, fn ($file) => str_ends_with($file->getFilename(), 'Test.php'));
-                $results['total_test_files'] += count($testFiles);
-            }
-        }
-
-        return $results;
-    }
-
-    /**
-     * Validate test configuration files.
-     */
-    public function validateTestConfiguration(): array
-    {
-        $configFiles = [
-            'phpunit.xml',
-            'tests/TestUtilities/TestConfiguration.php',
-        ];
-
-        $results = [
-            'valid' => true,
-            'missing_files' => [],
-            'invalid_files' => [],
-        ];
-
-        foreach ($configFiles as $file) {
-            if (! File::exists($file)) {
-                $results['missing_files'][] = $file;
-                $results['valid'] = false;
-            } else {
-                // Basic validation of file content
-                $content = File::get($file);
-                if (empty($content)) {
-                    $results['invalid_files'][] = $file;
-                    $results['valid'] = false;
-                }
-            }
-        }
-
-        return $results;
-    }
-
-    /**
-     * Generate validation report.
-     */
-    public function generateValidationReport(array $testResults): array
-    {
-        $validation = $this->validateTestSuite($testResults);
-        $testFiles = $this->validateTestFiles();
-        $config = $this->validateTestConfiguration();
-
-        return [
-            'validation_summary' => [
-                'overall_valid' => $validation['overall']['valid'],
-                'overall_score' => $validation['overall']['score'],
-                'total_issues' => count($validation['overall']['issues']),
-                'total_recommendations' => count($validation['overall']['recommendations']),
-            ],
-            'detailed_validation' => $validation,
-            'test_files_validation' => $testFiles,
-            'configuration_validation' => $config,
-            'generated_at' => now()->toISOString(),
-        ];
     }
 }

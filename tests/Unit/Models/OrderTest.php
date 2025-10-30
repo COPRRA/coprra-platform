@@ -8,90 +8,92 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\TestCase;
 
 /**
  * Unit tests for the Order model.
+ *
+ * @internal
  */
 #[CoversClass(Order::class)]
-class OrderTest extends TestCase
+final class OrderTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        \Mockery::close();
+        parent::tearDown();
+    }
+
     /**
      * Test that user relation is a BelongsTo instance.
      */
-    public function test_user_relation(): void
+    public function testUserRelation(): void
     {
-        $order = new Order;
+        $order = new Order();
 
         $relation = $order->user();
 
-        $this->assertInstanceOf(BelongsTo::class, $relation);
-        $this->assertEquals(User::class, $relation->getRelated()::class);
+        self::assertInstanceOf(BelongsTo::class, $relation);
+        self::assertSame(User::class, $relation->getRelated()::class);
     }
 
     /**
      * Test that items relation is a HasMany instance.
      */
-    public function test_items_relation(): void
+    public function testItemsRelation(): void
     {
-        $order = new Order;
+        $order = new Order();
 
         $relation = $order->items();
 
-        $this->assertInstanceOf(HasMany::class, $relation);
-        $this->assertEquals(OrderItem::class, $relation->getRelated()::class);
+        self::assertInstanceOf(HasMany::class, $relation);
+        self::assertSame(OrderItem::class, $relation->getRelated()::class);
     }
 
     /**
      * Test that payments relation is a HasMany instance.
      */
-    public function test_payments_relation(): void
+    public function testPaymentsRelation(): void
     {
-        $order = new Order;
+        $order = new Order();
 
         $relation = $order->payments();
 
-        $this->assertInstanceOf(HasMany::class, $relation);
-        $this->assertEquals(Payment::class, $relation->getRelated()::class);
+        self::assertInstanceOf(HasMany::class, $relation);
+        self::assertSame(Payment::class, $relation->getRelated()::class);
     }
 
     /**
      * Test scopeByStatus adds where clause for status.
      */
-    public function test_scope_by_status(): void
+    public function testScopeByStatus(): void
     {
         $status = 'pending';
-        $query = Mockery::mock(\Illuminate\Database\Eloquent\Builder::class);
+        $query = \Mockery::mock(Builder::class);
         $query->shouldReceive('where')->once()->with('status', $status)->andReturnSelf();
 
-        $order = new Order;
+        $order = new Order();
         $result = $order->scopeByStatus($query, $status);
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Builder::class, $result);
+        self::assertInstanceOf(Builder::class, $result);
     }
 
     /**
      * Test scopeForUser adds where clause for user_id.
      */
-    public function test_scope_for_user(): void
+    public function testScopeForUser(): void
     {
         $userId = 1;
-        $query = Mockery::mock(\Illuminate\Database\Eloquent\Builder::class);
+        $query = \Mockery::mock(Builder::class);
         $query->shouldReceive('where')->once()->with('user_id', $userId)->andReturnSelf();
 
-        $order = new Order;
+        $order = new Order();
         $result = $order->scopeForUser($query, $userId);
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Builder::class, $result);
-    }
-
-    protected function tearDown(): void
-    {
-        Mockery::close();
-        parent::tearDown();
+        self::assertInstanceOf(Builder::class, $result);
     }
 }

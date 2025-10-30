@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * FINAL BATCH FIX - Systematically fix all remaining test issues
- * This script will bring us to 100% green success
+ * This script will bring us to 100% green success.
  */
 echo "╔══════════════════════════════════════════════════════════════╗\n";
 echo "║  FINAL BATCH FIX - Systematic Test Issue Resolution         ║\n";
@@ -35,8 +37,8 @@ foreach ($middlewareFiles as $file => $replacements) {
 
         if ($content !== $original) {
             file_put_contents($path, $content);
-            echo "  ✓ Fixed $file\n";
-            $totalFixes++;
+            echo "  ✓ Fixed {$file}\n";
+            ++$totalFixes;
         }
     }
 }
@@ -54,14 +56,14 @@ foreach ($requestFiles as $file) {
 
     // Change 'required' to 'sometimes|required' for better test compatibility
     // Only for specific fields that might be optional in tests
-    if (basename($file) === 'UpdateUserRequest.php') {
+    if ('UpdateUserRequest.php' === basename($file)) {
         $content = str_replace("'password' => 'required", "'password' => 'sometimes|required", $content);
     }
 
     if ($content !== $original) {
         file_put_contents($file, $content);
         echo '  ✓ Enhanced '.basename($file)."\n";
-        $totalFixes++;
+        ++$totalFixes;
     }
 }
 
@@ -84,7 +86,7 @@ foreach ($resourceFiles as $file) {
 echo "\n[4/7] Verifying all routes are registered...\n";
 
 $routesApi = file_get_contents(__DIR__.'/routes/api.php');
-if (strpos($routesApi, "Route::apiResource('orders'") !== false) {
+if (false !== strpos($routesApi, "Route::apiResource('orders'")) {
     echo "  ✓ Order routes registered\n";
 }
 
@@ -115,7 +117,7 @@ echo "\n[6/7] Configuring error handler manager...\n";
 $errorHandlerPath = __DIR__.'/tests/ErrorHandlerManager.php';
 if (file_exists($errorHandlerPath)) {
     $content = file_get_contents($errorHandlerPath);
-    if (strpos($content, 'restore_error_handler') === false) {
+    if (false === strpos($content, 'restore_error_handler')) {
         // Add restoration logic
         $content = str_replace(
             'class ErrorHandlerManager',
@@ -124,7 +126,7 @@ if (file_exists($errorHandlerPath)) {
         );
         file_put_contents($errorHandlerPath, $content);
         echo "  ✓ Error handler manager configured\n";
-        $totalFixes++;
+        ++$totalFixes;
     }
 }
 
@@ -135,7 +137,7 @@ echo "\n[7/7] Creating missing test helpers...\n";
 
 // Ensure TestCase annotations are removed
 $testCaseContent = file_get_contents(__DIR__.'/tests/TestCase.php');
-if (strpos($testCaseContent, '@runTestsInSeparateProcesses') !== false) {
+if (false !== strpos($testCaseContent, '@runTestsInSeparateProcesses')) {
     $testCaseContent = str_replace([
         " * @runTestsInSeparateProcesses\n",
         " *\n",
@@ -148,7 +150,7 @@ if (strpos($testCaseContent, '@runTestsInSeparateProcesses') !== false) {
 
     file_put_contents(__DIR__.'/tests/TestCase.php', $testCaseContent);
     echo "  ✓ Removed process isolation from TestCase\n";
-    $totalFixes++;
+    ++$totalFixes;
 }
 
 // ============================================================================
@@ -158,5 +160,5 @@ echo "\n";
 echo "╔══════════════════════════════════════════════════════════════╗\n";
 echo "║                  BATCH FIX COMPLETED                         ║\n";
 echo "╚══════════════════════════════════════════════════════════════╝\n";
-echo "\nTotal fixes applied: $totalFixes\n";
+echo "\nTotal fixes applied: {$totalFixes}\n";
 echo "\nNext step: Running comprehensive test suite...\n\n";

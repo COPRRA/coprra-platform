@@ -6,44 +6,17 @@ namespace Tests\Feature\Models;
 
 use App\Models\Store;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class StoreTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class StoreTest extends TestCase
 {
     use RefreshDatabase;
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_create_a_store(): void
-    {
-        // Test that Store class exists
-        $model = new Store;
-        $this->assertInstanceOf(Store::class, $model);
-
-        // Test basic functionality
-        $this->assertTrue(true);
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_has_expected_properties(): void
-    {
-        // Test that Store class exists
-        $model = new Store;
-        $this->assertInstanceOf(Store::class, $model);
-
-        // Test basic functionality
-        $this->assertTrue(true);
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_be_instantiated(): void
-    {
-        // Test that Store class exists
-        $model = new Store;
-        $this->assertInstanceOf(Store::class, $model);
-
-        // Test basic functionality
-        $this->assertTrue(true);
-    }
 
     protected function setUp(): void
     {
@@ -53,5 +26,38 @@ class StoreTest extends TestCase
     protected function tearDown(): void
     {
         parent::tearDown();
+    }
+
+    #[Test]
+    public function testItCanCreateAStore(): void
+    {
+        // Test that Store class exists
+        $model = new Store();
+        self::assertInstanceOf(Store::class, $model);
+
+        // Test basic functionality
+        self::assertTrue(true);
+    }
+
+    #[Test]
+    public function testItHasExpectedProperties(): void
+    {
+        // Test that Store class exists
+        $model = new Store();
+        self::assertInstanceOf(Store::class, $model);
+
+        // Test basic functionality
+        self::assertTrue(true);
+    }
+
+    #[Test]
+    public function testItCanBeInstantiated(): void
+    {
+        // Test that Store class exists
+        $model = new Store();
+        self::assertInstanceOf(Store::class, $model);
+
+        // Test basic functionality
+        self::assertTrue(true);
     }
 }

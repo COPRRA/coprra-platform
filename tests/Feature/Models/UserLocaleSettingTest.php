@@ -9,12 +9,17 @@ use App\Models\Language;
 use App\Models\User;
 use App\Models\UserLocaleSetting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class UserLocaleSettingTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class UserLocaleSettingTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -30,8 +35,8 @@ class UserLocaleSettingTest extends TestCase
         \Config::set('hashing.bcrypt', []);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_can_create_a_user_locale_setting(): void
+    #[Test]
+    public function testItCanCreateAUserLocaleSetting(): void
     {
         $user = User::factory()->create();
         $language = Language::factory()->create();
@@ -46,17 +51,17 @@ class UserLocaleSettingTest extends TestCase
             'country_code' => 'US',
         ]);
 
-        $this->assertInstanceOf(UserLocaleSetting::class, $userLocaleSetting);
-        $this->assertEquals($user->id, $userLocaleSetting->user_id);
-        $this->assertEquals('session123', $userLocaleSetting->session_id);
-        $this->assertEquals($language->id, $userLocaleSetting->language_id);
-        $this->assertEquals($currency->id, $userLocaleSetting->currency_id);
-        $this->assertEquals('127.0.0.1', $userLocaleSetting->ip_address);
-        $this->assertEquals('US', $userLocaleSetting->country_code);
+        self::assertInstanceOf(UserLocaleSetting::class, $userLocaleSetting);
+        self::assertSame($user->id, $userLocaleSetting->user_id);
+        self::assertSame('session123', $userLocaleSetting->session_id);
+        self::assertSame($language->id, $userLocaleSetting->language_id);
+        self::assertSame($currency->id, $userLocaleSetting->currency_id);
+        self::assertSame('127.0.0.1', $userLocaleSetting->ip_address);
+        self::assertSame('US', $userLocaleSetting->country_code);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_casts_attributes_correctly(): void
+    #[Test]
+    public function testItCastsAttributesCorrectly(): void
     {
         $user = User::factory()->create();
         $language = Language::factory()->create();
@@ -68,43 +73,43 @@ class UserLocaleSettingTest extends TestCase
             'currency_id' => $currency->id,
         ]);
 
-        $this->assertIsInt($userLocaleSetting->user_id);
-        $this->assertIsInt($userLocaleSetting->language_id);
-        $this->assertIsInt($userLocaleSetting->currency_id);
+        self::assertIsInt($userLocaleSetting->user_id);
+        self::assertIsInt($userLocaleSetting->language_id);
+        self::assertIsInt($userLocaleSetting->currency_id);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_belongs_to_user(): void
+    #[Test]
+    public function testItBelongsToUser(): void
     {
         $user = User::factory()->create();
         $userLocaleSetting = UserLocaleSetting::factory()->create(['user_id' => $user->id]);
 
-        $this->assertInstanceOf(User::class, $userLocaleSetting->user);
-        $this->assertEquals($user->id, $userLocaleSetting->user->id);
+        self::assertInstanceOf(User::class, $userLocaleSetting->user);
+        self::assertSame($user->id, $userLocaleSetting->user->id);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_belongs_to_language(): void
+    #[Test]
+    public function testItBelongsToLanguage(): void
     {
         $language = Language::factory()->create();
         $userLocaleSetting = UserLocaleSetting::factory()->create(['language_id' => $language->id]);
 
-        $this->assertInstanceOf(Language::class, $userLocaleSetting->language);
-        $this->assertEquals($language->id, $userLocaleSetting->language->id);
+        self::assertInstanceOf(Language::class, $userLocaleSetting->language);
+        self::assertSame($language->id, $userLocaleSetting->language->id);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_it_belongs_to_currency(): void
+    #[Test]
+    public function testItBelongsToCurrency(): void
     {
         $currency = Currency::factory()->create();
         $userLocaleSetting = UserLocaleSetting::factory()->create(['currency_id' => $currency->id]);
 
-        $this->assertInstanceOf(Currency::class, $userLocaleSetting->currency);
-        $this->assertEquals($currency->id, $userLocaleSetting->currency->id);
+        self::assertInstanceOf(Currency::class, $userLocaleSetting->currency);
+        self::assertSame($currency->id, $userLocaleSetting->currency->id);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_find_for_user_with_user_id(): void
+    #[Test]
+    public function testFindForUserWithUserId(): void
     {
         $user = User::factory()->create();
         $language = Language::factory()->create();
@@ -118,13 +123,13 @@ class UserLocaleSettingTest extends TestCase
 
         $found = UserLocaleSetting::findForUser($user->id, null);
 
-        $this->assertInstanceOf(UserLocaleSetting::class, $found);
-        $this->assertEquals($userLocaleSetting->id, $found->id);
-        $this->assertEquals($user->id, $found->user_id);
+        self::assertInstanceOf(UserLocaleSetting::class, $found);
+        self::assertSame($userLocaleSetting->id, $found->id);
+        self::assertSame($user->id, $found->user_id);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_find_for_user_with_session_id(): void
+    #[Test]
+    public function testFindForUserWithSessionId(): void
     {
         $sessionId = 'session123';
         $language = Language::factory()->create();
@@ -139,13 +144,13 @@ class UserLocaleSettingTest extends TestCase
 
         $found = UserLocaleSetting::findForUser(null, $sessionId);
 
-        $this->assertInstanceOf(UserLocaleSetting::class, $found);
-        $this->assertEquals($userLocaleSetting->id, $found->id);
-        $this->assertEquals($sessionId, $found->session_id);
+        self::assertInstanceOf(UserLocaleSetting::class, $found);
+        self::assertSame($userLocaleSetting->id, $found->id);
+        self::assertSame($sessionId, $found->session_id);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_find_for_user_returns_latest_when_multiple_exist(): void
+    #[Test]
+    public function testFindForUserReturnsLatestWhenMultipleExist(): void
     {
         $user = User::factory()->create();
         $language1 = Language::factory()->create();
@@ -171,29 +176,29 @@ class UserLocaleSettingTest extends TestCase
 
         $found = UserLocaleSetting::findForUser($user->id, null);
 
-        $this->assertEquals($newerSetting->id, $found->id);
-        $this->assertEquals($language2->id, $found->language_id);
-        $this->assertEquals($currency2->id, $found->currency_id);
+        self::assertSame($newerSetting->id, $found->id);
+        self::assertSame($language2->id, $found->language_id);
+        self::assertSame($currency2->id, $found->currency_id);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_find_for_user_returns_null_when_no_user_or_session(): void
+    #[Test]
+    public function testFindForUserReturnsNullWhenNoUserOrSession(): void
     {
         $found = UserLocaleSetting::findForUser(null, null);
 
-        $this->assertNull($found);
+        self::assertNull($found);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_find_for_user_returns_null_when_no_match(): void
+    #[Test]
+    public function testFindForUserReturnsNullWhenNoMatch(): void
     {
         $found = UserLocaleSetting::findForUser(999, 'nonexistent_session');
 
-        $this->assertNull($found);
+        self::assertNull($found);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_update_or_create_for_user_with_user_id(): void
+    #[Test]
+    public function testUpdateOrCreateForUserWithUserId(): void
     {
         $user = User::factory()->create();
         $language = Language::factory()->create();
@@ -208,17 +213,17 @@ class UserLocaleSettingTest extends TestCase
             'US'
         );
 
-        $this->assertInstanceOf(UserLocaleSetting::class, $userLocaleSetting);
-        $this->assertEquals($user->id, $userLocaleSetting->user_id);
-        $this->assertNull($userLocaleSetting->session_id);
-        $this->assertEquals($language->id, $userLocaleSetting->language_id);
-        $this->assertEquals($currency->id, $userLocaleSetting->currency_id);
-        $this->assertEquals('127.0.0.1', $userLocaleSetting->ip_address);
-        $this->assertEquals('US', $userLocaleSetting->country_code);
+        self::assertInstanceOf(UserLocaleSetting::class, $userLocaleSetting);
+        self::assertSame($user->id, $userLocaleSetting->user_id);
+        self::assertNull($userLocaleSetting->session_id);
+        self::assertSame($language->id, $userLocaleSetting->language_id);
+        self::assertSame($currency->id, $userLocaleSetting->currency_id);
+        self::assertSame('127.0.0.1', $userLocaleSetting->ip_address);
+        self::assertSame('US', $userLocaleSetting->country_code);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_update_or_create_for_user_with_session_id(): void
+    #[Test]
+    public function testUpdateOrCreateForUserWithSessionId(): void
     {
         $sessionId = 'session123';
         $language = Language::factory()->create();
@@ -233,17 +238,17 @@ class UserLocaleSettingTest extends TestCase
             'CA'
         );
 
-        $this->assertInstanceOf(UserLocaleSetting::class, $userLocaleSetting);
-        $this->assertNull($userLocaleSetting->user_id);
-        $this->assertEquals($sessionId, $userLocaleSetting->session_id);
-        $this->assertEquals($language->id, $userLocaleSetting->language_id);
-        $this->assertEquals($currency->id, $userLocaleSetting->currency_id);
-        $this->assertEquals('192.168.1.1', $userLocaleSetting->ip_address);
-        $this->assertEquals('CA', $userLocaleSetting->country_code);
+        self::assertInstanceOf(UserLocaleSetting::class, $userLocaleSetting);
+        self::assertNull($userLocaleSetting->user_id);
+        self::assertSame($sessionId, $userLocaleSetting->session_id);
+        self::assertSame($language->id, $userLocaleSetting->language_id);
+        self::assertSame($currency->id, $userLocaleSetting->currency_id);
+        self::assertSame('192.168.1.1', $userLocaleSetting->ip_address);
+        self::assertSame('CA', $userLocaleSetting->country_code);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_update_or_create_for_user_updates_existing(): void
+    #[Test]
+    public function testUpdateOrCreateForUserUpdatesExisting(): void
     {
         $user = User::factory()->create();
         $language1 = Language::factory()->create();
@@ -271,17 +276,17 @@ class UserLocaleSettingTest extends TestCase
             'CA'
         );
 
-        $this->assertEquals($initialSetting->id, $updatedSetting->id);
-        $this->assertEquals($language2->id, $updatedSetting->language_id);
-        $this->assertEquals($currency2->id, $updatedSetting->currency_id);
-        $this->assertEquals('192.168.1.1', $updatedSetting->ip_address);
-        $this->assertEquals('CA', $updatedSetting->country_code);
+        self::assertSame($initialSetting->id, $updatedSetting->id);
+        self::assertSame($language2->id, $updatedSetting->language_id);
+        self::assertSame($currency2->id, $updatedSetting->currency_id);
+        self::assertSame('192.168.1.1', $updatedSetting->ip_address);
+        self::assertSame('CA', $updatedSetting->country_code);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_update_or_create_for_user_throws_exception_without_user_or_session(): void
+    #[Test]
+    public function testUpdateOrCreateForUserThrowsExceptionWithoutUserOrSession(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Either userId or sessionId must be provided');
 
         UserLocaleSetting::updateOrCreateForUser(
@@ -294,8 +299,8 @@ class UserLocaleSettingTest extends TestCase
         );
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_update_or_create_for_user_with_minimal_parameters(): void
+    #[Test]
+    public function testUpdateOrCreateForUserWithMinimalParameters(): void
     {
         $user = User::factory()->create();
         $language = Language::factory()->create();
@@ -308,26 +313,26 @@ class UserLocaleSettingTest extends TestCase
             $currency->id
         );
 
-        $this->assertInstanceOf(UserLocaleSetting::class, $userLocaleSetting);
-        $this->assertEquals($user->id, $userLocaleSetting->user_id);
-        $this->assertEquals($language->id, $userLocaleSetting->language_id);
-        $this->assertEquals($currency->id, $userLocaleSetting->currency_id);
-        $this->assertNull($userLocaleSetting->ip_address);
-        $this->assertNull($userLocaleSetting->country_code);
+        self::assertInstanceOf(UserLocaleSetting::class, $userLocaleSetting);
+        self::assertSame($user->id, $userLocaleSetting->user_id);
+        self::assertSame($language->id, $userLocaleSetting->language_id);
+        self::assertSame($currency->id, $userLocaleSetting->currency_id);
+        self::assertNull($userLocaleSetting->ip_address);
+        self::assertNull($userLocaleSetting->country_code);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_factory_creates_valid_user_locale_setting(): void
+    #[Test]
+    public function testFactoryCreatesValidUserLocaleSetting(): void
     {
         $userLocaleSetting = UserLocaleSetting::factory()->make();
 
-        $this->assertInstanceOf(UserLocaleSetting::class, $userLocaleSetting);
-        $this->assertNotNull($userLocaleSetting->language_id);
-        $this->assertNotNull($userLocaleSetting->currency_id);
+        self::assertInstanceOf(UserLocaleSetting::class, $userLocaleSetting);
+        self::assertNotNull($userLocaleSetting->language_id);
+        self::assertNotNull($userLocaleSetting->currency_id);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_fillable_attributes(): void
+    #[Test]
+    public function testFillableAttributes(): void
     {
         $fillable = [
             'user_id',
@@ -338,11 +343,11 @@ class UserLocaleSettingTest extends TestCase
             'country_code',
         ];
 
-        $this->assertEquals($fillable, (new UserLocaleSetting)->getFillable());
+        self::assertSame($fillable, (new UserLocaleSetting())->getFillable());
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_relationships_work_correctly(): void
+    #[Test]
+    public function testRelationshipsWorkCorrectly(): void
     {
         $user = User::factory()->create();
         $language = Language::factory()->create();
@@ -355,32 +360,32 @@ class UserLocaleSettingTest extends TestCase
         ]);
 
         // Test user relationship
-        $this->assertInstanceOf(User::class, $userLocaleSetting->user);
-        $this->assertEquals($user->id, $userLocaleSetting->user->id);
+        self::assertInstanceOf(User::class, $userLocaleSetting->user);
+        self::assertSame($user->id, $userLocaleSetting->user->id);
 
         // Test language relationship
-        $this->assertInstanceOf(Language::class, $userLocaleSetting->language);
-        $this->assertEquals($language->id, $userLocaleSetting->language->id);
+        self::assertInstanceOf(Language::class, $userLocaleSetting->language);
+        self::assertSame($language->id, $userLocaleSetting->language->id);
 
         // Test currency relationship
-        $this->assertInstanceOf(Currency::class, $userLocaleSetting->currency);
-        $this->assertEquals($currency->id, $userLocaleSetting->currency->id);
+        self::assertInstanceOf(Currency::class, $userLocaleSetting->currency);
+        self::assertSame($currency->id, $userLocaleSetting->currency->id);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_can_have_null_user_id(): void
+    #[Test]
+    public function testCanHaveNullUserId(): void
     {
         $userLocaleSetting = UserLocaleSetting::factory()->create([
             'user_id' => null,
             'session_id' => 'session123',
         ]);
 
-        $this->assertNull($userLocaleSetting->user_id);
-        $this->assertEquals('session123', $userLocaleSetting->session_id);
+        self::assertNull($userLocaleSetting->user_id);
+        self::assertSame('session123', $userLocaleSetting->session_id);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_can_have_null_session_id(): void
+    #[Test]
+    public function testCanHaveNullSessionId(): void
     {
         $user = User::factory()->create();
         $userLocaleSetting = UserLocaleSetting::factory()->create([
@@ -388,27 +393,27 @@ class UserLocaleSettingTest extends TestCase
             'session_id' => null,
         ]);
 
-        $this->assertEquals($user->id, $userLocaleSetting->user_id);
-        $this->assertNull($userLocaleSetting->session_id);
+        self::assertSame($user->id, $userLocaleSetting->user_id);
+        self::assertNull($userLocaleSetting->session_id);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_can_have_null_ip_address(): void
+    #[Test]
+    public function testCanHaveNullIpAddress(): void
     {
         $userLocaleSetting = UserLocaleSetting::factory()->create([
             'ip_address' => null,
         ]);
 
-        $this->assertNull($userLocaleSetting->ip_address);
+        self::assertNull($userLocaleSetting->ip_address);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function test_can_have_null_country_code(): void
+    #[Test]
+    public function testCanHaveNullCountryCode(): void
     {
         $userLocaleSetting = UserLocaleSetting::factory()->create([
             'country_code' => null,
         ]);
 
-        $this->assertNull($userLocaleSetting->country_code);
+        self::assertNull($userLocaleSetting->country_code);
     }
 }

@@ -8,15 +8,6 @@ use Illuminate\Http\Request;
 
 class ContentSecurityPolicyHeaderStrategy implements SecurityHeaderStrategyInterface
 {
-    /**
-     * @psalm-return 'Content-Security-Policy'
-     */
-    #[\Override]
-    public function getHeaderName(): string
-    {
-        return 'Content-Security-Policy';
-    }
-
     #[\Override]
     public function getValue(Request $request, array $config): ?string
     {
@@ -28,11 +19,5 @@ class ContentSecurityPolicyHeaderStrategy implements SecurityHeaderStrategyInter
     public function shouldApply(Request $request, array $config): bool
     {
         return $config['enabled'] ?? true;
-    }
-
-    #[\Override]
-    public function supportsDynamicValues(): bool
-    {
-        return true;
     }
 }

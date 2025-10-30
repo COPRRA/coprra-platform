@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Http\Middleware\SecurityHeadersMiddleware;
 use Symfony\Component\Process\Process;
 
 final class SecurityAnalysisService
@@ -11,7 +12,7 @@ final class SecurityAnalysisService
     /**
      * Run comprehensive security analysis.
      *
-     * @return array<int|string|array<string>>
+     * @return array<array<string>|int|string>
      *
      * @psalm-return array{score: int, max_score: 100, issues: list<string>, category: 'Security'}
      */
@@ -41,7 +42,7 @@ final class SecurityAnalysisService
     /**
      * Check for outdated dependencies.
      *
-     * @param  list<string>  $issues
+     * @param list<string> $issues
      *
      * @psalm-return 0|30
      */
@@ -56,8 +57,8 @@ final class SecurityAnalysisService
 
         $outdated = $process->getOutput();
         if (
-            in_array(trim($outdated), ['', '0'], true) ||
-            str_contains($outdated, 'No direct dependencies')
+            \in_array(trim($outdated), ['', '0'], true)
+            || str_contains($outdated, 'No direct dependencies')
         ) {
             return 30;
         }
@@ -70,7 +71,7 @@ final class SecurityAnalysisService
     /**
      * Check if .env.example file exists.
      *
-     * @param  list<string>  $issues
+     * @param list<string> $issues
      *
      * @psalm-return 0|10
      */
@@ -88,13 +89,13 @@ final class SecurityAnalysisService
     /**
      * Check if debug mode is disabled.
      *
-     * @param  list<string>  $issues
+     * @param list<string> $issues
      *
      * @psalm-return 0|20
      */
     private function checkDebugMode(array &$issues): int
     {
-        if (config('app.debug') === false) {
+        if (false === config('app.debug')) {
             return 20;
         }
 
@@ -106,14 +107,14 @@ final class SecurityAnalysisService
     /**
      * Check if HTTPS is configured.
      *
-     * @param  list<string>  $issues
+     * @param list<string> $issues
      *
      * @psalm-return 0|20
      */
     private function checkHttpsConfiguration(array &$issues): int
     {
         $appUrl = config('app.url');
-        if ($appUrl && is_string($appUrl) && str_starts_with($appUrl, 'https')) {
+        if ($appUrl && \is_string($appUrl) && str_starts_with($appUrl, 'https')) {
             return 20;
         }
 
@@ -125,13 +126,13 @@ final class SecurityAnalysisService
     /**
      * Check if SecurityHeadersMiddleware is registered.
      *
-     * @param  list<string>  $issues
+     * @param list<string> $issues
      *
      * @psalm-return 0|20
      */
     private function checkSecurityMiddleware(array &$issues): int
     {
-        if ($this->isMiddlewareRegistered(\App\Http\Middleware\SecurityHeadersMiddleware::class)) {
+        if ($this->isMiddlewareRegistered(SecurityHeadersMiddleware::class)) {
             return 20;
         }
 
@@ -160,13 +161,13 @@ final class SecurityAnalysisService
             $kernelContent = file_get_contents($kernelFile);
             $shortClassName = class_basename($middlewareClass);
 
-            if ($kernelContent === false) {
+            if (false === $kernelContent) {
                 return false;
             }
 
             // Check if middleware is registered in any of the arrays
-            return str_contains($kernelContent, $middlewareClass) ||
-                str_contains($kernelContent, $shortClassName);
+            return str_contains($kernelContent, $middlewareClass)
+                || str_contains($kernelContent, $shortClassName);
         } catch (\Exception) {
             return false;
         }

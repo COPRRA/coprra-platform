@@ -9,22 +9,28 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
-class AnalyticsEndpointTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class AnalyticsEndpointTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_guest_cannot_access_user_analytics(): void
+    public function testGuestCannotAccessUserAnalytics(): void
     {
         $response = $this->getJson('/api/analytics/user');
         $response->assertStatus(401);
     }
 
-    public function test_authenticated_user_can_get_user_analytics(): void
+    public function testAuthenticatedUserCanGetUserAnalytics(): void
     {
         $user = User::factory()->create();
 
         $response = $this->actingAs($user, 'sanctum')
-            ->getJson('/api/analytics/user');
+            ->getJson('/api/analytics/user')
+        ;
 
         $response->assertStatus(200)
             ->assertJsonStructure([
@@ -36,10 +42,11 @@ class AnalyticsEndpointTest extends TestCase
                     'lifetime_value',
                     'recommendation_score',
                 ],
-            ]);
+            ])
+        ;
     }
 
-    public function test_site_analytics_is_public_and_has_expected_keys(): void
+    public function testSiteAnalyticsIsPublicAndHasExpectedKeys(): void
     {
         $response = $this->getJson('/api/analytics/site');
 
@@ -55,10 +62,11 @@ class AnalyticsEndpointTest extends TestCase
                     'most_viewed_products',
                     'top_selling_products',
                 ],
-            ]);
+            ])
+        ;
     }
 
-    public function test_track_behavior_requires_auth(): void
+    public function testTrackBehaviorRequiresAuth(): void
     {
         $response = $this->postJson('/api/analytics/track', [
             'action' => 'page_view',
@@ -68,34 +76,35 @@ class AnalyticsEndpointTest extends TestCase
         $response->assertStatus(401);
     }
 
-    public function test_track_behavior_success_for_authenticated_user(): void
+    public function testTrackBehaviorSuccessForAuthenticatedUser(): void
     {
         $user = User::factory()->create();
 
         DB::shouldReceive('table')
             ->with('user_behaviors')
-            ->andReturnSelf();
+            ->andReturnSelf()
+        ;
         DB::shouldReceive('insert')
             ->once()
-            ->with(\Mockery::on(function ($arg) use ($user) {
+            ->with(\Mockery::on(static function ($arg) use ($user) {
                 return $arg['user_id'] === $user->id
-                    && $arg['action'] === 'page_view'
+                    && 'page_view' === $arg['action']
                     && $arg['data'] === json_encode(['page' => 'home'])
-                    && isset($arg['ip_address'])
-                    && isset($arg['user_agent'])
-                    && isset($arg['created_at'])
-                    && isset($arg['updated_at']);
-            }));
+                    && isset($arg['ip_address'], $arg['user_agent'], $arg['created_at'], $arg['updated_at']);
+            }))
+        ;
 
         $response = $this->actingAs($user, 'sanctum')
             ->postJson('/api/analytics/track', [
                 'action' => 'page_view',
                 'data' => ['page' => 'home'],
-            ]);
+            ])
+        ;
 
         $response->assertStatus(200)
             ->assertJsonPath('success', true)
-            ->assertJsonPath('message', 'تم تسجيل السلوك بنجاح');
+            ->assertJsonPath('message', 'تم تسجيل السلوك بنجاح')
+        ;
 
         $this->addToAssertionCount(1);
     }

@@ -6,23 +6,13 @@ namespace Tests\Performance;
 
 use Tests\TestCase;
 
-class ApiResponseTimeTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class ApiResponseTimeTest extends TestCase
 {
-    public function test_api_response_time_is_acceptable(): void
-    {
-        $this->assertTrue(true);
-    }
-
-    public function test_api_response_time_under_load(): void
-    {
-        $this->assertTrue(true);
-    }
-
-    public function test_api_response_time_consistency(): void
-    {
-        $this->assertTrue(true);
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -31,5 +21,20 @@ class ApiResponseTimeTest extends TestCase
     protected function tearDown(): void
     {
         parent::tearDown();
+    }
+
+    public function testApiResponseTimeIsAcceptable(): void
+    {
+        self::assertTrue(true);
+    }
+
+    public function testApiResponseTimeUnderLoad(): void
+    {
+        self::assertTrue(true);
+    }
+
+    public function testApiResponseTimeConsistency(): void
+    {
+        self::assertTrue(true);
     }
 }

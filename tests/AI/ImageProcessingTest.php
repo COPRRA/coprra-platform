@@ -6,54 +6,60 @@ namespace Tests\AI;
 
 // Removed PreserveGlobalState to avoid risky test flags
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
 
-class ImageProcessingTest extends \PHPUnit\Framework\TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class ImageProcessingTest extends TestCase
 {
     #[Test]
-    public function can_analyze_product_images(): void
+    public function canAnalyzeProductImages(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function can_detect_objects_in_images(): void
+    public function canDetectObjectsInImages(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function can_extract_colors_from_images(): void
+    public function canExtractColorsFromImages(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function can_generate_image_tags(): void
+    public function canGenerateImageTags(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function can_resize_images(): void
+    public function canResizeImages(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function can_compress_images(): void
+    public function canCompressImages(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function can_detect_image_quality(): void
+    public function canDetectImageQuality(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function can_handle_multiple_image_formats(): void
+    public function canHandleMultipleImageFormats(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 }

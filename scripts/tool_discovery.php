@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 $root = __DIR__.DIRECTORY_SEPARATOR.'..';
 chdir($root);
 
 function firstLine($str)
 {
-    if ($str === null) {
+    if (null === $str) {
         return null;
     }
     $str = trim($str);
@@ -27,7 +29,7 @@ function runCmd($cmd)
 
 function which($name)
 {
-    if (stripos(PHP_OS, 'WIN') !== false) {
+    if (false !== stripos(PHP_OS, 'WIN')) {
         return runCmd("where {$name}");
     }
 

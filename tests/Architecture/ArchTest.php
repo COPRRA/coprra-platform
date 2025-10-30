@@ -7,35 +7,40 @@ namespace Tests\Architecture;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class ArchTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class ArchTest extends TestCase
 {
     #[Test]
-    public function controllers_architecture(): void
+    public function controllersArchitecture(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function models_architecture(): void
+    public function modelsArchitecture(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function services_architecture(): void
+    public function servicesArchitecture(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function middleware_architecture(): void
+    public function middlewareArchitecture(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
-    public function providers_architecture(): void
+    public function providersArchitecture(): void
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 }

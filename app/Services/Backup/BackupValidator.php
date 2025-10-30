@@ -30,28 +30,4 @@ class BackupValidator
             'description' => $validated['description'] ?? '',
         ];
     }
-
-    /**
-     * Validate backup type.
-     */
-    public function validateBackupType(string $type): bool
-    {
-        return in_array($type, ['full', 'database', 'files'], true);
-    }
-
-    /**
-     * Validate backup name.
-     */
-    public function validateBackupName(string $name): bool
-    {
-        return $name !== '' && strlen($name) <= 255;
-    }
-
-    /**
-     * Validate backup description.
-     */
-    public function validateBackupDescription(string $description): bool
-    {
-        return strlen($description) <= 500;
-    }
 }

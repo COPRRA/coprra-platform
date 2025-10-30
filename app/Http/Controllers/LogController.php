@@ -110,8 +110,9 @@ class LogController extends Controller
     /**
      * Parse log file with filters.
      *
-     * @param  array<string>  $allowedLevels
-     * @return array<string, bool|string|array>
+     * @param array<string> $allowedLevels
+     *
+     * @return array<string, array|bool|string>
      */
     public function parseLogFile(array $allowedLevels = []): array
     {
@@ -124,7 +125,7 @@ class LogController extends Controller
             }
 
             $logs = File::get($this->logPath);
-            if ($logs === null || $logs === '') {
+            if (null === $logs || '' === $logs) {
                 return [
                     'success' => false,
                     'message' => 'Failed to read log file',
@@ -145,11 +146,11 @@ class LogController extends Controller
     /**
      * Parse access log file.
      *
-     * @return array<string, bool|string|array>
+     * @return array<string, array|bool|string>
      */
     public function parseAccessLogFile(): array
     {
-        return $this->executeLogOperation(function (): array {
+        return $this->executeLogOperation(static function (): array {
             $accessLogPath = storage_path('logs/access.log');
 
             if (! File::exists($accessLogPath)) {
@@ -160,7 +161,7 @@ class LogController extends Controller
             }
 
             $logs = File::get($accessLogPath);
-            if ($logs === null || $logs === '') {
+            if (null === $logs || '' === $logs) {
                 return [
                     'success' => false,
                     'message' => 'Failed to read access log file',
@@ -195,7 +196,7 @@ class LogController extends Controller
             }
 
             $data = $parsedLogs['data'] ?? [];
-            $errors = is_array($data) ? array_slice($data, 0, is_numeric($limit) ? (int) $limit : 50) : [];
+            $errors = \is_array($data) ? \array_slice($data, 0, is_numeric($limit) ? (int) $limit : 50) : [];
 
             return response()->json([
                 'success' => true,
@@ -222,7 +223,7 @@ class LogController extends Controller
     /**
      * Export logs to file.
      *
-     * @param  list<array<string, string|array>>  $logs
+     * @param list<array<string, array|string>> $logs
      */
     public function exportLogsToFile(array $logs): JsonResponse
     {
@@ -245,7 +246,7 @@ class LogController extends Controller
     /**
      * Get audit logs for export.
      *
-     * @return array<string, bool|string|array>
+     * @return array<string, array|bool|string>
      */
     public function getAuditLogsForExport(): array
     {
@@ -259,10 +260,8 @@ class LogController extends Controller
 
     /**
      * Get system logs for export.
-     *
-     * @return array<string, bool|string|array>
      */
-    public function getSystemLogsForExport(): array
+    public function getSystemLogsForExport(): JsonResponse
     {
         return $this->executeWithErrorHandling(function (): array {
             return $this->parseLogFile();
@@ -271,10 +270,8 @@ class LogController extends Controller
 
     /**
      * Get access logs for export.
-     *
-     * @return array<string, bool|string|array>
      */
-    public function getAccessLogsForExport(): array
+    public function getAccessLogsForExport(): JsonResponse
     {
         return $this->executeWithErrorHandling(function (): array {
             return $this->parseAccessLogFile();
@@ -308,7 +305,7 @@ class LogController extends Controller
         $lines = explode("\n", $logs);
 
         return [
-            'total_lines' => count($lines),
+            'total_lines' => \count($lines),
             'error_count' => $this->countLogLevel($lines, 'ERROR'),
             'warning_count' => $this->countLogLevel($lines, 'WARNING'),
             'info_count' => $this->countLogLevel($lines, 'INFO'),
@@ -321,13 +318,14 @@ class LogController extends Controller
     /**
      * Filter log lines by allowed levels.
      *
-     * @param  array<string>  $lines
-     * @param  array<string>  $allowedLevels
+     * @param array<string> $lines
+     * @param array<string> $allowedLevels
+     *
      * @return array<string>
      */
     private function filterLinesByLevels(array $lines, array $allowedLevels): array
     {
-        if ($allowedLevels === []) {
+        if ([] === $allowedLevels) {
             return $lines;
         }
 
@@ -345,7 +343,7 @@ class LogController extends Controller
     /**
      * Execute log operation with error handling.
      *
-     * @return array<string, bool|string|array>
+     * @return array<string, array|bool|string>
      */
     private function executeLogOperation(callable $callback, string $operation): array
     {
@@ -394,18 +392,18 @@ class LogController extends Controller
     /**
      * Write logs to CSV file.
      *
-     * @param  list<array<string, string|array>>  $logs
+     * @param list<array<string, array|string>> $logs
      */
     private function writeLogsToCsv(string $filePath, array $logs): void
     {
         $file = fopen($filePath, 'w');
-        if ($file === false) {
+        if (false === $file) {
             throw new \RuntimeException('Failed to create export file');
         }
 
         try {
             fputcsv($file, ['Timestamp', 'Level', 'Message']);
-            fputcsv($file, array_values(array_map(static fn (array $log): string => is_string($log) ? $log : 'log', $logs)));
+            fputcsv($file, array_values(array_map(static fn (array $log): string => \is_string($log) ? $log : 'log', $logs)));
         } finally {
             fclose($file);
         }
@@ -414,7 +412,7 @@ class LogController extends Controller
     /**
      * Retrieve and filter log entries based on request parameters.
      *
-     * @return array<string, string|array|int|bool|null>
+     * @return array<string, string|array|int|bool|* @method static \App\Models\Brand create(array<string, string|bool|null>
      */
     private function getFilteredLogs(Request $request): array
     {
@@ -442,7 +440,8 @@ class LogController extends Controller
     /**
      * Apply level filter to log lines.
      *
-     * @param  array<string>  $lines
+     * @param array<string> $lines
+     *
      * @return array<string>
      */
     private function applyLevelFilter(array $lines, Request $request): array
@@ -452,7 +451,7 @@ class LogController extends Controller
         }
 
         $level = $request->get('level');
-        if (! is_string($level)) {
+        if (! \is_string($level)) {
             return $lines;
         }
 
@@ -462,7 +461,8 @@ class LogController extends Controller
     /**
      * Apply limit filter to log lines.
      *
-     * @param  array<string>  $lines
+     * @param array<string> $lines
+     *
      * @return array<string>
      */
     private function applyLimitFilter(array $lines, Request $request): array
@@ -470,20 +470,20 @@ class LogController extends Controller
         $limitInput = $request->get('limit', 100);
         $limit = is_numeric($limitInput) ? (int) $limitInput : 100;
 
-        return array_slice($lines, 0, $limit);
+        return \array_slice($lines, 0, $limit);
     }
 
     /**
      * Count log level occurrences.
      *
-     * @param  array<string>  $lines
+     * @param array<string> $lines
      */
     private function countLogLevel(array $lines, string $level): int
     {
         $count = 0;
         foreach ($lines as $line) {
             if (str_contains($line, $level)) {
-                $count++;
+                ++$count;
             }
         }
 

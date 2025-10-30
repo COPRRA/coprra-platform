@@ -5,22 +5,25 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Database\Factories\PriceAlertFactory;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\MessageBag;
 
 /**
- * @property int $id
- * @property int $user_id
- * @property int $product_id
+ * @property int   $id
+ * @property int   $user_id
+ * @property int   $product_id
  * @property float $target_price
- * @property bool $repeat_alert
- * @property bool $is_active
- * @property \Carbon\Carbon|null $created_at
- * @property \Carbon\Carbon|null $updated_at
- * @property \Carbon\Carbon|null $deleted_at
- * @property \App\Models\User $user
- * @property \App\Models\Product $product
+ * @property bool  $repeat_alert
+ * @property bool  $is_active
+ ** @property Carbon|nullCarbon|null $created_at
+ ** @property Carbon|nullCarbon|null $updated_at
+ ** @property Carbon|nullCarbon|null $deleted_at
+ ** @property User $user
+ * @property Product $product
  *
  * @method static PriceAlertFactory factory(...$parameters)
  *
@@ -36,9 +39,9 @@ class PriceAlert extends ValidatableModel
     use SoftDeletes;
 
     /**
-     * @var class-string<\Illuminate\Database\Eloquent\Factories\Factory<PriceAlert>>
+     * @var class-string<Factory<PriceAlert>>
      */
-    protected static $factory = \Database\Factories\PriceAlertFactory::class;
+    protected static $factory = PriceAlertFactory::class;
 
     /**
      * @var array<int, string>
@@ -76,7 +79,7 @@ class PriceAlert extends ValidatableModel
     /**
      * Validation errors.
      */
-    protected ?\Illuminate\Support\MessageBag $errors = null;
+    protected ?MessageBag $errors = null;
 
     /**
      * Return only explicit casts defined on the model.
@@ -95,10 +98,10 @@ class PriceAlert extends ValidatableModel
         return $casts;
     }
 
+    // --- Relationships ---
+
     /**
      * Get the user that owns the price alert.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, PriceAlert>
      */
     public function user(): BelongsTo
     {
@@ -106,9 +109,7 @@ class PriceAlert extends ValidatableModel
     }
 
     /**
-     * Get the product associated with the price alert.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Product, PriceAlert>
+     * Get the product that this price alert is for.
      */
     public function product(): BelongsTo
     {
@@ -118,60 +119,44 @@ class PriceAlert extends ValidatableModel
     // --- Scopes ---
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Builder<PriceAlert>  $query
-     *
-     * @psalm-return \Illuminate\Database\Eloquent\Builder<self>
+     * Scope a query to only include active price alerts.
      */
-    public function scopeActive(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    public function scopeActive(Builder $query): Builder
     {
-        return $query->withoutGlobalScopes()->where('is_active', true);
+        return $query->where('is_active', true);
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Builder<PriceAlert>  $query
-     *
-     * @psalm-return \Illuminate\Database\Eloquent\Builder<self>
+     * Scope a query to only include price alerts for a specific user.
      */
-    public function scopeForUser(\Illuminate\Database\Eloquent\Builder $query, int $userId): \Illuminate\Database\Eloquent\Builder
+    public function scopeForUser(Builder $query, int $userId): Builder
     {
-        return $query->withoutGlobalScopes()->where('user_id', $userId);
+        return $query->where('user_id', $userId);
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Builder<PriceAlert>  $query
-     *
-     * @psalm-return \Illuminate\Database\Eloquent\Builder<self>
+     * Scope a query to only include price alerts for a specific product.
      */
-    public function scopeForProduct(\Illuminate\Database\Eloquent\Builder $query, int $productId): \Illuminate\Database\Eloquent\Builder
+    public function scopeForProduct(Builder $query, int $productId): Builder
     {
-        return $query->withoutGlobalScopes()->where('product_id', $productId);
+        return $query->where('product_id', $productId);
+    }
+
+    // --- Methods ---
+
+    /**
+     * Get the validation rules.
+     */
+    public function getRules(): array
+    {
+        return $this->rules;
     }
 
     /**
-     * Determine if the current price meets or is below the alert's target.
+     * Check if the price target has been reached.
      */
     public function isPriceTargetReached(float $currentPrice): bool
     {
-        $target = (float) ($this->target_price ?? 0.0);
-
-        return $currentPrice <= $target;
-    }
-
-    /**
-     * Activate this price alert.
-     */
-    public function activate(): void
-    {
-        $this->is_active = true;
-        $this->save();
-    }
-
-    /**
-     * Deactivate this price alert.
-     */
-    public function deactivate(): void
-    {
-        $this->is_active = false;
-        $this->save();
+        return $currentPrice <= $this->target_price;
     }
 }

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <psalm
     errorLevel="1"
     baseline="psalm-baseline.xml"
@@ -6,8 +6,10 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
-    findUnusedBaselineEntry="false"
+    findUnusedBaselineEntry="true"
     findUnusedCode="true"
+    findUnusedVariablesAndParams="true"
+    findUnusedPsalmSuppress="true"
     strictMixedIssues="true"
     strictUnnecessaryNullChecks="true"
     strictInternalClassChecks="true"
@@ -15,8 +17,14 @@
     strictFunctionChecks="true"
     strictReturnTypeChecks="true"
     strictParamChecks="true"
+    strictBinaryOperands="true"
+    strictComparison="true"
     taintAnalysis="true"
     trackTaintsInPath="true"
+    reportMixedIssues="true"
+    totallyTyped="true"
+    ensureArrayStringOffsetsExist="true"
+    ensureArrayIntOffsetsExist="true"
     autoloader="vendor/autoload.php"
     errorBaseline="psalm-baseline.xml"
 >

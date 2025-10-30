@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services\FileCleanup\Strategies;
 
 use App\Services\FileCleanup\DirectoryCleaner;
-use Exception;
 use Illuminate\Support\Facades\Log;
 
 final readonly class CacheFilesCleanupStrategy implements CleanupStrategy
@@ -20,7 +19,7 @@ final readonly class CacheFilesCleanupStrategy implements CleanupStrategy
     private int $retentionDays;
 
     /**
-     * @param  array<string>  $directories
+     * @param array<string> $directories
      */
     public function __construct(DirectoryCleaner $cleaner, array $directories, int $retentionDays)
     {
@@ -30,7 +29,7 @@ final readonly class CacheFilesCleanupStrategy implements CleanupStrategy
     }
 
     /**
-     * @return array<string, int|string|array<string>>
+     * @return array<string, array<string>|int|string>
      *
      * @psalm-return array<string, int|string|list<string>>
      */
@@ -53,7 +52,7 @@ final readonly class CacheFilesCleanupStrategy implements CleanupStrategy
             \Artisan::call('cache:clear');
             \Artisan::call('view:clear');
             \Artisan::call('config:clear');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $totalResults['errors'][] = $e->getMessage();
             Log::error('Cache clearing failed', ['error' => $e->getMessage()]);
         }

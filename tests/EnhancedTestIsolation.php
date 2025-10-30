@@ -4,247 +4,631 @@ declare(strict_types=1);
 
 namespace Tests;
 
+use Illuminate\Container\Container;
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\View;
+use Mockery;
+
 /**
- * Enhanced Test Isolation Trait
+ * Enhanced Test Isolation Trait.
  *
- * Prevents side-effects and cross-contamination between tests by:
- * - Backing up and restoring superglobals ($_ENV, $_SERVER)
- * - Clearing all caches before/after each test
- * - Cleaning up temporary files
- * - Resetting service container singletons
- * - Clearing configuration cache
- *
- * Usage: Add this trait to TestCase.php or individual test classes
+ * Provides comprehensive isolation between tests to prevent side-effects
+ * and cross-contamination. Includes advanced features for:
+ * - Superglobal backup/restore
+ * - Service container isolation
+ * - Cache management
+ * - Database state isolation
+ * - File system isolation
+ * - Memory management
+ * - Resource cleanup
  */
 trait EnhancedTestIsolation
 {
     /**
-     * Backup of $_ENV superglobal before test.
+     * Backup storage for superglobals.
      */
-    protected static array $envBackup = [];
+    protected array $envBackup = [];
+    protected array $serverBackup = [];
+    protected array $sessionBackup = [];
+    protected array $cookieBackup = [];
+    protected array $filesBackup = [];
+    protected array $getBackup = [];
+    protected array $postBackup = [];
+    protected array $requestBackup = [];
 
     /**
-     * Backup of $_SERVER superglobal before test.
+     * Application state backup.
      */
-    protected static array $serverBackup = [];
+    protected array $configBackup = [];
+    protected array $containerBackup = [];
+    protected array $serviceProvidersBackup = [];
 
     /**
-     * Backup of application config before test.
-     */
-    protected static array $configBackup = [];
-
-    /**
-     * Temporary files/directories created during test.
+     * Isolation tracking.
      */
     protected array $temporaryPaths = [];
+    protected array $createdFiles = [];
+    protected array $modifiedFiles = [];
+    protected array $originalFileContents = [];
+    protected array $databaseConnections = [];
+    protected array $cacheStores = [];
+    protected array $queueConnections = [];
 
     /**
-     * Set up enhanced isolation before each test.
+     * Resource monitoring.
      */
-    protected function setUpEnhancedIsolation(): void
+    protected int $initialMemoryUsage = 0;
+    protected int $maxMemoryUsage = 0;
+    protected array $openResources = [];
+    protected array $activeConnections = [];
+
+    /**
+     * Isolation configuration.
+     */
+    protected bool $strictIsolation = false;
+    protected bool $enableMemoryTracking = false;
+    protected bool $enableResourceTracking = false;
+    protected bool $enableFileSystemIsolation = true;
+    protected bool $enableDatabaseIsolation = true;
+    protected bool $enableCacheIsolation = true;
+
+    /**
+     * Track file creation.
+     */
+    public function trackFileCreation(string $filePath): void
     {
-        // Backup superglobals to prevent pollution
-        $this->backupSuperglobals();
-
-        // Clear all caches to ensure clean state
-        $this->clearAllCaches();
-
-        // Reset service container to default state
-        $this->resetServiceContainer();
-
-        // Backup current configuration
-        $this->backupConfiguration();
-
-        // Track temp directory for cleanup
-        $this->temporaryPaths = [];
+        $this->createdFiles[] = $filePath;
     }
 
     /**
-     * Tear down enhanced isolation after each test.
+     * Track file modification.
      */
-    protected function tearDownEnhancedIsolation(): void
+    public function trackFileModification(string $filePath): void
     {
-        // Restore superglobals to prevent pollution
-        $this->restoreSuperglobals();
+        if (! \in_array($filePath, $this->modifiedFiles, true)) {
+            $this->modifiedFiles[] = $filePath;
 
-        // Clear all caches again to clean up test artifacts
-        $this->clearAllCaches();
-
-        // Restore original configuration
-        $this->restoreConfiguration();
-
-        // Clean up temporary files/directories
-        $this->cleanupTemporaryPaths();
-
-        // Reset service container again
-        $this->resetServiceContainer();
-    }
-
-    /**
-     * Backup $_ENV and $_SERVER superglobals.
-     */
-    protected function backupSuperglobals(): void
-    {
-        static::$envBackup = $_ENV;
-        static::$serverBackup = $_SERVER;
-    }
-
-    /**
-     * Restore $_ENV and $_SERVER superglobals.
-     */
-    protected function restoreSuperglobals(): void
-    {
-        // Restore only if backups exist
-        if (! empty(static::$envBackup)) {
-            $_ENV = static::$envBackup;
-        }
-
-        if (! empty(static::$serverBackup)) {
-            $_SERVER = static::$serverBackup;
+            if (file_exists($filePath)) {
+                $this->originalFileContents[$filePath] = file_get_contents($filePath);
+            }
         }
     }
 
     /**
-     * Clear all application caches.
+     * Add temporary path for cleanup.
      */
-    protected function clearAllCaches(): void
-    {
-        try {
-            // Clear application cache
-            if (method_exists($this, 'app') && $this->app) {
-                if ($this->app->bound('cache')) {
-                    $this->app['cache']->flush();
-                }
-
-                // Clear config cache
-                if ($this->app->bound('config')) {
-                    $this->app['config']->set('cache.stores.array.store', []);
-                }
-
-                // Clear view cache
-                if (method_exists(\Illuminate\Support\Facades\View::class, 'getFinder')) {
-                    try {
-                        \Illuminate\Support\Facades\View::getFinder()->flush();
-                    } catch (\Throwable $e) {
-                        // Silently fail - view finder might not be available
-                    }
-                }
-            }
-
-            // Use Cache facade if available
-            if (class_exists(\Illuminate\Support\Facades\Cache::class)) {
-                try {
-                    \Illuminate\Support\Facades\Cache::flush();
-                } catch (\Throwable $e) {
-                    // Silently fail - cache might not be fully configured
-                }
-            }
-
-            // Clear opcache if available
-            if (function_exists('opcache_reset')) {
-                @opcache_reset();
-            }
-        } catch (\Throwable $e) {
-            // Silently fail - some cache operations may not be available in all contexts
-        }
-    }
-
-    /**
-     * Reset the service container to default state.
-     */
-    protected function resetServiceContainer(): void
-    {
-        try {
-            if (method_exists($this, 'app') && $this->app) {
-                // Flush resolved instances (singletons)
-                if (method_exists($this->app, 'forgetInstances')) {
-                    $this->app->forgetInstances();
-                }
-
-                // Refresh key services that might cache state
-                $servicesToRefresh = [
-                    'cache',
-                    'cache.store',
-                    'config',
-                    'db',
-                    'db.connection',
-                    'events',
-                    'files',
-                    'log',
-                    'queue',
-                    'redis',
-                    'session',
-                    'session.store',
-                    'view',
-                ];
-
-                foreach ($servicesToRefresh as $service) {
-                    if ($this->app->bound($service)) {
-                        try {
-                            $this->app->forgetInstance($service);
-                        } catch (\Throwable $e) {
-                            // Silently continue
-                        }
-                    }
-                }
-            }
-        } catch (\Throwable $e) {
-            // Silently fail - service container might not be available
-        }
-    }
-
-    /**
-     * Backup current configuration.
-     */
-    protected function backupConfiguration(): void
-    {
-        try {
-            if (method_exists($this, 'app') && $this->app && $this->app->bound('config')) {
-                static::$configBackup = $this->app['config']->all();
-            }
-        } catch (\Throwable $e) {
-            // Silently fail
-        }
-    }
-
-    /**
-     * Restore original configuration.
-     */
-    protected function restoreConfiguration(): void
-    {
-        try {
-            if (! empty(static::$configBackup) && method_exists($this, 'app') && $this->app && $this->app->bound('config')) {
-                foreach (static::$configBackup as $key => $value) {
-                    $this->app['config']->set($key, $value);
-                }
-            }
-        } catch (\Throwable $e) {
-            // Silently fail
-        }
-    }
-
-    /**
-     * Register a temporary path for automatic cleanup.
-     */
-    protected function trackTemporaryPath(string $path): void
+    public function addTemporaryPath(string $path): void
     {
         $this->temporaryPaths[] = $path;
     }
 
     /**
-     * Clean up all registered temporary paths.
+     * Get isolation statistics.
+     */
+    public function getIsolationStatistics(): array
+    {
+        return [
+            'memory_usage' => [
+                'initial' => $this->initialMemoryUsage,
+                'current' => memory_get_usage(true),
+                'peak' => memory_get_peak_usage(true),
+                'increase' => memory_get_usage(true) - $this->initialMemoryUsage,
+            ],
+            'tracked_files' => [
+                'created' => \count($this->createdFiles),
+                'modified' => \count($this->modifiedFiles),
+                'temporary_paths' => \count($this->temporaryPaths),
+            ],
+            'resources' => [
+                'initial_count' => \count($this->openResources),
+                'current_count' => \function_exists('get_resources') ? \count(get_resources()) : 0,
+            ],
+            'isolation_config' => [
+                'strict_isolation' => $this->strictIsolation,
+                'memory_tracking' => $this->enableMemoryTracking,
+                'resource_tracking' => $this->enableResourceTracking,
+                'filesystem_isolation' => $this->enableFileSystemIsolation,
+                'database_isolation' => $this->enableDatabaseIsolation,
+                'cache_isolation' => $this->enableCacheIsolation,
+            ],
+        ];
+    }
+
+    /**
+     * Set up enhanced test isolation.
+     */
+    protected function setUpEnhancedIsolation(): void
+    {
+        $this->recordInitialState();
+        $this->backupSuperglobals();
+        $this->backupApplicationState();
+        $this->setupIsolatedEnvironment();
+        $this->clearAllCaches();
+        $this->initializeResourceTracking();
+        $this->setupMemoryTracking();
+    }
+
+    /**
+     * Record initial system state.
+     */
+    protected function recordInitialState(): void
+    {
+        $this->initialMemoryUsage = memory_get_usage(true);
+        $this->maxMemoryUsage = $this->initialMemoryUsage;
+
+        // Record open file handles
+        if (\function_exists('get_resources')) {
+            $this->openResources = get_resources();
+        }
+
+        // Record database connections - ensure we start with a clean slate
+        if (class_exists(DB::class)) {
+            try {
+                // First close any existing connections to ensure clean state
+                $this->closeAllDatabaseConnections();
+
+                // Now record the clean state
+                $this->databaseConnections = DB::getConnections();
+            } catch (\Exception $e) {
+                // Ignore if DB not available
+                $this->databaseConnections = [];
+            }
+        }
+    }
+
+    /**
+     * Backup all superglobals.
+     */
+    protected function backupSuperglobals(): void
+    {
+        $this->envBackup = $_ENV ?? [];
+        $this->serverBackup = $_SERVER ?? [];
+        $this->sessionBackup = $_SESSION ?? [];
+        $this->cookieBackup = $_COOKIE ?? [];
+        $this->filesBackup = $_FILES ?? [];
+        $this->getBackup = $_GET ?? [];
+        $this->postBackup = $_POST ?? [];
+        $this->requestBackup = $_REQUEST ?? [];
+    }
+
+    /**
+     * Backup application state.
+     */
+    protected function backupApplicationState(): void
+    {
+        if (\function_exists('app') && app() instanceof Application) {
+            $app = app();
+
+            // Backup configuration
+            $this->configBackup = $app['config']->all();
+
+            // Backup container bindings
+            $this->containerBackup = $this->getContainerBindings($app);
+
+            // Backup service providers
+            $this->serviceProvidersBackup = $app->getLoadedProviders();
+        }
+    }
+
+    /**
+     * Get container bindings for backup.
+     */
+    protected function getContainerBindings(Container $container): array
+    {
+        $bindings = [];
+
+        try {
+            $reflection = new \ReflectionClass($container);
+            $bindingsProperty = $reflection->getProperty('bindings');
+            $bindingsProperty->setAccessible(true);
+            $bindings = $bindingsProperty->getValue($container);
+        } catch (\Exception $e) {
+            // Fallback: just record known important bindings
+            $bindings = [];
+        }
+
+        return $bindings;
+    }
+
+    /**
+     * Setup isolated environment.
+     */
+    protected function setupIsolatedEnvironment(): void
+    {
+        // Create isolated temporary directory
+        $tempDir = sys_get_temp_dir().'/test_isolation_'.uniqid();
+        if (! is_dir($tempDir)) {
+            mkdir($tempDir, 0755, true);
+            $this->temporaryPaths[] = $tempDir;
+        }
+
+        // Set isolated environment variables
+        $_ENV['TEST_ISOLATION_TEMP_DIR'] = $tempDir;
+        $_ENV['TEST_ISOLATION_ACTIVE'] = 'true';
+
+        // Configure isolated storage
+        if ($this->enableFileSystemIsolation) {
+            $this->setupIsolatedStorage($tempDir);
+        }
+
+        // Configure isolated database
+        if ($this->enableDatabaseIsolation) {
+            $this->setupIsolatedDatabase();
+        }
+    }
+
+    /**
+     * Setup isolated storage.
+     */
+    protected function setupIsolatedStorage(string $tempDir): void
+    {
+        $storagePath = $tempDir.'/storage';
+        mkdir($storagePath, 0755, true);
+
+        // Configure Laravel storage paths
+        if (\function_exists('config')) {
+            config([
+                'filesystems.disks.local.root' => $storagePath,
+                'filesystems.disks.public.root' => $storagePath.'/public',
+                'view.compiled' => $storagePath.'/views',
+                'cache.stores.file.path' => $storagePath.'/cache',
+                'session.files' => $storagePath.'/sessions',
+                'logging.channels.single.path' => $storagePath.'/logs/laravel.log',
+            ]);
+        }
+    }
+
+    /**
+     * Setup isolated database.
+     */
+    protected function setupIsolatedDatabase(): void
+    {
+        if (\function_exists('config')) {
+            // First, close any existing connections to prevent leaks
+            $this->closeAllDatabaseConnections();
+
+            // Use in-memory SQLite for complete isolation
+            config([
+                'database.default' => 'testing',
+                'database.connections.testing' => [
+                    'driver' => 'sqlite',
+                    'database' => ':memory:',
+                    'prefix' => '',
+                    'foreign_key_constraints' => true,
+                ],
+            ]);
+
+            // Record this connection in our baseline to avoid false positives
+            if (class_exists(DB::class)) {
+                try {
+                    // Force a connection to be created now so we can track it
+                    DB::connection('testing')->getPdo();
+
+                    // Update our baseline to include this connection
+                    $this->databaseConnections = DB::getConnections();
+                } catch (\Exception $e) {
+                    // Ignore if connection fails
+                }
+            }
+        }
+    }
+
+    /**
+     * Clear all caches comprehensively.
+     */
+    protected function clearAllCaches(): void
+    {
+        $this->clearApplicationCache();
+        $this->clearConfigCache();
+        $this->clearViewCache();
+        $this->clearRouteCache();
+        $this->clearEventCache();
+        $this->clearOpcache();
+        $this->clearRedisCache();
+        $this->clearFileCache();
+    }
+
+    /**
+     * Clear application cache.
+     */
+    protected function clearApplicationCache(): void
+    {
+        if (class_exists(Cache::class)) {
+            try {
+                Cache::flush();
+
+                // Clear all cache stores
+                foreach (config('cache.stores', []) as $store => $config) {
+                    Cache::store($store)->flush();
+                }
+            } catch (\Exception $e) {
+                // Ignore cache errors in isolation
+            }
+        }
+    }
+
+    /**
+     * Clear configuration cache.
+     */
+    protected function clearConfigCache(): void
+    {
+        if (\function_exists('app') && app()->bound('config')) {
+            try {
+                app('config')->set([], []);
+            } catch (\Exception $e) {
+                // Ignore config errors
+            }
+        }
+    }
+
+    /**
+     * Clear view cache.
+     */
+    protected function clearViewCache(): void
+    {
+        if (class_exists(View::class)) {
+            try {
+                View::flushFinderCache();
+
+                // Clear compiled views
+                $viewPath = storage_path('framework/views');
+                if (is_dir($viewPath)) {
+                    $this->clearDirectory($viewPath);
+                }
+            } catch (\Exception $e) {
+                // Ignore view cache errors
+            }
+        }
+    }
+
+    /**
+     * Clear route cache.
+     */
+    protected function clearRouteCache(): void
+    {
+        $routeCachePath = app()->bootstrapPath('cache/routes.php');
+        if (file_exists($routeCachePath)) {
+            unlink($routeCachePath);
+        }
+    }
+
+    /**
+     * Clear event cache.
+     */
+    protected function clearEventCache(): void
+    {
+        // Event faking is handled in TestCase.php
+        // No additional event clearing needed for test isolation
+    }
+
+    /**
+     * Clear OPcache.
+     */
+    protected function clearOpcache(): void
+    {
+        if (\function_exists('opcache_reset')) {
+            try {
+                opcache_reset();
+            } catch (\Exception $e) {
+                // Ignore opcache errors
+            }
+        }
+    }
+
+    /**
+     * Clear Redis cache.
+     */
+    protected function clearRedisCache(): void
+    {
+        // Skip Redis operations in testing environment
+        if (app()->environment('testing')) {
+            return;
+        }
+
+        try {
+            if (app()->bound('redis')) {
+                Redis::flushall();
+            }
+        } catch (\Exception $e) {
+            // Ignore Redis errors
+        }
+    }
+
+    /**
+     * Clear file cache.
+     */
+    protected function clearFileCache(): void
+    {
+        $cachePaths = [
+            storage_path('framework/cache'),
+            storage_path('framework/sessions'),
+            storage_path('framework/views'),
+            app()->bootstrapPath('cache'),
+        ];
+
+        foreach ($cachePaths as $path) {
+            if (is_dir($path)) {
+                $this->clearDirectory($path);
+            }
+        }
+    }
+
+    /**
+     * Initialize resource tracking.
+     */
+    protected function initializeResourceTracking(): void
+    {
+        if (! $this->enableResourceTracking) {
+            return;
+        }
+
+        // Track file operations
+        if ($this->enableFileSystemIsolation) {
+            $this->setupFileTracking();
+        }
+
+        // Track database connections
+        if ($this->enableDatabaseIsolation) {
+            $this->setupDatabaseTracking();
+        }
+
+        // Track cache operations
+        if ($this->enableCacheIsolation) {
+            $this->setupCacheTracking();
+        }
+    }
+
+    /**
+     * Setup file tracking.
+     */
+    protected function setupFileTracking(): void
+    {
+        // This would require stream wrapper or similar advanced technique
+        // For now, we'll track manually created files
+    }
+
+    /**
+     * Setup database tracking.
+     */
+    protected function setupDatabaseTracking(): void
+    {
+        if (class_exists(DB::class)) {
+            try {
+                // Enable query logging for tracking
+                DB::enableQueryLog();
+            } catch (\Exception $e) {
+                // Ignore if DB not available
+            }
+        }
+    }
+
+    /**
+     * Setup cache tracking.
+     */
+    protected function setupCacheTracking(): void
+    {
+        // Track cache stores that are created during test
+        if (\function_exists('config')) {
+            $this->cacheStores = array_keys(config('cache.stores', []));
+        }
+    }
+
+    /**
+     * Setup memory tracking.
+     */
+    protected function setupMemoryTracking(): void
+    {
+        if (! $this->enableMemoryTracking) {
+            return;
+        }
+
+        // Register shutdown function to track peak memory
+        register_shutdown_function(function () {
+            $this->maxMemoryUsage = max($this->maxMemoryUsage, memory_get_peak_usage(true));
+        });
+    }
+
+    /**
+     * Reset service container.
+     */
+    protected function resetServiceContainer(): void
+    {
+        if (\function_exists('app') && app() instanceof Application) {
+            $app = app();
+
+            // Clear resolved instances
+            $app->forgetInstances();
+
+            // Reset singletons
+            $reflection = new \ReflectionClass($app);
+            if ($reflection->hasProperty('instances')) {
+                $instancesProperty = $reflection->getProperty('instances');
+                $instancesProperty->setAccessible(true);
+                $instancesProperty->setValue($app, []);
+            }
+
+            // Rebind core services
+            $this->rebindCoreServices($app);
+        }
+    }
+
+    /**
+     * Rebind core services.
+     */
+    protected function rebindCoreServices(Application $app): void
+    {
+        // Rebind essential services that tests might need
+        $coreServices = [
+            'config',
+            'db',
+            'cache',
+            'session',
+            'auth',
+            'view',
+            'files',
+            'log',
+        ];
+
+        foreach ($coreServices as $service) {
+            if ($app->bound($service)) {
+                $app->forgetInstance($service);
+            }
+        }
+    }
+
+    /**
+     * Restore superglobals.
+     */
+    protected function restoreSuperglobals(): void
+    {
+        $_ENV = $this->envBackup;
+        $_SERVER = $this->serverBackup;
+        $_SESSION = $this->sessionBackup;
+        $_COOKIE = $this->cookieBackup;
+        $_FILES = $this->filesBackup;
+        $_GET = $this->getBackup;
+        $_POST = $this->postBackup;
+        $_REQUEST = $this->requestBackup;
+    }
+
+    /**
+     * Restore application state.
+     */
+    protected function restoreApplicationState(): void
+    {
+        if (\function_exists('app') && app() instanceof Application) {
+            $app = app();
+
+            // Restore configuration
+            if (! empty($this->configBackup)) {
+                foreach ($this->configBackup as $key => $value) {
+                    $app['config']->set($key, $value);
+                }
+            }
+
+            // Restore container bindings would be complex
+            // For now, we rely on application recreation
+        }
+    }
+
+    /**
+     * Clean up temporary paths.
      */
     protected function cleanupTemporaryPaths(): void
     {
         foreach ($this->temporaryPaths as $path) {
-            try {
-                if (is_file($path)) {
-                    @unlink($path);
-                } elseif (is_dir($path)) {
-                    $this->deleteDirectory($path);
-                }
-            } catch (\Throwable $e) {
-                // Silently continue
+            if (is_dir($path)) {
+                $this->removeDirectoryRecursively($path);
+            } elseif (is_file($path)) {
+                unlink($path);
             }
         }
 
@@ -252,43 +636,331 @@ trait EnhancedTestIsolation
     }
 
     /**
-     * Recursively delete a directory.
+     * Clean up created files.
      */
-    protected function deleteDirectory(string $dir): void
+    protected function cleanupCreatedFiles(): void
     {
-        if (! is_dir($dir)) {
+        foreach ($this->createdFiles as $file) {
+            if (file_exists($file)) {
+                unlink($file);
+            }
+        }
+
+        $this->createdFiles = [];
+    }
+
+    /**
+     * Restore modified files.
+     */
+    protected function restoreModifiedFiles(): void
+    {
+        foreach ($this->modifiedFiles as $file) {
+            if (isset($this->originalFileContents[$file])) {
+                file_put_contents($file, $this->originalFileContents[$file]);
+            }
+        }
+
+        $this->modifiedFiles = [];
+        $this->originalFileContents = [];
+    }
+
+    /**
+     * Clear directory contents.
+     */
+    protected function clearDirectory(string $directory): void
+    {
+        if (! is_dir($directory)) {
             return;
         }
 
-        try {
-            $iterator = new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
-                \RecursiveIteratorIterator::CHILD_FIRST
-            );
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($directory, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
+        );
 
-            foreach ($iterator as $file) {
-                if ($file->isDir()) {
-                    @rmdir($file->getPathname());
-                } else {
-                    @unlink($file->getPathname());
-                }
+        foreach ($files as $fileinfo) {
+            $todo = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
+
+            try {
+                $todo($fileinfo->getRealPath());
+            } catch (\Exception $e) {
+                // Ignore cleanup errors
             }
-
-            @rmdir($dir);
-        } catch (\Throwable $e) {
-            // Silently fail
         }
     }
 
     /**
-     * Get a clean temporary directory for this test.
+     * Remove directory recursively.
      */
-    protected function getTemporaryDirectory(string $prefix = 'test_'): string
+    protected function removeDirectoryRecursively(string $directory): void
     {
-        $tempDir = sys_get_temp_dir().DIRECTORY_SEPARATOR.$prefix.uniqid('', true);
-        @mkdir($tempDir, 0o755, true);
-        $this->trackTemporaryPath($tempDir);
+        if (! is_dir($directory)) {
+            return;
+        }
 
-        return $tempDir;
+        $this->clearDirectory($directory);
+
+        try {
+            rmdir($directory);
+        } catch (\Exception $e) {
+            // Ignore cleanup errors
+        }
+    }
+
+    /**
+     * Tear down enhanced isolation.
+     */
+    protected function tearDownEnhancedIsolation(): void
+    {
+        $this->cleanupResources();
+        $this->restoreSuperglobals();
+        $this->restoreApplicationState();
+        $this->cleanupTemporaryPaths();
+        $this->cleanupCreatedFiles();
+        $this->restoreModifiedFiles();
+        $this->resetServiceContainer();
+        $this->clearAllCaches();
+        $this->logResourceUsage();
+        $this->validateCleanup();
+
+        // Close Mockery
+        if (class_exists(\Mockery::class)) {
+            \Mockery::close();
+        }
+    }
+
+    /**
+     * Cleanup resources.
+     */
+    protected function cleanupResources(): void
+    {
+        // Close database connections
+        $this->closeAllDatabaseConnections();
+
+        // Clear queue connections
+        if (class_exists(Queue::class)) {
+            try {
+                Queue::getContainer()->forgetInstances();
+            } catch (\Exception $e) {
+                // Ignore cleanup errors
+            }
+        }
+
+        // Storage cleanup is handled by Laravel's testing framework
+        // No additional storage clearing needed for test isolation
+    }
+
+    /**
+     * Close all database connections comprehensively.
+     */
+    protected function closeAllDatabaseConnections(): void
+    {
+        if (! class_exists(DB::class)) {
+            return;
+        }
+
+        try {
+            // Get all current connections and close them individually
+            $connections = DB::getConnections();
+            foreach ($connections as $name => $connection) {
+                try {
+                    // Close the connection explicitly
+                    DB::disconnect($name);
+                } catch (\Exception $e) {
+                    // Continue with other connections if one fails
+                }
+            }
+
+            // Also disconnect the default connection explicitly
+            try {
+                DB::disconnect();
+            } catch (\Exception $e) {
+                // Ignore cleanup errors
+            }
+
+            // Force purge all connections from the manager
+            try {
+                $manager = DB::getManager();
+                if (method_exists($manager, 'purge')) {
+                    $manager->purge();
+                }
+            } catch (\Exception $e) {
+                // Ignore if purge method doesn't exist or fails
+            }
+
+            // Specifically handle testing and sqlite connections
+            try {
+                // Force disconnect specific problematic connections multiple times
+                $problematicConnections = ['testing', 'sqlite', 'sqlite_testing'];
+                foreach ($problematicConnections as $connectionName) {
+                    // Try multiple times to ensure disconnection
+                    for ($i = 0; $i < 3; ++$i) {
+                        try {
+                            DB::disconnect($connectionName);
+                        } catch (\Exception $e) {
+                            // Continue with other attempts
+                        }
+                    }
+                }
+
+                // Clear the connection resolver to prevent reconnection
+                if (method_exists(DB::class, 'setDefaultConnection')) {
+                    DB::setDefaultConnection('');
+                }
+
+                // Reset database configuration to prevent auto-reconnection
+                if (\function_exists('config')) {
+                    config(['database.default' => '']);
+                }
+
+                // Force garbage collection to clean up PDO connections
+                if (\function_exists('gc_collect_cycles')) {
+                    gc_collect_cycles();
+                }
+            } catch (\Exception $e) {
+                // Ignore cleanup errors
+            }
+        } catch (\Exception $e) {
+            // Ignore cleanup errors
+        }
+    }
+
+    /**
+     * Log resource usage.
+     */
+    protected function logResourceUsage(): void
+    {
+        if (! $this->enableMemoryTracking) {
+            return;
+        }
+
+        $currentMemory = memory_get_usage(true);
+        $peakMemory = memory_get_peak_usage(true);
+        $memoryIncrease = $currentMemory - $this->initialMemoryUsage;
+
+        if ($memoryIncrease > 50 * 1024 * 1024) { // 50MB threshold
+            error_log(\sprintf(
+                'Test isolation warning: High memory usage detected. Initial: %s, Current: %s, Peak: %s, Increase: %s',
+                $this->formatBytes($this->initialMemoryUsage),
+                $this->formatBytes($currentMemory),
+                $this->formatBytes($peakMemory),
+                $this->formatBytes($memoryIncrease)
+            ));
+        }
+    }
+
+    /**
+     * Validate cleanup.
+     */
+    protected function validateCleanup(): void
+    {
+        if (! $this->strictIsolation) {
+            return;
+        }
+
+        // Check for resource leaks
+        $this->validateMemoryUsage();
+        $this->validateFileHandles();
+        $this->validateDatabaseConnections();
+    }
+
+    /**
+     * Validate memory usage.
+     */
+    protected function validateMemoryUsage(): void
+    {
+        $currentMemory = memory_get_usage(true);
+        $memoryIncrease = $currentMemory - $this->initialMemoryUsage;
+
+        // Allow for some memory increase (10MB threshold)
+        if ($memoryIncrease > 10 * 1024 * 1024) {
+            trigger_error(\sprintf(
+                'Memory leak detected: %s increase from initial usage',
+                $this->formatBytes($memoryIncrease)
+            ), \E_USER_WARNING);
+        }
+    }
+
+    /**
+     * Validate file handles.
+     */
+    protected function validateFileHandles(): void
+    {
+        if (! \function_exists('get_resources')) {
+            return;
+        }
+
+        $currentResources = get_resources();
+        $resourceIncrease = \count($currentResources) - \count($this->openResources);
+
+        if ($resourceIncrease > 5) { // Allow for some resource increase
+            trigger_error(\sprintf(
+                'Resource leak detected: %d new resources not cleaned up',
+                $resourceIncrease
+            ), \E_USER_WARNING);
+        }
+    }
+
+    /**
+     * Validate database connections.
+     */
+    protected function validateDatabaseConnections(): void
+    {
+        if (! class_exists(DB::class)) {
+            return;
+        }
+
+        try {
+            $currentConnections = DB::getConnections();
+            $connectionIncrease = \count($currentConnections) - \count($this->databaseConnections);
+
+            if ($connectionIncrease > 0) {
+                // Get the names of new connections for better debugging
+                $initialConnectionNames = array_keys($this->databaseConnections);
+                $currentConnectionNames = array_keys($currentConnections);
+                $newConnectionNames = array_diff($currentConnectionNames, $initialConnectionNames);
+
+                // Try to force close the leaked connections before reporting
+                foreach ($newConnectionNames as $connectionName) {
+                    try {
+                        DB::disconnect($connectionName);
+                    } catch (\Exception $e) {
+                        // Continue with other connections
+                    }
+                }
+
+                // Check again after forced cleanup
+                $finalConnections = DB::getConnections();
+                $finalConnectionNames = array_keys($finalConnections);
+                $stillLeakedConnections = array_diff($finalConnectionNames, $initialConnectionNames);
+
+                if (! empty($stillLeakedConnections)) {
+                    trigger_error(\sprintf(
+                        'Database connection leak detected: %d new connections not closed. Leaked connections: [%s] in %s at line %d',
+                        \count($stillLeakedConnections),
+                        implode(', ', $stillLeakedConnections),
+                        __FILE__,
+                        __LINE__
+                    ), \E_USER_WARNING);
+                }
+            }
+        } catch (\Exception $e) {
+            // Ignore validation errors
+        }
+    }
+
+    /**
+     * Format bytes for human reading.
+     */
+    protected function formatBytes(int $bytes): string
+    {
+        $units = ['B', 'KB', 'MB', 'GB'];
+        $bytes = max($bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, \count($units) - 1);
+
+        $bytes /= (1 << (10 * $pow));
+
+        return round($bytes, 2).' '.$units[$pow];
     }
 }

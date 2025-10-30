@@ -11,7 +11,7 @@ class BrotliCompressionStrategy implements CompressionStrategyInterface
     #[\Override]
     public function isSupported(): bool
     {
-        return function_exists('brotli_compress');
+        return \function_exists('brotli_compress');
     }
 
     #[\Override]
@@ -29,7 +29,7 @@ class BrotliCompressionStrategy implements CompressionStrategyInterface
 
         $compressed = brotli_compress($content, self::COMPRESSION_LEVEL);
 
-        if ($compressed === false) {
+        if (false === $compressed) {
             return null;
         }
 

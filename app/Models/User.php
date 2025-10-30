@@ -7,6 +7,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -15,29 +16,29 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 /**
- * @property int $id
- * @property string $name
- * @property string $email
- * @property string $password
- * @property Carbon|null $email_verified_at
- * @property bool $is_admin
- * @property bool $is_active
- * @property bool $is_blocked
- * @property string|null $ban_reason
- * @property string|null $ban_description
- * @property Carbon|null $banned_at
- * @property Carbon|null $ban_expires_at
- * @property string|null $session_id
- * @property string $role
- * @property Collection<int, Review> $reviews
+ * @property int                       $id
+ * @property string                    $name
+ * @property string                    $email
+ * @property string                    $password
+ * @property Carbon|null               $email_verified_at
+ * @property bool                      $is_admin
+ * @property bool                      $is_active
+ * @property bool                      $is_blocked
+ * @property string|null               $ban_reason
+ * @property string|null               $ban_description
+ * @property Carbon|null               $banned_at
+ * @property Carbon|null               $ban_expires_at
+ * @property string|null               $session_id
+ * @property string                    $role
+ * @property Collection<int, Review>   $reviews
  * @property Collection<int, Wishlist> $wishlists
- * @property Collection<int, PriceAlert> $priceAlerts
+ ** @property eAlert> $priceAlerts
  * @property UserLocaleSetting|null $localeSetting
  *
  * @phpstan-ignore-next-line
  *
  * @method static \Illuminate\Database\Eloquent\Builder|User where(string $column, string|null $operator = null, scalar|array|null $value = null, string $boolean = 'and')
- * @method static UserFactory factory(...$parameters)
+ * @method static UserFactory                                factory(...$parameters)
  *
  * @phpstan-type TFactory \Database\Factories\UserFactory
  *
@@ -53,9 +54,9 @@ class User extends Authenticatable
     use Notifiable;
 
     /**
-     * @var class-string<\Illuminate\Database\Eloquent\Factories\Factory<User>>
+     * @var class-string<Factory<User>>
      */
-    protected static $factory = \Database\Factories\UserFactory::class;
+    protected static $factory = UserFactory::class;
 
     /**
      * @var array<int, string>
@@ -138,6 +139,14 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->is_admin ?? false;
+    }
+
+    /**
+     * Check if user has a specific role.
+     */
+    public function hasRole(string $role): bool
+    {
+        return $this->role === $role || ('admin' === $role && $this->is_admin);
     }
 
     /**

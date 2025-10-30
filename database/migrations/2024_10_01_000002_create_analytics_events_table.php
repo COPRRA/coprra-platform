@@ -6,14 +6,13 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('analytics_events', function (Blueprint $table): void {
+        Schema::create('analytics_events', static function (Blueprint $table): void {
             $table->id();
             $table->string('event_type', 50)->index(); // price_comparison, product_view, search, etc.
             $table->string('event_name', 100);

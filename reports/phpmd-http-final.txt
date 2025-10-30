@@ -1,0 +1,7 @@
+C:\Users\Gaser\Desktop\COPRRA\app\Http\Controllers\Api\PriceSearchController.php:16  NPathComplexity      The method bestOffer() has an NPath complexity of 5441. The configured NPath complexity threshold is 1000.
+C:\Users\Gaser\Desktop\COPRRA\app\Http\Controllers\BackupController.php:215          ShortVariable        Avoid variables with short names like $e. Configured minimum length is 2.
+C:\Users\Gaser\Desktop\COPRRA\app\Http\Controllers\Controller.php:11                 NumberOfChildren     The class Controller has 39 children. Consider to rebalance this class hierarchy to keep number of children under 15.
+C:\Users\Gaser\Desktop\COPRRA\app\Http\Controllers\ErrorController.php:89            ShortVariable        Avoid variables with short names like $a. Configured minimum length is 2.
+C:\Users\Gaser\Desktop\COPRRA\app\Http\Controllers\ErrorController.php:89            ShortVariable        Avoid variables with short names like $b. Configured minimum length is 2.
+C:\Users\Gaser\Desktop\COPRRA\app\Http\Controllers\SystemController.php:105          UnusedPrivateMethod  Avoid unused private methods such as 'backupDatabase'.
+C:\Users\Gaser\Desktop\COPRRA\app\Http\Controllers\SystemController.php:114          UnusedPrivateMethod  Avoid unused private methods such as 'backupFiles'.

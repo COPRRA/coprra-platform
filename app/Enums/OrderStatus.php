@@ -6,11 +6,11 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-use App\Traits\HasEnumUtilities;
+use App\Traits\HasStatusUtilities;
 
 enum OrderStatus: string
 {
-    use HasEnumUtilities;
+    use HasStatusUtilities;
 
     case PENDING = 'pending';
     case PROCESSING = 'processing';
@@ -54,9 +54,7 @@ enum OrderStatus: string
     /**
      * Get allowed status transitions.
      *
-     * @return array<App\Enums\OrderStatus::CANCELLED|App\Enums\OrderStatus::DELIVERED|App\Enums\OrderStatus::PROCESSING|App\Enums\OrderStatus::SHIPPED>
-     *
-     * @psalm-return list{0?: App\Enums\OrderStatus::DELIVERED|App\Enums\OrderStatus::PROCESSING|App\Enums\OrderStatus::SHIPPED, 1?: App\Enums\OrderStatus::CANCELLED}
+     * @return array<int, OrderStatus>
      */
     #[\Override]
     public function allowedTransitions(): array
@@ -77,46 +75,13 @@ enum OrderStatus: string
     #[\Override]
     public function canTransitionTo(self $targetStatus): bool
     {
-        return in_array($targetStatus, $this->allowedTransitions(), true);
+        return \in_array($targetStatus, $this->allowedTransitions(), true);
     }
 
     /**
-     * Get permissions for the status (not applicable for order statuses).
+     * Get all status options as value-label pairs.
      *
-     * @psalm-return array<never, never>
-     */
-    #[\Override]
-    public function permissions(): array
-    {
-        return [];
-    }
-
-    /**
-     * Check if status has a specific permission (not applicable for order statuses).
-     *
-     * @SuppressWarnings("UnusedFormalParameter")
-     */
-    #[\Override]
-    public function hasPermission(string $permission): bool
-    {
-        return false;
-    }
-
-    /**
-     * Check if status is admin (not applicable for order statuses).
-     */
-    #[\Override]
-    public function isAdmin(): bool
-    {
-        return false;
-    }
-
-    /**
-     * Get associative array of value => label pairs for options.
-     *
-     * @return array<string>
-     *
-     * @psalm-return array{pending: string, processing: string, shipped: string, delivered: string, cancelled: string, refunded: string}
+     * @return array<string, string>
      */
     public static function options(): array
     {

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services\Performance;
 
-use Exception;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Http\Client\Factory as HttpFactory;
 
@@ -20,8 +19,8 @@ final readonly class PerformanceReporter
         $this->output->info('💡 Recommendations...');
 
         $recommendations = [
-            'Enable OPcache' => extension_loaded('Zend OPcache') && ini_get('opcache.enable'),
-            'Enable Redis for caching' => config('cache.default') === 'redis',
+            'Enable OPcache' => \extension_loaded('Zend OPcache') && \ini_get('opcache.enable'),
+            'Enable Redis for caching' => 'redis' === config('cache.default'),
             'Use a CDN for assets' => false, // Placeholder
             'Enable gzip compression' => false, // Placeholder
         ];
@@ -46,7 +45,7 @@ final readonly class PerformanceReporter
 
     private function displayOpcacheStatus(): void
     {
-        $available = extension_loaded('Zend OPcache') && function_exists('opcache_get_status');
+        $available = \extension_loaded('Zend OPcache') && \function_exists('opcache_get_status');
         if (! $available) {
             $this->output->line('  OPcache status: ✗ Not available');
             $this->output->newLine();
@@ -70,7 +69,7 @@ final readonly class PerformanceReporter
                 ['Used memory', number_format(($opcacheStatus['memory_usage']['used_memory'] ?? 0) / 1024 / 1024, 2).' MB'],
                 ['Free memory', number_format(($opcacheStatus['memory_usage']['free_memory'] ?? 0) / 1024 / 1024, 2).' MB'],
                 ['Wasted memory', number_format(($opcacheStatus['memory_usage']['wasted_memory'] ?? 0) / 1024 / 1024, 2).' MB'],
-                ['Hit rate', number_format(($opcacheStatus['opcache_statistics']['opcache_hit_rate'] ?? 0), 2).' %'],
+                ['Hit rate', number_format($opcacheStatus['opcache_statistics']['opcache_hit_rate'] ?? 0, 2).' %'],
                 ['Cached scripts', $opcacheStatus['opcache_statistics']['num_cached_scripts'] ?? 0],
             ]
         );
@@ -91,7 +90,7 @@ final readonly class PerformanceReporter
             }
 
             $this->output->text($response->body());
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->output->warn('  Could not fetch real-time requests: '.$e->getMessage());
         }
     }

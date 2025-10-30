@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Middleware;
 
+use App\Http\Middleware\ApiErrorHandler;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -18,249 +19,253 @@ use Tests\TestCase;
 
 /**
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ *
+ * @coversNothing
  */
-class ApiErrorHandlerTest extends TestCase
+final class ApiErrorHandlerTest extends TestCase
 {
     use RefreshDatabase;
 
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function test_api_error_handler_passes_request_successfully(): void
+    public function testApiErrorHandlerPassesRequestSuccessfully(): void
     {
         $request = Request::create('/api/test', 'GET');
         $request->headers->set('Accept', 'application/json');
 
-        $middleware = new \App\Http\Middleware\ApiErrorHandler;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new ApiErrorHandler();
+        $response = $middleware->handle($request, static function ($req) {
             return response('Success', 200);
         });
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('Success', $response->getContent());
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('Success', $response->getContent());
     }
 
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function test_api_error_handler_handles_validation_exception(): void
+    public function testApiErrorHandlerHandlesValidationException(): void
     {
         $request = Request::create('/api/test', 'POST');
         $request->headers->set('Accept', 'application/json');
 
-        $middleware = new \App\Http\Middleware\ApiErrorHandler;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new ApiErrorHandler();
+        $response = $middleware->handle($request, static function ($req) {
             throw ValidationException::withMessages(['field' => ['The field is required.']]);
         });
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals(422, $response->getStatusCode());
-        $this->assertJson($response->getContent());
+        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertSame(422, $response->getStatusCode());
+        self::assertJson($response->getContent());
 
         $data = json_decode($response->getContent(), true);
-        $this->assertFalse($data['success']);
-        $this->assertEquals('Validation failed', $data['message']);
-        $this->assertEquals('VALIDATION_ERROR', $data['error_code']);
-        $this->assertArrayHasKey('errors', $data);
+        self::assertFalse($data['success']);
+        self::assertSame('Validation failed', $data['message']);
+        self::assertSame('VALIDATION_ERROR', $data['error_code']);
+        self::assertArrayHasKey('errors', $data);
     }
 
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function test_api_error_handler_handles_authentication_exception(): void
+    public function testApiErrorHandlerHandlesAuthenticationException(): void
     {
         $request = Request::create('/api/test', 'GET');
         $request->headers->set('Accept', 'application/json');
 
-        $middleware = new \App\Http\Middleware\ApiErrorHandler;
-        $response = $middleware->handle($request, function ($req) {
-            throw new AuthenticationException;
+        $middleware = new ApiErrorHandler();
+        $response = $middleware->handle($request, static function ($req) {
+            throw new AuthenticationException();
         });
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals(401, $response->getStatusCode());
-        $this->assertJson($response->getContent());
+        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertSame(401, $response->getStatusCode());
+        self::assertJson($response->getContent());
 
         $data = json_decode($response->getContent(), true);
-        $this->assertFalse($data['success']);
-        $this->assertEquals('Authentication required', $data['message']);
-        $this->assertEquals('UNAUTHENTICATED', $data['error_code']);
+        self::assertFalse($data['success']);
+        self::assertSame('Authentication required', $data['message']);
+        self::assertSame('UNAUTHENTICATED', $data['error_code']);
     }
 
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function test_api_error_handler_handles_authorization_exception(): void
+    public function testApiErrorHandlerHandlesAuthorizationException(): void
     {
         $request = Request::create('/api/test', 'GET');
         $request->headers->set('Accept', 'application/json');
 
-        $middleware = new \App\Http\Middleware\ApiErrorHandler;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new ApiErrorHandler();
+        $response = $middleware->handle($request, static function ($req) {
             throw new AuthorizationException('Access denied');
         });
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals(403, $response->getStatusCode());
-        $this->assertJson($response->getContent());
+        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertSame(403, $response->getStatusCode());
+        self::assertJson($response->getContent());
 
         $data = json_decode($response->getContent(), true);
-        $this->assertFalse($data['success']);
-        $this->assertEquals('Access denied', $data['message']);
-        $this->assertEquals('UNAUTHORIZED', $data['error_code']);
+        self::assertFalse($data['success']);
+        self::assertSame('Access denied', $data['message']);
+        self::assertSame('UNAUTHORIZED', $data['error_code']);
     }
 
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function test_api_error_handler_handles_model_not_found_exception(): void
+    public function testApiErrorHandlerHandlesModelNotFoundException(): void
     {
         $request = Request::create('/api/test', 'GET');
         $request->headers->set('Accept', 'application/json');
 
-        $middleware = new \App\Http\Middleware\ApiErrorHandler;
-        $response = $middleware->handle($request, function ($req) {
-            throw new ModelNotFoundException;
+        $middleware = new ApiErrorHandler();
+        $response = $middleware->handle($request, static function ($req) {
+            throw new ModelNotFoundException();
         });
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals(404, $response->getStatusCode());
-        $this->assertJson($response->getContent());
+        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertSame(404, $response->getStatusCode());
+        self::assertJson($response->getContent());
 
         $data = json_decode($response->getContent(), true);
-        $this->assertFalse($data['success']);
-        $this->assertEquals('Resource not found', $data['message']);
-        $this->assertEquals('NOT_FOUND', $data['error_code']);
+        self::assertFalse($data['success']);
+        self::assertSame('Resource not found', $data['message']);
+        self::assertSame('NOT_FOUND', $data['error_code']);
     }
 
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function test_api_error_handler_handles_not_found_http_exception(): void
+    public function testApiErrorHandlerHandlesNotFoundHttpException(): void
     {
         $request = Request::create('/api/test', 'GET');
         $request->headers->set('Accept', 'application/json');
 
-        $middleware = new \App\Http\Middleware\ApiErrorHandler;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new ApiErrorHandler();
+        $response = $middleware->handle($request, static function ($req) {
             throw new NotFoundHttpException('Endpoint not found');
         });
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals(404, $response->getStatusCode());
-        $this->assertJson($response->getContent());
+        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertSame(404, $response->getStatusCode());
+        self::assertJson($response->getContent());
 
         $data = json_decode($response->getContent(), true);
-        $this->assertFalse($data['success']);
-        $this->assertEquals('Endpoint not found', $data['message']);
-        $this->assertEquals('ENDPOINT_NOT_FOUND', $data['error_code']);
+        self::assertFalse($data['success']);
+        self::assertSame('Endpoint not found', $data['message']);
+        self::assertSame('ENDPOINT_NOT_FOUND', $data['error_code']);
     }
 
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function test_api_error_handler_handles_method_not_allowed_exception(): void
+    public function testApiErrorHandlerHandlesMethodNotAllowedException(): void
     {
         $request = Request::create('/api/test', 'POST');
         $request->headers->set('Accept', 'application/json');
 
-        $middleware = new \App\Http\Middleware\ApiErrorHandler;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new ApiErrorHandler();
+        $response = $middleware->handle($request, static function ($req) {
             throw new MethodNotAllowedHttpException(['GET']);
         });
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals(405, $response->getStatusCode());
-        $this->assertJson($response->getContent());
+        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertSame(405, $response->getStatusCode());
+        self::assertJson($response->getContent());
 
         $data = json_decode($response->getContent(), true);
-        $this->assertFalse($data['success']);
-        $this->assertEquals('Method not allowed', $data['message']);
-        $this->assertEquals('METHOD_NOT_ALLOWED', $data['error_code']);
+        self::assertFalse($data['success']);
+        self::assertSame('Method not allowed', $data['message']);
+        self::assertSame('METHOD_NOT_ALLOWED', $data['error_code']);
     }
 
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function test_api_error_handler_handles_too_many_requests_exception(): void
+    public function testApiErrorHandlerHandlesTooManyRequestsException(): void
     {
         $request = Request::create('/api/test', 'GET');
         $request->headers->set('Accept', 'application/json');
 
-        $middleware = new \App\Http\Middleware\ApiErrorHandler;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new ApiErrorHandler();
+        $response = $middleware->handle($request, static function ($req) {
             throw new TooManyRequestsHttpException(60, 'Rate limit exceeded');
         });
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals(429, $response->getStatusCode());
-        $this->assertJson($response->getContent());
+        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertSame(429, $response->getStatusCode());
+        self::assertJson($response->getContent());
 
         $data = json_decode($response->getContent(), true);
-        $this->assertFalse($data['success']);
-        $this->assertEquals('Too many requests', $data['message']);
-        $this->assertEquals('RATE_LIMIT_EXCEEDED', $data['error_code']);
+        self::assertFalse($data['success']);
+        self::assertSame('Too many requests', $data['message']);
+        self::assertSame('RATE_LIMIT_EXCEEDED', $data['error_code']);
     }
 
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function test_api_error_handler_handles_pdo_exception(): void
+    public function testApiErrorHandlerHandlesPdoException(): void
     {
         $request = Request::create('/api/test', 'GET');
         $request->headers->set('Accept', 'application/json');
 
-        $middleware = new \App\Http\Middleware\ApiErrorHandler;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new ApiErrorHandler();
+        $response = $middleware->handle($request, static function ($req) {
             throw new \PDOException('Database connection failed');
         });
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals(503, $response->getStatusCode());
-        $this->assertJson($response->getContent());
+        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertSame(503, $response->getStatusCode());
+        self::assertJson($response->getContent());
 
         $data = json_decode($response->getContent(), true);
-        $this->assertFalse($data['success']);
-        $this->assertEquals('Database connection error', $data['message']);
-        $this->assertEquals('DATABASE_ERROR', $data['error_code']);
+        self::assertFalse($data['success']);
+        self::assertSame('Database connection error', $data['message']);
+        self::assertSame('DATABASE_ERROR', $data['error_code']);
     }
 
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function test_api_error_handler_handles_general_exception_in_production(): void
+    public function testApiErrorHandlerHandlesGeneralExceptionInProduction(): void
     {
         $this->app->instance('env', 'production');
 
         $request = Request::create('/api/test', 'GET');
         $request->headers->set('Accept', 'application/json');
 
-        $middleware = new \App\Http\Middleware\ApiErrorHandler;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new ApiErrorHandler();
+        $response = $middleware->handle($request, static function ($req) {
             throw new \Exception('Something went wrong');
         });
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals(500, $response->getStatusCode());
-        $this->assertJson($response->getContent());
+        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertSame(500, $response->getStatusCode());
+        self::assertJson($response->getContent());
 
         $data = json_decode($response->getContent(), true);
-        $this->assertFalse($data['success']);
-        $this->assertEquals('Internal server error', $data['message']);
-        $this->assertEquals('INTERNAL_ERROR', $data['error_code']);
+        self::assertFalse($data['success']);
+        self::assertSame('Internal server error', $data['message']);
+        self::assertSame('INTERNAL_ERROR', $data['error_code']);
     }
 
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function test_api_error_handler_handles_general_exception_in_development(): void
+    public function testApiErrorHandlerHandlesGeneralExceptionInDevelopment(): void
     {
         $this->app->instance('env', 'local');
 
         $request = Request::create('/api/test', 'GET');
         $request->headers->set('Accept', 'application/json');
 
-        $middleware = new \App\Http\Middleware\ApiErrorHandler;
-        $response = $middleware->handle($request, function ($req) {
+        $middleware = new ApiErrorHandler();
+        $response = $middleware->handle($request, static function ($req) {
             throw new \Exception('Something went wrong');
         });
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals(500, $response->getStatusCode());
-        $this->assertJson($response->getContent());
+        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertSame(500, $response->getStatusCode());
+        self::assertJson($response->getContent());
 
         $data = json_decode($response->getContent(), true);
-        $this->assertFalse($data['success']);
-        $this->assertEquals('Something went wrong', $data['message']);
-        $this->assertEquals('INTERNAL_ERROR', $data['error_code']);
+        self::assertFalse($data['success']);
+        self::assertSame('Something went wrong', $data['message']);
+        self::assertSame('INTERNAL_ERROR', $data['error_code']);
     }
 }

@@ -6,13 +6,14 @@ require __DIR__.'/../vendor/autoload.php';
 
 $app = require __DIR__.'/../bootstrap/app.php';
 
+use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Http\Request;
 
 $request = Request::create('/test', 'GET');
 
-/** @var \App\Http\Middleware\SecurityHeaders $middleware */
-$middleware = $app->make(\App\Http\Middleware\SecurityHeaders::class);
-$response = $middleware->handle($request, function ($req) {
+/** @var SecurityHeaders $middleware */
+$middleware = $app->make(SecurityHeaders::class);
+$response = $middleware->handle($request, static function ($req) {
     return response('OK', 200);
 });
 

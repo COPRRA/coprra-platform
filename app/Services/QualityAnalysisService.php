@@ -36,7 +36,7 @@ final class QualityAnalysisService
     /**
      * Run PHPMD analysis.
      *
-     * @param  array<string>  $issues
+     * @param array<string> $issues
      *
      * @psalm-return int<0, max>
      */
@@ -52,7 +52,7 @@ final class QualityAnalysisService
         $output = $process->getOutput();
         $errorCount = substr_count(trim($output), "\n");
 
-        if ($errorCount === 0) {
+        if (0 === $errorCount) {
             return 50;
         }
 
@@ -64,7 +64,7 @@ final class QualityAnalysisService
     /**
      * Run PHPCPD analysis.
      *
-     * @param  array<string>  $issues
+     * @param array<string> $issues
      *
      * @psalm-return int<0, max>
      */

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services\Performance;
 
-use Exception;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\DatabaseManager;
@@ -29,8 +28,8 @@ final readonly class DatabaseOptimizerService
                 foreach ($tableNames as $tableName) {
                     try {
                         $this->database->connection()->statement("OPTIMIZE TABLE `{$tableName}`");
-                        $optimized++;
-                    } catch (Exception $e) {
+                        ++$optimized;
+                    } catch (\Exception $e) {
                         $errors[] = "Could not optimize table `{$tableName}`: {$e->getMessage()}";
                     }
                 }
@@ -59,11 +58,11 @@ final readonly class DatabaseOptimizerService
     {
         $tables = $this->database->connection()->select('SHOW TABLES');
         $database = $this->database->connection()->getDatabaseName();
-        $tableKey = is_string($database) ? "Tables_in_{$database}" : 'Tables_in_';
+        $tableKey = \is_string($database) ? "Tables_in_{$database}" : 'Tables_in_';
         $tableNames = [];
         foreach ($tables as $table) {
-            if (is_object($table) && isset($table->$tableKey) && is_string($table->$tableKey)) {
-                $tableNames[] = $table->$tableKey;
+            if (\is_object($table) && isset($table->{$tableKey}) && \is_string($table->{$tableKey})) {
+                $tableNames[] = $table->{$tableKey};
             }
         }
 
@@ -80,7 +79,7 @@ final readonly class DatabaseOptimizerService
         try {
             $task();
             $this->output->line('  ✓ '.$successMessage);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->output->warn('  ✗ Failed: '.$e->getMessage());
         }
 

@@ -14,7 +14,7 @@ final readonly class FactoryConfigurationService
     {
         $factoryClass = $this->factoryClass;
         $factoryClass::guessFactoryNamesUsing(
-            static fn (string $modelName): string => 'Database\\Factories\\'.class_basename($modelName).'Factory'
+            static fn (string $modelName): string => 'Database\Factories\\'.class_basename($modelName).'Factory'
         );
     }
 }

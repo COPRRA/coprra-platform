@@ -17,7 +17,7 @@ class PriceAlertFactory extends Factory
     protected $model = PriceAlert::class;
 
     /**
-     * @return (UserFactory|\Closure|bool|float)[]
+     * @return (bool|\Closure|float|UserFactory)[]
      *
      * @psalm-return array{user_id: UserFactory, product_id: \Closure():int, target_price: float, repeat_alert: bool, is_active: true}
      */
@@ -26,7 +26,7 @@ class PriceAlertFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'product_id' => function () {
+            'product_id' => static function () {
                 return Product::factory()->create()->id;
             },
             'target_price' => $this->faker->randomFloat(2, 10, 1000),

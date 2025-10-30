@@ -51,8 +51,16 @@
             <h2 class="text-xl font-semibold mb-4">🏷️ تصنيف المنتجات</h2>
             <div class="space-y-4">
                 <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">اسم المنتج:</label>
+                    <input type="text" id="productName" class="w-full p-3 border border-gray-300 rounded-md" placeholder="أدخل اسم المنتج هنا...">
+                </div>
+                <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">وصف المنتج:</label>
                     <textarea id="productDescription" class="w-full p-3 border border-gray-300 rounded-md" rows="3" placeholder="أدخل وصف المنتج هنا..."></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">السعر (اختياري):</label>
+                    <input type="number" id="productPrice" class="w-full p-3 border border-gray-300 rounded-md" placeholder="أدخل سعر المنتج..." step="0.01" min="0">
                 </div>
                 <button onclick="classifyProduct()" class="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600">
                     تصنيف المنتج
@@ -69,8 +77,12 @@
             <h2 class="text-xl font-semibold mb-4">💡 التوصيات</h2>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">تفضيلات المستخدم:</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">تفضيلات المستخدم (JSON):</label>
                     <textarea id="userPreferences" class="w-full p-3 border border-gray-300 rounded-md" rows="2" placeholder='{"categories": ["إلكترونيات"], "price_range": [1000, 5000]}'></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">المنتجات (JSON):</label>
+                    <textarea id="productsData" class="w-full p-3 border border-gray-300 rounded-md" rows="3" placeholder='[{"id": 1, "name": "منتج 1", "category": "إلكترونيات", "price": 1500}]'></textarea>
                 </div>
                 <button onclick="generateRecommendations()" class="bg-purple-500 text-white px-6 py-2 rounded-md hover:bg-purple-600">
                     توليد التوصيات
@@ -139,21 +151,28 @@
 
         // تصنيف المنتج
         async function classifyProduct() {
+            const name = document.getElementById('productName').value;
             const description = document.getElementById('productDescription').value;
+            const price = document.getElementById('productPrice').value;
 
-            if (!description.trim()) {
-                alert('يرجى إدخال وصف المنتج');
+            if (!name.trim() || !description.trim()) {
+                alert('يرجى إدخال اسم ووصف المنتج');
                 return;
             }
 
             try {
+                const requestBody = { name, description };
+                if (price && parseFloat(price) > 0) {
+                    requestBody.price = parseFloat(price);
+                }
+
                 const response = await fetch('/admin/ai/classify-product', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     },
-                    body: JSON.stringify({ description })
+                    body: JSON.stringify(requestBody)
                 });
 
                 const data = await response.json();
@@ -166,14 +185,17 @@
         // توليد التوصيات
         async function generateRecommendations() {
             const preferencesText = document.getElementById('userPreferences').value;
+            const productsText = document.getElementById('productsData').value;
 
-            if (!preferencesText.trim()) {
-                alert('يرجى إدخال تفضيلات المستخدم');
+            if (!preferencesText.trim() || !productsText.trim()) {
+                alert('يرجى إدخال تفضيلات المستخدم والمنتجات');
                 return;
             }
 
             try {
-                const preferences = JSON.parse(preferencesText);
+                const user_preferences = JSON.parse(preferencesText);
+                const products = JSON.parse(productsText);
+                
                 const response = await fetch('/admin/ai/recommendations', {
                     method: 'POST',
                     headers: {
@@ -181,15 +203,19 @@
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     },
                     body: JSON.stringify({
-                        preferences,
-                        products: []
+                        user_preferences,
+                        products
                     })
                 });
 
                 const data = await response.json();
                 showResult('recommendationsResult', 'recommendationsResultContent', data);
             } catch (error) {
-                showError('recommendationsResult', 'recommendationsResultContent', 'خطأ في توليد التوصيات');
+                if (error instanceof SyntaxError) {
+                    showError('recommendationsResult', 'recommendationsResultContent', 'خطأ في تنسيق JSON. يرجى التحقق من البيانات المدخلة.');
+                } else {
+                    showError('recommendationsResult', 'recommendationsResultContent', 'خطأ في توليد التوصيات');
+                }
             }
         }
 
