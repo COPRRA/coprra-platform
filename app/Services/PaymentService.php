@@ -103,7 +103,6 @@ final readonly class PaymentService
 
                 case 'paypal':
                     // PayPal refund would be implemented here
-                    // $this->paypal->refundTransaction($payment->transaction_id, $refundAmount);
                     break;
             }
 

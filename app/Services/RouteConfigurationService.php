@@ -27,8 +27,8 @@ final readonly class RouteConfigurationService
         // Auth rate limiting (for login attempts)
         $this->rateLimiter->for('auth', static fn (Request $request) => Limit::perMinute(10)->by($request->ip()));
 
-        // AI rate limiting
-        $this->rateLimiter->for('ai', static fn (Request $request) => Limit::perMinute(50)->by($request->user()->id ?? $request->ip()));
+        // AI rate limiting (strict to prevent cost overruns)
+        $this->rateLimiter->for('ai', static fn (Request $request) => Limit::perMinute(10)->by($request->user()->id ?? $request->ip()));
 
         // Public rate limiting
         $this->rateLimiter->for('public', static fn (Request $request) => Limit::perMinute(60)->by($request->ip()));

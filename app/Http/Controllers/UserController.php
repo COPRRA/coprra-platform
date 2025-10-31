@@ -30,11 +30,7 @@ class UserController extends Controller
 
         $users = $query->paginate(15);
 
-        return response()->json([
-            'success' => true,
-            'data' => $users,
-            'message' => 'Users retrieved successfully',
-        ]);
+        return $this->paginated($users, 'Users retrieved successfully');
     }
 
     /**
@@ -44,11 +40,7 @@ class UserController extends Controller
     {
         $user->load(['wishlists.product', 'priceAlerts.product', 'reviews.product']);
 
-        return response()->json([
-            'success' => true,
-            'data' => $user,
-            'message' => 'User retrieved successfully',
-        ]);
+        return $this->success($user, 'User retrieved successfully');
     }
 
     /**
@@ -64,11 +56,7 @@ class UserController extends Controller
         $validatedData = \is_array($validated) ? $validated : [];
         $user->update($validatedData);
 
-        return response()->json([
-            'success' => true,
-            'data' => $user->fresh(),
-            'message' => 'User updated successfully',
-        ]);
+        return $this->success($user->fresh(), 'User updated successfully');
     }
 
     /**
@@ -81,10 +69,7 @@ class UserController extends Controller
         // Verify current password
         $currentPassword = $request->input('current_password');
         if (! Hash::check(\is_string($currentPassword) ? $currentPassword : '', $user->password)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Current password is incorrect',
-            ], 400);
+            return $this->error('Current password is incorrect', null, 400);
         }
 
         // Validate new password against policy
@@ -92,11 +77,11 @@ class UserController extends Controller
         $emptyString = '';
         $passwordValidation = $this->passwordPolicyService->validatePassword(\is_string($newPassword) ? $newPassword : $emptyString, $user->id);
         if (! isset($passwordValidation['valid']) || ! $passwordValidation['valid']) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Password does not meet policy requirements',
-                'errors' => $passwordValidation['errors'],
-            ], 400);
+            return $this->error(
+                'Password does not meet policy requirements',
+                $passwordValidation['errors'],
+                400
+            );
         }
 
         // Update password
@@ -109,7 +94,7 @@ class UserController extends Controller
         $password = \is_string($passwordValue) ? $passwordValue : '';
         $this->passwordPolicyService->savePasswordToHistory($user->id, $password);
 
-        return response()->json(['message' => 'Password updated successfully']);
+        return $this->success(null, 'Password updated successfully');
     }
 
     /**
@@ -125,10 +110,7 @@ class UserController extends Controller
         $user->reviews()->delete();
         $user->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'User deleted successfully',
-        ]);
+        return $this->noContent();
     }
 
     /**
@@ -139,10 +121,7 @@ class UserController extends Controller
         User::findOrFail($userId);
 
         // Note: This would require soft deletes to be implemented in User model
-        return response()->json([
-            'success' => false,
-            'message' => 'Soft deletes not implemented for users',
-        ], 501);
+        return $this->error('Soft deletes not implemented for users', null, 501);
     }
 
     /**
@@ -152,11 +131,7 @@ class UserController extends Controller
     {
         $bannedUsers = $this->userBanService->getBannedUsers();
 
-        return response()->json([
-            'success' => true,
-            'data' => $bannedUsers,
-            'message' => 'Banned users retrieved successfully',
-        ]);
+        return $this->success($bannedUsers, 'Banned users retrieved successfully');
     }
 
     /**
@@ -166,11 +141,7 @@ class UserController extends Controller
     {
         $wishlist = $user->wishlists()->with('product.category', 'product.brand')->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => $wishlist,
-            'message' => 'User wishlist retrieved successfully',
-        ]);
+        return $this->success($wishlist, 'User wishlist retrieved successfully');
     }
 
     /**
@@ -180,11 +151,7 @@ class UserController extends Controller
     {
         $priceAlerts = $user->priceAlerts()->with('product.category', 'product.brand')->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => $priceAlerts,
-            'message' => 'User price alerts retrieved successfully',
-        ]);
+        return $this->success($priceAlerts, 'User price alerts retrieved successfully');
     }
 
     /**
@@ -194,11 +161,7 @@ class UserController extends Controller
     {
         $reviews = $user->reviews()->with('product.category', 'product.brand')->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => $reviews,
-            'message' => 'User reviews retrieved successfully',
-        ]);
+        return $this->success($reviews, 'User reviews retrieved successfully');
     }
 
     private function applyUserFilters(Request $request, Builder $query): Builder

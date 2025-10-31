@@ -218,9 +218,17 @@ final class AmazonAdapter extends StoreAdapter
             ];
         }
 
-        $this->lastError = 'Amazon API integration not yet implemented. Please configure Amazon Product Advertising API.';
+        $this->lastError = 'Amazon Product Advertising API requires credentials and approval.';
 
-        return null;
+        throw new \RuntimeException(
+            'Amazon Product Advertising API integration requires:'.\PHP_EOL
+            .'1. Amazon Associates account approval'.\PHP_EOL
+            .'2. Product Advertising API credentials (Access Key & Secret)'.\PHP_EOL
+            .'3. Compliance with Amazon API License Agreement'.\PHP_EOL
+            .'4. Associate Tag assignment'.\PHP_EOL.\PHP_EOL
+            .'Status: NOT IMPLEMENTED - Apply at https://affiliate-program.amazon.com'.\PHP_EOL
+            .'Note: Amazon has strict approval requirements and usage limits.'
+        );
     }
 
     /**

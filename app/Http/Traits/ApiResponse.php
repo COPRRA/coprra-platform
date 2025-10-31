@@ -5,16 +5,14 @@ declare(strict_types=1);
 namespace App\Http\Traits;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Pagination\LengthAwarePaginator;
 
-/**
- * Trait for standardized API responses.
- */
 trait ApiResponse
 {
     /**
      * Success response.
      *
-     * @param mixed $data
+     * @param mixed|null $data
      */
     protected function success($data = null, string $message = 'Success', int $status = 200): JsonResponse
     {
@@ -28,7 +26,7 @@ trait ApiResponse
     /**
      * Error response.
      *
-     * @param mixed $errors
+     * @param mixed|null $errors
      */
     protected function error(string $message = 'Error', $errors = null, int $status = 400): JsonResponse
     {
@@ -45,9 +43,9 @@ trait ApiResponse
     }
 
     /**
-     * Created response (201).
+     * Created response.
      *
-     * @param mixed $data
+     * @param mixed|null $data
      */
     protected function created($data = null, string $message = 'Created successfully'): JsonResponse
     {
@@ -55,7 +53,7 @@ trait ApiResponse
     }
 
     /**
-     * No content response (204).
+     * No content response.
      */
     protected function noContent(): JsonResponse
     {
@@ -63,7 +61,7 @@ trait ApiResponse
     }
 
     /**
-     * Not found response (404).
+     * Not found response.
      */
     protected function notFound(string $message = 'Resource not found'): JsonResponse
     {
@@ -71,7 +69,7 @@ trait ApiResponse
     }
 
     /**
-     * Unauthorized response (401).
+     * Unauthorized response.
      */
     protected function unauthorized(string $message = 'Unauthorized'): JsonResponse
     {
@@ -79,7 +77,7 @@ trait ApiResponse
     }
 
     /**
-     * Forbidden response (403).
+     * Forbidden response.
      */
     protected function forbidden(string $message = 'Forbidden'): JsonResponse
     {
@@ -87,7 +85,7 @@ trait ApiResponse
     }
 
     /**
-     * Validation error response (422).
+     * Validation error response.
      *
      * @param mixed $errors
      */
@@ -97,20 +95,38 @@ trait ApiResponse
     }
 
     /**
-     * Server error response (500).
+     * Server error response.
+     *
+     * @param mixed|null $errors
      */
-    protected function serverError(string $message = 'Internal server error', ?\Throwable $exception = null): JsonResponse
+    protected function serverError(string $message = 'Internal server error', $errors = null): JsonResponse
     {
-        $errors = null;
-
-        if ($exception && config('app.debug')) {
-            $errors = [
-                'message' => $exception->getMessage(),
-                'file' => $exception->getFile(),
-                'line' => $exception->getLine(),
-            ];
-        }
-
         return $this->error($message, $errors, 500);
+    }
+
+    /**
+     * Paginated response.
+     */
+    protected function paginated(LengthAwarePaginator $paginator, string $message = 'Success'): JsonResponse
+    {
+        return response()->json([
+            'success' => true,
+            'message' => $message,
+            'data' => $paginator->items(),
+            'meta' => [
+                'current_page' => $paginator->currentPage(),
+                'first_page_url' => $paginator->url(1),
+                'from' => $paginator->firstItem(),
+                'last_page' => $paginator->lastPage(),
+                'last_page_url' => $paginator->url($paginator->lastPage()),
+                'links' => $paginator->linkCollection()->toArray(),
+                'next_page_url' => $paginator->nextPageUrl(),
+                'path' => $paginator->path(),
+                'per_page' => $paginator->perPage(),
+                'prev_page_url' => $paginator->previousPageUrl(),
+                'to' => $paginator->lastItem(),
+                'total' => $paginator->total(),
+            ],
+        ], 200);
     }
 }

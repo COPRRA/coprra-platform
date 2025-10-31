@@ -140,10 +140,9 @@ class BackupController extends Controller
 
             $result = $this->restoreService->restoreFromBackup($backup);
 
-            return response()->json([
-                'success' => $result['success'],
-                'message' => $result['message'],
-            ]);
+            return $result['success']
+                ? $this->success($result, $result['message'])
+                : $this->error($result['message']);
         } catch (\Exception $e) {
             return $this->handleError($e, 'restoring backup');
         }
@@ -170,11 +169,7 @@ class BackupController extends Controller
      */
     private function createSuccessResponse(array $data, string $message): JsonResponse
     {
-        return response()->json([
-            'success' => true,
-            'data' => $data,
-            'message' => $message,
-        ]);
+        return $this->success($data, $message);
     }
 
     /**
@@ -182,10 +177,7 @@ class BackupController extends Controller
      */
     private function createNotFoundResponse(string $message): JsonResponse
     {
-        return response()->json([
-            'success' => false,
-            'message' => $message,
-        ], 404);
+        return $this->notFound($message);
     }
 
     /**
@@ -195,16 +187,12 @@ class BackupController extends Controller
      */
     private function createDownloadResponse(array $backup): JsonResponse
     {
-        return response()->json([
-            'success' => true,
-            'message' => 'Backup ready for download',
-            'data' => [
-                'filename' => $backup['filename'],
-                'download_url' => $this->buildDownloadUrl($backup),
-                'size' => $this->backupFileService->getBackupFileSize($backup),
-                'expires_at' => now()->addHours(24)->toISOString(),
-            ],
-        ]);
+        return $this->success([
+            'filename' => $backup['filename'],
+            'download_url' => $this->buildDownloadUrl($backup),
+            'size' => $this->backupFileService->getBackupFileSize($backup),
+            'expires_at' => now()->addHours(24)->toISOString(),
+        ], 'Backup ready for download');
     }
 
     /**
@@ -226,10 +214,9 @@ class BackupController extends Controller
     {
         Log::error("Error {$operation}: ".$e->getMessage());
 
-        return response()->json([
-            'success' => false,
-            'message' => "Failed to {$operation}",
-            'error' => $e->getMessage(),
-        ], 500);
+        return $this->serverError(
+            "Failed to {$operation}",
+            ['error' => $e->getMessage()]
+        );
     }
 }

@@ -15,7 +15,7 @@ use App\Http\Middleware\RedirectIfAuthenticated;
 use App\Http\Middleware\SecurityHeadersMiddleware;
 use App\Http\Middleware\SetLocaleAndCurrency;
 use App\Http\Middleware\TrimStrings;
-use App\Http\Middleware\TrustProxies;
+// use Illuminate\Http\Middleware\TrustProxies;
 use App\Http\Middleware\ValidateSignature;
 use App\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Auth\Middleware\AuthenticateWithBasicAuth;
@@ -47,7 +47,7 @@ class Kernel extends HttpKernel
      */
     protected $middleware = [
         // \App\Http\Middleware\TrustHosts::class,
-        TrustProxies::class,
+        // TrustProxies::class,
         HandleCors::class,
         PreventRequestsDuringMaintenance::class,
         ValidatePostSize::class,

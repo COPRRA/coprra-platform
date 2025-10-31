@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 final class OptimizedQueryService
@@ -58,20 +59,23 @@ final class OptimizedQueryService
      */
     public function getDashboardAnalytics(): array
     {
-        $analyticsResult = DB::select('
-            SELECT
-                (SELECT COUNT(*) FROM users WHERE is_active = 1) as total_users,
-                (SELECT COUNT(*) FROM products WHERE is_active = 1) as total_products,
-                (SELECT COUNT(*) FROM orders WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)) as recent_orders,
-                (
-                    SELECT COALESCE(SUM(total_amount), 0)
-                    FROM orders
-                    WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
-                ) as monthly_revenue
-            LIMIT 1
-        ');
+        // Cache dashboard analytics for 1 hour
+        return Cache::remember('dashboard_analytics', 3600, function () {
+            $analyticsResult = DB::select('
+                SELECT
+                    (SELECT COUNT(*) FROM users WHERE is_active = 1) as total_users,
+                    (SELECT COUNT(*) FROM products WHERE is_active = 1) as total_products,
+                    (SELECT COUNT(*) FROM orders WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)) as recent_orders,
+                    (
+                        SELECT COALESCE(SUM(total_amount), 0)
+                        FROM orders
+                        WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+                    ) as monthly_revenue
+                LIMIT 1
+            ');
 
-        return $this->formatAnalyticsResult($analyticsResult[0] ?? null);
+            return $this->formatAnalyticsResult($analyticsResult[0] ?? null);
+        });
     }
 
     /**

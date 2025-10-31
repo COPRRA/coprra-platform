@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use App\Services\OrderService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
@@ -21,6 +22,8 @@ use Tests\TestCase;
  */
 final class OrderServiceCoverageTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function testCreateOrderComputesTotalsAndPersistsItems(): void
     {
         $user = User::factory()->create();

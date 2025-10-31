@@ -7,6 +7,7 @@ namespace App\Services\AI\Services;
 use App\Services\AI\ModelVersionTracker;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Psr\Log\LoggerInterface;
@@ -73,6 +74,9 @@ class AIRequestService
         if ($disableExternal || (('' === $this->apiKey || '0' === $this->apiKey) && ('testing' === config('app.env')))) {
             return $this->getMockResponse($data);
         }
+
+        // Check cost limits before making request
+        $this->checkCostLimits();
 
         return $this->makeRequestWithRetry($endpoint, $data, $headers, $operation);
     }
@@ -394,5 +398,40 @@ class AIRequestService
                 ],
             ],
         ];
+    }
+
+    /**
+     * Check if cost limits have been exceeded.
+     *
+     * @throws \Exception
+     */
+    private function checkCostLimits(): void
+    {
+        $dailyBudget = config('ai.daily_budget', 5.00);
+        $autoStop = config('ai.auto_stop_on_budget_exceed', true);
+
+        // Get today's cost from cache
+        $todayCost = \Cache::get('ai_cost_today_'.now()->format('Y-m-d'), 0.0);
+
+        if ($todayCost >= $dailyBudget) {
+            $message = "Daily AI budget exceeded: \${$todayCost} >= \${$dailyBudget}";
+            $this->logger->error('🚫 '.$message);
+
+            if ($autoStop) {
+                throw new \Exception($message.' - Auto-stop enabled. Requests blocked.');
+            }
+
+            $this->logger->warning('⚠️ Budget exceeded but auto-stop disabled. Request continuing...');
+        }
+
+        // Warn at 80% of budget
+        $alertThreshold = config('ai.cost_alert_threshold', $dailyBudget * 0.8);
+        if ($todayCost >= $alertThreshold && $todayCost < $dailyBudget) {
+            $this->logger->warning('⚠️ AI cost alert', [
+                'current_cost' => $todayCost,
+                'daily_budget' => $dailyBudget,
+                'percentage' => round(($todayCost / $dailyBudget) * 100, 2),
+            ]);
+        }
     }
 }

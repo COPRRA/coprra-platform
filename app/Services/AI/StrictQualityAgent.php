@@ -325,6 +325,5 @@ final class StrictQualityAgent
     private function log(string $message): void
     {
         $this->logger->info($message);
-        echo $message.\PHP_EOL;
     }
 }

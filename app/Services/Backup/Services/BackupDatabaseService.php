@@ -4,114 +4,182 @@ declare(strict_types=1);
 
 namespace App\Services\Backup\Services;
 
-use Illuminate\Support\Facades\Process;
+use Illuminate\Support\Facades\Log;
 
-final class BackupDatabaseService
+class BackupDatabaseService
 {
     /**
-     * Backup database.
-     *
-     * @return array{
-     *     filename: string,
-     *     size: int,
-     *     status: string
-     * }
-     *
-     * @throws \Exception
+     * Create database backup.
      */
-    public function backupDatabase(string $backupDir): array
+    public function createDatabaseBackup(string $backupPath): bool
     {
-        $dbConfig = $this->getDatabaseCredentials();
-        $filename = 'database.sql';
-        $filepath = $backupDir.'/'.$filename;
+        try {
+            $dbConfig = config('database.connections.'.config('database.default'));
 
+            switch ($dbConfig['driver']) {
+                case 'mysql':
+                    return $this->backupMySql($dbConfig, $backupPath);
+
+                case 'pgsql':
+                    return $this->backupPostgreSql($dbConfig, $backupPath);
+
+                case 'sqlite':
+                    return $this->backupSqlite($dbConfig, $backupPath);
+
+                default:
+                    Log::warning('Unsupported database driver for backup', ['driver' => $dbConfig['driver']]);
+
+                    return false;
+            }
+        } catch (\Exception $e) {
+            Log::error('Database backup failed', ['error' => $e->getMessage()]);
+
+            return false;
+        }
+    }
+
+    /**
+     * Restore database from backup.
+     */
+    public function restoreDatabase(string $backupPath): bool
+    {
+        try {
+            if (! file_exists($backupPath)) {
+                Log::error('Backup file not found', ['path' => $backupPath]);
+
+                return false;
+            }
+
+            $dbConfig = config('database.connections.'.config('database.default'));
+
+            switch ($dbConfig['driver']) {
+                case 'mysql':
+                    return $this->restoreMySql($dbConfig, $backupPath);
+
+                case 'pgsql':
+                    return $this->restorePostgreSql($dbConfig, $backupPath);
+
+                case 'sqlite':
+                    return $this->restoreSqlite($dbConfig, $backupPath);
+
+                default:
+                    Log::warning('Unsupported database driver for restore', ['driver' => $dbConfig['driver']]);
+
+                    return false;
+            }
+        } catch (\Exception $e) {
+            Log::error('Database restore failed', ['error' => $e->getMessage()]);
+
+            return false;
+        }
+    }
+
+    /**
+     * Backup MySQL database.
+     */
+    private function backupMySql(array $config, string $backupPath): bool
+    {
         $command = \sprintf(
             'mysqldump --host=%s --port=%s --user=%s --password=%s %s > %s',
-            $dbConfig['host'],
-            $dbConfig['port'],
-            $dbConfig['username'],
-            $dbConfig['password'],
-            $dbConfig['database'],
-            $filepath
+            escapeshellarg($config['host'] ?? '127.0.0.1'),
+            escapeshellarg((string) ($config['port'] ?? 3306)),
+            escapeshellarg($config['username'] ?? 'root'),
+            escapeshellarg($config['password'] ?? ''),
+            escapeshellarg($config['database']),
+            escapeshellarg($backupPath)
         );
 
-        $result = Process::run($command);
+        exec($command, $output, $returnCode);
 
-        if (! $result->successful()) {
-            throw new \Exception('Database backup failed: '.$result->errorOutput());
-        }
-
-        return [
-            'filename' => $filename,
-            'size' => filesize($filepath),
-            'status' => 'completed',
-        ];
+        return 0 === $returnCode;
     }
 
     /**
-     * Restore database.
-     *
-     * @param array{filename?: string} $dbInfo
-     *
-     * @return array<string>
-     *
-     * @psalm-return array{status: 'completed'}
-     *
-     * @throws \Exception
+     * Backup PostgreSQL database.
      */
-    public function restoreDatabase(string $backupPath, array $dbInfo): array
+    private function backupPostgreSql(array $config, string $backupPath): bool
     {
-        $credentials = $this->getDatabaseCredentials();
-        $host = $credentials['host'];
-        $port = $credentials['port'];
-        $username = $credentials['username'];
-        $password = $credentials['password'];
-        $database = $credentials['database'];
+        $command = \sprintf(
+            'PGPASSWORD=%s pg_dump --host=%s --port=%s --username=%s --dbname=%s > %s',
+            escapeshellarg($config['password'] ?? ''),
+            escapeshellarg($config['host'] ?? '127.0.0.1'),
+            escapeshellarg((string) ($config['port'] ?? 5432)),
+            escapeshellarg($config['username'] ?? 'postgres'),
+            escapeshellarg($config['database']),
+            escapeshellarg($backupPath)
+        );
 
-        $filename = $dbInfo['filename'] ?? 'database.sql';
-        $sqlFile = $backupPath.'/'.(\is_string($filename) ? $filename : 'database.sql');
+        exec($command, $output, $returnCode);
 
-        if (! file_exists($sqlFile)) {
-            throw new \Exception('Database backup file not found');
+        return 0 === $returnCode;
+    }
+
+    /**
+     * Backup SQLite database.
+     */
+    private function backupSqlite(array $config, string $backupPath): bool
+    {
+        $databasePath = $config['database'];
+
+        if (! file_exists($databasePath)) {
+            return false;
         }
 
+        return copy($databasePath, $backupPath);
+    }
+
+    /**
+     * Restore MySQL database.
+     */
+    private function restoreMySql(array $config, string $backupPath): bool
+    {
         $command = \sprintf(
             'mysql --host=%s --port=%s --user=%s --password=%s %s < %s',
-            $host,
-            $port,
-            $username,
-            $password,
-            $database,
-            $sqlFile
+            escapeshellarg($config['host'] ?? '127.0.0.1'),
+            escapeshellarg((string) ($config['port'] ?? 3306)),
+            escapeshellarg($config['username'] ?? 'root'),
+            escapeshellarg($config['password'] ?? ''),
+            escapeshellarg($config['database']),
+            escapeshellarg($backupPath)
         );
 
-        $result = Process::run($command);
+        exec($command, $output, $returnCode);
 
-        if (! $result->successful()) {
-            throw new \Exception('Database restoration failed: '.$result->errorOutput());
-        }
-
-        return [
-            'status' => 'completed',
-        ];
+        return 0 === $returnCode;
     }
 
     /**
-     * Get database credentials.
-     *
-     * @return array{host: string, port: string, username: string, password: string, database: string}
+     * Restore PostgreSQL database.
      */
-    private function getDatabaseCredentials(): array
+    private function restorePostgreSql(array $config, string $backupPath): bool
     {
-        $dbConfig = config('database.connections.mysql', null);
-        $dbConfigArray = \is_array($dbConfig) ? $dbConfig : [];
+        $command = \sprintf(
+            'PGPASSWORD=%s psql --host=%s --port=%s --username=%s --dbname=%s < %s',
+            escapeshellarg($config['password'] ?? ''),
+            escapeshellarg($config['host'] ?? '127.0.0.1'),
+            escapeshellarg((string) ($config['port'] ?? 5432)),
+            escapeshellarg($config['username'] ?? 'postgres'),
+            escapeshellarg($config['database']),
+            escapeshellarg($backupPath)
+        );
 
-        return [
-            'host' => \is_string($dbConfigArray['host'] ?? null) ? $dbConfigArray['host'] : 'localhost',
-            'port' => \is_string($dbConfigArray['port'] ?? null) ? $dbConfigArray['port'] : '3306',
-            'username' => \is_string($dbConfigArray['username'] ?? null) ? $dbConfigArray['username'] : 'root',
-            'password' => \is_string($dbConfigArray['password'] ?? null) ? $dbConfigArray['password'] : '',
-            'database' => \is_string($dbConfigArray['database'] ?? null) ? $dbConfigArray['database'] : 'database',
-        ];
+        exec($command, $output, $returnCode);
+
+        return 0 === $returnCode;
+    }
+
+    /**
+     * Restore SQLite database.
+     */
+    private function restoreSqlite(array $config, string $backupPath): bool
+    {
+        $databasePath = $config['database'];
+
+        // Create backup of current database
+        if (file_exists($databasePath)) {
+            copy($databasePath, $databasePath.'.before-restore');
+        }
+
+        return copy($backupPath, $databasePath);
     }
 }

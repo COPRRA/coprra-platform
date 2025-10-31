@@ -33,7 +33,7 @@ final class AIServiceProvider extends ServiceProvider
         // Register AIRequestService with configuration (read at runtime)
         $this->app->bind(AIRequestService::class, static function (Application $app): AIRequestService {
             return new AIRequestService(
-                apiKey: config('ai.api_key', 'test_key'),
+                apiKey: config('ai.api_key', ''),
                 baseUrl: config('ai.base_url', 'https://api.openai.com/v1'),
                 timeout: config('ai.timeout', 60)
             );

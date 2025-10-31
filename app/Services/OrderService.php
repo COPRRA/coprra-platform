@@ -177,6 +177,8 @@ class OrderService
             ]);
 
             // Restore product stock using available column
+            // Eager load products with items to avoid N+1
+            $order->load('items.product');
             foreach ($order->items as $item) {
                 $product = $item->product;
                 if ($product && method_exists($product, 'increment')) {

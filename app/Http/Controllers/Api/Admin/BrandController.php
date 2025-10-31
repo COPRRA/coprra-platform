@@ -5,22 +5,15 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Requests\UpdateBrandRequest;
 use App\Models\Brand;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class BrandController extends BaseApiController
 {
-    public function update(Request $request, Brand $brand): JsonResponse
+    public function update(UpdateBrandRequest $request, Brand $brand): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
-
-        /** @var array<string, string> $validatedData */
-        $validatedData = \is_array($validated) ? $validated : [];
-        $brand->update($validatedData);
+        $brand->update($request->validated());
 
         return $this->success($brand, 'Brand updated successfully');
     }

@@ -8,82 +8,47 @@ return [
     | AI Service Configuration
     |--------------------------------------------------------------------------
     |
-    | Configuration for AI services including API keys, endpoints, and settings
+    | Configure AI services, API keys, and cost management settings.
     |
     */
 
-    // Prefer AI_API_KEY, fall back to OPENAI_API_KEY if present
-    'api_key' => env('AI_API_KEY', env('OPENAI_API_KEY', '')),
+    // API Configuration
+    'api_key' => env('AI_API_KEY', ''),
     'base_url' => env('AI_BASE_URL', 'https://api.openai.com/v1'),
-    'timeout' => env('AI_TIMEOUT', 30),
-    'max_tokens' => env('AI_MAX_TOKENS', 2000),
-    'temperature' => env('AI_TEMPERATURE', 0.5),
+    'timeout' => env('AI_TIMEOUT', 60),
+    'max_retries' => env('AI_MAX_RETRIES', 3),
+    'retry_delay' => env('AI_RETRY_DELAY', 1000),
 
-    // Disable external AI calls in testing to avoid real network requests
-    'disable_external_calls' => true, // Temporarily forced to true for testing
+    // Disable external API calls in testing
+    'disable_external_calls' => env('AI_DISABLE_EXTERNAL_CALLS', false),
 
-    /*
-    |--------------------------------------------------------------------------
-    | Model Configuration
-    |--------------------------------------------------------------------------
-    */
+    // Cost Management
+    'daily_budget' => (float) env('AI_DAILY_BUDGET', 5.00), // $5 per day
+    'monthly_budget' => (float) env('AI_MONTHLY_BUDGET', 100.00), // $100 per month
+    'auto_stop_on_budget_exceed' => env('AI_AUTO_STOP', true),
+    'cost_alert_threshold' => (float) env('AI_COST_ALERT_THRESHOLD', 3.00), // Alert at $3
 
-    'models' => [
-        'text' => env('AI_TEXT_MODEL', 'gpt-3.5-turbo'),
-        'image' => env('AI_IMAGE_MODEL', 'gpt-4-vision-preview'),
-        'embedding' => env('AI_EMBEDDING_MODEL', 'text-embedding-ada-002'),
-    ],
+    // Rate Limiting
+    'rate_limit_per_minute' => (int) env('AI_RATE_LIMIT_PER_MINUTE', 10),
+    'rate_limit_per_hour' => (int) env('AI_RATE_LIMIT_PER_HOUR', 100),
+    'rate_limit_per_day' => (int) env('AI_RATE_LIMIT_PER_DAY', 1000),
 
-    /*
-    |--------------------------------------------------------------------------
-    | Cache Configuration
-    |--------------------------------------------------------------------------
-    */
+    // Model Configuration
+    'default_model' => env('AI_DEFAULT_MODEL', 'gpt-3.5-turbo'), // Use cheaper model by default
+    'max_tokens' => (int) env('AI_MAX_TOKENS', 2000),
+    'temperature' => (float) env('AI_TEMPERATURE', 0.7),
 
-    'cache' => [
-        'enabled' => env('AI_CACHE_ENABLED', true),
-        'ttl' => env('AI_CACHE_TTL', 3600), // 1 hour
-        'prefix' => env('AI_CACHE_PREFIX', 'ai_'),
-    ],
+    // Caching
+    'cache_enabled' => env('AI_CACHE_ENABLED', true),
+    'cache_ttl' => (int) env('AI_CACHE_TTL', 604800), // 7 days in seconds
 
-    /*
-    |--------------------------------------------------------------------------
-    | Rate Limiting
-    |--------------------------------------------------------------------------
-    */
+    // Performance
+    'use_queue' => env('AI_USE_QUEUE', true), // Process AI requests in background
+    'queue_name' => env('AI_QUEUE_NAME', 'ai'),
+    'timeout_warning_threshold' => (int) env('AI_TIMEOUT_WARNING', 30), // Warn if >30s
 
-    'rate_limit' => [
-        'enabled' => env('AI_RATE_LIMIT_ENABLED', true),
-        'max_requests' => env('AI_RATE_LIMIT_MAX', 100),
-        'per_minutes' => env('AI_RATE_LIMIT_MINUTES', 60),
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Fallback Configuration
-    |--------------------------------------------------------------------------
-    */
-
-    'fallback' => [
-        'enabled' => env('AI_FALLBACK_ENABLED', true),
-        'default_responses' => [
-            'product_classification' => 'غير محدد',
-            'sentiment' => 'محايد',
-            'recommendations' => [],
-        ],
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Agents Scheduling Configuration
-    |--------------------------------------------------------------------------
-    */
-
-    'monitor' => [
-        'enabled' => env('AI_MONITOR_ENABLED', true),
-    ],
-
-    'strict_agent' => [
-        'enabled' => env('AI_STRICT_AGENT_ENABLED', true),
-    ],
+    // Monitoring
+    'log_requests' => env('AI_LOG_REQUESTS', true),
+    'track_costs' => env('AI_TRACK_COSTS', true),
+    'alert_email' => env('AI_ALERT_EMAIL', env('MAIL_FROM_ADDRESS')),
 ];
