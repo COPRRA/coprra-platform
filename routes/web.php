@@ -12,6 +12,7 @@ use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CostDashboardController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\HomeController;
@@ -21,6 +22,7 @@ use App\Http\Controllers\PriceAlertController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\StatusController;
 use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
 
@@ -42,6 +44,15 @@ Route::get('/health/ping', [HealthController::class, 'ping'])->name('health.ping
 Route::get('/health-check', static function () {
     return redirect('/health');
 })->name('health.legacy');
+
+// Status monitoring endpoint
+Route::get('/status', [StatusController::class, 'index'])->name('status');
+
+// Cost Dashboard (requires authentication)
+Route::get('/dashboard/costs', [CostDashboardController::class, 'index'])
+    ->middleware('auth')
+    ->name('dashboard.costs')
+;
 
 // AI Agent Health Monitoring Routes
 Route::prefix('ai/health')->name('ai.health.')->group(static function () {

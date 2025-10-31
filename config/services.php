@@ -73,4 +73,8 @@ return [
         'api_key' => env('NOON_API_KEY'),
         'country' => env('NOON_COUNTRY', 'ae'),
     ],
+
+    'google_analytics' => [
+        'id' => env('GOOGLE_ANALYTICS_ID'),
+    ],
 ];
