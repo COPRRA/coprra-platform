@@ -1,46 +1,75 @@
-# Hostinger Deployment Checklist
 
-## Pre-Deployment Preparation
+# COPRRA Deployment Checklist
+============================
 
-### Hostinger Account Setup
-- [ ] Hostinger account active and accessible
-- [ ] cPanel credentials available
-- [ ] Domain name configured and pointing to Hostinger nameservers
-- [ ] SSL certificate available (Let's Encrypt via cPanel)
+## Pre-Deployment Verification
+- [ ] coprra_deployment.zip exists and is complete
+- [ ] coprra_database_setup.php is available
+- [ ] Hostinger login credentials are correct
+- [ ] Database credentials are configured
 
-### Local Preparation
-- [ ] Latest code pulled from GitHub
-- [ ] All tests passing locally
-- [ ] `.env.example` file updated
-- [ ] Database migrations tested locally
-- [ ] Deployment package created
+## Hostinger File Manager Steps
+- [ ] Log into Hostinger hPanel
+- [ ] Navigate to File Manager for coprra.com
+- [ ] Clean public_html directory completely
+- [ ] Upload coprra_deployment.zip
+- [ ] Upload coprra_database_setup.php
+- [ ] Extract coprra_deployment.zip
+- [ ] Move all files to public_html root
+- [ ] Set proper file permissions (755/644)
 
-## Phase 1: File Upload
+## Database Setup
+- [ ] Access https://coprra.com/coprra_database_setup.php
+- [ ] Verify database connection
+- [ ] Run Laravel migrations
+- [ ] Seed database if needed
+- [ ] Test database functionality
 
-### Backup Existing Files (if any)
-- [ ] Created backup folder in cPanel: `public_html_backup_[date]`
-- [ ] Moved existing files to backup folder
-- [ ] Noted any custom configurations
+## Website Testing
+- [ ] Access https://coprra.com
+- [ ] Verify homepage loads without errors
+- [ ] Test main navigation
+- [ ] Check Laravel routes work
+- [ ] Verify static assets load
+- [ ] Test user registration/login
+- [ ] Check admin functionality
 
-### Upload Files
-- [ ] Logged into Hostinger cPanel
-- [ ] Navigated to File Manager → public_html/
-- [ ] Uploaded `coprra-hostinger.tar.gz` (or used FTP)
-- [ ] Extracted archive successfully
-- [ ] Deleted .tar.gz file after extraction
-- [ ] Verified all folders present (app/, config/, public/, etc.)
+## Performance Optimization
+- [ ] Enable caching in Laravel
+- [ ] Optimize images and assets
+- [ ] Configure CDN if available
+- [ ] Set up SSL certificate
+- [ ] Configure error logging
 
-## SUCCESS CRITERIA
+## Security Checklist
+- [ ] Remove debug mode in production
+- [ ] Secure .env file permissions
+- [ ] Configure proper error pages
+- [ ] Set up backup schedule
+- [ ] Enable security headers
 
-Deployment complete when:
-- ✅ All checklist items marked
-- ✅ Production URL live
-- ✅ Status endpoint operational
-- ✅ No critical errors
-- ✅ All features tested
+## Final Verification
+- [ ] Website loads at https://coprra.com
+- [ ] All features work correctly
+- [ ] No 403/404/500 errors
+- [ ] Database operations successful
+- [ ] Performance is acceptable
 
----
+## Troubleshooting Resources
+- [ ] quick_fix.py - Automated diagnostics
+- [ ] browser_automation_guide.py - Step-by-step guide
+- [ ] COMPLETE_DEPLOYMENT_GUIDE.md - Detailed instructions
+- [ ] troubleshoot_deployment.py - Health checks
 
-**Deployment Date:** _________________
-**Production URL:** https://_________________
-**Status:** ⏳ Pending Hostinger Credentials
+## Contact Information
+- Hosting: Hostinger Support
+- Domain: coprra.com
+- Database: MySQL on localhost
+- Email: gasser.elshewaikh@gmail.com
+
+## Success Criteria
+✓ Website accessible at https://coprra.com
+✓ No HTTP errors (403, 404, 500)
+✓ Database connectivity working
+✓ Laravel application functional
+✓ All features operational

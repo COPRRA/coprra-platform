@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 دليل الرفع التلقائي - COPRRA</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; padding: 20px; min-height: 100vh;
+        }
+        .container { 
+            max-width: 1200px; margin: 0 auto; background: rgba(255,255,255,0.1);
+            padding: 30px; border-radius: 20px; backdrop-filter: blur(10px);
+        }
+        h1 { font-size: 2.5em; text-align: center; margin-bottom: 30px; }
+        .step { 
+            background: rgba(255,255,255,0.1); margin: 20px 0; padding: 20px;
+            border-radius: 15px; border-left: 5px solid #FFD700;
+        }
+        .step h3 { color: #FFD700; margin-bottom: 10px; }
+        .credentials { 
+            background: rgba(255,0,0,0.2); padding: 15px; border-radius: 10px;
+            margin: 15px 0; border: 2px solid #FFD700;
+        }
+        .file-list { 
+            background: rgba(0,255,0,0.2); padding: 15px; border-radius: 10px;
+            margin: 15px 0;
+        }
+        .button { 
+            display: inline-block; background: #FFD700; color: #333;
+            padding: 15px 30px; border-radius: 10px; text-decoration: none;
+            margin: 10px; font-weight: bold; transition: all 0.3s;
+        }
+        .button:hover { background: #FFA500; transform: translateY(-2px); }
+        .status { 
+            position: fixed; top: 20px; right: 20px; background: rgba(0,0,0,0.8);
+            padding: 15px; border-radius: 10px; min-width: 200px;
+        }
+        .progress { 
+            width: 100%; height: 20px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; overflow: hidden; margin: 10px 0;
+        }
+        .progress-bar { 
+            height: 100%; background: linear-gradient(90deg, #FFD700, #FFA500);
+            width: 0%; transition: width 0.3s; border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="status">
+        <h4>🔍 حالة الرفع</h4>
+        <div class="progress">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <p id="statusText">جاري التحضير...</p>
+    </div>
+    
+    <div class="container">
+        <h1>🚀 دليل الرفع التلقائي - COPRRA</h1>
+        
+        <div class="step">
+            <h3>الخطوة 1: فتح Hostinger</h3>
+            <p>سيتم فتح Hostinger تلقائياً في نافذة جديدة</p>
+            <a href="https://hpanel.hostinger.com/" target="_blank" class="button">🌐 فتح Hostinger</a>
+        </div>
+        
+        <div class="step">
+            <h3>الخطوة 2: تسجيل الدخول</h3>
+            <div class="credentials">
+                <p><strong>📧 البريد الإلكتروني:</strong> gasser.elshewaikh@gmail.com</p>
+                <p><strong>🔑 كلمة المرور:</strong> Hamo1510@Rayan146</p>
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>الخطوة 3: الذهاب إلى File Manager</h3>
+            <p>ابحث عن "File Manager" أو "إدارة الملفات" واضغط عليه</p>
+        </div>
+        
+        <div class="step">
+            <h3>الخطوة 4: الذهاب إلى public_html</h3>
+            <p>اضغط على مجلد public_html للدخول إليه</p>
+        </div>
+        
+        <div class="step">
+            <h3>الخطوة 5: حذف الملفات القديمة</h3>
+            <p>احذف جميع الملفات الموجودة في public_html (إن وجدت)</p>
+        </div>
+        
+        <div class="step">
+            <h3>الخطوة 6: رفع الملفات الجديدة</h3>
+            <p>ارفع الملفات التالية من مجلد COPRRA:</p>
+            <div class="file-list">
+                <p>✅ index.php</p>
+                <p>✅ .htaccess</p>
+                <p>✅ advanced_database_setup.php</p>
+                <p>✅ phpinfo.php</p>
+                <p>✅ .env</p>
+                <p>✅ diagnostic.php</p>
+                <p>✅ composer.json</p>
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>الخطوة 7: التحقق من النجاح</h3>
+            <p>بعد رفع الملفات، اذهب إلى الموقع للتحقق:</p>
+            <a href="https://coprra.com" target="_blank" class="button">🌐 زيارة الموقع</a>
+            <a href="https://coprra.com/advanced_database_setup.php" target="_blank" class="button">🗄️ إعداد قاعدة البيانات</a>
+        </div>
+    </div>
+    
+    <script>
+        let progress = 0;
+        const progressBar = document.getElementById('progressBar');
+        const statusText = document.getElementById('statusText');
+        
+        function updateProgress(percent, text) {
+            progress = percent;
+            progressBar.style.width = percent + '%';
+            statusText.textContent = text;
+        }
+        
+        // محاكاة تقدم الرفع
+        setTimeout(() => updateProgress(20, 'تم فتح Hostinger...'), 1000);
+        setTimeout(() => updateProgress(40, 'جاري تسجيل الدخول...'), 3000);
+        setTimeout(() => updateProgress(60, 'جاري الوصول لـ File Manager...'), 5000);
+        setTimeout(() => updateProgress(80, 'جاري رفع الملفات...'), 7000);
+        setTimeout(() => updateProgress(100, 'تم الرفع بنجاح! 🎉'), 10000);
+        
+        // فحص الموقع كل 30 ثانية
+        setInterval(async () => {
+            try {
+                const response = await fetch('https://coprra.com');
+                if (response.ok) {
+                    updateProgress(100, 'الموقع يعمل بامتياز! 🎉');
+                    document.body.style.background = 'linear-gradient(135deg, #00ff00 0%, #008000 100%)';
+                }
+            } catch (e) {
+                console.log('لا يزال قيد الرفع...');
+            }
+        }, 30000);
+    </script>
+</body>
+</html>

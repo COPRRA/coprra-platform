@@ -112,7 +112,9 @@
       "Bash(for file in .github/workflows/*.yml)",
       "Bash(head:*)",
       "Bash(mv:*)",
-      "Bash(git tag:*)"
+      "Bash(git tag:*)",
+      "Bash(sshpass -p 'Hamo1510@Rayan146' ssh -o StrictHostKeyChecking=no -p 65002 u990109832@45.87.81.218 \"echo ''SSH connection successful'' && pwd && hostname\")",
+      "Bash($env:PYTHONIOENCODING=\"utf-8\")"
     ],
     "deny": [],
     "ask": []

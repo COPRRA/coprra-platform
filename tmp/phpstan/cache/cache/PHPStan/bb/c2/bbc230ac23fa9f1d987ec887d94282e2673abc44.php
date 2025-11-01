@@ -779,7 +779,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Http\\Controllers\\Api\\Admin\\BrandController.php' => 
     array (
-      0 => 'f92e9a7d9cec8ecf2ba8ca54c96fb0e54d8e65cd',
+      0 => '7da34f9598dfbeb1639b0340ff3533dede886d7c',
       1 => 
       array (
         0 => 'app\\http\\controllers\\api\\admin\\brandcontroller',
@@ -794,7 +794,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Http\\Controllers\\Api\\Admin\\CategoryController.php' => 
     array (
-      0 => '70dff203550d96ce13c371ac753c744b4cbba11d',
+      0 => '0ef4dc2c24ed42ea2c59c0502fc28612280a6bee',
       1 => 
       array (
         0 => 'app\\http\\controllers\\api\\admin\\categorycontroller',
@@ -981,7 +981,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Http\\Controllers\\BackupController.php' => 
     array (
-      0 => '1347d5427886856f4ebbafefbb2ee6f05a895c34',
+      0 => 'e4d850010eccee2295bdf302ce721738608d768a',
       1 => 
       array (
         0 => 'app\\http\\controllers\\backupcontroller',
@@ -1052,7 +1052,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Http\\Controllers\\Controller.php' => 
     array (
-      0 => '10e2e5e7b4444e10a3b136dc92982e1040f86c1e',
+      0 => '238a21e119d5449e5b7f2c0b3581c9b52fb24e73',
       1 => 
       array (
         0 => 'app\\http\\controllers\\controller',
@@ -1396,7 +1396,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Http\\Controllers\\UserController.php' => 
     array (
-      0 => '20a958b61f86147623dfea84b0dc21e0816ebb5e',
+      0 => 'd7682c52c60db9ff3048bfb4b542c650fca2ad48',
       1 => 
       array (
         0 => 'app\\http\\controllers\\usercontroller',
@@ -1450,7 +1450,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Http\\Kernel.php' => 
     array (
-      0 => '9576e12a4bd7affff2a9d40c5eb6e4d693a42729',
+      0 => '410a556e25b5b1cec1571f595a4cf37e87718621',
       1 => 
       array (
         0 => 'app\\http\\kernel',
@@ -2042,20 +2042,6 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       array (
       ),
     ),
-    'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Http\\Middleware\\TrustProxies.php' => 
-    array (
-      0 => '43871267e37761ee5bfc88305ad0f2a360c094f5',
-      1 => 
-      array (
-        0 => 'app\\http\\middleware\\trustproxies',
-      ),
-      2 => 
-      array (
-      ),
-      3 => 
-      array (
-      ),
-    ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Http\\Middleware\\ValidateApiRequest.php' => 
     array (
       0 => 'c46f45c6ab9940c4a254be5d4ffe1ca6ce1ae7f5',
@@ -2470,13 +2456,15 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Http\\Requests\\UpdateBrandRequest.php' => 
     array (
-      0 => '5de8eb775fbdb8d2e2f425f016393c3d05f2e27e',
+      0 => '2ddcc41d623d42a0f25a565fc03b6ed818ae6a40',
       1 => 
       array (
         0 => 'app\\http\\requests\\updatebrandrequest',
       ),
       2 => 
       array (
+        0 => 'app\\http\\requests\\authorize',
+        1 => 'app\\http\\requests\\rules',
       ),
       3 => 
       array (
@@ -2499,7 +2487,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Http\\Requests\\UpdateCategoryRequest.php' => 
     array (
-      0 => 'bc4cfa3f325d7b61c502defaf4dfe45b1f10510c',
+      0 => 'cf6d97f41e05eeba323ca329957336b5d8a90dc3',
       1 => 
       array (
         0 => 'app\\http\\requests\\updatecategoryrequest',
@@ -4192,7 +4180,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Services\\AI\\Services\\AIRequestService.php' => 
     array (
-      0 => '0a75d74f83324f1d48904a3892ba3c423be38aeb',
+      0 => '5d391242db2a8dad589656ab6cf1d3c004af57e8',
       1 => 
       array (
         0 => 'app\\services\\ai\\services\\airequestservice',
@@ -4204,6 +4192,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
         2 => 'app\\services\\ai\\services\\makerequestwithretry',
         3 => 'app\\services\\ai\\services\\classifyerrortype',
         4 => 'app\\services\\ai\\services\\getmockresponse',
+        5 => 'app\\services\\ai\\services\\checkcostlimits',
       ),
       3 => 
       array (
@@ -4305,7 +4294,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Services\\AI\\StrictQualityAgent.php' => 
     array (
-      0 => 'dc9c53112325eecf87b5a04b4c96e95f3142d03f',
+      0 => '5ae5ba1569c8172c08b6d5f62075979d05543a17',
       1 => 
       array (
         0 => 'app\\services\\ai\\strictqualityagent',
@@ -4646,16 +4635,21 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Services\\Backup\\Services\\BackupDatabaseService.php' => 
     array (
-      0 => '0eb03e3220e5fbdacf393faa106231dc32bad097',
+      0 => 'bdfc21d57e2bb5c9bddddf4c0b563031da56a9fa',
       1 => 
       array (
         0 => 'app\\services\\backup\\services\\backupdatabaseservice',
       ),
       2 => 
       array (
-        0 => 'app\\services\\backup\\services\\backupdatabase',
+        0 => 'app\\services\\backup\\services\\createdatabasebackup',
         1 => 'app\\services\\backup\\services\\restoredatabase',
-        2 => 'app\\services\\backup\\services\\getdatabasecredentials',
+        2 => 'app\\services\\backup\\services\\backupmysql',
+        3 => 'app\\services\\backup\\services\\backuppostgresql',
+        4 => 'app\\services\\backup\\services\\backupsqlite',
+        5 => 'app\\services\\backup\\services\\restoremysql',
+        6 => 'app\\services\\backup\\services\\restorepostgresql',
+        7 => 'app\\services\\backup\\services\\restoresqlite',
       ),
       3 => 
       array (
@@ -5722,7 +5716,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Services\\OptimizedQueryService.php' => 
     array (
-      0 => 'ddf32200507491f7c937117fb19eeb81ac51b2d1',
+      0 => '14d7a107db1217e1bb627cbdf6e021fbe5989d08',
       1 => 
       array (
         0 => 'app\\services\\optimizedqueryservice',
@@ -5762,7 +5756,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Services\\OrderService.php' => 
     array (
-      0 => 'ac43d39be8ae3740cc931981415ad6f3f1d72399',
+      0 => 'a98aeeeaeb1007a4257bf7322ac5dde5752f73c0',
       1 => 
       array (
         0 => 'app\\services\\orderservice',
@@ -5850,7 +5844,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Services\\PaymentService.php' => 
     array (
-      0 => '5f6e02de08726bf03a227224b5c358244a531d42',
+      0 => '79e511bf17fb3324a1b1ed50d2d2016fe6582419',
       1 => 
       array (
         0 => 'app\\services\\paymentservice',
@@ -6341,7 +6335,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Services\\RouteConfigurationService.php' => 
     array (
-      0 => 'b8afdf68804e178a8ba20e6bf8d6296d05e5848b',
+      0 => '57cb2e37b34374c871fdd7fd3adddf2c7bf8bea2',
       1 => 
       array (
         0 => 'app\\services\\routeconfigurationservice',
@@ -6750,7 +6744,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Services\\StoreAdapters\\AmazonAdapter.php' => 
     array (
-      0 => '7a3eada1e04fddc4f69353af08f4b6b955e1455c',
+      0 => '2158925cdcf1681f48c977ad3054acde52a3dac6',
       1 => 
       array (
         0 => 'app\\services\\storeadapters\\amazonadapter',
@@ -7562,7 +7556,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Providers\\AIServiceProvider.php' => 
     array (
-      0 => 'cdb4374c642c7e39c496f93ef2fdb063920cf654',
+      0 => '00ca7ceab9d6206ba37870157bdbabdca432284f',
       1 => 
       array (
         0 => 'app\\providers\\aiserviceprovider',
@@ -8295,7 +8289,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Http\\Traits\\ApiResponse.php' => 
     array (
-      0 => 'e3d21fdd29e8a55965d3e2f85218b11fd91a78a5',
+      0 => 'a8700a9863828c71484a946b39667960ac6f4331',
       1 => 
       array (
         0 => 'app\\http\\traits\\apiresponse',
@@ -8311,6 +8305,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
         6 => 'app\\http\\traits\\forbidden',
         7 => 'app\\http\\traits\\validationerror',
         8 => 'app\\http\\traits\\servererror',
+        9 => 'app\\http\\traits\\paginated',
       ),
       3 => 
       array (
@@ -8408,6 +8403,111 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
         15 => 'app\\services\\ai\\updateuptimestats',
         16 => 'app\\services\\ai\\updateheartbeatstats',
         17 => 'app\\services\\ai\\calculateaverages',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Console\\Commands\\MonitorAICosts.php' => 
+    array (
+      0 => '7157cef6a655816f835633120bab0e3d2ab60653',
+      1 => 
+      array (
+        0 => 'app\\console\\commands\\monitoraicosts',
+      ),
+      2 => 
+      array (
+        0 => 'app\\console\\commands\\handle',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Http\\Controllers\\CostDashboardController.php' => 
+    array (
+      0 => '42ed45c5214ca27378d747765631619e9dfae953',
+      1 => 
+      array (
+        0 => 'app\\http\\controllers\\costdashboardcontroller',
+      ),
+      2 => 
+      array (
+        0 => 'app\\http\\controllers\\index',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Http\\Controllers\\StatusController.php' => 
+    array (
+      0 => '9bc81c856374bcb59e0df169840bf33eeae39906',
+      1 => 
+      array (
+        0 => 'app\\http\\controllers\\statuscontroller',
+      ),
+      2 => 
+      array (
+        0 => 'app\\http\\controllers\\index',
+        1 => 'app\\http\\controllers\\measuretime',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Models\\AICostLog.php' => 
+    array (
+      0 => '2c39a14a6c1764bd3c20df69a32b4c834bbeadfc',
+      1 => 
+      array (
+        0 => 'app\\models\\aicostlog',
+      ),
+      2 => 
+      array (
+        0 => 'app\\models\\gettodaycost',
+        1 => 'app\\models\\getcostbyservice',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Services\\Backup\\Services\\BackupFileService.php' => 
+    array (
+      0 => '0af84cda92368eae0872780a41e8481400879b99',
+      1 => 
+      array (
+        0 => 'app\\services\\backup\\services\\backupfileservice',
+      ),
+      2 => 
+      array (
+        0 => 'app\\services\\backup\\services\\createfilesbackup',
+        1 => 'app\\services\\backup\\services\\cleanoldbackups',
+        2 => 'app\\services\\backup\\services\\getbackupsize',
+        3 => 'app\\services\\backup\\services\\validatebackup',
+        4 => 'app\\services\\backup\\services\\getdefaultbackupdirectories',
+        5 => 'app\\services\\backup\\services\\adddirectorytozip',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    'C:\\Users\\Gaser\\Desktop\\COPRRA\\app\\Services\\BackupServiceRefactored.php' => 
+    array (
+      0 => '0a99db4b6c9fd97c4a2f679331f91e12b9448ed5',
+      1 => 
+      array (
+        0 => 'app\\services\\backupservicerefactored',
+      ),
+      2 => 
+      array (
+        0 => 'app\\services\\__construct',
+        1 => 'app\\services\\createfullbackup',
+        2 => 'app\\services\\createdatabasebackup',
+        3 => 'app\\services\\createfilesbackup',
+        4 => 'app\\services\\restoredatabase',
+        5 => 'app\\services\\getbackupstatus',
+        6 => 'app\\services\\cleanoldbackups',
+        7 => 'app\\services\\validatebackup',
+        8 => 'app\\services\\formatbytes',
       ),
       3 => 
       array (
