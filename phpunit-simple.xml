@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="tests/bootstrap.php"
+         colors="true"
+         processIsolation="false"
+         stopOnFailure="false"
+         stopOnError="false"
+         stopOnIncomplete="false"
+         stopOnSkipped="false"
+         stopOnRisky="false"
+         failOnRisky="false"
+         failOnWarning="false"
+         failOnIncomplete="false"
+         failOnSkipped="false"
+         cacheDirectory=".phpunit.cache"
+         executionOrder="depends,defects"
+         resolveDependencies="true">
+  <testsuites>
+    <testsuite name="Unit">
+      <directory suffix="Test.php">./tests/Unit</directory>
+    </testsuite>
+    <testsuite name="Feature">
+      <directory suffix="Test.php">./tests/Feature</directory>
+    </testsuite>
+    <testsuite name="AI">
+      <directory suffix="Test.php">./tests/AI</directory>
+      <exclude>./tests/AI/AIBaseTestCase.php</exclude>
+      <exclude>./tests/AI/MockAIService.php</exclude>
+    </testsuite>
+    <testsuite name="Security">
+      <directory suffix="Test.php">./tests/Security</directory>
+    </testsuite>
+    <testsuite name="Performance">
+      <directory suffix="Test.php">./tests/Performance</directory>
+    </testsuite>
+    <testsuite name="Integration">
+      <directory suffix="Test.php">./tests/Integration</directory>
+    </testsuite>
+    <testsuite name="Architecture">
+      <directory suffix="Test.php">./tests/Architecture</directory>
+    </testsuite>
+    <testsuite name="All">
+      <directory suffix="Test.php">./tests</directory>
+      <exclude>./tests/AI/AIBaseTestCase.php</exclude>
+      <exclude>./tests/AI/MockAIService.php</exclude>
+      <exclude>./tests/Support</exclude>
+    </testsuite>
+  </testsuites>
+  <php>
+    <env name="APP_ENV" value="testing"/>
+    <env name="BCRYPT_ROUNDS" value="4"/>
+    <env name="CACHE_DRIVER" value="array"/>
+    <env name="DB_CONNECTION" value="sqlite"/>
+    <env name="DB_DATABASE" value=":memory:"/>
+    <env name="MAIL_MAILER" value="array"/>
+    <env name="QUEUE_CONNECTION" value="sync"/>
+    <env name="SESSION_DRIVER" value="array"/>
+    <env name="TELESCOPE_ENABLED" value="false"/>
+  </php>
+</phpunit>

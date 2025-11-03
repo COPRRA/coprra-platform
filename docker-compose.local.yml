@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: coprra_mysql_local
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: coprra_local
+      MYSQL_USER: coprra
+      MYSQL_PASSWORD: coprra
+      MYSQL_ROOT_HOST: '%'
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    command: --default-authentication-plugin=mysql_native_password --bind-address=0.0.0.0
+    networks:
+      - coprra_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: coprra_redis_local
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - coprra_network
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: coprra_mailhog_local
+    restart: unless-stopped
+    ports:
+      - "1026:1025"  # SMTP
+      - "8026:8025"  # Web UI
+    networks:
+      - coprra_network
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  coprra_network:
+    driver: bridge

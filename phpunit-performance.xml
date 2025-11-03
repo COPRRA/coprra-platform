@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         processIsolation="false"
+         stopOnFailure="false"
+         cacheDirectory=".phpunit.cache"
+         backupGlobals="false"
+         backupStaticAttributes="false"
+         beStrictAboutTestsThatDoNotTestAnything="false"
+         beStrictAboutOutputDuringTests="true"
+         beStrictAboutTodoAnnotatedTests="true"
+         failOnRisky="true"
+         failOnWarning="true"
+         verbose="false">
+    
+    <!-- Performance Optimizations -->
+    <php>
+        <!-- Memory limit for tests -->
+        <ini name="memory_limit" value="512M"/>
+        
+        <!-- Disable xdebug for performance -->
+        <ini name="xdebug.mode" value="off"/>
+        
+        <!-- Optimize garbage collection -->
+        <ini name="zend.enable_gc" value="1"/>
+        <ini name="gc_probability" value="0"/>
+        
+        <!-- Optimize opcache for tests -->
+        <ini name="opcache.enable" value="1"/>
+        <ini name="opcache.enable_cli" value="1"/>
+        <ini name="opcache.memory_consumption" value="128"/>
+        <ini name="opcache.max_accelerated_files" value="4000"/>
+        <ini name="opcache.validate_timestamps" value="0"/>
+        
+        <!-- Environment variables for testing -->
+        <env name="APP_ENV" value="testing"/>
+        <env name="BCRYPT_ROUNDS" value="4"/>
+        <env name="CACHE_DRIVER" value="array"/>
+        <env name="DB_CONNECTION" value="sqlite"/>
+        <env name="DB_DATABASE" value=":memory:"/>
+        <env name="MAIL_MAILER" value="array"/>
+        <env name="QUEUE_CONNECTION" value="sync"/>
+        <env name="SESSION_DRIVER" value="array"/>
+        <env name="TELESCOPE_ENABLED" value="false"/>
+        
+        <!-- Performance testing specific -->
+        <env name="TEST_PERFORMANCE_ENABLED" value="true"/>
+        <env name="TEST_PROFILING_ENABLED" value="true"/>
+    </php>
+
+    <!-- Test Suites with Performance Focus -->
+    <testsuites>
+        <!-- Fast Unit Tests -->
+        <testsuite name="Unit-Fast">
+            <directory suffix="Test.php">./tests/Unit</directory>
+            <exclude>./tests/Unit/Services/AI</exclude>
+            <exclude>./tests/Unit/Services/ExternalStoreServiceEdgeCasesTest.php</exclude>
+        </testsuite>
+        
+        <!-- AI/ML Tests (potentially slower) -->
+        <testsuite name="AI-ML">
+            <directory suffix="Test.php">./tests/Unit/Services/AI</directory>
+        </testsuite>
+        
+        <!-- Security Tests -->
+        <testsuite name="Security">
+            <file>./tests/Unit/Services/PaymentServiceSecurityTest.php</file>
+            <file>./tests/Unit/Services/FinancialTransactionServiceSecurityTest.php</file>
+        </testsuite>
+        
+        <!-- Edge Case Tests -->
+        <testsuite name="EdgeCases">
+            <file>./tests/Unit/Services/ExternalStoreServiceEdgeCasesTest.php</file>
+        </testsuite>
+        
+        <!-- Integration Tests -->
+        <testsuite name="Integration">
+            <directory suffix="Test.php">./tests/Integration</directory>
+        </testsuite>
+        
+        <!-- Performance Tests -->
+        <testsuite name="Performance">
+            <directory suffix="Test.php">./tests/Benchmarks</directory>
+        </testsuite>
+        
+        <!-- All Tests -->
+        <testsuite name="All">
+            <directory suffix="Test.php">./tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <!-- Coverage Configuration -->
+    <coverage cacheDirectory=".phpunit.cache/code-coverage"
+              processUncoveredFiles="true">
+        <include>
+            <directory suffix=".php">./app</directory>
+        </include>
+        <exclude>
+            <directory>./app/Console</directory>
+            <directory>./app/Exceptions</directory>
+            <directory>./app/Http/Middleware</directory>
+            <file>./app/Providers/RouteServiceProvider.php</file>
+        </exclude>
+        <report>
+            <html outputDirectory="reports/coverage"/>
+            <text outputFile="reports/coverage.txt"/>
+            <xml outputDirectory="reports/coverage-xml"/>
+        </report>
+    </coverage>
+
+    <!-- Logging Configuration -->
+    <logging>
+        <junit outputFile="reports/junit.xml"/>
+        <teamcity outputFile="reports/teamcity.txt"/>
+        <testdoxHtml outputFile="reports/testdox.html"/>
+        <testdoxText outputFile="reports/testdox.txt"/>
+    </logging>
+
+    <!-- Extensions for Performance -->
+    <extensions>
+        <!-- Add performance monitoring extensions here -->
+    </extensions>
+
+    <!-- Listeners for Performance Monitoring -->
+    <listeners>
+        <!-- Add custom listeners for performance tracking -->
+    </listeners>
+</phpunit>
