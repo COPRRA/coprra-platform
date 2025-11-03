@@ -8,37 +8,54 @@
     <meta name="description" content="@yield('description', __('messages.coprra_description'))">
     <meta name="keywords" content="@yield('keywords', 'price comparison, shopping, deals, discounts, COPRRA')">
     <meta name="author" content="{{ config('app.name', 'COPRRA') }}">
-    <meta name="theme-color" content="#3b82f6">
+    <meta name="theme-color" content="#0A1E40">
     <meta name="color-scheme" content="light dark">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{{ asset('images/logo/coprra-icon.svg') }}">
+    <link rel="alternate icon" type="image/png" href="{{ asset('favicon.png') }}">
+
     <!-- Open Graph -->
     <meta property="og:title" content="@yield('og_title', View::getSection('title') ?? config('app.name', 'COPRRA'))">
     <meta property="og:description" content="@yield('og_description', __('messages.coprra_description'))">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:image" content="@yield('og_image', asset('apple-touch-icon.png'))">
+    <meta property="og:image" content="@yield('og_image', asset('images/logo/coprra-logo.svg'))">
 
     <title>@yield('title', config('app.name', 'COPRRA'))</title>
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo/coprra-icon.svg') }}">
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
-    <link rel="preload" href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" as="style">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <!-- Fonts: use system stack locally (remove external CDNs) -->
+    <!-- External font CDNs removed to meet Local First directive -->
+
+    <!-- Icons: Font Awesome (local) -->
+    <link rel="stylesheet" href="{{ asset('vendor/fontawesome/css/all.min.css') }}">
 
     <!-- Critical CSS -->
     <style>{!! file_exists(public_path('build/manifest.json')) ? \Illuminate\Support\Facades\File::get(resource_path('css/critical.css')) : \Illuminate\Support\Facades\File::get(resource_path('css/critical.css')) !!}</style>
 
+    <!-- Brand CSS -->
+    <link rel="stylesheet" href="{{ asset('css/coprra-brand.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/coprra-utilities.css') }}">
+
     <!-- Additional CSS -->
     @stack('styles')
+
+    <!-- Alpine.js (local) - include only when a view declares 'alpine' section -->
+    @hasSection('alpine')
+    <script defer src="{{ asset('vendor/alpinejs/alpine.min.js') }}"></script>
+    @endhasSection
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <!-- Livewire -->
+    <!-- Livewire (excluded on home to avoid CSP eval warning) -->
+    @unless (request()->routeIs('home'))
     @livewireStyles
+    @endunless
 
     <!-- Google Analytics -->
     @if(config('services.google_analytics.id'))
@@ -82,11 +99,12 @@
         @include('layouts.footer')
     </div>
 
-    <!-- Livewire -->
+    <!-- Livewire (excluded on home) -->
+    @unless (request()->routeIs('home'))
     @livewireScripts
+    @endunless
 
     <!-- Additional JS -->
     @stack('scripts')
 </body>
 </html>
-
