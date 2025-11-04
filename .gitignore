@@ -401,3 +401,48 @@ credentials/
 # Additional Docker patterns
 .dockerignore.backup
 docker-compose.*.override.yml
+# --- Added to ensure clean working tree for baseline ---
+# App backups and temporary variants
+app/Http/Kernel.php.backup_*
+app/Providers/*_bkp_*
+
+# Root-level prototype or recovery controllers/services
+ScraperController_fixed.php
+SimpleProductController.php
+TelescopeServiceProvider*.php
+UpdateAdminCredentials.php
+ULTRA_SIMPLE_IMPORT.php
+
+# Root-level deployment and recovery documents
+*_REPORT.md
+*_PLAN.md
+*_GUIDE*.md
+*_STATUS_*.md
+*RESULTS*.txt
+*VERIFY*.txt
+*FINAL*.md
+*SUMMARY*.md
+*EXECUTION*.md
+*RECOVERY*.md
+
+# Root-level prototype scripts and helpers
+backup_ProductController.php
+backup_db.sh
+clear_all_caches.php
+current_web.php
+current_web_routes.php
+deploy-*
+deploy_*.php
+deploy_*.sh
+deploy_*.bat
+executeCommand_method.txt
+create_enhanced_product.php
+create_scraper_via_web.php
+auto_deploy_all.sh
+debug.php
+apple_products_urls.json
+apple_urls_for_gui.txt
+
+# Stray files from earlier operations
+h =
+t == set origin (Owner PAT embedded) ==
