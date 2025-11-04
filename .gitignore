@@ -446,3 +446,37 @@ apple_urls_for_gui.txt
 # Stray files from earlier operations
 h =
 t == set origin (Owner PAT embedded) ==
+
+# Additional recovery artifacts and root-level test files
+AIControlPanelController_original.php
+AIServiceTest.php
+AdminController.php
+AdminController_updated.php
+CreateSuperAdminSeeder.php
+*Test.php
+FIXED_FILES/
+READY_TO_DEPLOY/
+RECOVERED_EXPORT_JSON/
+auto_import_system/
+DATABASE_INVENTORY.md
+DATA_INTEGRITY_SUMMARY.json
+DEPLOYMENT_INSTRUCTIONS.html
+DEPLOYMENT_SUMMARY.txt
+EXECUTE_THESE_COMMANDS_IN_CPANEL.md
+FILES_CREATED.md
+FORENSIC_RECOVERY_SUMMARY.json
+INDEX.md
+MASS_IMPORT_ALL_BRANDS.php
+ONE_CLICK_IMPORT.sh
+PRE_DEPLOYMENT_VERIFICATION.md
+ProcessScrapingJob_server.php
+QUICK_ACTION_CHECKLIST.md
+QUICK_DEPLOYMENT_COMMANDS.md
+REPAIR_COMPLETION_REPORT_V3.md
+SEOServiceTest.php
+SITEMAP_VERIFY.json
+START_DEPLOYMENT_NOW.md
+TEST_EXECUTION_DIRECT.txt
+app_config_fixed.php
+create_admin_temp.php
+fix_appcomposer_now.sh
