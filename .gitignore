@@ -458,7 +458,7 @@ AIServiceTest.php
 AdminController.php
 AdminController_updated.php
 CreateSuperAdminSeeder.php
-*Test.php
+/*Test.php
 FIXED_FILES/
 READY_TO_DEPLOY/
 RECOVERED_EXPORT_JSON/
