@@ -249,6 +249,116 @@ NUL
 /backups/
 storage/reports/
 
+# ===================================================================
+#  Workspace Sanitation (Local-only artifacts and scripts)
+# ===================================================================
+# Python virtual environment
+/venv/
+
+# Local test and run artifacts
+/test_results/
+/raw_outputs/
+/downloaded-ci/
+/temp_task4/
+/local/
+
+# Root-only route snapshots and duplicates
+/web.php
+/web_current.php
+/web_routes_*.php
+
+# Root-only Blade templates for quick previews
+/*.blade.php
+
+# Local helper scripts (not part of deploy)
+/upload_*.py
+/upload_*.sh
+/verify_*.py
+/verify_*.sh
+/update_*.py
+/server_*.py
+/server_*.sh
+/start_worker_simple.py
+/test_*.py
+/*results.html
+/*.expect
+
+# Scripts folder local artifacts
+/scripts/requirements.txt
+/scripts/php_batch_scraper.php
+
+# Additional local-only artifacts (fine-grained)
+/repos/
+/scrapers/
+/project_docs/
+/post_flight_verify.py
+/*repair_log*.txt
+/queue_worker.sh
+/rapid_import.sh
+/remote_diagnostics.sh
+/run_scraper_on_server.sh
+/public/test-server.php
+/routes/web.php.backup_*
+/phase*_*.py
+/phase*_results.json
+/test-*.php
+
+# Root-level logs and reports
+/*results.json
+/*output*.txt
+/*log.txt
+/*_backup.txt
+
+# Root-level helper scripts
+/quick_*.sh
+/quick_*.py
+/run_*.py
+/install_*.sh
+/*diagnosis*.py
+/seed_database_now.php
+/ssh_deploy.py
+/view_laravel_log.py
+/warm_cache.py
+/sqlite_to_json.py
+/ux_audit.py
+/telescope_config*.php
+
+# Scripts directory Python tools (local-only)
+/scripts/*.py
+/scripts/*.md
+
+# Root-level fix/force utility scripts
+/fix_*.py
+/fix_*.php
+/force_*.py
+/force_*.php
+/manual_*.sh
+/verify-deployment.sh
+/live_*.php
+
+# Specific local helper files
+/gitignore_laravel.txt
+
+# Additional local helper patterns
+/deploy_with_expect.sh
+/execute_*.py
+/execute_*.php
+/scrape_*.py
+/*_scraper*.py
+/final_*.py
+/emergency_*.py
+/diagnose_*.py
+/download_*.py
+/simple_*.py
+/simple_*.php
+/show_*.php
+/direct_*.php
+/run_seeders_*.php
+/telescope_*.py
+
+# Catch-all: ignore new root-level Python helpers (untracked only)
+/*.py
+
 # Build and output artifacts
 *.out
 *.zip
