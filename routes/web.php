@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CompareController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CostDashboardController;
 use App\Http\Controllers\FileController;
@@ -25,6 +26,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
+use Laravel\Pulse\Pulse;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,6 +49,11 @@ Route::get('/health-check', static function () {
 
 // Status monitoring endpoint
 Route::get('/status', [StatusController::class, 'index'])->name('status');
+
+// Laravel Pulse dashboard (secured via viewPulse gate and middleware in config/pulse.php)
+if (class_exists(\Laravel\Pulse\Pulse::class) && method_exists(\Laravel\Pulse\Pulse::class, 'route')) {
+    Pulse::route('/' . (string) config('pulse.path', 'pulse'));
+}
 
 // Cost Dashboard (requires authentication)
 Route::get('/dashboard/costs', [CostDashboardController::class, 'index'])
@@ -117,6 +124,12 @@ Route::get('products', [ProductController::class, 'index'])->name('products.inde
 Route::get('products/search', [ProductController::class, 'search'])->name('products.search');
 Route::get('products/{slug}', [ProductController::class, 'show'])->name('products.show');
 
+// Compare Routes (public, session-based)
+Route::get('compare', [CompareController::class, 'index'])->name('compare.index');
+Route::post('compare/add/{product}', [CompareController::class, 'add'])->name('compare.add');
+Route::delete('compare/remove/{product}', [CompareController::class, 'remove'])->name('compare.remove');
+Route::post('compare/clear', [CompareController::class, 'clear'])->name('compare.clear');
+
 Route::get('categories', [CategoryController::class, 'index'])->name('categories.index');
 Route::get('categories/{slug}', [CategoryController::class, 'show'])->name('categories.show');
 
@@ -129,41 +142,9 @@ Route::get('contact', static function () {
     return view('contact');
 })->name('contact');
 
-// Public test route for debugging AI status
-Route::get('/public-test-ai', static function () {
-    try {
-        return response()->json([
-            'success' => true,
-            'message' => 'Public test route working',
-            'timestamp' => now(),
-        ]);
-    } catch (Exception $e) {
-        return response()->json([
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString(),
-        ], 500);
-    }
-})->name('public-test-ai');
-
-// Auth-only test route for debugging
-Route::middleware('auth')->get('/auth-test-ai', static function () {
-    try {
-        return response()->json([
-            'success' => true,
-            'message' => 'Auth test route working',
-            'user' => auth()->user()->email ?? 'No user',
-            'timestamp' => now(),
-        ]);
-    } catch (Exception $e) {
-        return response()->json([
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString(),
-        ], 500);
-    }
-})->name('auth-test-ai');
-
-// Locale switching route
+// Locale switching routes
 Route::post('locale/language', [LocaleController::class, 'switchLanguage'])->name('locale.language');
+Route::post('locale/currency', [LocaleController::class, 'switchCurrency'])->name('locale.currency');
 
 // --- المسارات المحمية التي تتطلب تسجيل الدخول ---
 
@@ -218,14 +199,29 @@ Route::middleware('auth')->group(static function (): void {
 
 // --- Admin Routes (تتطلب صلاحيات إدارية) ---
 
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(static function (): void {
+Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(static function (): void {
+    // Dashboard and basic management pages
     Route::get('dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('users', [AdminController::class, 'users'])->name('users');
-    Route::get('products', [AdminController::class, 'products'])->name('products');
-    Route::get('brands', [AdminController::class, 'brands'])->name('brands');
-    Route::get('categories', [AdminController::class, 'categories'])->name('admin.categories');
     Route::get('stores', [AdminController::class, 'stores'])->name('stores');
     Route::post('users/{user}/toggle-admin', [AdminController::class, 'toggleUserAdmin'])->name('users.toggle-admin');
+
+    // Products routes
+    Route::prefix('products')->name('products.')->group(static function (): void {
+        Route::get('/', [AdminController::class, 'products'])->name('index');
+        Route::get('/{product}/edit', [AdminController::class, 'editProduct'])->name('edit');
+        Route::put('/{product}', [AdminController::class, 'updateProduct'])->name('update');
+    });
+
+    // Categories routes
+    Route::prefix('categories')->name('categories.')->group(static function (): void {
+        Route::get('/', [AdminController::class, 'categories'])->name('index');
+        Route::get('/{category}/edit', [AdminController::class, 'editCategory'])->name('edit');
+        Route::put('/{category}', [AdminController::class, 'updateCategory'])->name('update');
+    });
+
+    // Brands routes
+    Route::get('brands', [AdminController::class, 'brands'])->name('brands.index');
 
     // AI Control Panel Routes
     Route::prefix('ai')->name('ai.')->group(static function (): void {
@@ -259,40 +255,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(sta
         });
     });
 
-    // Simple admin test route
-    Route::get('/admin-test', static function () {
-        return response()->json(['success' => true, 'message' => 'Admin route working', 'user' => auth()->user()->email]);
-    });
-
-    // Simple AI status test without controller
-    Route::get('/ai-status-simple', static function () {
-        return response()->json([
-            'success' => true,
-            'message' => 'AI status route working',
-            'timestamp' => now()->toISOString(),
-            'user' => auth()->user()->email,
-        ]);
-    });
-
-    // Temporary test route for debugging
-    Route::get('/test-ai-status', static function () {
-        try {
-            $controller = app(AIControlPanelController::class);
-
-            return $controller->getStatus();
-        } catch (Exception $e) {
-            return response()->json([
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ], 500);
-        }
-    })->name('test-ai-status');
 });
 
-// --- Brand Routes (تتطلب تسجيل الدخول) ---
-
+// --- Brand Routes ---
+// Make brands index public, keep other resource actions behind auth
+Route::get('brands', [BrandController::class, 'index'])->name('brands.index');
 Route::middleware('auth')->group(static function (): void {
-    Route::resource('brands', BrandController::class);
+    Route::resource('brands', BrandController::class)->except(['index']);
 });
 
 // Secure file serving via signed URLs (private storage)
@@ -302,7 +271,25 @@ Route::get('/files/{path}', [FileController::class, 'show'])
     ->name('files.show')
 ;
 
-// Sentry test route to validate error capture
-Route::get('/sentry-test', static function () {
-    throw new Exception('Sentry test exception');
-});
+// --- Debug & Test Routes (Non-Production Only) ---
+if (config('app.env') !== 'production') {
+    Route::get('/public-test-ai', static function () {
+        return response()->json(['success' => true, 'message' => 'Test OK']);
+    })->name('public-test-ai');
+
+    Route::middleware('auth')->get('/auth-test-ai', static function () {
+        return response()->json(['success' => true, 'message' => 'Auth test OK', 'user' => auth()->user()->email]);
+    })->name('auth-test-ai');
+
+    Route::middleware('auth')->get('/ai-status-simple', static function () {
+        return response()->json(['success' => true, 'message' => 'AI status OK', 'user' => auth()->user()->email]);
+    });
+
+    Route::middleware('auth')->get('/test-ai-status', static function () {
+        return app(AIControlPanelController::class)->getStatus();
+    })->name('test-ai-status');
+
+    Route::get('/sentry-test', static function () {
+        throw new Exception('Sentry test exception');
+    });
+}

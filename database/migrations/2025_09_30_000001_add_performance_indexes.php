@@ -226,7 +226,7 @@ return new class extends Migration {
                     $table->index(['causer_type', 'causer_id'], 'activity_log_causer_index');
                 }
 
-                if (! $this->indexExists('activity_log', 'activity_log__index')) {
+                if (! $this->indexExists('activity_log', 'activity_log_created_at_index')) {
                     $table->index('created_at', 'activity_log_created_at_index');
                 }
             });
@@ -337,10 +337,20 @@ return new class extends Migration {
      */
     private function indexExists(string $table, string $index): bool
     {
-        if ('sqlite' === Schema::getConnection()->getDriverName()) {
+        $connection = Schema::getConnection();
+
+        // SQLite: use PRAGMA to detect existing indexes
+        if ('sqlite' === $connection->getDriverName()) {
+            $rows = $connection->select('PRAGMA index_list("'.$table.'")');
+            foreach ($rows as $row) {
+                $name = is_array($row) ? ($row['name'] ?? null) : ($row->name ?? null);
+                if ($name === $index) {
+                    return true;
+                }
+            }
             return false;
         }
 
-        return Schema::getConnection()->getSchemaBuilder()->hasIndex($table, $index);
+        return $connection->getSchemaBuilder()->hasIndex($table, $index);
     }
 };

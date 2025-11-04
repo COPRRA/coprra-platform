@@ -15,15 +15,6 @@ class SetLocaleAndCurrency
      */
     public function handle(Request $request, \Closure $next): Response
     {
-        // Set locale from user preference, session, or default
-        $locale = $request->user()?->locale
-            ?? session('locale')
-            ?? config('app.locale');
-
-        if ($locale && \in_array($locale, config('app.supported_locales', ['en']), true)) {
-            App::setLocale($locale);
-        }
-
         // Set currency from user preference, session, or default
         $currency = $request->user()?->currency
             ?? session('currency')

@@ -81,6 +81,45 @@ trait EnhancedTestIsolation
     protected bool $enableCacheIsolation = true;
 
     /**
+     * Determine if RefreshDatabase (or custom equivalent) is enabled for this test.
+     */
+    protected function isRefreshDatabaseEnabled(): bool
+    {
+        try {
+            if (method_exists($this, 'usesRefreshDatabase')) {
+                return (bool) $this->usesRefreshDatabase();
+            }
+        } catch (\Throwable $e) {
+            // Ignore errors in detection and fall back to trait inspection
+        }
+
+        $traits = class_uses_recursive(static::class);
+        return \in_array(\Illuminate\Foundation\Testing\RefreshDatabase::class, $traits, true)
+            || \in_array(\Tests\CustomRefreshDatabase::class, $traits, true);
+    }
+
+    /**
+     * Heuristic to detect whether a database transaction is currently active.
+     */
+    protected function isDatabaseTransacting(): bool
+    {
+        if (! class_exists(DB::class)) {
+            return false;
+        }
+
+        try {
+            $conn = DB::connection();
+            if (method_exists($conn, 'transactionLevel')) {
+                return $conn->transactionLevel() > 0;
+            }
+        } catch (\Throwable $e) {
+            return false;
+        }
+
+        return false;
+    }
+
+    /**
      * Track file creation.
      */
     public function trackFileCreation(string $filePath): void
@@ -169,13 +208,15 @@ trait EnhancedTestIsolation
             $this->openResources = get_resources();
         }
 
-        // Record database connections - ensure we start with a clean slate
+        // Record database connections without disrupting RefreshDatabase transactions
         if (class_exists(DB::class)) {
             try {
-                // First close any existing connections to ensure clean state
-                $this->closeAllDatabaseConnections();
+                // If not using RefreshDatabase or an active transaction, ensure we start clean
+                if (! $this->isRefreshDatabaseEnabled() && ! $this->isDatabaseTransacting()) {
+                    $this->closeAllDatabaseConnections();
+                }
 
-                // Now record the clean state
+                // Record current connections state
                 $this->databaseConnections = DB::getConnections();
             } catch (\Exception $e) {
                 // Ignore if DB not available
@@ -244,7 +285,7 @@ trait EnhancedTestIsolation
     protected function setupIsolatedEnvironment(): void
     {
         // Create isolated temporary directory
-        $tempDir = sys_get_temp_dir().'/test_isolation_'.uniqid();
+        $tempDir = sys_get_temp_dir() . '/test_isolation_' . uniqid();
         if (! is_dir($tempDir)) {
             mkdir($tempDir, 0755, true);
             $this->temporaryPaths[] = $tempDir;
@@ -270,19 +311,23 @@ trait EnhancedTestIsolation
      */
     protected function setupIsolatedStorage(string $tempDir): void
     {
-        $storagePath = $tempDir.'/storage';
+        $storagePath = $tempDir . '/storage';
         mkdir($storagePath, 0755, true);
 
         // Configure Laravel storage paths
-        if (\function_exists('config')) {
-            config([
-                'filesystems.disks.local.root' => $storagePath,
-                'filesystems.disks.public.root' => $storagePath.'/public',
-                'view.compiled' => $storagePath.'/views',
-                'cache.stores.file.path' => $storagePath.'/cache',
-                'session.files' => $storagePath.'/sessions',
-                'logging.channels.single.path' => $storagePath.'/logs/laravel.log',
-            ]);
+        if (\function_exists('app') && app()->bound('config')) {
+            try {
+                app('config')->set([
+                    'filesystems.disks.local.root' => $storagePath,
+                    'filesystems.disks.public.root' => $storagePath . '/public',
+                    'view.compiled' => $storagePath . '/views',
+                    'cache.stores.file.path' => $storagePath . '/cache',
+                    'session.files' => $storagePath . '/sessions',
+                    'logging.channels.single.path' => $storagePath . '/logs/laravel.log',
+                ]);
+            } catch (\Throwable $e) {
+                // Ignore configuration errors during isolation setup
+            }
         }
     }
 
@@ -291,26 +336,46 @@ trait EnhancedTestIsolation
      */
     protected function setupIsolatedDatabase(): void
     {
-        if (\function_exists('config')) {
+        // When using Laravel's RefreshDatabase, or if a transaction is active, do not override
+        if ($this->isRefreshDatabaseEnabled() || $this->isDatabaseTransacting()) {
+            return;
+        }
+
+        if (\function_exists('app') && app()->bound('config')) {
             // First, close any existing connections to prevent leaks
             $this->closeAllDatabaseConnections();
 
-            // Use in-memory SQLite for complete isolation
-            config([
-                'database.default' => 'testing',
-                'database.connections.testing' => [
-                    'driver' => 'sqlite',
-                    'database' => ':memory:',
-                    'prefix' => '',
-                    'foreign_key_constraints' => true,
-                ],
-            ]);
+            // Use in-memory SQLite for complete isolation, without changing default
+            try {
+                $default = config('database.default', 'sqlite');
+
+                // Ensure the default connection is sqlite and points to memory
+                if ($default !== 'sqlite') {
+                    // Do not force change default; just ensure sqlite memory is available
+                    app('config')->set('database.connections.sqlite', [
+                        'driver' => 'sqlite',
+                        'database' => ':memory:',
+                        'prefix' => '',
+                        'foreign_key_constraints' => true,
+                    ]);
+                } else {
+                    // Keep default as sqlite and enforce memory settings
+                    app('config')->set('database.connections.sqlite', [
+                        'driver' => 'sqlite',
+                        'database' => ':memory:',
+                        'prefix' => '',
+                        'foreign_key_constraints' => true,
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                // Ignore configuration errors during isolation setup
+            }
 
             // Record this connection in our baseline to avoid false positives
             if (class_exists(DB::class)) {
                 try {
                     // Force a connection to be created now so we can track it
-                    DB::connection('testing')->getPdo();
+                    DB::connection(config('database.default', 'sqlite'))->getPdo();
 
                     // Update our baseline to include this connection
                     $this->databaseConnections = DB::getConnections();
@@ -346,8 +411,13 @@ trait EnhancedTestIsolation
                 Cache::flush();
 
                 // Clear all cache stores
-                foreach (config('cache.stores', []) as $store => $config) {
-                    Cache::store($store)->flush();
+                $stores = (\function_exists('app') && app()->bound('config')) ? config('cache.stores', []) : [];
+                foreach ($stores as $store => $config) {
+                    try {
+                        Cache::store($store)->flush();
+                    } catch (\Throwable $e) {
+                        // Ignore individual store flush errors
+                    }
                 }
             } catch (\Exception $e) {
                 // Ignore cache errors in isolation
@@ -361,11 +431,11 @@ trait EnhancedTestIsolation
     protected function clearConfigCache(): void
     {
         if (\function_exists('app') && app()->bound('config')) {
-            try {
-                app('config')->set([], []);
-            } catch (\Exception $e) {
-                // Ignore config errors
+            // Avoid nuking configuration when RefreshDatabase is in use
+            if ($this->isRefreshDatabaseEnabled()) {
+                return;
             }
+            // Intentionally skip destructive clearing; container reset handles re-resolution.
         }
     }
 
@@ -516,8 +586,12 @@ trait EnhancedTestIsolation
     protected function setupCacheTracking(): void
     {
         // Track cache stores that are created during test
-        if (\function_exists('config')) {
-            $this->cacheStores = array_keys(config('cache.stores', []));
+        if (\function_exists('app') && app()->bound('config')) {
+            try {
+                $this->cacheStores = array_keys(config('cache.stores', []));
+            } catch (\Throwable $e) {
+                $this->cacheStores = [];
+            }
         }
     }
 
@@ -541,6 +615,11 @@ trait EnhancedTestIsolation
      */
     protected function resetServiceContainer(): void
     {
+        // Avoid resetting container when RefreshDatabase is managing transactions
+        if (($this->isRefreshDatabaseEnabled() || $this->isDatabaseTransacting())) {
+            return;
+        }
+
         if (\function_exists('app') && app() instanceof Application) {
             $app = app();
 
@@ -577,7 +656,16 @@ trait EnhancedTestIsolation
             'log',
         ];
 
+        $skip = [];
+        if ($this->isRefreshDatabaseEnabled() || $this->isDatabaseTransacting()) {
+            // Do not disturb DB or config while RefreshDatabase manages transactions
+            $skip = ['db', 'config'];
+        }
+
         foreach ($coreServices as $service) {
+            if (\in_array($service, $skip, true)) {
+                continue;
+            }
             if ($app->bound($service)) {
                 $app->forgetInstance($service);
             }
@@ -734,8 +822,10 @@ trait EnhancedTestIsolation
      */
     protected function cleanupResources(): void
     {
-        // Close database connections
-        $this->closeAllDatabaseConnections();
+        // Close database connections unless using RefreshDatabase or an active transaction
+        if (! ($this->isRefreshDatabaseEnabled() || $this->isDatabaseTransacting())) {
+            $this->closeAllDatabaseConnections();
+        }
 
         // Clear queue connections
         if (class_exists(Queue::class)) {
@@ -760,6 +850,11 @@ trait EnhancedTestIsolation
         }
 
         try {
+            // Do not interfere with RefreshDatabase using in-memory sqlite or active transactions
+            if ($this->isRefreshDatabaseEnabled() || $this->isDatabaseTransacting()) {
+                return;
+            }
+
             // Get all current connections and close them individually
             $connections = DB::getConnections();
             foreach ($connections as $name => $connection) {
@@ -801,16 +896,6 @@ trait EnhancedTestIsolation
                             // Continue with other attempts
                         }
                     }
-                }
-
-                // Clear the connection resolver to prevent reconnection
-                if (method_exists(DB::class, 'setDefaultConnection')) {
-                    DB::setDefaultConnection('');
-                }
-
-                // Reset database configuration to prevent auto-reconnection
-                if (\function_exists('config')) {
-                    config(['database.default' => '']);
                 }
 
                 // Force garbage collection to clean up PDO connections
@@ -961,6 +1046,6 @@ trait EnhancedTestIsolation
 
         $bytes /= (1 << (10 * $pow));
 
-        return round($bytes, 2).' '.$units[$pow];
+        return round($bytes, 2) . ' ' . $units[$pow];
     }
 }

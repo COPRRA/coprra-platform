@@ -15,9 +15,9 @@ class LocaleMiddleware
      */
     public function handle(Request $request, \Closure $next): Response
     {
-        // Get locale from request (header, query param, or session)
-        $locale = $request->header('Accept-Language')
-            ?? $request->query('locale')
+        // Consolidated locale source of truth:
+        // 1) User's saved preference -> 2) Session -> 3) Default config
+        $locale = $request->user()?->locale
             ?? session('locale')
             ?? config('app.locale');
 

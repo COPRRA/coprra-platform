@@ -55,7 +55,8 @@ final class ProductQueryBuilderService
     public function buildRelatedQuery(Product $product, int $limit): Builder
     {
         return Product::query()
-            ->select(['id', 'name', 'slug', 'price', 'image', 'category_id'])
+            ->select(['id', 'name', 'slug', 'price', 'image', 'category_id', 'brand_id'])
+            ->with(['category', 'brand'])
             ->where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
             ->where('is_active', true)

@@ -4,93 +4,123 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Spatie\Sitemap\Sitemap;
+use Spatie\Sitemap\Tags\Url;
 
-/**
- * @psalm-suppress PropertyNotSetInConstructor, UnusedClass
- */
-final class GenerateSitemap extends Command
+class GenerateSitemap extends Command
 {
     /**
      * The name and signature of the console command.
+     *
+     * @var string
      */
     protected $signature = 'sitemap:generate';
 
     /**
      * The console command description.
+     *
+     * @var string
      */
-    protected $description = 'Generate XML sitemap for SEO optimization';
+    protected $description = 'Generate sitemap.xml for static pages and dynamic content (products, categories).';
 
-    private readonly Filesystem $filesystem;
-
-    public function __construct(Filesystem $filesystem)
-    {
-        parent::__construct();
-        $this->filesystem = $filesystem;
-    }
-
+    /**
+     * Execute the console command.
+     */
     public function handle(): int
     {
-        $this->info('Generating sitemap...');
+        $baseUrl = rtrim((string) config('app.url', 'http://127.0.0.1:8000'), '/');
 
-        $sitemap = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
-        $sitemap .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
+        $sitemap = Sitemap::create();
 
-        // Homepage
-        $sitemap .= $this->addUrl(url('/'), '1.0', 'daily');
+        // Static pages
+        $sitemap->add(
+            Url::create($baseUrl.'/')
+                ->setLastModificationDate(Carbon::now())
+                ->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY)
+                ->setPriority(1.0)
+        );
 
-        // Products
-        Product::query()->chunk(100, function (Collection $products) use (&$sitemap): void {
-            foreach ($products as $product) {
-                $sitemap .= $this->addUrl(
-                    route('products.show', $product->slug),
-                    '0.8',
-                    'weekly'
-                );
-            }
-        });
+        $sitemap->add(
+            Url::create($baseUrl.'/products')
+                ->setLastModificationDate(Carbon::now())
+                ->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY)
+                ->setPriority(0.9)
+        );
 
-        // Categories
-        Category::query()->chunk(100, function (Collection $categories) use (&$sitemap): void {
-            foreach ($categories as $category) {
-                $sitemap .= $this->addUrl(
-                    route('categories.show', $category->id),
-                    '0.7',
-                    'weekly'
-                );
-            }
-        });
+        $sitemap->add(
+            Url::create($baseUrl.'/categories')
+                ->setLastModificationDate(Carbon::now())
+                ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
+                ->setPriority(0.6)
+        );
 
-        // Brands
-        Brand::query()->chunk(100, function (Collection $brands) use (&$sitemap): void {
-            foreach ($brands as $brand) {
-                $sitemap .= $this->addUrl(
-                    route('brands.show', $brand->id),
-                    '0.6',
-                    'monthly'
-                );
-            }
-        });
+        $sitemap->add(
+            Url::create($baseUrl.'/contact')
+                ->setLastModificationDate(Carbon::now())
+                ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY)
+                ->setPriority(0.3)
+        );
 
-        $sitemap .= '</urlset>';
+        // Dynamic products
+        Product::query()
+            ->where('is_active', true)
+            ->orderByDesc('updated_at')
+            ->select(['slug', 'updated_at'])
+            ->chunk(500, function ($products) use ($sitemap, $baseUrl): void {
+                foreach ($products as $product) {
+                    $slug = (string) $product->slug;
+                    if ('' === $slug) {
+                        continue;
+                    }
+                    $lastmod = $product->updated_at instanceof Carbon
+                        ? Carbon::create($product->updated_at)
+                        : Carbon::now();
 
-        $this->filesystem->put(public_path('sitemap.xml'), $sitemap);
+                    $sitemap->add(
+                        Url::create($baseUrl.'/products/'.Str::of($slug)->ltrim('/'))
+                            ->setLastModificationDate($lastmod)
+                            ->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY)
+                            ->setPriority(0.8)
+                    );
+                }
+            });
 
-        $this->info('Sitemap generated successfully at '.public_path('sitemap.xml'));
+        // Dynamic categories
+        Category::query()
+            ->where('is_active', true)
+            ->orderByDesc('updated_at')
+            ->select(['slug', 'updated_at'])
+            ->chunk(500, function ($categories) use ($sitemap, $baseUrl): void {
+                foreach ($categories as $category) {
+                    $slug = (string) $category->slug;
+                    if ('' === $slug) {
+                        continue;
+                    }
+                    $lastmod = $category->updated_at instanceof Carbon
+                        ? Carbon::create($category->updated_at)
+                        : Carbon::now();
 
-        return Command::SUCCESS;
-    }
+                    $sitemap->add(
+                        Url::create($baseUrl.'/categories/'.Str::of($slug)->ltrim('/'))
+                            ->setLastModificationDate($lastmod)
+                            ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
+                            ->setPriority(0.5)
+                    );
+                }
+            });
 
-    private function addUrl(string $url, string $priority, string $changefreq): string
-    {
-        $lastmod = Carbon::now()->toAtomString();
+        // Write sitemap to public folder
+        $path = public_path('sitemap.xml');
+        $sitemap->writeToFile($path);
 
-        return "  <url>\n    <loc>{$url}</loc>\n    <priority>{$priority}</priority>\n    <changefreq>{$changefreq}</changefreq>\n    <lastmod>{$lastmod}</lastmod>\n  </url>\n";
+        $this->info("Sitemap generated: {$path}");
+
+        return self::SUCCESS;
     }
 }
+

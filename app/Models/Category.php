@@ -209,4 +209,12 @@ class Category extends ValidatableModel
             $this->level = 0;
         }
     }
+
+    /**
+     * Use slug for route model binding.
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
 }

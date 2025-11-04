@@ -6,6 +6,10 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Models\Category;
+use App\Models\Product;
+use App\Observers\CategoryObserver;
+use App\Observers\ProductObserver;
 use App\Repositories\ProductRepository;
 use App\Services\CacheService;
 use App\Services\Contracts\CacheServiceContract;
@@ -48,5 +52,14 @@ final class AppServiceProvider extends ServiceProvider
         if (true === $this->app->environment('local', 'testing') && class_exists(DuskServiceProvider::class)) {
             $this->app->register(DuskServiceProvider::class);
         }
+    }
+
+    /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
+    {
+        Product::observe(ProductObserver::class);
+        Category::observe(CategoryObserver::class);
     }
 }

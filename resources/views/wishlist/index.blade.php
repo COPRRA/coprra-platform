@@ -1,47 +1,38 @@
-@extends('layouts.app')
-
-@section('title', 'My Wishlist')
-
-@section('content')
-<div class="container">
-    <div class="row">
-        <div class="col-md-12">
-            <h1>My Wishlist</h1>
-
-            @if($wishlistItems->count() > 0)
-                <div class="row">
-                    @foreach($wishlistItems as $item)
-                        <div class="col-md-3 mb-4">
-                            <div class="card">
-                                @if($item->product->image)
-                                    <img src="{{ $item->product->image }}" class="card-img-top" alt="{{ $item->product->name }}">
-                                @endif
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ $item->product->name }}</h5>
-                                    <p class="card-text">{{ Str::limit($item->product->description, 100) }}</p>
-                                    <p class="card-text"><strong>${{ $item->product->price }}</strong></p>
-                                    <div class="d-flex justify-content-between">
-                                        <a href="#" class="btn btn-primary btn-sm" aria-label="View details for {{ $item->product->name }}">View Product</a>
-                                        <form method="POST" action="{{ route('wishlist.destroy', $item->id) }}" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <input type="hidden" name="product_id" value="{{ $item->product->id }}">
-                                            <button type="submit" class="btn btn-outline-danger btn-sm" aria-label="Remove {{ $item->product->name }} from wishlist">Remove</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            @else
-                <div class="text-center py-5">
-                    <h3>Your wishlist is empty</h3>
-                    <p>Start adding products to your wishlist!</p>
-                    <a href="#" class="btn btn-primary">Browse Products</a>
-                </div>
-            @endif
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wishlist</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body{font-family:Inter,system-ui,Arial,sans-serif;margin:2rem;color:#111}
+        .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem}
+        .card{border:1px solid #e5e7eb;border-radius:8px;padding:12px}
+        a{color:#2563eb;text-decoration:none}
+        form button{padding:.35rem .6rem;border-radius:6px;background:#ef4444;color:#fff;border:0}
+    </style>
+    </head>
+<body>
+    <h1>Your Wishlist</h1>
+    @if(isset($wishlistItems) && $wishlistItems->count())
+        <div class="grid">
+            @foreach($wishlistItems as $item)
+                <article class="card">
+                    <h2>
+                        <a href="{{ route('products.show', $item->product->slug) }}">{{ $item->product->name }}</a>
+                    </h2>
+                    <form method="post" action="{{ route('wishlist.remove', $item->product_id) }}">
+                        @csrf
+                        <button type="submit">Remove</button>
+                    </form>
+                </article>
+            @endforeach
         </div>
-    </div>
-</div>
-@endsection
+    @else
+        <p>Your wishlist is empty.</p>
+    @endif
+</body>
+</html>

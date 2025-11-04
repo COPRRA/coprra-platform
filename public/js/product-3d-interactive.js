@@ -46,14 +46,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const spotlightContainers = document.querySelectorAll('.spotlight-container');
 
     spotlightContainers.forEach(container => {
+        // Guard against non-HTMLElement nodes or missing style object
+        if (!(container instanceof HTMLElement)) return;
+
         container.addEventListener('mousemove', (e) => {
             const rect = container.getBoundingClientRect();
             const x = ((e.clientX - rect.left) / rect.width) * 100;
             const y = ((e.clientY - rect.top) / rect.height) * 100;
 
-            const spotlight = container.querySelector('::before');
-            container.style.setProperty('--spotlight-x', `${x}%`);
-            container.style.setProperty('--spotlight-y', `${y}%`);
+            // Update CSS variables only when supported
+            if (container.style && typeof container.style.setProperty === 'function') {
+                container.style.setProperty('--spotlight-x', `${x}%`);
+                container.style.setProperty('--spotlight-y', `${y}%`);
+            }
         });
     });
 
@@ -230,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function() {
                /Android.*Mobile/.test(navigator.userAgent);
     };
 
-    if (isLowEndDevice()) {
+    if (isLowEndDevice() && document.body) {
         console.log('⚡ Low-end device detected - reducing effects');
         document.body.classList.add('reduced-effects');
 

@@ -1,73 +1,100 @@
-@extends('layouts.app')
-
-@section('title', 'Admin Dashboard')
+@extends('admin.layouts.app')
 
 @section('content')
-<div class="py-12">
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-6 text-gray-900 dark:text-gray-100">
-                <h1 class="text-2xl font-bold mb-6">Admin Dashboard</h1>
-                
-                <!-- Stats Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <div class="bg-blue-500 text-white p-6 rounded-lg">
-                        <h3 class="text-lg font-semibold">Total Users</h3>
-                        <p class="text-3xl font-bold">{{ $stats['users'] ?? 0 }}</p>
-                    </div>
-                    <div class="bg-green-500 text-white p-6 rounded-lg">
-                        <h3 class="text-lg font-semibold">Total Products</h3>
-                        <p class="text-3xl font-bold">{{ $stats['products'] ?? 0 }}</p>
-                    </div>
-                    <div class="bg-yellow-500 text-white p-6 rounded-lg">
-                        <h3 class="text-lg font-semibold">Total Stores</h3>
-                        <p class="text-3xl font-bold">{{ $stats['stores'] ?? 0 }}</p>
-                    </div>
-                    <div class="bg-purple-500 text-white p-6 rounded-lg">
-                        <h3 class="text-lg font-semibold">Total Categories</h3>
-                        <p class="text-3xl font-bold">{{ $stats['categories'] ?? 0 }}</p>
-                    </div>
-                </div>
+<div class="container-fluid">
+    <h2 class="mb-4">Admin Dashboard</h2>
 
-                <!-- Recent Users -->
-                <div class="mb-8">
-                    <h2 class="text-xl font-bold mb-4">Recent Users</h2>
-                    <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
-                        @if(isset($recentUsers) && $recentUsers->count() > 0)
-                            <div class="space-y-2">
-                                @foreach($recentUsers as $user)
-                                    <div class="flex justify-between items-center">
-                                        <span>{{ $user->name }}</span>
-                                        <span class="text-sm text-gray-500">{{ $user->created_at->diffForHumans() }}</span>
-                                    </div>
-                                @endforeach
-                            </div>
-                        @else
-                            <p class="text-gray-500">No recent users</p>
-                        @endif
-                    </div>
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Total Users</h5>
+                    <p class="display-6">{{ $stats['users'] ?? 0 }}</p>
                 </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Total Products</h5>
+                    <p class="display-6">{{ $stats['products'] ?? 0 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Total Categories</h5>
+                    <p class="display-6">{{ $stats['categories'] ?? 0 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Total Stores</h5>
+                    <p class="display-6">{{ $stats['stores'] ?? 0 }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                <!-- Recent Products -->
-                <div>
-                    <h2 class="text-xl font-bold mb-4">Recent Products</h2>
-                    <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
-                        @if(isset($recentProducts) && $recentProducts->count() > 0)
-                            <div class="space-y-2">
-                                @foreach($recentProducts as $product)
-                                    <div class="flex justify-between items-center">
-                                        <span>{{ $product->name }}</span>
-                                        <span class="text-sm text-gray-500">{{ $product->created_at->diffForHumans() }}</span>
-                                    </div>
-                                @endforeach
-                            </div>
-                        @else
-                            <p class="text-gray-500">No recent products</p>
-                        @endif
-                    </div>
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Recent Users</div>
+                <div class="card-body p-0">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Email</th>
+                                <th>Joined</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($recentUsers as $u)
+                                <tr>
+                                    <td>{{ $u->id }}</td>
+                                    <td>{{ $u->email }}</td>
+                                    <td>{{ $u->created_at?->diffForHumans() }}</td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="3" class="text-center">No users</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Recent Products</div>
+                <div class="card-body p-0">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($recentProducts as $p)
+                                <tr>
+                                    <td>{{ $p->id }}</td>
+                                    <td>{{ $p->name }}</td>
+                                    <td>{{ $p->updated_at?->diffForHumans() }}</td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="3" class="text-center">No products</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 </div>
 @endsection
+

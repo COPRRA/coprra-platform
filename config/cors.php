@@ -64,6 +64,6 @@ return [
     // Cache preflight responses
     'max_age' => (int) env('CORS_MAX_AGE', 600),
 
-    // Credentials: only enable when required (e.g., Sanctum SPA)
-    'supports_credentials' => (bool) env('CORS_SUPPORTS_CREDENTIALS', false),
+    // Credentials: disabled by default for hardened security
+    'supports_credentials' => false,
 ];

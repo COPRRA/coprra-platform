@@ -1,0 +1,8 @@
+open 45.87.81.218 21
+u990109832
+Hamo1510@Rayan146
+cd /domains/coprra.com/public_html
+binary
+put diagnose_and_fix.php
+ls -la diagnose_and_fix.php
+bye

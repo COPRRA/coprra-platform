@@ -219,6 +219,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Supported Locales
+    |--------------------------------------------------------------------------
+    |
+    | Explicit list of supported locales for middleware and controllers.
+    | Keep in sync with seeded languages.
+    |
+    */
+
+    'supported_locales' => ['en', 'ar', 'fr', 'es', 'de'],
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Fallback Locale
     |--------------------------------------------------------------------------
     |

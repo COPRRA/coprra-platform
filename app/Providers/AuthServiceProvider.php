@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Models\User;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 /**
@@ -21,5 +23,10 @@ class AuthServiceProvider extends ServiceProvider
     {
         // Policies are auto-discovered in Laravel 12
         // No need to call $this->registerPolicies()
+
+        // Allow only admins to view the Laravel Pulse dashboard
+        Gate::define('viewPulse', function (?User $user): bool {
+            return $user !== null && method_exists($user, 'hasRole') && $user->hasRole('admin');
+        });
     }
 }

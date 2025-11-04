@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\SQLiteConnection;
 
 return new class extends Migration {
     /**
@@ -12,7 +13,8 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        // Add indexes to products table
+        // Add indexes to products table if exists
+        if (Schema::hasTable('products')) {
         Schema::table('products', function (Blueprint $table) {
             if (! $this->indexExists('products', 'products_category_id_index')) {
                 $table->index('category_id');
@@ -31,8 +33,10 @@ return new class extends Migration {
                 $table->index(['category_id', 'is_active']);
             }
         });
+        }
 
-        // Add indexes to price_offers table
+        // Add indexes to price_offers table if exists
+        if (Schema::hasTable('price_offers')) {
         Schema::table('price_offers', function (Blueprint $table) {
             if (! $this->indexExists('price_offers', 'price_offers_product_id_index')) {
                 $table->index('product_id');
@@ -48,6 +52,7 @@ return new class extends Migration {
                 $table->index(['product_id', 'in_stock']);
             }
         });
+        }
 
         // Add indexes to orders table if exists
         if (Schema::hasTable('orders')) {
@@ -80,7 +85,8 @@ return new class extends Migration {
             });
         }
 
-        // Add indexes to price_alerts table
+        // Add indexes to price_alerts table if exists
+        if (Schema::hasTable('price_alerts')) {
         Schema::table('price_alerts', function (Blueprint $table) {
             if (! $this->indexExists('price_alerts', 'price_alerts_user_id_index')) {
                 $table->index('user_id');
@@ -96,8 +102,10 @@ return new class extends Migration {
                 $table->index(['user_id', 'is_active']);
             }
         });
+        }
 
-        // Add indexes to wishlists table
+        // Add indexes to wishlists table if exists
+        if (Schema::hasTable('wishlists')) {
         Schema::table('wishlists', function (Blueprint $table) {
             if (! $this->indexExists('wishlists', 'wishlists_user_id_index')) {
                 $table->index('user_id');
@@ -110,8 +118,10 @@ return new class extends Migration {
                 $table->index(['user_id', 'product_id']);
             }
         });
+        }
 
-        // Add indexes to reviews table
+        // Add indexes to reviews table if exists
+        if (Schema::hasTable('reviews')) {
         Schema::table('reviews', function (Blueprint $table) {
             if (! $this->indexExists('reviews', 'reviews_product_id_index')) {
                 $table->index('product_id');
@@ -127,15 +137,19 @@ return new class extends Migration {
                 $table->index(['product_id', 'is_approved']);
             }
         });
+        }
 
-        // Add indexes to users table (additional)
+        // Add indexes to users table (additional) if exists
+        if (Schema::hasTable('users')) {
         Schema::table('users', function (Blueprint $table) {
             if (! $this->indexExists('users', 'users_created_at_index')) {
                 $table->index('created_at');
             }
         });
+        }
 
-        // Add indexes to stores table
+        // Add indexes to stores table if exists
+        if (Schema::hasTable('stores')) {
         Schema::table('stores', function (Blueprint $table) {
             if (! $this->indexExists('stores', 'stores_is_active_index')) {
                 $table->index('is_active');
@@ -144,6 +158,7 @@ return new class extends Migration {
                 $table->index('country');
             }
         });
+        }
     }
 
     /**
@@ -226,8 +241,28 @@ return new class extends Migration {
      */
     private function indexExists(string $table, string $index): bool
     {
-        $sm = Schema::getConnection()->getDoctrineSchemaManager();
-        $indexes = $sm->listTableIndexes($table);
+        $connection = Schema::getConnection();
+
+        // SQLite: use PRAGMA introspection to avoid duplicate index creation
+        if ($connection instanceof SQLiteConnection) {
+            $rows = $connection->select('PRAGMA index_list("'.$table.'")');
+            foreach ($rows as $row) {
+                // Row can be array or object depending on driver
+                $name = is_array($row) ? ($row['name'] ?? null) : ($row->name ?? null);
+                if ($name === $index) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Guard in case the driver doesn't support Doctrine schema manager
+        if (!method_exists($connection, 'getDoctrineSchemaManager')) {
+            return false;
+        }
+
+        $schemaManager = $connection->getDoctrineSchemaManager();
+        $indexes = $schemaManager->listTableIndexes($table);
 
         return array_key_exists($index, $indexes);
     }

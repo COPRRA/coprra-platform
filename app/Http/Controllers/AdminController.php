@@ -11,25 +11,26 @@ use App\Models\Store;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 
-class AdminController extends Controller
+final class AdminController extends Controller
 {
-    public function dashboard(): View|RedirectResponse
+    public function dashboard(Request $request): View|RedirectResponse
     {
-        $user = auth()->user();
+        $user = $request->user();
         if (! $user || ! method_exists($user, 'hasRole') || ! $user->hasRole('admin')) {
             return redirect()->route('home');
         }
 
         $stats = [
-            'users' => User::count(),
-            'products' => Product::count(),
-            'stores' => Store::count(),
-            'categories' => Category::count(),
+            'users' => User::query()->count(),
+            'products' => Product::query()->count(),
+            'stores' => Store::query()->count(),
+            'categories' => Category::query()->count(),
         ];
 
-        $recentUsers = User::latest()->take(5)->get();
-        $recentProducts = Product::latest()->take(5)->get();
+        $recentUsers = User::query()->latest()->take(5)->get();
+        $recentProducts = Product::query()->latest()->take(5)->get();
 
         return view('admin.dashboard', [
             'stats' => $stats,
@@ -38,79 +39,85 @@ class AdminController extends Controller
         ]);
     }
 
-    public function users(): View|RedirectResponse
+    public function users(Request $request): View|RedirectResponse
     {
-        $user = auth()->user();
+        $user = $request->user();
         if (! $user || ! method_exists($user, 'hasRole') || ! $user->hasRole('admin')) {
             return redirect()->route('home');
         }
 
-        $users = User::latest()->paginate(15);
+        $users = User::query()->latest()->paginate(15);
 
         return view('admin.users', [
             'users' => $users,
         ]);
     }
 
-    public function products(): View|RedirectResponse
+    public function products(Request $request): View|RedirectResponse
     {
-        $user = auth()->user();
+        $user = $request->user();
         if (! $user || ! method_exists($user, 'hasRole') || ! $user->hasRole('admin')) {
             return redirect()->route('home');
         }
 
-        $products = Product::latest()->paginate(20);
+        $products = Product::query()
+            ->with(['brand', 'category'])
+            ->latest()
+            ->paginate(20);
 
-        return view('admin.products', [
+        return view('admin.products.index', [
             'products' => $products,
         ]);
     }
 
-    public function brands(): View|RedirectResponse
+    public function brands(Request $request): View|RedirectResponse
     {
-        $user = auth()->user();
+        $user = $request->user();
         if (! $user || ! method_exists($user, 'hasRole') || ! $user->hasRole('admin')) {
             return redirect()->route('home');
         }
 
-        $brands = Brand::latest()->paginate(20);
+        $brands = Brand::query()->latest()->paginate(20);
 
-        return view('admin.brands', [
+        return view('admin.brands.index', [
             'brands' => $brands,
         ]);
     }
 
-    public function categories(): View|RedirectResponse
+    public function categories(Request $request): View|RedirectResponse
     {
-        $user = auth()->user();
+        $user = $request->user();
         if (! $user || ! method_exists($user, 'hasRole') || ! $user->hasRole('admin')) {
             return redirect()->route('home');
         }
 
-        $categories = Category::latest()->paginate(20);
+        $categories = Category::query()
+            ->withCount('products')
+            ->latest()
+            ->paginate(20);
 
-        return view('admin.categories', [
+        return view('admin.categories.index', [
             'categories' => $categories,
         ]);
     }
 
-    public function stores(): View|RedirectResponse
+    public function stores(Request $request): View|RedirectResponse
     {
-        $user = auth()->user();
+        $user = $request->user();
         if (! $user || ! method_exists($user, 'hasRole') || ! $user->hasRole('admin')) {
             return redirect()->route('home');
         }
 
-        $stores = Store::latest()->paginate(20);
+        $stores = Store::query()->latest()->paginate(20);
 
         return view('admin.stores', [
             'stores' => $stores,
         ]);
     }
 
-    public function toggleUserAdmin(User $user): RedirectResponse
+    public function toggleUserAdmin(Request $request, User $user): RedirectResponse
     {
-        $acting = auth()->user();
+        $acting = $request->user();
         if (! $acting || ! method_exists($acting, 'hasRole') || ! $acting->hasRole('admin')) {
             return redirect()->route('home');
         }
@@ -125,5 +132,51 @@ class AdminController extends Controller
         $user->save();
 
         return redirect()->route('admin.users')->with('status', 'User admin status updated.');
+    }
+
+    public function editProduct(Request $request, Product $product): View|RedirectResponse
+    {
+        $user = $request->user();
+        if (! $user || ! method_exists($user, 'hasRole') || ! $user->hasRole('admin')) {
+            return redirect()->route('home');
+        }
+
+        return view('admin.products.edit', [
+            'product' => $product,
+        ]);
+    }
+
+    public function updateProduct(Request $request, Product $product): RedirectResponse
+    {
+        $user = $request->user();
+        if (! $user || ! method_exists($user, 'hasRole') || ! $user->hasRole('admin')) {
+            return redirect()->route('home');
+        }
+
+        // Placeholder: edit functionality will be implemented later
+        return redirect()->route('admin.products.edit', $product)->with('status', 'Update endpoint ready. Editing to be implemented.');
+    }
+
+    public function editCategory(Request $request, Category $category): View|RedirectResponse
+    {
+        $user = $request->user();
+        if (! $user || ! method_exists($user, 'hasRole') || ! $user->hasRole('admin')) {
+            return redirect()->route('home');
+        }
+
+        return view('admin.categories.edit', [
+            'category' => $category,
+        ]);
+    }
+
+    public function updateCategory(Request $request, Category $category): RedirectResponse
+    {
+        $user = $request->user();
+        if (! $user || ! method_exists($user, 'hasRole') || ! $user->hasRole('admin')) {
+            return redirect()->route('home');
+        }
+
+        // Placeholder: edit functionality will be implemented later
+        return redirect()->route('admin.categories.edit', $category)->with('status', 'Update endpoint ready. Editing to be implemented.');
     }
 }

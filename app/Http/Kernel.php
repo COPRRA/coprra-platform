@@ -104,6 +104,7 @@ class Kernel extends HttpKernel
         'verified' => EnsureEmailIsVerified::class,
         'locale' => LocaleMiddleware::class,
         'admin' => AdminMiddleware::class,
+        'is_admin' => \App\Http\Middleware\IsAdmin::class,
     ];
 
     /**
