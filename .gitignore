@@ -447,6 +447,11 @@ apple_urls_for_gui.txt
 h =
 t == set origin (Owner PAT embedded) ==
 
+# Local temp and remaining prototypes
+.sudo_temp
+FINAL_APPLE_IMPORT_SERVER.php
+ProfileController_complete.php
+
 # Additional recovery artifacts and root-level test files
 AIControlPanelController_original.php
 AIServiceTest.php
