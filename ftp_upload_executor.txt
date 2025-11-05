@@ -1,0 +1,8 @@
+open 45.87.81.218
+user u990109832 Hamo1510@Rayan146
+cd /domains/coprra.com/public_html
+binary
+lcd C:\Users\Gaser\Desktop\COPRRA
+put execute_deployment.php
+dir execute_deployment.php
+bye

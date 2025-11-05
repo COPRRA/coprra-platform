@@ -136,6 +136,7 @@ Route::get('categories/{slug}', [CategoryController::class, 'show'])->name('cate
 // تغيير اللغة والعملة
 Route::get('language/{langCode}', [LocaleController::class, 'changeLanguage'])->name('change.language');
 Route::get('currency/{currencyCode}', [LocaleController::class, 'changeCurrency'])->name('change.currency');
+Route::get('country/{countryCode}', [LocaleController::class, 'changeCountry'])->name('change.country');
 
 // Contact page
 Route::get('contact', static function () {
@@ -145,6 +146,7 @@ Route::get('contact', static function () {
 // Locale switching routes
 Route::post('locale/language', [LocaleController::class, 'switchLanguage'])->name('locale.language');
 Route::post('locale/currency', [LocaleController::class, 'switchCurrency'])->name('locale.currency');
+Route::post('locale/country', [LocaleController::class, 'switchCountry'])->name('locale.country');
 
 // --- المسارات المحمية التي تتطلب تسجيل الدخول ---
 

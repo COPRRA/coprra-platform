@@ -38,6 +38,18 @@
                     </select>
                 </form>
 
+                <!-- Country Dropdown -->
+                <form method="POST" action="{{ route('locale.country') }}" class="inline-block">
+                    @csrf
+                    <select name="country" onchange="this.form.submit()" class="px-3 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        @foreach($countries as $country)
+                            <option value="{{ $country['code'] }}" {{ $country['is_current'] ? 'selected' : '' }}>
+                                {{ $country['flag'] ?? '' }} {{ $country['native_name'] ?? $country['name'] }}
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
+
                 <!-- Currency Dropdown -->
                 <form method="POST" action="{{ route('locale.currency') }}" class="inline-block">
                     @csrf

@@ -18,17 +18,19 @@ class ViewServiceProvider extends ServiceProvider
         'products.show' => [
             'parent_name' => 'Products',
             'parent_route' => 'products.index',
-            'param_name' => 'product',
+            // Routes use slug parameters; handle safely in composer
+            'param_name' => 'slug',
         ],
         'categories.show' => [
             'parent_name' => 'Categories',
             'parent_route' => 'categories.index',
-            'param_name' => 'category',
+            'param_name' => 'slug',
         ],
         'brands.show' => [
             'parent_name' => 'Brands',
             'parent_route' => 'brands.index',
-            'param_name' => 'brand',
+            // Use slug when brand show route is present
+            'param_name' => 'slug',
         ],
     ];
 
@@ -70,7 +72,7 @@ class ViewServiceProvider extends ServiceProvider
     /**
      * Get breadcrumbs for the current page.
      *
-     * @return array<int, array<string, string|* @method static \App\Models\Brand create(array<string, string|bool|null>>
+     * @return array<int, array<string, string|null>>
      */
     private function getBreadcrumbs(): array
     {
@@ -96,7 +98,7 @@ class ViewServiceProvider extends ServiceProvider
     /**
      * Add breadcrumbs based on the route configuration.
      *
-     * @param  array<int, array<string, string|* @method static \App\Models\Brand create(array<string, string|bool|null>>  $breadcrumbs
+     * @param  array<int, array<string, string|null>> $breadcrumbs
      * @param array<string, string> $config
      */
     private function addConfiguredBreadcrumbs(array &$breadcrumbs, Route $route, array $config): void
@@ -105,8 +107,18 @@ class ViewServiceProvider extends ServiceProvider
 
         $param = $route->parameter($config['param_name']);
 
-        if ($param && isset($param->name)) {
-            $breadcrumbs[] = ['name' => $param->name, 'url' => null];
+        // Support both object-bound params and simple slug/string params
+        $name = null;
+        if (\is_object($param) && isset($param->name)) {
+            /** @var object $param */
+            // @phpstan-ignore-next-line
+            $name = $param->name;
+        } elseif (\is_string($param) && $param !== '') {
+            $name = $param;
+        }
+
+        if (null !== $name) {
+            $breadcrumbs[] = ['name' => $name, 'url' => null];
         }
     }
 }

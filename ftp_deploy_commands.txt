@@ -1,0 +1,8 @@
+open 45.87.81.218
+user u990109832 Hamo1510@Rayan146
+cd /domains/coprra.com/public_html
+binary
+lcd C:\Users\Gaser\Desktop\COPRRA
+put deploy_critical_fixes.php
+dir deploy_critical_fixes.php
+bye

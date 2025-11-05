@@ -114,7 +114,20 @@
       "Bash(mv:*)",
       "Bash(git tag:*)",
       "Bash(sshpass -p 'Hamo1510@Rayan146' ssh -o StrictHostKeyChecking=no -p 65002 u990109832@45.87.81.218 \"echo ''SSH connection successful'' && pwd && hostname\")",
-      "Bash($env:PYTHONIOENCODING=\"utf-8\")"
+      "Bash($env:PYTHONIOENCODING=\"utf-8\")",
+      "Bash(sshpass:*)",
+      "WebFetch(domain:coprra.com)",
+      "Bash(ftp:*)",
+      "Bash(ssh -o StrictHostKeyChecking=no -p 65002 u990109832@45.87.81.218 \"echo ''SSH connection successful'' && pwd && whoami\")",
+      "Bash(ssh:*)",
+      "Bash(certutil:*)",
+      "Bash(nul)",
+      "Bash(for url in \"https://coprra.com/categories\" \"https://coprra.com/brands\")",
+      "Bash(do echo -n \"$url: \")",
+      "Bash(for url in \"https://coprra.com\" \"https://coprra.com/products\" \"https://coprra.com/categories\")",
+      "Bash(grep:*)",
+      "Bash(for url in \"https://coprra.com\" \"https://coprra.com/products\" \"https://coprra.com/categories\" \"https://coprra.com/brands\")",
+      "Bash(for file in brands/index.blade.php categories/index.blade.php home.blade.php welcome.blade.php)"
     ],
     "deny": [],
     "ask": []

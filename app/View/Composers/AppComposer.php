@@ -6,6 +6,7 @@ namespace App\View\Composers;
 
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\Country;
 use App\Models\Currency;
 use App\Models\Language;
 use Illuminate\Database\Eloquent\Builder;
@@ -25,6 +26,7 @@ final class AppComposer
         $view->with([
             'languages' => $this->getLanguages(),
             'currencies' => $this->getCurrencies(),
+            'countries' => $this->getCountries(),
             'categories' => $this->getCategories(),
             'brands' => $this->getBrands(),
             'isRTL' => $this->isRTL(),
@@ -83,6 +85,33 @@ final class AppComposer
         };
 
         return $this->getCachedData('currencies', Currency::class, $mapper, 'sort_order', 3600);
+    }
+
+    /**
+     * Get active countries.
+     *
+     * @return array<array<array<int|string>>>
+     *
+     * @psalm-return list<array<string, array<string, int|string|bool|null>>>
+     */
+    private function getCountries(): array
+    {
+        $currentCountry = session('locale_country', null);
+
+        /**
+         * @return array{code: string, name: string, native_name: string, flag?: string|null, is_current: bool}
+         */
+        $mapper = function (Country $country) use ($currentCountry): array {
+            return [
+                'code' => $country->code ?? '',
+                'name' => $country->name ?? '',
+                'native_name' => $country->native_name ?? '',
+                'flag' => $country->flag_emoji ?? null,
+                'is_current' => (null !== $currentCountry) && ($currentCountry === $country->code),
+            ];
+        };
+
+        return $this->getCachedData('countries', Country::class, $mapper, 'sort_order', 3600);
     }
 
     /**

@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\SwitchLanguageRequest;
 use App\Http\Requests\SwitchCurrencyRequest;
 use App\Models\Currency;
+use App\Models\Country;
 use App\Models\Language;
 use App\Models\UserLocaleSetting;
 use Illuminate\Http\RedirectResponse;
@@ -84,5 +85,36 @@ class LocaleController extends Controller
     {
         $currencyCode = (string) $request->input('currency');
         return $this->changeCurrency($request, $currencyCode);
+    }
+
+    /**
+     * Change application country via GET route: /country/{countryCode}
+     */
+    public function changeCountry(Request $request, string $countryCode): RedirectResponse
+    {
+        $country = Country::query()->where('code', $countryCode)->first();
+        if (!$country) {
+            return redirect()->back()->with('error', __('Invalid country'));
+        }
+
+        Session::put('locale_country', $country->code);
+
+        // Persist user preference when authenticated
+        if ($request->user()) {
+            $setting = UserLocaleSetting::firstOrNew(['user_id' => $request->user()->id]);
+            $setting->country_code = $country->code;
+            $setting->save();
+        }
+
+        return redirect()->back()->with('status', __('Country updated'));
+    }
+
+    /**
+     * Switch country via POST route: /locale/country
+     */
+    public function switchCountry(Request $request): RedirectResponse
+    {
+        $code = (string) ($request->input('country') ?? '');
+        return $this->changeCountry($request, $code);
     }
 }

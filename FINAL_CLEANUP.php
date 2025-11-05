@@ -63,38 +63,38 @@ try {
     require __DIR__.'/vendor/autoload.php';
     $app = require_once __DIR__.'/bootstrap/app.php';
     $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
-    
+
     echo "<div class='success'>✅ Laravel bootstrapped</div>";
-    
+
     // Read current .env file
     $envPath = __DIR__ . '/.env';
     if (file_exists($envPath)) {
         $envContent = file_get_contents($envPath);
-        
+
         // Check current debug status
         if (preg_match('/APP_DEBUG=(true|false)/', $envContent, $matches)) {
             $currentDebug = $matches[1];
             echo "<div class='warning'>Current APP_DEBUG: {$currentDebug}</div>";
-            
+
             if ($currentDebug === 'true') {
                 // Change to false
                 $newEnvContent = preg_replace('/APP_DEBUG=true/', 'APP_DEBUG=false', $envContent);
-                
+
                 if (file_put_contents($envPath, $newEnvContent)) {
                     echo "<div class='success'>✅ ✅ APP_DEBUG set to FALSE</div>";
-                    
+
                     // Clear config cache
                     \Illuminate\Support\Facades\Artisan::call('config:clear');
                     echo "<div class='success'>✅ Config cache cleared</div>";
-                    
+
                     \Illuminate\Support\Facades\Artisan::call('cache:clear');
                     echo "<div class='success'>✅ Application cache cleared</div>";
-                    
+
                     if (function_exists('opcache_reset')) {
                         opcache_reset();
                         echo "<div class='success'>✅ OPcache cleared</div>";
                     }
-                    
+
                     echo "<div class='success' style='font-size: 18px; margin-top: 20px;'>";
                     echo "🔒 DEBUG MODE DISABLED - Production is now secure!";
                     echo "</div>";
@@ -110,7 +110,7 @@ try {
     } else {
         echo "<div class='error'>❌ .env file not found</div>";
     }
-    
+
 } catch (\Exception $e) {
     echo "<div class='error'>❌ Error: " . htmlspecialchars($e->getMessage()) . "</div>";
 }
@@ -153,4 +153,3 @@ echo "<p style='color: #0f0; margin-top: 30px;'>Cleanup completed: " . date('Y-m
 
 </body>
 </html>
-
