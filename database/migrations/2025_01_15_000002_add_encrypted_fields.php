@@ -31,19 +31,19 @@ return new class extends Migration {
             Schema::table('stores', static function (Blueprint $table): void {
                 // Add encrypted fields for store sensitive data
                 if (! Schema::hasColumn('stores', 'encrypted_contact_person')) {
-                    $table->text('encrypted_contact_person')->nullable()->after('contact_person');
+                    $table->text('encrypted_contact_person')->nullable();
                 }
                 if (! Schema::hasColumn('stores', 'encrypted_contact_email')) {
-                    $table->text('encrypted_contact_email')->nullable()->after('contact_email');
+                    $table->text('encrypted_contact_email')->nullable();
                 }
                 if (! Schema::hasColumn('stores', 'encrypted_contact_phone')) {
-                    $table->text('encrypted_contact_phone')->nullable()->after('contact_phone');
+                    $table->text('encrypted_contact_phone')->nullable();
                 }
                 if (! Schema::hasColumn('stores', 'encrypted_address')) {
-                    $table->text('encrypted_address')->nullable()->after('address');
+                    $table->text('encrypted_address')->nullable();
                 }
                 if (! Schema::hasColumn('stores', 'encrypted_api_credentials')) {
-                    $table->text('encrypted_api_credentials')->nullable()->after('api_credentials');
+                    $table->text('encrypted_api_credentials')->nullable();
                 }
             });
         }
@@ -52,10 +52,10 @@ return new class extends Migration {
             Schema::table('price_offers', static function (Blueprint $table): void {
                 // Add encrypted fields for offer sensitive data
                 if (! Schema::hasColumn('price_offers', 'encrypted_offer_url')) {
-                    $table->text('encrypted_offer_url')->nullable()->after('offer_url');
+                    $table->text('encrypted_offer_url')->nullable();
                 }
                 if (! Schema::hasColumn('price_offers', 'encrypted_notes')) {
-                    $table->text('encrypted_notes')->nullable()->after('notes');
+                    $table->text('encrypted_notes')->nullable();
                 }
             });
         }
@@ -64,10 +64,10 @@ return new class extends Migration {
             Schema::table('reviews', static function (Blueprint $table): void {
                 // Add encrypted fields for review sensitive data
                 if (! Schema::hasColumn('reviews', 'encrypted_user_email')) {
-                    $table->text('encrypted_user_email')->nullable()->after('user_email');
+                    $table->text('encrypted_user_email')->nullable();
                 }
                 if (! Schema::hasColumn('reviews', 'encrypted_contact_info')) {
-                    $table->text('encrypted_contact_info')->nullable()->after('contact_info');
+                    $table->text('encrypted_contact_info')->nullable();
                 }
             });
         }
