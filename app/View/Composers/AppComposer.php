@@ -68,18 +68,19 @@ final class AppComposer
     {
         $currentCurrency = session('currency', config('app.default_currency', 'USD'));
 
-        $mapper
-            /**
-             * @return array<string|bool>
-             *
-             * @psalm-return array{code: string, name: string, symbol: string, is_current: bool}
-             */
-            = fn(Currency $currency) use ($currentCurrency): array => [
+        /**
+         * @return array<string|bool>
+         *
+         * @psalm-return array{code: string, name: string, symbol: string, is_current: bool}
+         */
+        $mapper = function (Currency $currency) use ($currentCurrency): array {
+            return [
                 'code' => $currency->code ?? '',
                 'name' => $currency->name ?? '',
                 'symbol' => $currency->symbol ?? '',
                 'is_current' => $currentCurrency === $currency->code,
             ];
+        };
 
         return $this->getCachedData('currencies', Currency::class, $mapper, 'sort_order', 3600);
     }
