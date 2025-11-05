@@ -85,7 +85,7 @@
                             @endif
                             <h6 class="card-title">{{ $catName }}</h6>
                             <p class="card-text small text-muted">{{ $catCount }} products</p>
-                            <a href="{{ route('categories.show', $category) }}" class="btn btn-outline-primary btn-sm">Browse</a>
+                            <a href="{{ route('categories.show', is_array($category) ? ($category['slug'] ?? '') : ($category->slug ?? '')) }}" class="btn btn-outline-primary btn-sm">Browse</a>
                         </div>
                     </div>
                 </div>
