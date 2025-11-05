@@ -265,49 +265,52 @@ class MigrateDataFromSqlite extends Command
         $records = $this->sqlite->query('SELECT * FROM products')->fetchAll(PDO::FETCH_ASSOC);
         $count = 0;
 
-        foreach ($records as $record) {
-            if (! $this->dryRun) {
-                // Get brand_id and category_id if they exist
-                $brandId = null;
-                if (isset($record['brand_id'])) {
-                    $brand = Brand::find($record['brand_id']);
-                    $brandId = $brand?->id;
-                }
+        // Disable model events to prevent cache clearing issues during migration
+        Product::withoutEvents(function () use ($records, &$count) {
+            foreach ($records as $record) {
+                if (! $this->dryRun) {
+                    // Get brand_id and category_id if they exist
+                    $brandId = null;
+                    if (isset($record['brand_id'])) {
+                        $brand = Brand::find($record['brand_id']);
+                        $brandId = $brand?->id;
+                    }
 
-                $categoryId = null;
-                if (isset($record['category_id'])) {
-                    $category = Category::find($record['category_id']);
-                    $categoryId = $category?->id;
-                }
+                    $categoryId = null;
+                    if (isset($record['category_id'])) {
+                        $category = Category::find($record['category_id']);
+                        $categoryId = $category?->id;
+                    }
 
-                Product::updateOrCreate(
-                    ['slug' => $record['slug']],
-                    [
-                        'name' => $record['name'],
-                        'description' => $record['description'] ?? null,
-                        'long_description' => $record['long_description'] ?? null,
-                        'sku' => $record['sku'] ?? null,
-                        'barcode' => $record['barcode'] ?? null,
-                        'brand_id' => $brandId,
-                        'category_id' => $categoryId,
-                        'current_price' => $record['current_price'] ?? 0,
-                        'original_price' => $record['original_price'] ?? null,
-                        'image_url' => $record['image_url'] ?? null,
-                        'images' => $record['images'] ?? null,
-                        'specifications' => $record['specifications'] ?? null,
-                        'features' => $record['features'] ?? null,
-                        'is_active' => $record['is_active'] ?? true,
-                        'is_featured' => $record['is_featured'] ?? false,
-                        'stock_status' => $record['stock_status'] ?? 'in_stock',
-                        'view_count' => $record['view_count'] ?? 0,
-                        'average_rating' => $record['average_rating'] ?? null,
-                        'created_at' => $record['created_at'] ?? now(),
-                        'updated_at' => $record['updated_at'] ?? now(),
-                    ]
-                );
+                    Product::updateOrCreate(
+                        ['slug' => $record['slug']],
+                        [
+                            'name' => $record['name'],
+                            'description' => $record['description'] ?? null,
+                            'long_description' => $record['long_description'] ?? null,
+                            'sku' => $record['sku'] ?? null,
+                            'barcode' => $record['barcode'] ?? null,
+                            'brand_id' => $brandId,
+                            'category_id' => $categoryId,
+                            'current_price' => $record['current_price'] ?? 0,
+                            'original_price' => $record['original_price'] ?? null,
+                            'image_url' => $record['image_url'] ?? null,
+                            'images' => $record['images'] ?? null,
+                            'specifications' => $record['specifications'] ?? null,
+                            'features' => $record['features'] ?? null,
+                            'is_active' => $record['is_active'] ?? true,
+                            'is_featured' => $record['is_featured'] ?? false,
+                            'stock_status' => $record['stock_status'] ?? 'in_stock',
+                            'view_count' => $record['view_count'] ?? 0,
+                            'average_rating' => $record['average_rating'] ?? null,
+                            'created_at' => $record['created_at'] ?? now(),
+                            'updated_at' => $record['updated_at'] ?? now(),
+                        ]
+                    );
+                }
+                ++$count;
             }
-            ++$count;
-        }
+        });
 
         $this->migrated += $count;
         $this->info("✅ Migrated {$count} products");
