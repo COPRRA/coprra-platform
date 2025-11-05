@@ -216,6 +216,19 @@ class Product extends Model
         return $query;
     }
 
+    // --- Accessors & Mutators ---
+
+    /**
+     * Get the product image URL.
+     * Falls back to image_url if image is not set.
+     *
+     * @return string|null
+     */
+    public function getImageAttribute(?string $value): ?string
+    {
+        return $value ?: $this->attributes['image_url'] ?? null;
+    }
+
     // --- طرق مساعدة ---
 
     /**
