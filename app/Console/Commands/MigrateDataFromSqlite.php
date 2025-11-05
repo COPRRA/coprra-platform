@@ -214,13 +214,23 @@ class MigrateDataFromSqlite extends Command
         $records = $this->sqlite->query('SELECT * FROM stores')->fetchAll(PDO::FETCH_ASSOC);
         $count = 0;
 
+        // Get default currency (USD or first available) for stores without currency
+        $defaultCurrency = Currency::where('code', 'USD')->first() ?? Currency::first();
+
+        if (! $defaultCurrency) {
+            $this->error('No currencies found in database. Please migrate currencies first.');
+            return;
+        }
+
         foreach ($records as $record) {
             if (! $this->dryRun) {
-                // Get currency_id from currencies table if it exists
-                $currencyId = null;
+                // Get currency_id from currencies table if it exists, otherwise use default
+                $currencyId = $defaultCurrency->id;
                 if (isset($record['currency_id'])) {
                     $currency = Currency::find($record['currency_id']);
-                    $currencyId = $currency?->id;
+                    if ($currency) {
+                        $currencyId = $currency->id;
+                    }
                 }
 
                 Store::updateOrCreate(
