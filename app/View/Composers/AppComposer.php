@@ -24,11 +24,11 @@ final class AppComposer
     public function compose(View $view): void
     {
         $view->with([
-            'languages' => $this->getLanguages(),
-            'currencies' => $this->getCurrencies(),
-            'countries' => $this->getCountries(),
-            'categories' => $this->getCategories(),
-            'brands' => $this->getBrands(),
+            'navLanguages' => $this->getLanguages(),
+            'navCurrencies' => $this->getCurrencies(),
+            'navCountries' => $this->getCountries(),
+            'navCategories' => $this->getCategories(),
+            'navBrands' => $this->getBrands(),
             'isRTL' => $this->isRTL(),
         ]);
     }

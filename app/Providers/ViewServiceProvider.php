@@ -51,7 +51,8 @@ class ViewServiceProvider extends ServiceProvider
 
     private function registerGlobalComposers(): void
     {
-        View::composer('*', AppComposer::class);
+        // Limit global data to navigation to avoid variable collisions in page views
+        View::composer(['layouts.navigation'], AppComposer::class);
     }
 
     private function registerLayoutComposers(): void

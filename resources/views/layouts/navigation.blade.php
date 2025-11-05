@@ -27,10 +27,11 @@
             <!-- Right Side Of Navbar -->
             <div class="hidden md:flex items-center space-x-4">
                 <!-- Language Dropdown -->
+                @php($navLanguages = $navLanguages ?? [])
                 <form method="POST" action="{{ route('locale.language') }}" class="inline-block">
                     @csrf
                     <select name="language" onchange="this.form.submit()" class="px-3 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        @foreach($languages as $language)
+                        @foreach($navLanguages as $language)
                             <option value="{{ $language['code'] }}" {{ $language['is_current'] ? 'selected' : '' }}>
                                 {{ $language['native_name'] }}
                             </option>
@@ -39,12 +40,12 @@
                 </form>
 
                 <!-- Country Dropdown -->
-                @php($countries = $countries ?? [])
-                @if(is_array($countries) && count($countries) > 0)
+                @php($navCountries = $navCountries ?? [])
+                @if(is_array($navCountries) && count($navCountries) > 0)
                 <form method="POST" action="{{ route('locale.country') }}" class="inline-block">
                     @csrf
                     <select name="country" onchange="this.form.submit()" class="px-3 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        @foreach($countries as $country)
+                        @foreach($navCountries as $country)
                             <option value="{{ $country['code'] }}" {{ $country['is_current'] ? 'selected' : '' }}>
                                 {{ $country['flag'] ?? '' }} {{ $country['native_name'] ?? $country['name'] }}
                             </option>
@@ -54,10 +55,11 @@
                 @endif
 
                 <!-- Currency Dropdown -->
+                @php($navCurrencies = $navCurrencies ?? [])
                 <form method="POST" action="{{ route('locale.currency') }}" class="inline-block">
                     @csrf
                     <select name="currency" onchange="this.form.submit()" class="px-3 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        @foreach($currencies as $currency)
+                        @foreach($navCurrencies as $currency)
                             <option value="{{ $currency['code'] }}" {{ $currency['is_current'] ? 'selected' : '' }}>
                                 {{ $currency['symbol'] }} {{ $currency['code'] }}
                             </option>
