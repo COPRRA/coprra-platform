@@ -46,4 +46,38 @@ if (is_readable($logPath)) {
 echo "<h2>🌐 اختبار الاتصال</h2>";
 echo "<p>✅ الموقع يعمل!</p>";
 echo "<p><a href='/' style='background:#007cba;color:white;padding:10px;text-decoration:none;'>🏠 الصفحة الرئيسية</a></p>";
+
+// --- Maintenance Actions ---
+echo "<h2>🛠 إجراءات الصيانة</h2>";
+$action = $_GET['action'] ?? '';
+if ($action === 'purge_views') {
+    $viewsDir = __DIR__ . '/storage/framework/views';
+    $deleted = 0;
+    if (is_dir($viewsDir)) {
+        foreach (glob($viewsDir . '/*.php') as $viewFile) {
+            if (@unlink($viewFile)) { $deleted++; }
+        }
+    }
+    echo "<p>🧹 تم حذف ملفات Blade المترجمة: {$deleted}</p>";
+}
+
+if ($action === 'reset_opcache') {
+    if (function_exists('opcache_reset')) {
+        opcache_reset();
+        echo "<p>♻️ تم إعادة ضبط OPcache بنجاح.</p>";
+    } else {
+        echo "<p>⚠️ OPcache غير مفعّل.</p>";
+    }
+}
+
+if ($action === 'clear_caches') {
+    $out = @shell_exec('php artisan optimize:clear 2>&1');
+    echo "<pre style='background:#fff;padding:10px;border:1px solid #ddd;'>" . htmlspecialchars($out ?? 'No output') . "</pre>";
+}
+
+echo "<p>روابط سريعة: ";
+echo "<a href='?action=purge_views'>🧹 حذف القوالب المترجمة</a> | ";
+echo "<a href='?action=reset_opcache'>♻️ إعادة ضبط OPcache</a> | ";
+echo "<a href='?action=clear_caches'>🧯 Laravel optimize:clear</a>";
+echo "</p>";
 ?>
