@@ -47,7 +47,7 @@
     <!-- Alpine.js (local) - include only when a view declares 'alpine' section -->
     @hasSection('alpine')
     <script defer src="{{ asset('vendor/alpinejs/alpine.min.js') }}"></script>
-    @endhasSection
+    @endif
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
