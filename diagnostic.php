@@ -80,4 +80,28 @@ echo "<a href='?action=purge_views'>🧹 حذف القوالب المترجمة<
 echo "<a href='?action=reset_opcache'>♻️ إعادة ضبط OPcache</a> | ";
 echo "<a href='?action=clear_caches'>🧯 Laravel optimize:clear</a>";
 echo "</p>";
+
+// --- View file insights ---
+echo "<h2>🧩 فحص ملفات القوالب (Blade)</h2>";
+$viewFiles = [
+    __DIR__ . '/resources/views/brands/index.blade.php',
+    __DIR__ . '/resources/views/brands/index_clean.blade.php',
+    __DIR__ . '/resources/views/categories/index.blade.php',
+    __DIR__ . '/resources/views/categories/index_clean.blade.php',
+    __DIR__ . '/resources/views/welcome.blade.php',
+];
+foreach ($viewFiles as $vf) {
+    echo '<div style="background:#fff;padding:10px;border:1px solid #ddd;margin-bottom:10px">';
+    echo '<strong>' . htmlspecialchars(str_replace(__DIR__.'/', '', $vf)) . '</strong><br/>';
+    if (is_readable($vf)) {
+        echo 'mtime: ' . date('c', filemtime($vf)) . '<br/>';
+        $content = @file_get_contents($vf);
+        $lines = explode("\n", (string)$content);
+        $preview = array_slice($lines, 0, 20);
+        echo '<pre>' . htmlspecialchars(implode("\n", $preview)) . '</pre>';
+    } else {
+        echo '⚠️ غير قابل للقراءة.';
+    }
+    echo '</div>';
+}
 ?>
