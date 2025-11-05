@@ -11,6 +11,18 @@
         @if(isset($brands) && count($brands))
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 @foreach($brands as $brand)
+                    @php
+                        // Normalize array to object for legacy compiled views safety
+                        if (is_array($brand)) {
+                            $tmp = (object) $brand;
+                            $tmp->logo_url = $brand['logo'] ?? ($brand['logo_url'] ?? null);
+                            $tmp->name = $brand['name'] ?? '';
+                            $tmp->description = $brand['description'] ?? null;
+                            $tmp->products_count = $brand['products_count'] ?? 0;
+                            $tmp->website_url = $brand['website_url'] ?? null;
+                            $brand = $tmp;
+                        }
+                    @endphp
                     @php($brandLogo = is_array($brand) ? ($brand['logo'] ?? null) : ($brand->logo_url ?? null))
                     @php($brandName = is_array($brand) ? ($brand['name'] ?? '') : ($brand->name ?? ''))
                     @php($brandDesc = is_array($brand) ? ($brand['description'] ?? null) : ($brand->description ?? null))

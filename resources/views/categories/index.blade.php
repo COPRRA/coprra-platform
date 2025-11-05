@@ -11,6 +11,16 @@
         @if(isset($categories) && count($categories))
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 @foreach($categories as $category)
+                    @php
+                        if (is_array($category)) {
+                            $tmp = (object) $category;
+                            $tmp->image_url = $category['image_url'] ?? null;
+                            $tmp->name = $category['name'] ?? '';
+                            $tmp->slug = $category['slug'] ?? '';
+                            $tmp->products_count = $category['products_count'] ?? 0;
+                            $category = $tmp;
+                        }
+                    @endphp
                     @php($catImage = is_array($category) ? ($category['image_url'] ?? null) : ($category->image_url ?? null))
                     @php($catName = is_array($category) ? ($category['name'] ?? '') : ($category->name ?? ''))
                     @php($catSlug = is_array($category) ? ($category['slug'] ?? '') : ($category->slug ?? ''))
