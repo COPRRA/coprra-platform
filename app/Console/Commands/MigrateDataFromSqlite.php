@@ -240,7 +240,7 @@ class MigrateDataFromSqlite extends Command
                         'description' => $record['description'] ?? null,
                         'logo_url' => $record['logo_url'] ?? null,
                         'website_url' => $record['website_url'] ?? null,
-                        'country_code' => $record['country_code'] ?? null,
+                        'country_code' => $record['country_code'] ?? 'US',
                         'is_active' => $record['is_active'] ?? true,
                         'priority' => $record['priority'] ?? 0,
                         'affiliate_base_url' => $record['affiliate_base_url'] ?? null,
