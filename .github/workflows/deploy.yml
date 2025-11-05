@@ -1,0 +1,62 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare SSH key
+        shell: bash
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          # Optionally trust host to avoid interactive prompt
+          echo "45.87.81.218,45.87.81.218 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA" >> ~/.ssh/known_hosts || true
+
+      - name: Deploy over SSH
+        shell: bash
+        run: |
+          ssh -i ~/.ssh/id_rsa -p 65002 -o StrictHostKeyChecking=no u990109832@45.87.81.218 << 'EOF'
+          set -euo pipefail
+          cd /home/u990109832/domains/coprra.com/public_html
+
+          echo "Pulling latest code..."
+          git pull origin main
+
+          echo "Installing PHP dependencies (no-dev)..."
+          composer install --no-dev --prefer-dist --no-interaction
+
+          echo "Clearing caches..."
+          php artisan optimize:clear
+
+          echo "Rebuilding caches..."
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+
+          echo "Running migrations..."
+          php artisan migrate --force
+          EOF
+
+      - name: Health check
+        shell: bash
+        run: |
+          echo "Running health check..."
+          curl --fail --silent --show-error https://coprra.com/api/health > /dev/null
+          echo "Health OK"
+
