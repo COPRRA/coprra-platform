@@ -32,8 +32,8 @@
                     @csrf
                     <select name="language" onchange="this.form.submit()" class="px-3 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         @foreach($navLanguages as $language)
-                            <option value="{{ $language['code'] }}" {{ $language['is_current'] ? 'selected' : '' }}>
-                                {{ $language['native_name'] }}
+                            <option value="{{ $language->code }}" {{ $language->is_current ? 'selected' : '' }}>
+                                {{ $language->native_name }}
                             </option>
                         @endforeach
                     </select>
@@ -46,8 +46,8 @@
                     @csrf
                     <select name="country" onchange="this.form.submit()" class="px-3 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         @foreach($navCountries as $country)
-                            <option value="{{ $country['code'] }}" {{ $country['is_current'] ? 'selected' : '' }}>
-                                {{ $country['flag'] ?? '' }} {{ $country['native_name'] ?? $country['name'] }}
+                            <option value="{{ $country->code }}" {{ $country->is_current ? 'selected' : '' }}>
+                                {{ $country->flag ?? '' }} {{ $country->native_name ?? $country->name }}
                             </option>
                         @endforeach
                     </select>
@@ -60,8 +60,8 @@
                     @csrf
                     <select name="currency" onchange="this.form.submit()" class="px-3 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         @foreach($navCurrencies as $currency)
-                            <option value="{{ $currency['code'] }}" {{ $currency['is_current'] ? 'selected' : '' }}>
-                                {{ $currency['symbol'] }} {{ $currency['code'] }}
+                            <option value="{{ $currency->code }}" {{ $currency->is_current ? 'selected' : '' }}>
+                                {{ $currency->symbol }} {{ $currency->code }}
                             </option>
                         @endforeach
                     </select>
