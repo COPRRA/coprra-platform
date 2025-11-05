@@ -53,6 +53,9 @@ jobs:
           # Optionally precompile views; comment out if causing stale caches
           # php artisan view:cache
 
+          echo "Resetting OPcache..."
+          php -r 'function_exists("opcache_reset") ? opcache_reset() : null;'
+
           echo "Running migrations..."
           php artisan migrate --force
           EOF
