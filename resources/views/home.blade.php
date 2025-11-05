@@ -29,7 +29,7 @@
                     <p class="text-muted">No featured products available.</p>
                     @endif
 
-                    @if(isset($categories) && $categories->count() > 0)
+                    @if(isset($categories) && count($categories) > 0)
                     <h5 class="mt-4">Categories</h5>
                     <div class="row">
                         @foreach($categories as $category)
@@ -45,7 +45,7 @@
                     </div>
                     @endif
 
-                    @if(isset($brands) && $brands->count() > 0)
+                    @if(isset($brands) && count($brands) > 0)
                     <h5 class="mt-4">Brands</h5>
                     <div class="row">
                         @foreach($brands as $brand)

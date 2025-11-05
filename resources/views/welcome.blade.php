@@ -66,7 +66,7 @@
     @endif
 
     <!-- Categories -->
-    @if(isset($categories) && $categories->count() > 0)
+    @if(isset($categories) && count($categories) > 0)
     <section class="py-5 bg-light">
         <div class="container">
             <h2 class="text-center mb-5">Shop by Category</h2>
@@ -93,7 +93,7 @@
     @endif
 
     <!-- Brands -->
-    @if(isset($brands) && $brands->count() > 0)
+    @if(isset($brands) && count($brands) > 0)
     <section class="py-5">
         <div class="container">
             <h2 class="text-center mb-5">Popular Brands</h2>
