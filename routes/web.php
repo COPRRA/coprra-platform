@@ -201,7 +201,7 @@ Route::middleware('auth')->group(static function (): void {
 
 // --- Admin Routes (تتطلب صلاحيات إدارية) ---
 
-Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(static function (): void {
+Route::middleware(['auth', \App\Http\Middleware\IsAdmin::class])->prefix('admin')->name('admin.')->group(static function (): void {
     // Root admin route - redirect to dashboard
     Route::get('/', fn () => redirect()->route('admin.dashboard'));
 

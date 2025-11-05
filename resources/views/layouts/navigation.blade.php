@@ -39,6 +39,8 @@
                 </form>
 
                 <!-- Country Dropdown -->
+                @php($countries = $countries ?? [])
+                @if(is_array($countries) && count($countries) > 0)
                 <form method="POST" action="{{ route('locale.country') }}" class="inline-block">
                     @csrf
                     <select name="country" onchange="this.form.submit()" class="px-3 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -49,6 +51,7 @@
                         @endforeach
                     </select>
                 </form>
+                @endif
 
                 <!-- Currency Dropdown -->
                 <form method="POST" action="{{ route('locale.currency') }}" class="inline-block">
