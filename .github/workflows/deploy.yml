@@ -49,6 +49,8 @@ jobs:
           php artisan config:cache
           php artisan route:cache
           # Force clear compiled Blade views to avoid stale templates
+          echo "Removing compiled Blade files..."
+          rm -f storage/framework/views/*.php || true
           php artisan view:clear
           # Optionally precompile views; comment out if causing stale caches
           # php artisan view:cache
