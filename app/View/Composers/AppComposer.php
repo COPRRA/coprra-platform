@@ -6,6 +6,7 @@ namespace App\View\Composers;
 
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\Currency;
 use App\Models\Language;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -23,6 +24,7 @@ final class AppComposer
     {
         $view->with([
             'languages' => $this->getLanguages(),
+            'currencies' => $this->getCurrencies(),
             'categories' => $this->getCategories(),
             'brands' => $this->getBrands(),
             'isRTL' => $this->isRTL(),
@@ -53,6 +55,33 @@ final class AppComposer
             ];
 
         return $this->getCachedData('languages', Language::class, $mapper, 'sort_order', 3600);
+    }
+
+    /**
+     * Get active currencies.
+     *
+     * @return array<array<array<int|string>>>
+     *
+     * @psalm-return list<array<string, array<string, int|string>>>
+     */
+    private function getCurrencies(): array
+    {
+        $currentCurrency = session('currency', config('app.default_currency', 'USD'));
+
+        $mapper
+            /**
+             * @return array<string|bool>
+             *
+             * @psalm-return array{code: string, name: string, symbol: string, is_current: bool}
+             */
+            = static fn(Currency $currency) use ($currentCurrency): array => [
+                'code' => $currency->code ?? '',
+                'name' => $currency->name ?? '',
+                'symbol' => $currency->symbol ?? '',
+                'is_current' => $currentCurrency === $currency->code,
+            ];
+
+        return $this->getCachedData('currencies', Currency::class, $mapper, 'sort_order', 3600);
     }
 
     /**

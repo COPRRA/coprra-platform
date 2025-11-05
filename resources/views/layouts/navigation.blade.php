@@ -26,6 +26,30 @@
 
             <!-- Right Side Of Navbar -->
             <div class="hidden md:flex items-center space-x-4">
+                <!-- Language Dropdown -->
+                <form method="POST" action="{{ route('locale.language') }}" class="inline-block">
+                    @csrf
+                    <select name="language" onchange="this.form.submit()" class="px-3 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        @foreach($languages as $language)
+                            <option value="{{ $language['code'] }}" {{ $language['is_current'] ? 'selected' : '' }}>
+                                {{ $language['native_name'] }}
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
+
+                <!-- Currency Dropdown -->
+                <form method="POST" action="{{ route('locale.currency') }}" class="inline-block">
+                    @csrf
+                    <select name="currency" onchange="this.form.submit()" class="px-3 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        @foreach($currencies as $currency)
+                            <option value="{{ $currency['code'] }}" {{ $currency['is_current'] ? 'selected' : '' }}>
+                                {{ $currency['symbol'] }} {{ $currency['code'] }}
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
+
                 @guest
                     <a href="{{ route('login') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
                         <i class="fas fa-sign-in-alt mr-2"></i> Log in
