@@ -336,7 +336,6 @@ class MigrateDataFromSqlite extends Command
                         [
                             'product_id' => $product->id,
                             'store_id' => $store->id,
-                            'url' => $record['url'] ?? '',
                         ],
                         [
                             'price' => $record['price'],
