@@ -1,38 +1,61 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $category->name ?? 'Category' }}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        body{font-family:Inter,system-ui,Arial,sans-serif;margin:2rem;color:#111}
-        .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-top:1rem}
-        .card{border:1px solid #e5e7eb;border-radius:8px;padding:12px}
-        a{color:#2563eb;text-decoration:none}
-    </style>
-    </head>
-<body>
-    <a href="{{ route('categories.index') }}">← Back to categories</a>
-    <h1>{{ $category->name }}</h1>
-    @if(!empty($category->description))
-        <p>{{ $category->description }}</p>
-    @endif
+@extends('layouts.app')
 
-    @if(isset($products) && $products->count())
-        <h2>Products</h2>
-        <div class="grid">
-            @foreach($products as $product)
-                <article class="card">
-                    <h3><a href="{{ route('products.show', $product->slug) }}">{{ $product->name }}</a></h3>
-                </article>
-            @endforeach
+@section('title', ($category->name ?? 'Category') . ' - ' . config('app.name'))
+@section('description', $category->description ?? 'Browse products in this category')
+
+@section('content')
+<div class="py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <a href="{{ route('categories.index') }}" class="inline-flex items-center text-blue-600 dark:text-blue-400 hover:underline mb-6">
+            <i class="fas fa-arrow-left mr-2"></i> Back to categories
+        </a>
+
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">{{ $category->name }}</h1>
+            @if($category->description)
+                <p class="text-gray-600 dark:text-gray-400">{{ $category->description }}</p>
+            @endif
         </div>
-        {{ $products->links() }}
-    @else
-        <p>No products in this category.</p>
-    @endif
-</body>
-</html>
+
+        @if(isset($products) && $products->count())
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                @foreach($products as $product)
+                    <article class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+                        @if($product->image)
+                            <img src="{{ $product->image }}" alt="{{ $product->name }}" class="w-full h-48 object-cover">
+                        @else
+                            <div class="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                <i class="fas fa-image fa-3x text-gray-400"></i>
+                            </div>
+                        @endif
+
+                        <div class="p-4">
+                            <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                                <a href="{{ route('products.show', $product->slug) }}" class="hover:text-blue-600 dark:hover:text-blue-400">
+                                    {{ $product->name }}
+                                </a>
+                            </h2>
+                            @if(!is_null($product->price))
+                                <div class="text-xl font-bold text-blue-600 dark:text-blue-400">
+                                    ${{ number_format((float)$product->price, 2) }}
+                                </div>
+                            @endif
+                        </div>
+                    </article>
+                @endforeach
+            </div>
+
+            @if(method_exists($products, 'links'))
+                <div class="mt-8">
+                    {{ $products->links() }}
+                </div>
+            @endif
+        @else
+            <div class="text-center py-12">
+                <i class="fas fa-box-open fa-4x text-gray-300 dark:text-gray-600 mb-4"></i>
+                <p class="text-gray-600 dark:text-gray-400 text-lg">No products in this category yet.</p>
+            </div>
+        @endif
+    </div>
+</div>
+@endsection

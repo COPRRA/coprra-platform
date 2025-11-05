@@ -1,48 +1,61 @@
 <nav class="bg-white dark:bg-gray-800 shadow">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex">
-                <!-- Logo -->
-                <div class="shrink-0 flex items-center">
-                    <a href="{{ route('home') }}" class="text-xl font-bold text-gray-800 dark:text-white">
-                        {{ config('app.name', 'COPRRA') }}
-                    </a>
-                </div>
+        <div class="flex justify-between items-center h-16">
+            <!-- Logo -->
+            <div class="shrink-0 flex items-center">
+                <a href="{{ route('home') }}" class="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                    {{ config('app.name', 'COPRRA') }}
+                </a>
+            </div>
 
-                <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <a href="{{ route('home') }}" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
-                        Home
-                    </a>
-                    <a href="{{ route('categories.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
-                        Categories
-                    </a>
-                    <a href="{{ route('products.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
-                        Products
-                    </a>
-                    <a href="{{ route('brands.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
-                        Brands
-                    </a>
-                </div>
+            <!-- Centered Navigation Links -->
+            <div class="hidden md:flex space-x-8 absolute left-1/2 transform -translate-x-1/2">
+                <a href="{{ route('home') }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition duration-150 ease-in-out {{ request()->routeIs('home') ? 'text-blue-600 dark:text-blue-400 font-semibold' : '' }}">
+                    <i class="fas fa-home mr-2"></i> Home
+                </a>
+                <a href="{{ route('categories.index') }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition duration-150 ease-in-out {{ request()->routeIs('categories.*') ? 'text-blue-600 dark:text-blue-400 font-semibold' : '' }}">
+                    <i class="fas fa-tags mr-2"></i> Categories
+                </a>
+                <a href="{{ route('products.index') }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition duration-150 ease-in-out {{ request()->routeIs('products.*') ? 'text-blue-600 dark:text-blue-400 font-semibold' : '' }}">
+                    <i class="fas fa-box mr-2"></i> Products
+                </a>
+                <a href="{{ route('brands.index') }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition duration-150 ease-in-out {{ request()->routeIs('brands.*') ? 'text-blue-600 dark:text-blue-400 font-semibold' : '' }}">
+                    <i class="fas fa-building mr-2"></i> Brands
+                </a>
             </div>
 
             <!-- Right Side Of Navbar -->
-            <div class="hidden sm:flex sm:items-center sm:ml-6">
+            <div class="hidden md:flex items-center space-x-4">
                 @guest
-                    <a href="{{ route('login') }}" class="text-sm text-gray-700 dark:text-gray-500 underline">Log in</a>
-                    <a href="{{ route('register') }}" class="ml-4 text-sm text-gray-700 dark:text-gray-500 underline">Register</a>
+                    <a href="{{ route('login') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                        <i class="fas fa-sign-in-alt mr-2"></i> Log in
+                    </a>
+                    <a href="{{ route('register') }}" class="inline-flex items-center px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                        <i class="fas fa-user-plus mr-2"></i> Register
+                    </a>
                 @else
-                    <div class="ml-3 relative">
-                        <div class="flex items-center space-x-4">
-                            <span class="text-sm text-gray-700 dark:text-gray-300">{{ Auth::user()->name }}</span>
-                            <a href="{{ route('profile.edit') }}" class="text-sm text-gray-700 dark:text-gray-500 underline">Profile</a>
-                            <form method="POST" action="{{ route('logout') }}" class="inline">
-                                @csrf
-                                <button type="submit" class="text-sm text-gray-700 dark:text-gray-500 underline">Log Out</button>
-                            </form>
-                        </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-sm text-gray-700 dark:text-gray-300">
+                            <i class="fas fa-user mr-1"></i> {{ Auth::user()->name }}
+                        </span>
+                        <a href="{{ route('profile.edit') }}" class="text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
+                            <i class="fas fa-cog mr-1"></i> Profile
+                        </a>
+                        <form method="POST" action="{{ route('logout') }}" class="inline">
+                            @csrf
+                            <button type="submit" class="text-sm text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400">
+                                <i class="fas fa-sign-out-alt mr-1"></i> Log Out
+                            </button>
+                        </form>
                     </div>
                 @endguest
+            </div>
+
+            <!-- Mobile menu button -->
+            <div class="md:hidden">
+                <button type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700" aria-label="Main menu">
+                    <i class="fas fa-bars fa-lg"></i>
+                </button>
             </div>
         </div>
     </div>

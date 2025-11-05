@@ -1,42 +1,95 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $product->name ?? 'Product' }}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        body{font-family:Inter,system-ui,Arial,sans-serif;margin:2rem;color:#111}
-        .price{color:#0f766e}
-        .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-top:1rem}
-        .card{border:1px solid #e5e7eb;border-radius:8px;padding:12px}
-        a{color:#2563eb;text-decoration:none}
-    </style>
-    </head>
-<body>
-    <a href="{{ route('products.index') }}">← Back to products</a>
-    <h1>{{ $product->name }}</h1>
-    @if(!is_null($product->price))
-        <div class="price">${{ number_format((float)$product->price, 2) }}</div>
-    @endif
-    @if(!empty($product->description))
-        <p>{{ $product->description }}</p>
-    @endif
+@extends('layouts.app')
 
-    @if(isset($relatedProducts) && $relatedProducts->count())
-        <h2>Related Products</h2>
-        <div class="grid">
-            @foreach($relatedProducts as $rp)
-                <article class="card">
-                    <h3><a href="{{ route('products.show', $rp->slug) }}">{{ $rp->name }}</a></h3>
-                    @if(!is_null($rp->price))
-                        <div class="price">${{ number_format((float)$rp->price, 2) }}</div>
+@section('title', ($product->name ?? 'Product') . ' - ' . config('app.name'))
+@section('description', $product->description ?? 'View product details')
+
+@section('content')
+<div class="py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <a href="{{ route('products.index') }}" class="inline-flex items-center text-blue-600 dark:text-blue-400 hover:underline mb-6">
+            <i class="fas fa-arrow-left mr-2"></i> Back to products
+        </a>
+
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+            <div class="grid md:grid-cols-2 gap-8 p-8">
+                <!-- Product Image -->
+                <div>
+                    @if($product->image)
+                        <img src="{{ $product->image }}" alt="{{ $product->name }}" class="w-full rounded-lg">
+                    @else
+                        <div class="w-full h-96 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-image fa-6x text-gray-400"></i>
+                        </div>
                     @endif
-                </article>
-            @endforeach
+                </div>
+
+                <!-- Product Details -->
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">{{ $product->name }}</h1>
+
+                    @if(!is_null($product->price))
+                        <div class="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-6">
+                            ${{ number_format((float)$product->price, 2) }}
+                        </div>
+                    @endif
+
+                    @if(!empty($product->description))
+                        <div class="prose dark:prose-invert mb-6">
+                            <p class="text-gray-700 dark:text-gray-300">{{ $product->description }}</p>
+                        </div>
+                    @endif
+
+                    @if($product->category)
+                        <div class="mb-4">
+                            <span class="text-sm text-gray-500 dark:text-gray-400">Category:</span>
+                            <a href="{{ route('categories.show', $product->category->slug) }}"
+                               class="ml-2 text-blue-600 dark:text-blue-400 hover:underline">
+                                {{ $product->category->name }}
+                            </a>
+                        </div>
+                    @endif
+
+                    @if($product->brand)
+                        <div class="mb-4">
+                            <span class="text-sm text-gray-500 dark:text-gray-400">Brand:</span>
+                            <span class="ml-2 text-gray-900 dark:text-white font-medium">{{ $product->brand->name }}</span>
+                        </div>
+                    @endif
+                </div>
+            </div>
         </div>
-    @endif
-</body>
-</html>
+
+        @if(isset($relatedProducts) && $relatedProducts->count())
+            <div class="mt-12">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Related Products</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    @foreach($relatedProducts as $rp)
+                        <article class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+                            @if($rp->image)
+                                <img src="{{ $rp->image }}" alt="{{ $rp->name }}" class="w-full h-48 object-cover">
+                            @else
+                                <div class="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                    <i class="fas fa-image fa-3x text-gray-400"></i>
+                                </div>
+                            @endif
+
+                            <div class="p-4">
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                                    <a href="{{ route('products.show', $rp->slug) }}" class="hover:text-blue-600 dark:hover:text-blue-400">
+                                        {{ $rp->name }}
+                                    </a>
+                                </h3>
+                                @if(!is_null($rp->price))
+                                    <div class="text-xl font-bold text-blue-600 dark:text-blue-400">
+                                        ${{ number_format((float)$rp->price, 2) }}
+                                    </div>
+                                @endif
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+    </div>
+</div>
+@endsection
