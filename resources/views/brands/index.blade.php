@@ -11,9 +11,14 @@
         @if(isset($brands) && count($brands))
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 @foreach($brands as $brand)
+                    @php($brandLogo = is_array($brand) ? ($brand['logo'] ?? null) : ($brand->logo_url ?? null))
+                    @php($brandName = is_array($brand) ? ($brand['name'] ?? '') : ($brand->name ?? ''))
+                    @php($brandDesc = is_array($brand) ? ($brand['description'] ?? null) : ($brand->description ?? null))
+                    @php($brandCount = is_array($brand) ? ($brand['products_count'] ?? 0) : ($brand->products_count ?? 0))
+                    @php($brandWebsite = is_array($brand) ? ($brand['website_url'] ?? null) : ($brand->website_url ?? null))
                     <article class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition">
-                        @if($brand->logo_url)
-                            <img src="{{ $brand->logo_url }}" alt="{{ $brand->name }}" class="w-full h-24 object-contain mb-4">
+                        @if($brandLogo)
+                            <img src="{{ $brandLogo }}" alt="{{ $brandName }}" class="w-full h-24 object-contain mb-4">
                         @else
                             <div class="w-full h-24 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center mb-4">
                                 <i class="fas fa-building fa-3x text-gray-400"></i>
@@ -21,20 +26,20 @@
                         @endif
 
                         <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2 text-center">
-                            {{ $brand->name }}
+                            {{ $brandName }}
                         </h2>
 
-                        @if($brand->description)
-                            <p class="text-gray-600 dark:text-gray-400 text-sm mb-3 line-clamp-2">{{ $brand->description }}</p>
+                        @if($brandDesc)
+                            <p class="text-gray-600 dark:text-gray-400 text-sm mb-3 line-clamp-2">{{ $brandDesc }}</p>
                         @endif
 
                         <div class="text-gray-600 dark:text-gray-400 text-sm text-center">
-                            {{ $brand->products_count ?? $brand->products()->count() }} products
+                            {{ $brandCount }} products
                         </div>
 
-                        @if($brand->website_url)
+                        @if($brandWebsite)
                             <div class="mt-3 text-center">
-                                <a href="{{ $brand->website_url }}" target="_blank" rel="noopener" class="text-blue-600 dark:text-blue-400 hover:underline text-sm">
+                                <a href="{{ $brandWebsite }}" target="_blank" rel="noopener" class="text-blue-600 dark:text-blue-400 hover:underline text-sm">
                                     <i class="fas fa-external-link-alt mr-1"></i> Visit website
                                 </a>
                             </div>

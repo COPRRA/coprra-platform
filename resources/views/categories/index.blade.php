@@ -11,9 +11,13 @@
         @if(isset($categories) && count($categories))
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 @foreach($categories as $category)
+                    @php($catImage = is_array($category) ? ($category['image_url'] ?? null) : ($category->image_url ?? null))
+                    @php($catName = is_array($category) ? ($category['name'] ?? '') : ($category->name ?? ''))
+                    @php($catSlug = is_array($category) ? ($category['slug'] ?? '') : ($category->slug ?? ''))
+                    @php($catCount = is_array($category) ? ($category['products_count'] ?? 0) : ($category->products_count ?? 0))
                     <article class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition">
-                        @if($category->image_url)
-                            <img src="{{ $category->image_url }}" alt="{{ $category->name }}" class="w-16 h-16 object-cover rounded-lg mb-4">
+                        @if($catImage)
+                            <img src="{{ $catImage }}" alt="{{ $catName }}" class="w-16 h-16 object-cover rounded-lg mb-4">
                         @else
                             <div class="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center mb-4">
                                 <i class="fas fa-tag fa-2x text-gray-400"></i>
@@ -21,20 +25,22 @@
                         @endif
 
                         <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                            <a href="{{ route('categories.show', $category->slug) }}" class="hover:text-blue-600 dark:hover:text-blue-400">
-                                {{ $category->name }}
+                            <a href="{{ route('categories.show', $catSlug) }}" class="hover:text-blue-600 dark:hover:text-blue-400">
+                                {{ $catName }}
                             </a>
                         </h2>
 
                         <div class="text-gray-600 dark:text-gray-400 text-sm">
-                            {{ $category->products_count ?? $category->products()->count() }} products
+                            {{ $catCount }} products
                         </div>
                     </article>
                 @endforeach
             </div>
 
             <div class="mt-8">
-                {{ $categories->withQueryString()->links() }}
+                @if(method_exists($categories, 'withQueryString'))
+                    {{ $categories->withQueryString()->links() }}
+                @endif
             </div>
         @else
             <div class="text-center py-12">
