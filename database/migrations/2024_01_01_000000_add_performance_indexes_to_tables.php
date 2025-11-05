@@ -154,8 +154,8 @@ return new class extends Migration {
             if (! $this->indexExists('stores', 'stores_is_active_index')) {
                 $table->index('is_active');
             }
-            if (! $this->indexExists('stores', 'stores_country_index')) {
-                $table->index('country');
+            if (! $this->indexExists('stores', 'stores_country_code_index')) {
+                $table->index('country_code');
             }
         });
         }
@@ -232,7 +232,7 @@ return new class extends Migration {
         // Drop indexes from stores table
         Schema::table('stores', static function (Blueprint $table) {
             $table->dropIndex(['is_active']);
-            $table->dropIndex(['country']);
+            $table->dropIndex(['country_code']);
         });
     }
 
