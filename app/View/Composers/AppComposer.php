@@ -74,7 +74,7 @@ final class AppComposer
              *
              * @psalm-return array{code: string, name: string, symbol: string, is_current: bool}
              */
-            = static fn(Currency $currency) use ($currentCurrency): array => [
+            = fn(Currency $currency) use ($currentCurrency): array => [
                 'code' => $currency->code ?? '',
                 'name' => $currency->name ?? '',
                 'symbol' => $currency->symbol ?? '',
