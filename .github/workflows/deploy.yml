@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 concurrency:
   group: deploy-production
@@ -59,4 +60,3 @@ jobs:
           echo "Running health check..."
           curl --fail --silent --show-error https://coprra.com/api/health > /dev/null
           echo "Health OK"
-
