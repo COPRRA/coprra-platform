@@ -1,5 +1,7 @@
 # Coprra - Laravel E-Commerce Platform
 
+<!-- CI Trigger: Automated deployment run initiated by assistant -->
+
 [![PHP Version](https://img.shields.io/badge/PHP-8.2%2B-blue)](https://php.net)
 [![Laravel Version](https://img.shields.io/badge/Laravel-12-red)](https://laravel.com)
 [![PHPStan Level](https://img.shields.io/badge/PHPStan-Level%208-brightgreen)](https://phpstan.org)
