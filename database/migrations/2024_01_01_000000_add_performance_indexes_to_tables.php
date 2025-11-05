@@ -238,16 +238,17 @@ return new class extends Migration {
 
     /**
      * Check if an index exists.
+     *
+     * Laravel 11+ removed Doctrine DBAL, so we use raw queries instead.
      */
     private function indexExists(string $table, string $index): bool
     {
         $connection = Schema::getConnection();
 
-        // SQLite: use PRAGMA introspection to avoid duplicate index creation
+        // SQLite: use PRAGMA introspection
         if ($connection instanceof SQLiteConnection) {
             $rows = $connection->select('PRAGMA index_list("'.$table.'")');
             foreach ($rows as $row) {
-                // Row can be array or object depending on driver
                 $name = is_array($row) ? ($row['name'] ?? null) : ($row->name ?? null);
                 if ($name === $index) {
                     return true;
@@ -256,14 +257,19 @@ return new class extends Migration {
             return false;
         }
 
-        // Guard in case the driver doesn't support Doctrine schema manager
-        if (!method_exists($connection, 'getDoctrineSchemaManager')) {
+        // MySQL/MariaDB: use information_schema
+        try {
+            $database = $connection->getDatabaseName();
+            $indexes = $connection->select(
+                "SELECT INDEX_NAME FROM information_schema.STATISTICS
+                 WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND INDEX_NAME = ?",
+                [$database, $table, $index]
+            );
+
+            return count($indexes) > 0;
+        } catch (\Exception $e) {
+            // If query fails, assume index doesn't exist (safe to try creating)
             return false;
         }
-
-        $schemaManager = $connection->getDoctrineSchemaManager();
-        $indexes = $schemaManager->listTableIndexes($table);
-
-        return array_key_exists($index, $indexes);
     }
 };
