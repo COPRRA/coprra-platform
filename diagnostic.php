@@ -18,10 +18,29 @@ foreach($files as $file) {
 
 echo "<h2>🗄️ اختبار قاعدة البيانات</h2>";
 try {
-    $pdo = new PDO("mysql:host=localhost;dbname=u574849695_coprra", "u574849695_coprra", "Hamo1510@Rayan146");
-    echo "<p>✅ اتصال قاعدة البيانات ناجح</p>";
+    $dbHost = getenv('DB_HOST') ?: 'localhost';
+    $dbName = getenv('DB_DATABASE') ?: 'unknown';
+    $dbUser = getenv('DB_USERNAME') ?: 'unknown';
+    $dbPass = getenv('DB_PASSWORD') ?: '';
+    $pdo = new PDO("mysql:host={$dbHost};dbname={$dbName}", $dbUser, $dbPass);
+    echo "<p>✅ اتصال قاعدة البيانات ناجح ({$dbName}@{$dbHost})</p>";
 } catch(Exception $e) {
-    echo "<p>❌ خطأ في قاعدة البيانات: " . $e->getMessage() . "</p>";
+    echo "<p>❌ خطأ في قاعدة البيانات: " . htmlspecialchars($e->getMessage()) . "</p>";
+}
+
+echo "<h2>🧾 آخر سجل Laravel</h2>";
+$logPath = __DIR__ . '/storage/logs/laravel.log';
+if (is_readable($logPath)) {
+    $log = @file_get_contents($logPath);
+    if ($log !== false) {
+        $lines = explode("\n", $log);
+        $tail = array_slice($lines, -200);
+        echo '<pre style="background:#fff;padding:10px;border:1px solid #ddd;max-height:400px;overflow:auto">' . htmlspecialchars(implode("\n", $tail)) . '</pre>';
+    } else {
+        echo "<p>⚠️ تعذر قراءة الملف.</p>";
+    }
+} else {
+    echo "<p>⚠️ ملف السجل غير موجود أو لا يمكن قراءته.</p>";
 }
 
 echo "<h2>🌐 اختبار الاتصال</h2>";
