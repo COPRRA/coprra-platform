@@ -63,8 +63,8 @@ class ProductRepository
     {
         $this->validationService->validateSlug($slug);
 
-        return $this->cacheService->rememberProductBySlug($slug, function () {
-            return $this->queryBuilderService->buildProductBySlugQuery()->first();
+        return $this->cacheService->rememberProductBySlug($slug, function () use ($slug) {
+            return $this->queryBuilderService->buildProductBySlugQuery($slug)->first();
         });
     }
 
