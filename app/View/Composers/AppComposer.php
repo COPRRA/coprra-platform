@@ -219,7 +219,8 @@ final class AppComposer
                     /** @var Collection<int, array<string, array>> $mapped */
                     $mapped = $collection->map($mapper);
 
-                    return $mapped->values()->toArray();
+                    // Convert array items to objects for view compatibility
+                    return $mapped->map(fn($item) => (object) $item)->values()->all();
                 }
             );
         } catch (\Throwable $e) {
