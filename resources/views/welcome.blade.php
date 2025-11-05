@@ -72,6 +72,16 @@
             <h2 class="text-center mb-5">Shop by Category</h2>
             <div class="row">
                 @foreach($categories as $category)
+                @php
+                    if (is_array($category)) {
+                        $tmp = (object) $category;
+                        $tmp->image_url = $category['image_url'] ?? null;
+                        $tmp->name = $category['name'] ?? '';
+                        $tmp->slug = $category['slug'] ?? '';
+                        $tmp->products_count = $category['products_count'] ?? 0;
+                        $category = $tmp;
+                    }
+                @endphp
                 @php($catImage = is_array($category) ? ($category['image_url'] ?? null) : ($category->image_url ?? null))
                 @php($catName = is_array($category) ? ($category['name'] ?? '') : ($category->name ?? ''))
                 @php($catCount = is_array($category) ? ($category['products_count'] ?? 0) : ($category->products_count ?? 0))
@@ -102,6 +112,15 @@
             <h2 class="text-center mb-5">Popular Brands</h2>
             <div class="row">
                 @foreach($brands as $brand)
+                @php
+                    if (is_array($brand)) {
+                        $tmp = (object) $brand;
+                        $tmp->logo_url = $brand['logo'] ?? ($brand['logo_url'] ?? null);
+                        $tmp->name = $brand['name'] ?? '';
+                        $tmp->products_count = $brand['products_count'] ?? 0;
+                        $brand = $tmp;
+                    }
+                @endphp
                 @php($brandLogo = is_array($brand) ? ($brand['logo'] ?? null) : ($brand->logo_url ?? null))
                 @php($brandName = is_array($brand) ? ($brand['name'] ?? '') : ($brand->name ?? ''))
                 @php($brandCount = is_array($brand) ? ($brand['products_count'] ?? 0) : ($brand->products_count ?? 0))
