@@ -33,11 +33,13 @@
                     <h5 class="mt-4">Categories</h5>
                     <div class="row">
                         @foreach($categories as $category)
+                        @php($catName = is_array($category) ? ($category['name'] ?? '') : ($category->name ?? ''))
+                        @php($catCount = is_array($category) ? ($category['products_count'] ?? 0) : ($category->products_count ?? 0))
                         <div class="col-md-2">
                             <div class="card mb-3">
                                 <div class="card-body text-center">
-                                    <h6 class="card-title">{{ $category->name }}</h6>
-                                    <p class="small text-muted">{{ $category->products_count }} products</p>
+                                    <h6 class="card-title">{{ $catName }}</h6>
+                                    <p class="small text-muted">{{ $catCount }} products</p>
                                 </div>
                             </div>
                         </div>
@@ -49,11 +51,13 @@
                     <h5 class="mt-4">Brands</h5>
                     <div class="row">
                         @foreach($brands as $brand)
+                        @php($brandName = is_array($brand) ? ($brand['name'] ?? '') : ($brand->name ?? ''))
+                        @php($brandCount = is_array($brand) ? ($brand['products_count'] ?? 0) : ($brand->products_count ?? 0))
                         <div class="col-md-2">
                             <div class="card mb-3">
                                 <div class="card-body text-center">
-                                    <h6 class="card-title">{{ $brand->name }}</h6>
-                                    <p class="small text-muted">{{ $brand->products_count }} products</p>
+                                    <h6 class="card-title">{{ $brandName }}</h6>
+                                    <p class="small text-muted">{{ $brandCount }} products</p>
                                 </div>
                             </div>
                         </div>
@@ -66,4 +70,4 @@
     </div>
 </div>
 @endsection
-
+

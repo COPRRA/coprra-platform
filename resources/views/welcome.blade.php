@@ -72,16 +72,19 @@
             <h2 class="text-center mb-5">Shop by Category</h2>
             <div class="row">
                 @foreach($categories as $category)
+                @php($catImage = is_array($category) ? ($category['image_url'] ?? null) : ($category->image_url ?? null))
+                @php($catName = is_array($category) ? ($category['name'] ?? '') : ($category->name ?? ''))
+                @php($catCount = is_array($category) ? ($category['products_count'] ?? 0) : ($category->products_count ?? 0))
                 <div class="col-md-2 mb-4">
                     <div class="card category-card text-center h-100">
                         <div class="card-body">
-                            @if($category->image_url)
-                            <img src="{{ $category->image_url }}" class="img-fluid mb-3" alt="{{ $category->name }}" style="height: 80px; object-fit: cover;">
+                            @if($catImage)
+                            <img src="{{ $catImage }}" class="img-fluid mb-3" alt="{{ $catName }}" style="height: 80px; object-fit: cover;">
                             @else
                             <i class="fas fa-tag fa-3x text-muted mb-3"></i>
                             @endif
-                            <h6 class="card-title">{{ $category->name }}</h6>
-                            <p class="card-text small text-muted">{{ $category->products_count }} products</p>
+                            <h6 class="card-title">{{ $catName }}</h6>
+                            <p class="card-text small text-muted">{{ $catCount }} products</p>
                             <a href="{{ route('categories.show', $category) }}" class="btn btn-outline-primary btn-sm">Browse</a>
                         </div>
                     </div>
@@ -99,16 +102,19 @@
             <h2 class="text-center mb-5">Popular Brands</h2>
             <div class="row">
                 @foreach($brands as $brand)
+                @php($brandLogo = is_array($brand) ? ($brand['logo'] ?? null) : ($brand->logo_url ?? null))
+                @php($brandName = is_array($brand) ? ($brand['name'] ?? '') : ($brand->name ?? ''))
+                @php($brandCount = is_array($brand) ? ($brand['products_count'] ?? 0) : ($brand->products_count ?? 0))
                 <div class="col-md-2 mb-4">
                     <div class="card text-center h-100">
                         <div class="card-body">
-                            @if($brand->logo_url)
-                            <img src="{{ $brand->logo_url }}" class="img-fluid mb-3" alt="{{ $brand->name }}" style="height: 60px; object-fit: contain;">
+                            @if($brandLogo)
+                            <img src="{{ $brandLogo }}" class="img-fluid mb-3" alt="{{ $brandName }}" style="height: 60px; object-fit: contain;">
                             @else
                             <i class="fas fa-building fa-3x text-muted mb-3"></i>
                             @endif
-                            <h6 class="card-title">{{ $brand->name }}</h6>
-                            <p class="card-text small text-muted">{{ $brand->products_count }} products</p>
+                            <h6 class="card-title">{{ $brandName }}</h6>
+                            <p class="card-text small text-muted">{{ $brandCount }} products</p>
                         </div>
                     </div>
                 </div>
