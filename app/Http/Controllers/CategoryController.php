@@ -39,7 +39,7 @@ class CategoryController extends Controller
                 ['categories']
             );
 
-            return view('categories.index', compact('categories'));
+            return view('categories.index_clean', compact('categories'));
         } catch (\Throwable $e) {
             Log::error('Categories index failure', [
                 'exception' => $e->getMessage(),

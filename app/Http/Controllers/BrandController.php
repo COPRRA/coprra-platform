@@ -24,7 +24,7 @@ class BrandController extends Controller
                 ->orderBy('name')
                 ->paginate($perPage);
 
-            return view('brands.index', compact('brands'));
+            return view('brands.index_clean', compact('brands'));
         } catch (\Throwable $e) {
             Log::error('Brands index failure', [
                 'exception' => $e->getMessage(),
