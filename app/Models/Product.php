@@ -62,6 +62,7 @@ class Product extends Model
         'description',
         'price',
         'image',
+        'image_url',
         'is_active',
         'stock_quantity',
         'category_id',
@@ -226,7 +227,13 @@ class Product extends Model
      */
     public function getImageAttribute(?string $value): ?string
     {
-        return $value ?: $this->attributes['image_url'] ?? null;
+        // If image column has value, use it
+        if ($value) {
+            return $value;
+        }
+
+        // Otherwise fall back to image_url column
+        return $this->getAttributeFromArray('image_url');
     }
 
     // --- طرق مساعدة ---
