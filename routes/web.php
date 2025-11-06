@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\Admin\AgentDashboardController;
 use App\Http\Controllers\Admin\AgentManagementController;
 use App\Http\Controllers\Admin\AIControlPanelController;
+use App\Http\Controllers\Admin\ScraperController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AI\AgentHealthController;
 use App\Http\Controllers\Auth\AuthController;
@@ -266,8 +267,10 @@ Route::middleware(['auth', \App\Http\Middleware\IsAdmin::class])->prefix('admin'
 
     // Scraper Routes
     Route::prefix('scraper')->name('scraper.')->group(static function (): void {
-        Route::get('/', [Admin\ScraperController::class, 'index'])->name('index');
-        Route::post('/start', [Admin\ScraperController::class, 'startScraping'])->name('start');
+        Route::get('/', [ScraperController::class, 'index'])->name('index');
+        Route::post('/start', [ScraperController::class, 'startScraping'])->name('start');
+        Route::get('/logs', [ScraperController::class, 'getLogs'])->name('logs');
+        Route::post('/clear-logs', [ScraperController::class, 'clearLogs'])->name('clear-logs');
     });
 
 });
