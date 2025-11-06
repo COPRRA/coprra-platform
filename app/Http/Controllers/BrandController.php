@@ -21,6 +21,7 @@ class BrandController extends Controller
             $perPage = (int) $request->query('per_page', 20);
             $brands = Brand::query()
                 ->active()
+                ->withCount('products')
                 ->orderBy('name')
                 ->paginate($perPage);
 

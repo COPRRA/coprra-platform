@@ -55,6 +55,16 @@
                             <span class="ml-2 text-gray-900 dark:text-white font-medium">{{ $product->brand->name }}</span>
                         </div>
                     @endif
+
+                    <!-- Call to Action Buttons -->
+                    <div class="mt-8 flex gap-4">
+                        <a href="#" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition">
+                            <i class="fas fa-shopping-cart mr-2"></i>View Stores
+                        </a>
+                        <button class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-semibold py-3 px-6 rounded-lg transition">
+                            <i class="fas fa-heart mr-2"></i>Wishlist
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

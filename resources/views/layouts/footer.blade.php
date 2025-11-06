@@ -7,34 +7,34 @@
                     {{ config('app.name', 'COPRRA') }}
                 </h3>
                 <p class="text-gray-600 dark:text-gray-400 mb-4">
-                    {{ __('messages.coprra_description') }}
-                </p>
+                    {{ __('main.coprra_description') }}
+</p>
             </div>
 
             <!-- Quick Links -->
             <div>
                 <h4 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-4">
-                    {{ __('messages.quick_links') }}
+                    {{ __('main.quick_links') }}
                 </h4>
                 <ul class="space-y-2">
-                    <li><a href="{{ route('home') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('messages.home') }}</a></li>
-                    <li><a href="{{ route('products.index') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('messages.products') }}</a></li>
-                    <li><a href="{{ route('categories.index') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('messages.categories') }}</a></li>
-                    <li><a href="{{ route('brands.index') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('messages.brands') }}</a></li>
-                    <li><a href="#" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('messages.stores') }}</a></li>
+                    <li><a href="{{ route('home') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('main.home') }}</a></li>
+                    <li><a href="{{ route('products.index') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('main.products') }}</a></li>
+                    <li><a href="{{ route('categories.index') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('main.categories') }}</a></li>
+                    <li><a href="{{ route('brands.index') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('main.brands') }}</a></li>
+                    <li><a href="#" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('main.stores') }}</a></li>
                 </ul>
             </div>
 
             <!-- Support -->
             <div>
                 <h4 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-4">
-                    {{ __('messages.support') }}
+                    {{ __('main.support') }}
                 </h4>
                 <ul class="space-y-2">
-                    <li><a href="{{ route('faq') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('messages.help_center') }}</a></li>
-                    <li><a href="{{ route('contact') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('messages.contact_us') }}</a></li>
-                    <li><a href="{{ route('privacy') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('messages.privacy_policy') }}</a></li>
-                    <li><a href="{{ route('terms') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('messages.terms_of_service') }}</a></li>
+                    <li><a href="{{ route('faq') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('main.help_center') }}</a></li>
+                    <li><a href="{{ route('contact') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('main.contact_us') }}</a></li>
+                    <li><a href="{{ route('privacy') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('main.privacy_policy') }}</a></li>
+                    <li><a href="{{ route('terms') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('main.terms_of_service') }}</a></li>
                     <li><a href="{{ route('about') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">About Us</a></li>
                 </ul>
             </div>
@@ -44,7 +44,7 @@
         <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <p class="text-gray-600 dark:text-gray-400 text-sm">
-                    &copy; {{ date('Y') }} {{ config('app.name', 'COPRRA') }}. {{ __('messages.all_rights_reserved') }}.
+                    &copy; {{ date('Y') }} {{ config('app.name', 'COPRRA') }}. {{ __('main.all_rights_reserved') }}.
                 </p>
                 <div class="flex items-center space-x-4 mt-4 md:mt-0">
                     <!-- Language Switcher -->

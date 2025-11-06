@@ -77,7 +77,7 @@ class CategoryController extends Controller
                         ->active()
                         ->with(['category', 'brand'])
                         ->where('category_id', $category->id)
-                        ->orderByDesc('purchase_count')
+                        ->orderBy('name')
                         ->paginate($perPage);
                 },
                 ['products', 'categories']

@@ -91,11 +91,6 @@
         <!-- Page Content -->
         <main id="main-content" role="main">
             @yield('content')
-
-            <!-- Autoprefixer visual test -->
-            <div class="autoprefixer-test-container">
-                <span class="autoprefixer-test">Autoprefixer Test</span>
-            </div>
         </main>
 
         <!-- Footer -->
