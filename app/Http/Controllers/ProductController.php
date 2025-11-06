@@ -67,6 +67,12 @@ class ProductController extends Controller
     {
         try {
             $product = $this->productService->getBySlug($slug);
+
+            // Return 404 if product not found
+            if ($product === null) {
+                abort(404);
+            }
+
             $relatedProducts = $this->productService->getRelatedProducts($product);
 
             return view('products.show', compact('product', 'relatedProducts'));

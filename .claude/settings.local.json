@@ -132,7 +132,15 @@
       "Bash(do echo -n \"https://coprra.com/$url: \")",
       "Bash(for url in \"/\" \"/products\" \"/categories\" \"/brands\")",
       "Bash(do echo \"Testing https://coprra.com$url\")",
-      "Bash(scp:*)"
+      "Bash(scp:*)",
+      "Bash(for url in \"\" \"about\" \"contact\" \"privacy\" \"terms\" \"faq\")",
+      "Bash(do echo \"=== Testing: https://coprra.com/$url ===\")",
+      "Bash(dig coprra.com +short)",
+      "WebSearch",
+      "Bash(for page in \"\" \"about\" \"contact\" \"privacy\" \"terms\" \"faq\")",
+      "Bash(do echo \"=== $page ===\")",
+      "Bash(for page in \"privacy\" \"terms\" \"faq\")",
+      "Bash(do echo \"=== Testing /$page ===\")"
     ],
     "deny": [],
     "ask": []

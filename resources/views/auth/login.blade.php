@@ -41,6 +41,12 @@
             </label>
 
             <button type="submit">Sign in</button>
+
+            <div style="margin-top:1rem;text-align:center">
+                <a href="{{ route('password.request') }}" style="color:#2563eb;text-decoration:none;font-size:0.875rem">
+                    Forgot your password?
+                </a>
+            </div>
         </form>
     </div>
     <script>

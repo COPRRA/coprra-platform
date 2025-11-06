@@ -147,11 +147,6 @@ Route::get('language/{langCode}', [LocaleController::class, 'changeLanguage'])->
 Route::get('currency/{currencyCode}', [LocaleController::class, 'changeCurrency'])->name('change.currency');
 Route::get('country/{countryCode}', [LocaleController::class, 'changeCountry'])->name('change.country');
 
-// Contact page
-Route::get('contact', static function () {
-    return view('contact');
-})->name('contact');
-
 // Locale switching routes
 Route::post('locale/language', [LocaleController::class, 'switchLanguage'])->name('locale.language');
 Route::post('locale/currency', [LocaleController::class, 'switchCurrency'])->name('locale.currency');
