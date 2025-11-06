@@ -25,4 +25,30 @@ class SwitchLanguageRequest extends FormRequest
             'locale' => ['nullable', 'string', 'exists:languages,code'],
         ];
     }
+
+    /**
+     * Custom error messages for validation failures.
+     */
+    public function messages(): array
+    {
+        return [
+            'language.required_without' => __('Please select a language.'),
+            'language.exists' => __('The selected language is not available.'),
+            'locale.exists' => __('The selected language is not available.'),
+        ];
+    }
+
+    /**
+     * Handle a failed validation attempt - log for debugging.
+     */
+    protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        \Log::warning('Language switch validation failed', [
+            'errors' => $validator->errors()->toArray(),
+            'input' => $this->all(),
+            'ip' => $this->ip()
+        ]);
+
+        parent::failedValidation($validator);
+    }
 }

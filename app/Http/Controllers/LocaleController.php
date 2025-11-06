@@ -75,6 +75,14 @@ class LocaleController extends Controller
     public function switchLanguage(SwitchLanguageRequest $request): RedirectResponse
     {
         $code = (string) ($request->input('language') ?? $request->input('locale') ?? config('app.locale', 'en'));
+
+        \Log::info('Language switch requested', [
+            'code' => $code,
+            'input' => $request->all(),
+            'user_id' => $request->user()?->id,
+            'ip' => $request->ip()
+        ]);
+
         return $this->changeLanguage($request, $code);
     }
 
@@ -84,6 +92,14 @@ class LocaleController extends Controller
     public function switchCurrency(SwitchCurrencyRequest $request): RedirectResponse
     {
         $currencyCode = (string) $request->input('currency');
+
+        \Log::info('Currency switch requested', [
+            'code' => $currencyCode,
+            'input' => $request->all(),
+            'user_id' => $request->user()?->id,
+            'ip' => $request->ip()
+        ]);
+
         return $this->changeCurrency($request, $currencyCode);
     }
 
