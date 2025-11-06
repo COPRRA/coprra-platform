@@ -119,19 +119,7 @@
     @endif
 
     <!-- Footer -->
-    <footer class="bg-dark text-white py-4">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>{{ config('app.name', 'COPRRA') }}</h5>
-                    <p>Your trusted price comparison platform</p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <p>&copy; {{ date('Y') }} {{ config('app.name', 'COPRRA') }}. All rights reserved.</p>
-                </div>
-            </div>
-        </div>
-    </footer>
+    @include('layouts.footer')
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
