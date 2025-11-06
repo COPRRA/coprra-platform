@@ -13,6 +13,7 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CompareController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CostDashboardController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\HealthController;
@@ -90,6 +91,14 @@ Route::prefix('ai/health')->name('ai.health.')->group(static function () {
 });
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Static Pages
+Route::get('/about', fn () => view('about'))->name('about');
+Route::get('/contact', [ContactController::class, 'show'])->name('contact');
+Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit');
+Route::get('/privacy', fn () => view('privacy'))->name('privacy');
+Route::get('/terms', fn () => view('terms'))->name('terms');
+Route::get('/faq', fn () => view('faq'))->name('faq');
 
 // Dashboard route expected by tests
 Route::get('/dashboard', static function () {
@@ -258,6 +267,12 @@ Route::middleware(['auth', \App\Http\Middleware\IsAdmin::class])->prefix('admin'
             Route::get('/{agentId}/debug', [AgentManagementController::class, 'getDebugInfo'])->name('debug');
             Route::post('/{agentId}/simulate', [AgentManagementController::class, 'simulateRequest'])->name('simulate');
         });
+    });
+
+    // Scraper Routes
+    Route::prefix('scraper')->name('scraper.')->group(static function (): void {
+        Route::get('/', [Admin\ScraperController::class, 'index'])->name('index');
+        Route::post('/start', [Admin\ScraperController::class, 'startScraping'])->name('start');
     });
 
 });

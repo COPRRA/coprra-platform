@@ -51,10 +51,11 @@
                     {{ __('messages.support') }}
                 </h4>
                 <ul class="space-y-2">
-                    <li><a href="#" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('messages.help_center') }}</a></li>
-                    <li><a href="#" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('messages.contact_us') }}</a></li>
-                    <li><a href="#" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('messages.privacy_policy') }}</a></li>
-                    <li><a href="#" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('messages.terms_of_service') }}</a></li>
+                    <li><a href="{{ route('faq') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('messages.help_center') }}</a></li>
+                    <li><a href="{{ route('contact') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('messages.contact_us') }}</a></li>
+                    <li><a href="{{ route('privacy') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('messages.privacy_policy') }}</a></li>
+                    <li><a href="{{ route('terms') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('messages.terms_of_service') }}</a></li>
+                    <li><a href="{{ route('about') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">About Us</a></li>
                 </ul>
             </div>
         </div>

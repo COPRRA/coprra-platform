@@ -30,6 +30,7 @@ final class AppComposer
             'navCategories' => $this->getCategories(),
             'navBrands' => $this->getBrands(),
             'isRTL' => $this->isRTL(),
+            'i18nHierarchy' => $this->getI18nHierarchy(),
         ]);
     }
 
@@ -173,6 +174,66 @@ final class AppComposer
         $rtlLocales = ['ar', 'ur', 'fa', 'he'];
 
         return \in_array(app()->getLocale(), $rtlLocales, true);
+    }
+
+    /**
+     * Get hierarchical i18n data for dynamic dropdowns.
+     * Returns: { languages: [...], hierarchy: { lang_code: { countries: [...] } } }
+     */
+    private function getI18nHierarchy(): array
+    {
+        try {
+            return cache()->remember('i18n_hierarchy', 3600, function () {
+                // Get all countries with their relationships
+                $countries = Country::with(['language', 'currency'])
+                    ->where('is_active', true)
+                    ->orderBy('sort_order')
+                    ->get();
+
+                // Build hierarchy: language_code => [countries]
+                $hierarchy = [];
+                foreach ($countries as $country) {
+                    $langCode = $country->language?->code ?? 'en';
+
+                    if (!isset($hierarchy[$langCode])) {
+                        $hierarchy[$langCode] = [];
+                    }
+
+                    $hierarchy[$langCode][] = [
+                        'code' => $country->code,
+                        'name' => $country->name,
+                        'native_name' => $country->native_name,
+                        'flag' => $country->flag_emoji,
+                        'currency_code' => $country->currency?->code ?? 'USD',
+                        'currency_symbol' => $country->currency?->symbol ?? '$',
+                    ];
+                }
+
+                // Get current selections
+                $currentLang = app()->getLocale();
+                $currentCountry = session('locale_country', null);
+                $currentCurrency = session('currency', config('app.default_currency', 'USD'));
+
+                return [
+                    'hierarchy' => $hierarchy,
+                    'current' => [
+                        'language' => $currentLang,
+                        'country' => $currentCountry,
+                        'currency' => $currentCurrency,
+                    ],
+                ];
+            });
+        } catch (\Throwable $e) {
+            Log::error('Failed to build i18n hierarchy', ['error' => $e->getMessage()]);
+            return [
+                'hierarchy' => [],
+                'current' => [
+                    'language' => 'en',
+                    'country' => null,
+                    'currency' => 'USD',
+                ],
+            ];
+        }
     }
 
     /**

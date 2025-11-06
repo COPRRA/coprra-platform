@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         body{font-family:Inter,system-ui,Arial,sans-serif;margin:2rem;color:#111}
         .card{max-width:380px;border:1px solid #e5e7eb;border-radius:8px;padding:16px}
@@ -14,6 +15,9 @@
         input{width:100%;padding:.5rem;border:1px solid #d1d5db;border-radius:6px}
         button{margin-top:1rem;width:100%;padding:.6rem;border-radius:6px;background:#2563eb;color:#fff;border:0}
         .error{color:#ef4444;margin-top:.5rem}
+        .password-wrapper{position:relative}
+        .password-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:#6b7280}
+        .password-toggle:hover{color:#2563eb}
     </style>
     </head>
 <body>
@@ -26,7 +30,10 @@
             @error('email')<div class="error">{{ $message }}</div>@enderror
 
             <label for="password">Password</label>
-            <input id="password" name="password" type="password" required>
+            <div class="password-wrapper">
+                <input id="password" name="password" type="password" required style="padding-right:2.5rem">
+                <i class="fas fa-eye password-toggle" id="togglePassword"></i>
+            </div>
             @error('password')<div class="error">{{ $message }}</div>@enderror
 
             <label style="display:flex;align-items:center;gap:.5rem;margin-top:.5rem">
@@ -36,5 +43,16 @@
             <button type="submit">Sign in</button>
         </form>
     </div>
+    <script>
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+    </script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-<nav class="bg-white dark:bg-gray-800 shadow">
+<nav class="bg-white dark:bg-gray-800 shadow" x-data="{ mobileMenuOpen: false, searchOpen: false }">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
             <!-- Logo -->
@@ -8,29 +8,111 @@
                 </a>
             </div>
 
-            <!-- Centered Navigation Links -->
+            <!-- Centered Navigation Links (Desktop) -->
             <div class="hidden md:flex space-x-8 absolute left-1/2 transform -translate-x-1/2">
                 <a href="{{ route('home') }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition duration-150 ease-in-out {{ request()->routeIs('home') ? 'text-blue-600 dark:text-blue-400 font-semibold' : '' }}">
-                    <i class="fas fa-home mr-2"></i> Home
+                    <i class="fas fa-home mr-2"></i> {{ __('Home') }}
                 </a>
                 <a href="{{ route('categories.index') }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition duration-150 ease-in-out {{ request()->routeIs('categories.*') ? 'text-blue-600 dark:text-blue-400 font-semibold' : '' }}">
-                    <i class="fas fa-tags mr-2"></i> Categories
+                    <i class="fas fa-tags mr-2"></i> {{ __('Categories') }}
                 </a>
                 <a href="{{ route('products.index') }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition duration-150 ease-in-out {{ request()->routeIs('products.*') ? 'text-blue-600 dark:text-blue-400 font-semibold' : '' }}">
-                    <i class="fas fa-box mr-2"></i> Products
+                    <i class="fas fa-box mr-2"></i> {{ __('Products') }}
                 </a>
                 <a href="{{ route('brands.index') }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition duration-150 ease-in-out {{ request()->routeIs('brands.*') ? 'text-blue-600 dark:text-blue-400 font-semibold' : '' }}">
-                    <i class="fas fa-building mr-2"></i> Brands
+                    <i class="fas fa-building mr-2"></i> {{ __('Brands') }}
                 </a>
             </div>
 
-            <!-- Right Side Of Navbar -->
-            <div class="hidden md:flex items-center space-x-4">
-                <!-- Language Dropdown -->
-                @php($navLanguages = $navLanguages ?? [])
-                <form method="POST" action="{{ route('locale.language') }}" class="inline-block">
+            <!-- Right Side Of Navbar (Desktop) -->
+            <div class="hidden md:flex items-center space-x-6">
+                <!-- Search Bar -->
+                <form method="GET" action="{{ route('products.index') }}" class="relative">
+                    <input type="text" name="search" placeholder="{{ __('Search products...') }}" class="pl-10 pr-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 w-48">
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </form>
+
+                <!-- Hierarchical Internationalization Component -->
+                @include('layouts.navigation-i18n')
+
+                @guest
+                    <a href="{{ route('login') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                        <i class="fas fa-sign-in-alt mr-2"></i> {{ __('Log in') }}
+                    </a>
+                    <a href="{{ route('register') }}" class="inline-flex items-center px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                        <i class="fas fa-user-plus mr-2"></i> {{ __('Register') }}
+                    </a>
+                @else
+                    <div x-data="{ userMenuOpen: false }" class="relative">
+                        <button @click="userMenuOpen = !userMenuOpen" class="flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
+                            <i class="fas fa-user"></i>
+                            <span>{{ Auth::user()->name }}</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div x-show="userMenuOpen" @click.away="userMenuOpen = false" x-transition class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50">
+                            <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <i class="fas fa-cog mr-2"></i> {{ __('Profile') }}
+                            </a>
+                            @if(Auth::user()->role === 'admin' || (method_exists(Auth::user(), 'hasRole') && Auth::user()->hasRole('admin')))
+                            <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <i class="fas fa-tachometer-alt mr-2"></i> {{ __('Admin Dashboard') }}
+                            </a>
+                            @endif
+                            <form method="POST" action="{{ route('logout') }}" class="block">
+                                @csrf
+                                <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> {{ __('Log Out') }}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                @endguest
+            </div>
+
+            <!-- Mobile menu button -->
+            <div class="md:hidden flex items-center space-x-2">
+                <button @click="searchOpen = !searchOpen" class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="fas fa-search"></i>
+                </button>
+                <button @click="mobileMenuOpen = !mobileMenuOpen" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700" aria-label="Main menu">
+                    <i :class="mobileMenuOpen ? 'fa-times' : 'fa-bars'" class="fas fa-lg"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Search Bar -->
+        <div x-show="searchOpen" x-transition class="md:hidden py-3">
+            <form method="GET" action="{{ route('products.index') }}" class="relative">
+                <input type="text" name="search" placeholder="{{ __('Search products...') }}" class="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            </form>
+        </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div x-show="mobileMenuOpen" x-transition class="md:hidden border-t border-gray-200 dark:border-gray-700">
+        <div class="px-2 pt-2 pb-3 space-y-1">
+            <a href="{{ route('home') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700 {{ request()->routeIs('home') ? 'bg-gray-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400' : '' }}">
+                <i class="fas fa-home mr-2"></i> {{ __('Home') }}
+            </a>
+            <a href="{{ route('categories.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700 {{ request()->routeIs('categories.*') ? 'bg-gray-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400' : '' }}">
+                <i class="fas fa-tags mr-2"></i> {{ __('Categories') }}
+            </a>
+            <a href="{{ route('products.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700 {{ request()->routeIs('products.*') ? 'bg-gray-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400' : '' }}">
+                <i class="fas fa-box mr-2"></i> {{ __('Products') }}
+            </a>
+            <a href="{{ route('brands.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700 {{ request()->routeIs('brands.*') ? 'bg-gray-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400' : '' }}">
+                <i class="fas fa-building mr-2"></i> {{ __('Brands') }}
+            </a>
+        </div>
+
+        <!-- Mobile i18n Options -->
+        <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-3 space-y-3">
+            <div>
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{ __('Language') }}</label>
+                <form method="POST" action="{{ route('locale.language') }}">
                     @csrf
-                    <select name="language" onchange="this.form.submit()" class="px-3 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <select name="language" onchange="this.form.submit()" class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         @foreach($navLanguages as $language)
                             <option value="{{ $language->code }}" {{ $language->is_current ? 'selected' : '' }}>
                                 {{ $language->native_name }}
@@ -38,13 +120,13 @@
                         @endforeach
                     </select>
                 </form>
-
-                <!-- Country Dropdown -->
-                @php($navCountries = $navCountries ?? [])
-                @if(is_array($navCountries) && count($navCountries) > 0)
-                <form method="POST" action="{{ route('locale.country') }}" class="inline-block">
+            </div>
+            @if(is_array($navCountries) && count($navCountries) > 0)
+            <div>
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{ __('Country') }}</label>
+                <form method="POST" action="{{ route('locale.country') }}">
                     @csrf
-                    <select name="country" onchange="this.form.submit()" class="px-3 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <select name="country" onchange="this.form.submit()" class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         @foreach($navCountries as $country)
                             <option value="{{ $country->code }}" {{ $country->is_current ? 'selected' : '' }}>
                                 {{ $country->flag ?? '' }} {{ $country->native_name ?? $country->name }}
@@ -52,13 +134,13 @@
                         @endforeach
                     </select>
                 </form>
-                @endif
-
-                <!-- Currency Dropdown -->
-                @php($navCurrencies = $navCurrencies ?? [])
-                <form method="POST" action="{{ route('locale.currency') }}" class="inline-block">
+            </div>
+            @endif
+            <div>
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{ __('Currency') }}</label>
+                <form method="POST" action="{{ route('locale.currency') }}">
                     @csrf
-                    <select name="currency" onchange="this.form.submit()" class="px-3 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <select name="currency" onchange="this.form.submit()" class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         @foreach($navCurrencies as $currency)
                             <option value="{{ $currency->code }}" {{ $currency->is_current ? 'selected' : '' }}>
                                 {{ $currency->symbol }} {{ $currency->code }}
@@ -66,38 +148,41 @@
                         @endforeach
                     </select>
                 </form>
+            </div>
+        </div>
 
-                @guest
-                    <a href="{{ route('login') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
-                        <i class="fas fa-sign-in-alt mr-2"></i> Log in
+        <!-- Mobile User Menu -->
+        <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-3">
+            @guest
+                <div class="space-y-2">
+                    <a href="{{ route('login') }}" class="block w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition text-center">
+                        <i class="fas fa-sign-in-alt mr-2"></i> {{ __('Log in') }}
                     </a>
-                    <a href="{{ route('register') }}" class="inline-flex items-center px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition">
-                        <i class="fas fa-user-plus mr-2"></i> Register
+                    <a href="{{ route('register') }}" class="block w-full px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition text-center">
+                        <i class="fas fa-user-plus mr-2"></i> {{ __('Register') }}
                     </a>
-                @else
-                    <div class="flex items-center space-x-4">
-                        <span class="text-sm text-gray-700 dark:text-gray-300">
-                            <i class="fas fa-user mr-1"></i> {{ Auth::user()->name }}
-                        </span>
-                        <a href="{{ route('profile.edit') }}" class="text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
-                            <i class="fas fa-cog mr-1"></i> Profile
-                        </a>
-                        <form method="POST" action="{{ route('logout') }}" class="inline">
-                            @csrf
-                            <button type="submit" class="text-sm text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400">
-                                <i class="fas fa-sign-out-alt mr-1"></i> Log Out
-                            </button>
-                        </form>
+                </div>
+            @else
+                <div class="space-y-1">
+                    <div class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-user mr-1"></i> {{ Auth::user()->name }}
                     </div>
-                @endguest
-            </div>
-
-            <!-- Mobile menu button -->
-            <div class="md:hidden">
-                <button type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700" aria-label="Main menu">
-                    <i class="fas fa-bars fa-lg"></i>
-                </button>
-            </div>
+                    <a href="{{ route('profile.edit') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <i class="fas fa-cog mr-2"></i> {{ __('Profile') }}
+                    </a>
+                    @if(Auth::user()->role === 'admin' || (method_exists(Auth::user(), 'hasRole') && Auth::user()->hasRole('admin')))
+                    <a href="{{ route('admin.dashboard') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <i class="fas fa-tachometer-alt mr-2"></i> {{ __('Admin Dashboard') }}
+                    </a>
+                    @endif
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <i class="fas fa-sign-out-alt mr-2"></i> {{ __('Log Out') }}
+                        </button>
+                    </form>
+                </div>
+            @endguest
         </div>
     </div>
 </nav>

@@ -41,13 +41,16 @@
     <link rel="stylesheet" href="{{ asset('css/coprra-brand.css') }}">
     <link rel="stylesheet" href="{{ asset('css/coprra-utilities.css') }}">
 
+    <!-- RTL Support for Arabic, Hebrew, Urdu, Farsi -->
+    @if(in_array(app()->getLocale(), ['ar', 'ur', 'fa', 'he']))
+    <link rel="stylesheet" href="{{ asset('css/rtl.css') }}">
+    @endif
+
     <!-- Additional CSS -->
     @stack('styles')
 
-    <!-- Alpine.js (local) - include only when a view declares 'alpine' section -->
-    @hasSection('alpine')
+    <!-- Alpine.js (local) - loaded globally for navigation component -->
     <script defer src="{{ asset('vendor/alpinejs/alpine.min.js') }}"></script>
-    @endif
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])

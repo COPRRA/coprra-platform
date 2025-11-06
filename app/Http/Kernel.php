@@ -72,6 +72,7 @@ class Kernel extends HttpKernel
             ShareErrorsFromSession::class,
             VerifyCsrfToken::class,
             SubstituteBindings::class,
+            \App\Http\Middleware\DetectUserLocale::class,
             LocaleMiddleware::class,
             SetLocaleAndCurrency::class,
         ],

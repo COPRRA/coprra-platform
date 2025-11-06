@@ -127,7 +127,12 @@
       "Bash(for url in \"https://coprra.com\" \"https://coprra.com/products\" \"https://coprra.com/categories\")",
       "Bash(grep:*)",
       "Bash(for url in \"https://coprra.com\" \"https://coprra.com/products\" \"https://coprra.com/categories\" \"https://coprra.com/brands\")",
-      "Bash(for file in brands/index.blade.php categories/index.blade.php home.blade.php welcome.blade.php)"
+      "Bash(for file in brands/index.blade.php categories/index.blade.php home.blade.php welcome.blade.php)",
+      "Bash(for url in \"\" \"products\" \"categories\" \"brands\" \"admin\")",
+      "Bash(do echo -n \"https://coprra.com/$url: \")",
+      "Bash(for url in \"/\" \"/products\" \"/categories\" \"/brands\")",
+      "Bash(do echo \"Testing https://coprra.com$url\")",
+      "Bash(scp:*)"
     ],
     "deny": [],
     "ask": []

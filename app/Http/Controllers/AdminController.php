@@ -27,12 +27,13 @@ final class AdminController extends Controller
             'products' => Product::query()->count(),
             'stores' => Store::query()->count(),
             'categories' => Category::query()->count(),
+            'brands' => Brand::query()->count(),
         ];
 
         $recentUsers = User::query()->latest()->take(5)->get();
         $recentProducts = Product::query()->latest()->take(5)->get();
 
-        return view('admin.dashboard', [
+        return view('admin.index', [
             'stats' => $stats,
             'recentUsers' => $recentUsers,
             'recentProducts' => $recentProducts,
