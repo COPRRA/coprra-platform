@@ -227,7 +227,18 @@ return [
     |
     */
 
-    'supported_locales' => ['en', 'ar', 'fr', 'es', 'de'],
+    'supported_locales' => ['en', 'ar', 'fr', 'es', 'de', 'zh', 'hi', 'pt', 'ja', 'ru', 'ko', 'tr', 'it', 'id', 'nl'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Currency
+    |--------------------------------------------------------------------------
+    |
+    | This is the default currency code used when no currency preference is set.
+    |
+    */
+
+    'default_currency' => env('COPRRA_DEFAULT_CURRENCY', 'USD'),
 
     /*
     |--------------------------------------------------------------------------
