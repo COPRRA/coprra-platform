@@ -8,7 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        .hero-section { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .hero-section { background: linear-gradient(135deg, #0A1E40 0%, #3B82F6 100%); }
         .product-card { transition: transform 0.3s ease; }
         .product-card:hover { transform: translateY(-5px); }
         .category-card { transition: all 0.3s ease; }

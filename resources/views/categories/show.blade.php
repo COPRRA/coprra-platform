@@ -36,10 +36,20 @@
                                 </a>
                             </h2>
                             @if(!is_null($product->price))
-                                <div class="text-xl font-bold text-blue-600 dark:text-blue-400">
+                                <div class="text-xl font-bold text-blue-600 dark:text-blue-400 mb-3">
                                     ${{ number_format((float)$product->price, 2) }}
                                 </div>
                             @endif
+
+                            <!-- Action Buttons -->
+                            <div class="flex gap-2 mt-3">
+                                <button class="flex-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white py-2 px-3 rounded text-sm transition">
+                                    <i class="fas fa-heart mr-1"></i> Wishlist
+                                </button>
+                                <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded text-sm transition">
+                                    <i class="fas fa-balance-scale mr-1"></i> Compare
+                                </button>
+                            </div>
                         </div>
                     </article>
                 @endforeach
