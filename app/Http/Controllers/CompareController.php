@@ -23,7 +23,31 @@ class CompareController extends Controller
             ->get()
         ;
 
-        return view('compare.index', compact('products'));
+        // Get available years and colors for filters
+        $availableYears = Product::query()
+            ->whereIn('id', $compareIds)
+            ->whereNotNull('year_of_manufacture')
+            ->distinct()
+            ->pluck('year_of_manufacture')
+            ->sort()
+            ->values();
+
+        $availableColors = Product::query()
+            ->whereIn('id', $compareIds)
+            ->whereNotNull('available_colors')
+            ->get()
+            ->pluck('available_colors')
+            ->flatten()
+            ->unique()
+            ->sort()
+            ->values();
+
+        return view('compare.index', [
+            'products' => $products,
+            'availableYears' => $availableYears,
+            'availableColors' => $availableColors,
+            'maxProducts' => 4,
+        ]);
     }
 
     /**

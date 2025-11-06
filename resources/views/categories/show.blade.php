@@ -46,9 +46,12 @@
                                 <button class="flex-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white py-2 px-3 rounded text-sm transition">
                                     <i class="fas fa-heart mr-1"></i> Wishlist
                                 </button>
-                                <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded text-sm transition">
-                                    <i class="fas fa-balance-scale mr-1"></i> Compare
-                                </button>
+                                <form method="POST" action="{{ route('compare.add', $product) }}" class="flex-1">
+                                    @csrf
+                                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded text-sm transition">
+                                        <i class="fas fa-balance-scale mr-1"></i> Compare
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </article>

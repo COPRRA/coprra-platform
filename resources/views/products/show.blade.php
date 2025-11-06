@@ -56,6 +56,27 @@
                         </div>
                     @endif
 
+                    <!-- Product Specifications -->
+                    @if($product->year_of_manufacture || $product->available_colors)
+                        <div class="mt-6 bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Specifications</h3>
+
+                            @if($product->year_of_manufacture)
+                                <div class="flex justify-between py-2 border-b border-gray-200 dark:border-gray-600">
+                                    <span class="text-gray-600 dark:text-gray-400">Year:</span>
+                                    <span class="font-semibold text-gray-900 dark:text-white">{{ $product->year_of_manufacture }}</span>
+                                </div>
+                            @endif
+
+                            @if($product->available_colors && is_array($product->available_colors) && count($product->available_colors) > 0)
+                                <div class="flex justify-between py-2">
+                                    <span class="text-gray-600 dark:text-gray-400">Colors:</span>
+                                    <span class="font-semibold text-gray-900 dark:text-white">{{ $product->color_list }}</span>
+                                </div>
+                            @endif
+                        </div>
+                    @endif
+
                     <!-- Call to Action Buttons -->
                     <div class="mt-8 flex gap-4">
                         <a href="#" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition">

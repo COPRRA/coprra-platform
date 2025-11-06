@@ -140,7 +140,9 @@
       "Bash(for page in \"\" \"about\" \"contact\" \"privacy\" \"terms\" \"faq\")",
       "Bash(do echo \"=== $page ===\")",
       "Bash(for page in \"privacy\" \"terms\" \"faq\")",
-      "Bash(do echo \"=== Testing /$page ===\")"
+      "Bash(do echo \"=== Testing /$page ===\")",
+      "Bash(for category in monitors gaming-laptops smartphones tablets)",
+      "Bash(do echo \"=== Testing /categories/$category ===\")"
     ],
     "deny": [],
     "ask": []

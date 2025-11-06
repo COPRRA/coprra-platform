@@ -13,9 +13,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property int         $id
  * @property int|null    $user_id
  * @property string|null $session_id
- * @property int         $language_id
- * @property int         $currency_id
- ** @property string|null $ip_address
+ * @property int|null    $language_id
+ * @property int|null    $currency_id
+ * @property string|null $ip_address
  * @property string|null $country_code
  * @property User|null   $user
  * @property Language    $language

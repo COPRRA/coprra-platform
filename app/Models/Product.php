@@ -28,6 +28,8 @@ use Illuminate\Support\Facades\Cache;
  * @property int                                                       $category_id
  * @property int                                                       $brand_id
  * @property int                                                       $purchase_count
+ * @property int|null                                                  $year_of_manufacture
+ * @property array|null                                                $available_colors
  * @property Category                                                  $category
  * @property Brand                                                     $brand
  * @property \Illuminate\Database\Eloquent\Collection<int, PriceAlert> $priceAlerts
@@ -68,6 +70,8 @@ class Product extends Model
         'category_id',
         'brand_id',
         'store_id',
+        'year_of_manufacture',
+        'available_colors',
     ];
 
     /**
@@ -77,6 +81,8 @@ class Product extends Model
         'price' => 'decimal:2',
         'is_active' => 'boolean',
         'stock_quantity' => 'integer',
+        'year_of_manufacture' => 'integer',
+        'available_colors' => 'array',
     ];
 
     /**
@@ -318,6 +324,24 @@ class Product extends Model
     public function getAverageRating(): float
     {
         return (float) $this->reviews()->avg('rating') ?: 0.0;
+    }
+
+    /**
+     * Get formatted year display.
+     */
+    public function getFormattedYearAttribute(): ?string
+    {
+        return $this->year_of_manufacture ? (string) $this->year_of_manufacture : null;
+    }
+
+    /**
+     * Get color list as comma-separated string.
+     */
+    public function getColorListAttribute(): string
+    {
+        return $this->available_colors && is_array($this->available_colors)
+            ? implode(', ', $this->available_colors)
+            : 'N/A';
     }
 
     #[\Override]
