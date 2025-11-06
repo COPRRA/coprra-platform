@@ -26,29 +26,9 @@
             </div>
 
             <!-- Right Side Of Navbar (Desktop) -->
-            <div class="hidden md:flex items-center space-x-6">
-                <!-- Search Bar -->
-                <form method="GET" action="{{ route('products.index') }}" class="relative">
-                    <input type="text" name="search" placeholder="{{ __('Search products...') }}" class="pl-10 pr-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 w-48">
-                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                </form>
-
-                <!-- Comparison Counter -->
-                @php
-                    $compareCount = count(session()->get('compare', []));
-                @endphp
-                <a href="{{ route('compare.index') }}" class="relative inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition duration-150 ease-in-out {{ request()->routeIs('compare.*') ? 'text-blue-600 dark:text-blue-400 font-semibold' : '' }}">
-                    <i class="fas fa-balance-scale mr-2"></i>
-                    <span>{{ __('Compare') }}</span>
-                    @if($compareCount > 0)
-                        <span class="ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-blue-600 rounded-full">
-                            {{ $compareCount }}
-                        </span>
-                    @endif
-                </a>
-
-                <!-- Hierarchical Internationalization Component -->
-                @include('layouts.navigation-i18n')
+            <div class="hidden md:flex items-center space-x-4">
+                <!-- Consolidated Globe Icon I18n Dropdown -->
+                @include('layouts.navigation-i18n-consolidated')
 
                 @guest
                     <a href="{{ route('login') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
