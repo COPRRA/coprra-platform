@@ -1,73 +1,116 @@
 @extends('layouts.app')
 
+@section('title', __('Home') . ' - ' . config('app.name'))
+@section('description', __('main.coprra_description'))
+
 @section('content')
-<div class="container py-4">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">Home</div>
+<div class="py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Hero Section -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                {{ __('Welcome to') }} {{ config('app.name', 'COPRRA') }}
+            </h1>
+            <p class="text-lg text-gray-600 dark:text-gray-400">
+                {{ __('main.coprra_description') }}
+            </p>
+        </div>
 
-                <div class="card-body">
-                    <h5>Featured Products</h5>
-                    @if(isset($featuredProducts) && $featuredProducts->count() > 0)
-                    <div class="row">
-                        @foreach($featuredProducts as $product)
-                        <div class="col-md-3">
-                            <div class="card mb-3">
-                                <div class="card-body">
-                                    <h6 class="card-title">{{ $product->name }}</h6>
-                                    <!-- Null-safe access to brand name to avoid 500 errors -->
-                                    <p class="card-text text-muted">{{ $product->brand?->name ?? '' }}</p>
-                                    <p><strong>${{ number_format($product->price, 2) }}</strong></p>
-                                    <a href="{{ route('products.show', $product) }}" class="btn btn-sm btn-primary">View</a>
-                                </div>
+        <!-- Featured Products -->
+        @if(isset($featuredProducts) && $featuredProducts->count() > 0)
+        <div class="mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-6">{{ __('Featured Products') }}</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                @foreach($featuredProducts as $product)
+                    <article class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+                        @if($product->image)
+                            <img src="{{ $product->image }}" alt="{{ $product->name }}" class="w-full h-48 object-cover">
+                        @else
+                            <div class="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                <i class="fas fa-image fa-3x text-gray-400"></i>
                             </div>
-                        </div>
-                        @endforeach
-                    </div>
-                    @else
-                    <p class="text-muted">No featured products available.</p>
-                    @endif
+                        @endif
 
-                    @if(isset($categories) && count($categories) > 0)
-                    <h5 class="mt-4">Categories</h5>
-                    <div class="row">
-                        @foreach($categories as $category)
-                        @php($catName = is_array($category) ? ($category['name'] ?? '') : ($category->name ?? ''))
-                        @php($catCount = is_array($category) ? ($category['products_count'] ?? 0) : ($category->products_count ?? 0))
-                        <div class="col-md-2">
-                            <div class="card mb-3">
-                                <div class="card-body text-center">
-                                    <h6 class="card-title">{{ $catName }}</h6>
-                                    <p class="small text-muted">{{ $catCount }} products</p>
+                        <div class="p-4">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                                <a href="{{ route('products.show', $product->slug ?? $product->id) }}" class="hover:text-blue-600 dark:hover:text-blue-400">
+                                    {{ $product->name }}
+                                </a>
+                            </h3>
+                            @if($product->brand)
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ $product->brand->name }}</p>
+                            @endif
+                            @if(!is_null($product->price))
+                                <div class="text-xl font-bold text-blue-600 dark:text-blue-400 mb-3">
+                                    ${{ number_format((float)$product->price, 2) }}
                                 </div>
-                            </div>
+                            @endif
+                            <a href="{{ route('products.show', $product->slug ?? $product->id) }}" class="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-4 rounded transition">
+                                {{ __('View Details') }}
+                            </a>
                         </div>
-                        @endforeach
-                    </div>
-                    @endif
-
-                    @if(isset($brands) && count($brands) > 0)
-                    <h5 class="mt-4">Brands</h5>
-                    <div class="row">
-                        @foreach($brands as $brand)
-                        @php($brandName = is_array($brand) ? ($brand['name'] ?? '') : ($brand->name ?? ''))
-                        @php($brandCount = is_array($brand) ? ($brand['products_count'] ?? 0) : ($brand->products_count ?? 0))
-                        <div class="col-md-2">
-                            <div class="card mb-3">
-                                <div class="card-body text-center">
-                                    <h6 class="card-title">{{ $brandName }}</h6>
-                                    <p class="small text-muted">{{ $brandCount }} products</p>
-                                </div>
-                            </div>
-                        </div>
-                        @endforeach
-                    </div>
-                    @endif
-                </div>
+                    </article>
+                @endforeach
             </div>
+        </div>
+        @endif
+
+        <!-- Categories -->
+        @if(isset($categories) && count($categories) > 0)
+        <div class="mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-6">{{ __('main.categories') }}</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                @foreach($categories as $category)
+                    @php
+                        $catName = is_array($category) ? ($category['name'] ?? '') : ($category->name ?? '');
+                        $catCount = is_array($category) ? ($category['products_count'] ?? 0) : ($category->products_count ?? 0);
+                        $catSlug = is_array($category) ? ($category['slug'] ?? '') : ($category->slug ?? '');
+                        $catId = is_array($category) ? ($category['id'] ?? '') : ($category->id ?? '');
+                    @endphp
+                    <a href="{{ $catSlug ? route('categories.show', $catSlug) : route('categories.show', $catId) }}" class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 hover:shadow-lg transition text-center">
+                        <div class="flex flex-col items-center">
+                            <i class="fas fa-tags text-3xl text-blue-600 dark:text-blue-400 mb-2"></i>
+                            <h3 class="font-semibold text-gray-900 dark:text-white mb-1">{{ $catName }}</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">{{ $catCount }} {{ __('products') }}</p>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
+        <!-- Brands -->
+        @if(isset($brands) && count($brands) > 0)
+        <div class="mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-6">{{ __('main.brands') }}</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                @foreach($brands as $brand)
+                    @php
+                        $brandName = is_array($brand) ? ($brand['name'] ?? '') : ($brand->name ?? '');
+                        $brandCount = is_array($brand) ? ($brand['products_count'] ?? 0) : ($brand->products_count ?? 0);
+                        $brandSlug = is_array($brand) ? ($brand['slug'] ?? '') : ($brand->slug ?? '');
+                        $brandId = is_array($brand) ? ($brand['id'] ?? '') : ($brand->id ?? '');
+                    @endphp
+                    <a href="{{ $brandSlug ? route('brands.show', $brandSlug) : route('brands.show', $brandId) }}" class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 hover:shadow-lg transition text-center">
+                        <div class="flex flex-col items-center">
+                            <i class="fas fa-building text-3xl text-blue-600 dark:text-blue-400 mb-2"></i>
+                            <h3 class="font-semibold text-gray-900 dark:text-white mb-1">{{ $brandName }}</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">{{ $brandCount }} {{ __('products') }}</p>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
+        <!-- Call to Action -->
+        <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg shadow-lg p-8 text-center text-white">
+            <h2 class="text-3xl font-bold mb-4">{{ __('Start Comparing Prices') }}</h2>
+            <p class="text-lg mb-6">{{ __('Find the best deals across multiple stores and save money on your purchases.') }}</p>
+            <a href="{{ route('products.index') }}" class="inline-block bg-white text-blue-600 font-semibold py-3 px-8 rounded-lg hover:bg-gray-100 transition">
+                {{ __('Browse All Products') }}
+            </a>
         </div>
     </div>
 </div>
 @endsection
-
