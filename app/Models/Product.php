@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
@@ -65,6 +66,7 @@ class Product extends Model
         'price',
         'image',
         'image_url',
+        'source_url',
         'is_active',
         'stock_quantity',
         'category_id',
@@ -142,6 +144,20 @@ class Product extends Model
     public function wishlists(): HasMany
     {
         return $this->hasMany(Wishlist::class);
+    }
+
+    /**
+     * Users who have saved the product to their wishlist.
+     *
+     * @return BelongsToMany<User, Product>
+     */
+    public function wishlistUsers(): BelongsToMany
+    {
+        return $this
+            ->belongsToMany(User::class, 'wishlists')
+            ->withTimestamps()
+            ->withPivot(['id', 'notes', 'deleted_at'])
+            ->wherePivotNull('deleted_at');
     }
 
     /**

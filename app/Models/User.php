@@ -9,6 +9,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -103,6 +104,20 @@ class User extends Authenticatable
     public function wishlists(): HasMany
     {
         return $this->hasMany(Wishlist::class);
+    }
+
+    /**
+     * Wishlist relationship returning the actual products saved by the user.
+     *
+     * @return BelongsToMany<Product, User>
+     */
+    public function wishlist(): BelongsToMany
+    {
+        return $this
+            ->belongsToMany(Product::class, 'wishlists')
+            ->withTimestamps()
+            ->withPivot(['id', 'notes', 'deleted_at'])
+            ->wherePivotNull('deleted_at');
     }
 
     /**

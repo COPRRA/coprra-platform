@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\UsesClass;
 use Tests\TestCase;
 
@@ -32,9 +31,6 @@ use Tests\TestCase;
 #[CoversClass(AnalyticsController::class)]
 #[UsesClass(BehaviorAnalysisService::class)]
 #[UsesClass(User::class)]
-#[CoversMethod(AnalyticsController::class, 'userAnalytics')]
-#[CoversMethod(AnalyticsController::class, 'siteAnalytics')]
-#[CoversMethod(AnalyticsController::class, 'trackBehavior')]
 final class AnalyticsControllerTest extends TestCase
 {
     private AnalyticsController $controller;

@@ -53,7 +53,11 @@
     <script defer src="{{ asset('vendor/alpinejs/alpine.min.js') }}"></script>
 
     <!-- Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @if (app()->environment('testing'))
+        {{-- Skip Vite during tests to avoid missing manifest errors --}}
+    @else
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @endif
 
     <!-- Livewire (excluded on home to avoid CSP eval warning) -->
     @unless (request()->routeIs('home'))
@@ -71,7 +75,10 @@
     </script>
     @endif
 </head>
-<body class="font-sans antialiased">
+<body class="font-sans antialiased"
+      data-authenticated="{{ auth()->check() ? 'true' : 'false' }}"
+      data-login-url="{{ route('login') }}"
+      data-register-url="{{ route('register') }}">
     <!-- Skip Links for Accessibility -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <a href="#navigation" class="skip-link">Skip to navigation</a>
