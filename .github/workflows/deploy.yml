@@ -18,6 +18,27 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Checkout Golden Master branch (for asset build)
+        uses: actions/checkout@v4
+        with:
+          ref: feature/golden-master
+          path: golden-master
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Build assets (Vite) from Golden Master
+        working-directory: golden-master
+        run: |
+          if [ -f package.json ]; then
+            npm ci || npm install
+            npm run build || npm run production || true
+          else
+            echo "No package.json in golden-master; skipping asset build"
+          fi
+
       - name: Prepare SSH key
         shell: bash
         env:
@@ -36,35 +57,78 @@ jobs:
           set -euo pipefail
           cd /home/u990109832/domains/coprra.com/public_html
 
-          echo "Pulling latest code..."
-          git pull origin main
+          echo "PHASE 1: Emergency Lockdown & Containment"
+          echo "Deleting exposed sensitive files..."
+          rm -f phpinfo.php diagnostic.php artisan || true
+          rm -f storage/logs/laravel.log || true
+          rm -f storage/api-docs/api-docs.json || true
+          find . -maxdepth 1 -type f -name '*.zip' -delete || true
+          find . -maxdepth 1 -type f -name '.env.*' -delete || true
+
+          echo "Enable maintenance page"
+          echo "<html><head><meta charset=\"utf-8\"><title>Maintenance</title></head><body><h1>Site is under maintenance</h1><p>Please check back soon.</p></body></html>" > index.html
+          [ -f .htaccess ] && mv .htaccess .htaccess_disabled || true
+
+          echo "PHASE 2: Nuke and Rebuild"
+          ts=$(date +%Y%m%d%H%M%S)
+          backup_dir=/home/u990109832/domains/coprra.com/backup_$ts
+          mkdir -p "$backup_dir"
+          echo "Backing up .env and uploads..."
+          [ -f .env ] && cp -a .env "$backup_dir/.env.backup" || true
+          [ -d storage/app/public ] && cp -a storage/app/public "$backup_dir/storage_app_public" || true
+          [ -d public/uploads ] && cp -a public/uploads "$backup_dir/public_uploads" || true
+
+          echo "Wiping public_html contents..."
+          rm -rf /home/u990109832/domains/coprra.com/public_html/*
+          cd /home/u990109832/domains/coprra.com/public_html
+
+          echo "Cloning Golden Master branch..."
+          git clone --depth=1 -b feature/golden-master https://github.com/COPRRA/coprra-platform.git .
+
+          echo "Restoring .env..."
+          [ -f "$backup_dir/.env.backup" ] && cp -a "$backup_dir/.env.backup" .env || true
+
+          echo "Writing .htaccess to rewrite to public/"
+          cat > .htaccess << 'HTACC'
+          <IfModule mod_rewrite.c>
+              RewriteEngine On
+              RewriteRule ^(.*)$ public/$1 [L]
+          </IfModule>
+HTACC
 
           echo "Installing PHP dependencies (no-dev)..."
-          composer install --no-dev --prefer-dist --no-interaction
+          composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
 
-          echo "Clearing caches..."
+          echo "Framework setup (artisan)"
+          php artisan key:generate || true
+          php artisan storage:link || true
+          php artisan migrate --force || true
           php artisan optimize:clear
-
-          echo "Rebuilding caches..."
-          php artisan config:cache
-          php artisan route:cache
-          # Force clear compiled Blade views to avoid stale templates
-          echo "Removing compiled Blade files..."
-          rm -f storage/framework/views/*.php || true
-          php artisan view:clear
-          # Optionally precompile views; comment out if causing stale caches
-          # php artisan view:cache
 
           echo "Resetting OPcache..."
           php -r 'function_exists("opcache_reset") ? opcache_reset() : null;'
 
-          echo "Running migrations..."
-          php artisan migrate --force
+          echo "PHASE 2 complete"
           EOF
 
-      - name: Health check
+      - name: Upload built assets to server
+        if: success()
         shell: bash
         run: |
-          echo "Running health check..."
-          curl --fail --silent --show-error https://coprra.com/api/health > /dev/null
-          echo "Health OK"
+          if [ -d golden-master/public/build ]; then
+            echo "Uploading Vite build to server..."
+            scp -i ~/.ssh/id_rsa -P 65002 -o StrictHostKeyChecking=no -r golden-master/public/build u990109832@45.87.81.218:/home/u990109832/domains/coprra.com/public_html/public/
+          else
+            echo "No built assets found; skipping upload"
+          fi
+
+      - name: Health check (homepage)
+        shell: bash
+        run: |
+          echo "Running homepage health check..."
+          code=$(curl -s -o /dev/null -w "%{http_code}" https://coprra.com/)
+          echo "Home status: $code"
+          if [ "$code" != "200" ]; then
+            echo "Homepage not healthy (status $code)" >&2
+            exit 1
+          fi

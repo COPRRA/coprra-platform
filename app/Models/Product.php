@@ -65,6 +65,7 @@ class Product extends Model
         'price',
         'image',
         'image_url',
+        'source_url',
         'is_active',
         'stock_quantity',
         'category_id',

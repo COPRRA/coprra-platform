@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Account\WishlistController as AccountWishlistController;
+use App\Http\Controllers\Api\WishlistController as ApiWishlistController;
 use App\Http\Controllers\Admin\AgentDashboardController;
+use App\Http\Controllers\Api\CompareController as ApiCompareController;
 use App\Http\Controllers\Admin\AgentManagementController;
 use App\Http\Controllers\Admin\AIControlPanelController;
 use App\Http\Controllers\Admin\ScraperController;
@@ -26,7 +29,6 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\StatusController;
-use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Pulse\Pulse;
 
@@ -51,6 +53,14 @@ Route::get('/health-check', static function () {
 
 // Status monitoring endpoint
 Route::get('/status', [StatusController::class, 'index'])->name('status');
+
+// API-like routes that rely on session state (guest-friendly endpoints)
+Route::prefix('api')->name('api.')->group(static function (): void {
+    Route::get('compare', [ApiCompareController::class, 'index'])->name('compare.index');
+    Route::post('compare/clear', [ApiCompareController::class, 'clear'])->name('compare.clear');
+    Route::post('compare/{product}', [ApiCompareController::class, 'store'])->name('compare.store');
+    Route::delete('compare/{product}', [ApiCompareController::class, 'destroy'])->name('compare.destroy');
+});
 
 // Laravel Pulse dashboard (secured via viewPulse gate and middleware in config/pulse.php)
 if (class_exists(\Laravel\Pulse\Pulse::class) && method_exists(\Laravel\Pulse\Pulse::class, 'route')) {
@@ -167,12 +177,7 @@ Route::middleware('auth')->group(static function (): void {
         'price-alerts' => 'priceAlert',
     ]);
 
-    // Wishlist Routes
-    Route::post('wishlist/add', [WishlistController::class, 'store'])->name('wishlist.add');
-    Route::delete('wishlist/remove', [WishlistController::class, 'remove'])->name('wishlist.remove');
-    Route::delete('wishlist/clear', [WishlistController::class, 'clear'])->name('wishlist.clear');
-    Route::post('wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
-    Route::resource('wishlist', WishlistController::class)->only(['index', 'destroy']);
+    Route::get('account/wishlist', [AccountWishlistController::class, 'index'])->name('account.wishlist');
 
     // Review Routes
     Route::resource('reviews', ReviewController::class)->only(['store', 'update', 'destroy']);
@@ -182,7 +187,7 @@ Route::middleware('auth')->group(static function (): void {
 
 // Cart Routes (public, ensure web middleware is explicitly applied)
 Route::middleware('web')->group(static function (): void {
-    Route::get('cart', [CartController::class, 'index'])->name('cart.index');
+    Route::get('cartx', [CartController::class, 'index'])->name('cart.index');
     Route::post('cart', [CartController::class, 'addFromRequest'])->name('cart.store');
     Route::post('cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
     Route::post('cart/update', [CartController::class, 'update'])->name('cart.update');
@@ -270,7 +275,9 @@ Route::middleware(['auth', \App\Http\Middleware\IsAdmin::class])->prefix('admin'
         Route::get('/', [ScraperController::class, 'index'])->name('index');
         Route::post('/start', [ScraperController::class, 'startScraping'])->name('start');
         Route::get('/logs', [ScraperController::class, 'getLogs'])->name('logs');
+        Route::get('/jobs', [ScraperController::class, 'getJobs'])->name('jobs');
         Route::post('/clear-logs', [ScraperController::class, 'clearLogs'])->name('clear-logs');
+        Route::post('/clear-jobs', [ScraperController::class, 'clearJobs'])->name('clear-jobs');
     });
 
 });

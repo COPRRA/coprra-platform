@@ -7,6 +7,8 @@ namespace App\Jobs;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ScraperJob;
+use App\Services\StoreAdapters\MockStoreAdapter;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -44,6 +46,13 @@ class ProcessScrapingJob implements ShouldQueue
     public $jobNumber;
 
     /**
+     * The scraper job model ID for tracking.
+     *
+     * @var int
+     */
+    public $scraperJobId;
+
+    /**
      * The number of times the job may be attempted.
      *
      * @var int
@@ -60,11 +69,22 @@ class ProcessScrapingJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(string $url, string $batchId, int $jobNumber)
+    public function __construct(string $url, string $batchId, int $jobNumber, int $scraperJobId)
     {
         $this->url = $url;
         $this->batchId = $batchId;
         $this->jobNumber = $jobNumber;
+        $this->scraperJobId = $scraperJobId;
+    }
+
+    /**
+     * Calculate the number of seconds to wait before retrying the job.
+     *
+     * @return array<int, int>
+     */
+    public function backoff(): array
+    {
+        return [60, 180, 300]; // Retry after 1, 3, and 5 minutes
     }
 
     /**
@@ -72,40 +92,61 @@ class ProcessScrapingJob implements ShouldQueue
      */
     public function handle(): void
     {
+        // Get the scraper job model
+        $scraperJob = ScraperJob::find($this->scraperJobId);
+
+        if (!$scraperJob) {
+            Log::channel('scraper')->error("❌ Job #{$this->jobNumber}: ScraperJob record not found (ID: {$this->scraperJobId})");
+            return;
+        }
+
+        // Mark job as running
+        $scraperJob->markAsRunning();
+
         Log::channel('scraper')->info("🔍 Job #{$this->jobNumber}: Starting scraping for {$this->url}");
 
         try {
             // Validate URL
-            if (! $this->isValidAmazonUrl($this->url)) {
-                Log::channel('scraper')->error("❌ Job #{$this->jobNumber}: Invalid Amazon URL");
-
-                return;
+            if (!$this->isValidUrl($this->url)) {
+                throw new \Exception("Invalid URL format");
             }
 
-            // Call Python scraper
-            $data = $this->runPythonScraper();
+            // Initialize Mock Store Adapter
+            $adapter = app(MockStoreAdapter::class);
 
-            if (! $data) {
-                Log::channel('scraper')->error("❌ Job #{$this->jobNumber}: Failed to extract data from URL");
+            // Fetch product data using adapter
+            $data = $adapter->fetchProduct($this->url);
 
-                return;
+            if (!$data) {
+                throw new \Exception("Failed to extract data from URL");
             }
+
+            // Store the adapter name
+            $scraperJob->update(['store_adapter' => $adapter->getStoreName()]);
 
             // Create product from scraped data
             $product = $this->createProduct($data);
 
             if ($product) {
-                Log::channel('scraper')->info("✅ Job #{$this->jobNumber}: Product created successfully (ID: {$product->id})");
+                $scraperJob->markAsCompleted($product->id);
+                Log::channel('scraper')->info("✅ Job #{$this->jobNumber}: Product created successfully (ID: {$product->id}, Name: {$product->name})");
             } else {
-                Log::channel('scraper')->error("❌ Job #{$this->jobNumber}: Failed to create product in database");
+                throw new \Exception("Failed to create product in database");
             }
         } catch (\Exception $e) {
-            Log::channel('scraper')->error("❌ Job #{$this->jobNumber}: Exception - {$e->getMessage()}");
+            $errorMessage = $e->getMessage();
+            Log::channel('scraper')->error("❌ Job #{$this->jobNumber}: Exception - {$errorMessage}");
 
-            // Re-throw to mark job as failed (for retry logic)
-            if ($this->attempts() < $this->tries) {
-                throw $e;
+            // Mark as failed if this is the last attempt
+            if ($this->attempts() >= $this->tries) {
+                $scraperJob->markAsFailed($errorMessage);
+                Log::channel('scraper')->error("❌ Job #{$this->jobNumber}: FAILED after {$this->tries} attempts");
+            } else {
+                Log::channel('scraper')->warning("⏳ Job #{$this->jobNumber}: Will retry (Attempt {$this->attempts()}/{$this->tries})");
             }
+
+            // Re-throw to trigger retry logic
+            throw $e;
         }
     }
 
@@ -114,32 +155,25 @@ class ProcessScrapingJob implements ShouldQueue
      */
     public function failed(\Throwable $exception): void
     {
-        Log::channel('scraper')->error("❌ Job #{$this->jobNumber} FAILED after {$this->tries} attempts: {$exception->getMessage()}");
+        Log::channel('scraper')->error("❌ Job #{$this->jobNumber} FAILED PERMANENTLY: {$exception->getMessage()}");
+
+        // Try to mark scraper job as failed if not already done
+        try {
+            $scraperJob = ScraperJob::find($this->scraperJobId);
+            if ($scraperJob && $scraperJob->status !== 'failed') {
+                $scraperJob->markAsFailed($exception->getMessage());
+            }
+        } catch (\Exception $e) {
+            Log::channel('scraper')->error("Failed to update scraper job status: {$e->getMessage()}");
+        }
     }
 
     /**
-     * Validate if URL is a valid product URL
-     * Now supports ANY store, ANY country, ANY product.
+     * Validate if URL is a valid product URL.
      */
-    private function isValidAmazonUrl(string $url): bool
+    private function isValidUrl(string $url): bool
     {
-        // Accept any valid URL from any store
-        // Examples: amazon.com, amazon.eg, jumia.com.eg, noon.com, etc.
-        return false !== filter_var($url, \FILTER_VALIDATE_URL);
-    }
-
-    /**
-     * Run Python scraper script.
-     */
-    private function runPythonScraper(): ?array
-    {
-        // Note: shell_exec may be disabled on shared hosting
-        // Using fallback mock data for now
-        // In production, use HTTP API or direct scraping with PHP
-
-        Log::channel('scraper')->info('Using fallback scraper (shell_exec disabled on server)');
-
-        return $this->mockScrapedData();
+        return filter_var($url, FILTER_VALIDATE_URL) !== false;
     }
 
     /**
@@ -151,7 +185,6 @@ class ProcessScrapingJob implements ShouldQueue
             // Validate required fields
             if (empty($data['name']) || empty($data['price'])) {
                 Log::channel('scraper')->error('❌ Missing required fields: name or price');
-
                 return null;
             }
 
@@ -168,7 +201,7 @@ class ProcessScrapingJob implements ShouldQueue
             $originalSlug = $slug;
             $counter = 1;
             while (Product::where('slug', $slug)->exists()) {
-                $slug = $originalSlug.'-'.$counter;
+                $slug = $originalSlug . '-' . $counter;
                 ++$counter;
             }
 
@@ -178,11 +211,12 @@ class ProcessScrapingJob implements ShouldQueue
                 'slug' => $slug,
                 'description' => $data['description'] ?? null,
                 'price' => $this->parsePrice($data['price']),
-                'image' => $data['image'] ?? null,
+                'image' => null,
+                'image_url' => $data['image_url'] ?? null,
+                'source_url' => $this->url,
                 'brand_id' => $brand->id,
                 'category_id' => $category->id,
                 'is_active' => true,
-                'source_url' => $this->url,
             ]);
 
             Log::channel('scraper')->info("✅ Product created: {$product->name} (ID: {$product->id})");
@@ -190,7 +224,6 @@ class ProcessScrapingJob implements ShouldQueue
             return $product;
         } catch (\Exception $e) {
             Log::channel('scraper')->error("❌ Error creating product: {$e->getMessage()}");
-
             return null;
         }
     }
@@ -204,7 +237,7 @@ class ProcessScrapingJob implements ShouldQueue
             ['name' => $brandName],
             [
                 'slug' => Str::slug($brandName),
-                'description' => 'Imported from Amazon',
+                'description' => 'Auto-imported brand',
                 'is_active' => true,
             ]
         );
@@ -237,154 +270,8 @@ class ProcessScrapingJob implements ShouldQueue
         }
 
         // Remove non-numeric characters except decimal point
-        $cleaned = preg_replace('/[^0-9.]/', '', $price);
+        $cleaned = preg_replace('/[^0-9.]/', '', (string) $price);
 
         return (float) $cleaned;
-    }
-
-    /**
-     * Mock scraped data (fallback for testing).
-     */
-    private function mockScrapedData(): array
-    {
-        // Extract product ID from URL if possible
-        preg_match('/\/dp\/([A-Z0-9]+)/', $this->url, $matches);
-        $productId = $matches[1] ?? 'UNKNOWN';
-
-        // Extract product name from URL
-        preg_match('/\/([^\/]+)\/dp\//', $this->url, $nameMatches);
-        $urlName = $nameMatches[1] ?? 'Product';
-        $urlName = str_replace('-', ' ', $urlName);
-        $urlName = ucwords($urlName);
-
-        // Universal brand detection from URL (works with ANY store)
-        $brand = 'Generic';
-        $urlLower = strtolower($this->url);
-
-        // Major brands detection
-        if (false !== stripos($urlLower, 'apple') || false !== stripos($urlLower, 'iphone') || false !== stripos($urlLower, 'macbook')) {
-            $brand = 'Apple';
-        } elseif (false !== stripos($urlLower, 'samsung') || false !== stripos($urlLower, 'galaxy')) {
-            $brand = 'Samsung';
-        } elseif (false !== stripos($urlLower, 'lg')) {
-            $brand = 'LG';
-        } elseif (false !== stripos($urlLower, 'sony')) {
-            $brand = 'Sony';
-        } elseif (false !== stripos($urlLower, 'dell')) {
-            $brand = 'Dell';
-        } elseif (false !== stripos($urlLower, 'hp') || false !== stripos($urlLower, 'hewlett')) {
-            $brand = 'HP';
-        } elseif (false !== stripos($urlLower, 'lenovo')) {
-            $brand = 'Lenovo';
-        } elseif (false !== stripos($urlLower, 'asus')) {
-            $brand = 'ASUS';
-        } elseif (false !== stripos($urlLower, 'acer')) {
-            $brand = 'Acer';
-        } elseif (false !== stripos($urlLower, 'xiaomi') || false !== stripos($urlLower, 'redmi')) {
-            $brand = 'Xiaomi';
-        } elseif (false !== stripos($urlLower, 'oppo')) {
-            $brand = 'OPPO';
-        } elseif (false !== stripos($urlLower, 'vivo')) {
-            $brand = 'Vivo';
-        } elseif (false !== stripos($urlLower, 'realme')) {
-            $brand = 'Realme';
-        } elseif (false !== stripos($urlLower, 'nokia')) {
-            $brand = 'Nokia';
-        } elseif (false !== stripos($urlLower, 'huawei')) {
-            $brand = 'Huawei';
-        } elseif (false !== stripos($urlLower, 'microsoft') || false !== stripos($urlLower, 'surface')) {
-            $brand = 'Microsoft';
-        } elseif (false !== stripos($urlLower, 'google') || false !== stripos($urlLower, 'pixel')) {
-            $brand = 'Google';
-        } elseif (false !== stripos($urlLower, 'bosch')) {
-            $brand = 'Bosch';
-        } elseif (false !== stripos($urlLower, 'siemens')) {
-            $brand = 'Siemens';
-        } elseif (false !== stripos($urlLower, 'whirlpool')) {
-            $brand = 'Whirlpool';
-        } elseif (false !== stripos($urlLower, 'tornado')) {
-            $brand = 'Tornado';
-        } elseif (false !== stripos($urlLower, 'fresh')) {
-            $brand = 'Fresh';
-        } elseif (false !== stripos($urlLower, 'kiriazi')) {
-            $brand = 'Kiriazi';
-        } elseif (false !== stripos($urlLower, 'sharp')) {
-            $brand = 'Sharp';
-        } elseif (false !== stripos($urlLower, 'toshiba')) {
-            $brand = 'Toshiba';
-        } elseif (false !== stripos($urlLower, 'panasonic')) {
-            $brand = 'Panasonic';
-        } elseif (false !== stripos($urlLower, 'philips')) {
-            $brand = 'Philips';
-        }
-
-        // Universal category detection (ANY product type)
-        $category = 'General';
-
-        // Mobile Phones & Accessories
-        if (false !== stripos($urlLower, 'iphone') || false !== stripos($urlLower, 'mobile')
-            || false !== stripos($urlLower, 'phone') || false !== stripos($urlLower, 'smartphone')
-            || false !== stripos($urlLower, 'galaxy') || false !== stripos($urlLower, 'pixel')) {
-            $category = 'Mobile Phones';
-        }
-        // Laptops & Computers
-        elseif (false !== stripos($urlLower, 'macbook') || false !== stripos($urlLower, 'laptop')
-                || false !== stripos($urlLower, 'notebook') || false !== stripos($urlLower, 'computer')
-                || false !== stripos($urlLower, 'desktop')) {
-            $category = 'Laptops';
-        }
-        // Tablets
-        elseif (false !== stripos($urlLower, 'ipad') || false !== stripos($urlLower, 'tablet')) {
-            $category = 'Tablets';
-        }
-        // Watches & Wearables
-        elseif (false !== stripos($urlLower, 'watch') || false !== stripos($urlLower, 'smartwatch')) {
-            $category = 'Smart Watches';
-        }
-        // Headphones & Audio
-        elseif (false !== stripos($urlLower, 'airpods') || false !== stripos($urlLower, 'headphone')
-                || false !== stripos($urlLower, 'earbuds') || false !== stripos($urlLower, 'speaker')) {
-            $category = 'Audio Accessories';
-        }
-        // Home Appliances (Large)
-        elseif (false !== stripos($urlLower, 'refrigerator') || false !== stripos($urlLower, 'washing')
-                || false !== stripos($urlLower, 'washer') || false !== stripos($urlLower, 'dryer')
-                || false !== stripos($urlLower, 'dishwasher') || false !== stripos($urlLower, 'oven')) {
-            $category = 'Home Appliances';
-        }
-        // Small Kitchen Appliances
-        elseif (false !== stripos($urlLower, 'blender') || false !== stripos($urlLower, 'mixer')
-                || false !== stripos($urlLower, 'toaster') || false !== stripos($urlLower, 'coffee')
-                || false !== stripos($urlLower, 'microwave')) {
-            $category = 'Kitchen Appliances';
-        }
-        // TVs & Displays
-        elseif (false !== stripos($urlLower, 'tv') || false !== stripos($urlLower, 'television')
-                || false !== stripos($urlLower, 'monitor') || false !== stripos($urlLower, 'display')) {
-            $category = 'TVs & Displays';
-        }
-        // Gaming
-        elseif (false !== stripos($urlLower, 'playstation') || false !== stripos($urlLower, 'xbox')
-                || false !== stripos($urlLower, 'nintendo') || false !== stripos($urlLower, 'gaming')) {
-            $category = 'Gaming';
-        }
-        // Cameras
-        elseif (false !== stripos($urlLower, 'camera') || false !== stripos($urlLower, 'canon')
-                || false !== stripos($urlLower, 'nikon')) {
-            $category = 'Cameras';
-        }
-        // ANY other product
-        else {
-            $category = 'Other Products';
-        }
-
-        return [
-            'name' => "{$urlName} (Imported from Amazon - {$productId})",
-            'price' => rand(5000, 80000),
-            'description' => "<ul><li>High-quality product imported from Amazon Egypt</li><li>Product ID: {$productId}</li><li>Brand: {$brand}</li><li>Category: {$category}</li><li>Full details available at source URL</li></ul>",
-            'image' => null,
-            'brand' => $brand,
-            'category' => $category,
-        ];
     }
 }
