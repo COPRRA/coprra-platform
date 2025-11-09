@@ -4,61 +4,70 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Models\Brand;
-use App\Models\Category;
-use App\Models\Product;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Carbon;
+use Spatie\Sitemap\Sitemap;
+use Spatie\Sitemap\Tags\Url;
+use App\Models\Category;
+use App\Models\Brand;
+use App\Models\Product;
 
 class SitemapController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $baseUrl = config('app.url');
+
+        $sitemap = Sitemap::create()
+            ->add(Url::create(url('/'))->setLastModificationDate(Carbon::now()))
+            ->add(Url::create(route('products.index')))
+            ->add(Url::create(route('categories.index')))
+            ->add(Url::create(route('brands.index')))
+            ->add(Url::create(url('/compare')))
+            ->add(Url::create(url('/account/wishlist')))
+            ->add(Url::create(route('login')));
+
+        // Dynamic categories
         try {
-            $products = Product::where('is_active', true)->get();
-            $categories = Category::all();
-            $brands = Brand::all();
-        } catch (\Exception $e) {
-            $products = collect([]);
-            $categories = collect([]);
-            $brands = collect([]);
+            $categories = Category::query()->select(['slug', 'updated_at'])->get();
+            foreach ($categories as $category) {
+                $sitemap->add(
+                    Url::create(route('categories.show', $category->slug))
+                        ->setLastModificationDate($category->updated_at ?? Carbon::now())
+                );
+            }
+        } catch (\Throwable $e) {
+            // ignore DB errors in sitemap generation
         }
 
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>';
-        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-
-        // Homepage
-        $xml .= '<url><loc>https://coprra.com</loc><priority>1.0</priority></url>';
-
-        // Products
-        foreach ($products as $product) {
-            $slug = $product->slug ?? $product->id;
-            $xml .= "<url><loc>https://coprra.com/products/{$slug}</loc><priority>0.8</priority></url>";
+        // Dynamic brands
+        try {
+            $brands = Brand::query()->select(['slug', 'updated_at'])->get();
+            foreach ($brands as $brand) {
+                // brand show route may use slug
+                $sitemap->add(
+                    Url::create(route('brands.show', $brand->slug))
+                        ->setLastModificationDate($brand->updated_at ?? Carbon::now())
+                );
+            }
+        } catch (\Throwable $e) {
+            // ignore
         }
 
-        // Categories
-        foreach ($categories as $category) {
-            $slug = $category->slug ?? $category->id;
-            $xml .= "<url><loc>https://coprra.com/categories/{$slug}</loc><priority>0.7</priority></url>";
+        // Dynamic products
+        try {
+            $products = Product::query()->select(['slug', 'updated_at'])->get();
+            foreach ($products as $product) {
+                $sitemap->add(
+                    Url::create(route('products.show', $product->slug))
+                        ->setLastModificationDate($product->updated_at ?? Carbon::now())
+                );
+            }
+        } catch (\Throwable $e) {
+            // ignore
         }
 
-        // Static pages
-        $staticPages = [
-            ['url' => 'products', 'priority' => '0.9'],
-            ['url' => 'categories', 'priority' => '0.9'],
-            ['url' => 'brands', 'priority' => '0.8'],
-            ['url' => 'deals', 'priority' => '0.9'],
-            ['url' => 'blog', 'priority' => '0.7'],
-            ['url' => 'compare', 'priority' => '0.6'],
-            ['url' => 'about', 'priority' => '0.5'],
-            ['url' => 'contact', 'priority' => '0.5'],
-        ];
-
-        foreach ($staticPages as $page) {
-            $xml .= "<url><loc>https://coprra.com/{$page['url']}</loc><priority>{$page['priority']}</priority></url>";
-        }
-
-        $xml .= '</urlset>';
-
-        return response($xml, 200)->header('Content-Type', 'application/xml');
+        return $sitemap->toResponse($request);
     }
 }
