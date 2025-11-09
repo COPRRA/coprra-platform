@@ -1,9 +1,14 @@
 # 🔥 COPRRA - Advanced .htaccess Configuration
 
-# Enable Rewrite Engine
+# Enable Rewrite Engine (root dispatcher)
 RewriteEngine On
 
-# Handle Angular and Vue.js routes
+# Ensure Apache does not use MultiViews content negotiation (prevents false 404s on routes like /products)
+<IfModule mod_negotiation.c>
+    Options -MultiViews
+</IfModule>
+
+# Handle all dynamic routes through Laravel's front controller
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ index.php [QSA,L]

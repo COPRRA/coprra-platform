@@ -13,6 +13,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('jobs')) {
+            return;
+        }
+
         Schema::create('jobs', static function (Blueprint $table): void {
             $table->id();
             $table->string('queue')->index();

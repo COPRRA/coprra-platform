@@ -4,248 +4,223 @@
 @section('description', 'Compare up to 4 products side by side with detailed specifications')
 
 @section('content')
-<div class="py-8">
+<div class="py-10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Header -->
-        <div class="flex justify-between items-center mb-6">
+        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Product Comparison</h1>
-                <p class="text-gray-600 dark:text-gray-400 mt-2">Compare up to {{ $maxProducts }} products side by side</p>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+                    {{ __('Interactive Product Comparison') }}
+                </h1>
+                <p class="mt-2 text-gray-600 dark:text-gray-400">
+                    {{ __('Select up to :count products to compare every detail side by side.', ['count' => $maxProducts]) }}
+                </p>
             </div>
-            <div class="flex gap-2">
-                <a href="{{ route('products.index') }}" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg transition">
-                    <i class="fas fa-arrow-left mr-2"></i>Browse Products
+            <div class="flex flex-wrap gap-3">
+                <a href="{{ route('products.index') }}"
+                   class="inline-flex items-center px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white transition">
+                    <i class="fas fa-search mr-2"></i> {{ __('Browse Products') }}
                 </a>
-                @if($products->count() > 0)
-                    <form method="POST" action="{{ route('compare.clear') }}">
+                @if($products->isNotEmpty())
+                    <form method="POST" action="{{ route('compare.clear') }}" data-compare-clear-form="true">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition">
-                            <i class="fas fa-trash mr-2"></i>Clear All
+                        <button type="submit"
+                                class="inline-flex items-center px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white transition"
+                                data-compare-clear="true">
+                            <i class="fas fa-trash mr-2"></i> {{ __('Clear Comparison') }}
                         </button>
                     </form>
                 @endif
             </div>
         </div>
 
-        @if($products->count() > 0)
-            <!-- Filters -->
-            @if($availableYears->count() > 0 || $availableColors->count() > 0)
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-6">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Filters</h3>
-                    <div class="flex gap-4 flex-wrap">
-                        @if($availableYears->count() > 0)
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Year of Manufacture</label>
-                                <select id="yearFilter" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                                    <option value="">All Years</option>
-                                    @foreach($availableYears as $year)
-                                        <option value="{{ $year }}">{{ $year }}</option>
-                                    @endforeach
-                                </select>
+        @if($products->isEmpty())
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-12 text-center">
+                <i class="fas fa-balance-scale fa-5x text-gray-300 dark:text-gray-600 mb-6"></i>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                    {{ __('Your comparison list is empty.') }}
+                </h2>
+                <p class="text-gray-600 dark:text-gray-400 mb-6">
+                    {{ __('Add products to compare them side-by-side and find the perfect match for you.') }}
+                </p>
+                <a href="{{ route('products.index') }}"
+                   class="inline-flex items-center px-6 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition">
+                    <i class="fas fa-shopping-bag mr-2"></i> {{ __('Start Shopping') }}
+                </a>
                             </div>
-                        @endif
+        @else
+            <div class="flex flex-col xl:flex-row gap-6">
+                <aside class="xl:w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm p-6 h-fit">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                        {{ __('Highlight specific attributes') }}
+                    </h2>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                        {{ __('Toggle the attributes you care about. The comparison table will update instantly.') }}
+                    </p>
 
-                        @if($availableColors->count() > 0)
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Available Colors</label>
-                                <select id="colorFilter" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                                    <option value="">All Colors</option>
-                                    @foreach($availableColors as $color)
-                                        <option value="{{ $color }}">{{ $color }}</option>
+                    <div class="space-y-3">
+                        @foreach($attributeLabels as $attributeKey => $attributeLabel)
+                            <label class="flex items-center gap-3 cursor-pointer select-none">
+                                <input
+                                    type="checkbox"
+                                    class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                    data-compare-attribute-toggle="{{ $attributeKey }}"
+                                    checked
+                                >
+                                <span class="text-sm text-gray-800 dark:text-gray-200 font-medium">
+                                    {{ $attributeLabel }}
+                                </span>
+                            </label>
                                     @endforeach
-                                </select>
-                            </div>
-                        @endif
                     </div>
-                </div>
-            @endif
+                </aside>
 
-            <!-- Comparison Table -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-x-auto">
+                <div class="flex-1">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
+                        <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                     <thead class="bg-gray-50 dark:bg-gray-900">
                         <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                Specification
+                                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 dark:text-gray-400 uppercase">
+                                        {{ __('Specification') }}
                             </th>
                             @foreach($products as $product)
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                    Product {{ $loop->iteration }}
+                                        @php
+                                            $isWishlisted = in_array($product->id, $wishlistProductIds ?? [], true);
+                                        @endphp
+                                        <th scope="col" class="px-6 py-4">
+                                            <div class="flex items-center justify-between gap-2">
+                                                <span class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                                                    {{ __('Product') }} {{ $loop->iteration }}
+                                                </span>
+                                                <button
+                                                    type="button"
+                                                    class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-500/10 dark:text-red-300 transition"
+                                                    data-compare-remove="{{ $product->id }}"
+                                                >
+                                                    <i class="fas fa-times mr-1"></i> {{ __('Remove') }}
+                                                </button>
+                                            </div>
                                 </th>
                             @endforeach
                         </tr>
                     </thead>
-                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                        <!-- Product Images -->
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                Image
+                                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                                @foreach($attributeLabels as $attributeKey => $attributeLabel)
+                                    @php $isZebra = $loop->odd; @endphp
+                                    <tr
+                                        class="{{ $isZebra ? 'bg-gray-50 dark:bg-gray-900/50' : 'bg-white dark:bg-gray-800' }}"
+                                        data-compare-attribute-row="{{ $attributeKey }}"
+                                    >
+                                        <td class="px-6 py-5 text-sm font-semibold text-gray-900 dark:text-white align-top">
+                                            {{ $attributeLabel }}
                             </td>
                             @foreach($products as $product)
-                                <td class="px-6 py-4">
-                                    @if($product->image)
-                                        <img src="{{ $product->image }}" alt="{{ $product->name }}" class="w-32 h-32 object-cover rounded">
+                                            <td class="px-6 py-5 text-sm text-gray-700 dark:text-gray-200 align-top">
+                                                @switch($attributeKey)
+                                                    @case('image')
+                                                        <div class="flex items-center justify-center">
+                                                            @if($product->image ?? $product->image_url)
+                                                                <img src="{{ $product->image ?? $product->image_url }}" alt="{{ $product->name }}" class="w-36 h-36 object-cover rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
                                     @else
-                                        <div class="w-32 h-32 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
+                                                                <div class="w-36 h-36 bg-gray-200 dark:bg-gray-700 rounded-xl flex items-center justify-center">
                                             <i class="fas fa-image fa-2x text-gray-400"></i>
                                         </div>
                                     @endif
-                                </td>
-                            @endforeach
-                        </tr>
+                                                        </div>
+                                                        @break
 
-                        <!-- Product Names -->
-                        <tr class="bg-gray-50 dark:bg-gray-900">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                Name
-                            </td>
-                            @foreach($products as $product)
-                                <td class="px-6 py-4 text-sm text-gray-900 dark:text-white font-semibold">
-                                    <a href="{{ route('products.show', $product->slug) }}" class="hover:text-blue-600 dark:hover:text-blue-400">
+                                                    @case('name')
+                                                        <a href="{{ route('products.show', $product->slug) }}" class="block text-base font-semibold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition">
                                         {{ $product->name }}
                                     </a>
-                                </td>
-                            @endforeach
-                        </tr>
+                                                        @break
 
-                        <!-- Price -->
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                Price
-                            </td>
-                            @foreach($products as $product)
-                                <td class="px-6 py-4 text-sm">
+                                                    @case('brand')
+                                                        <span>{{ $product->brand->name ?? __('N/A') }}</span>
+                                                        @break
+
+                                                    @case('price')
+                                                        @if(!is_null($product->price))
                                     <span class="text-xl font-bold text-blue-600 dark:text-blue-400">
-                                        ${{ number_format((float)$product->price, 2) }}
+                                                                ${{ number_format((float) $product->price, 2) }}
                                     </span>
+                                                        @else
+                                                            <span class="text-gray-400">{{ __('Not available') }}</span>
+                                                        @endif
+                                                        @break
+
+                                                    @case('category')
+                                                        <span>{{ $product->category->name ?? __('N/A') }}</span>
+                                                        @break
+
+                                                    @case('year')
+                                                        <span>{{ $product->year_of_manufacture ?? __('N/A') }}</span>
+                                                        @break
+
+                                                    @case('colors')
+                                                        @php
+                                                            $colorList = $product->available_colors;
+                                                            $colorText = is_array($colorList) && count($colorList) > 0
+                                                                ? implode(', ', array_map('trim', $colorList))
+                                                                : ($product->color_list ?? null);
+                                                        @endphp
+                                                        <span>{{ $colorText ?: __('N/A') }}</span>
+                                                        @break
+
+                                                    @case('description')
+                                                        <p class="text-sm leading-relaxed">
+                                                            {{ $product->description ? Str::limit(strip_tags((string) $product->description), 220) : __('No description available.') }}
+                                                        </p>
+                                                        @break
+
+                                                    @default
+                                                        <span>{{ __('N/A') }}</span>
+                                                @endswitch
                                 </td>
                             @endforeach
                         </tr>
-
-                        <!-- Category -->
-                        <tr class="bg-gray-50 dark:bg-gray-900">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                Category
-                            </td>
-                            @foreach($products as $product)
-                                <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
-                                    {{ $product->category->name ?? 'N/A' }}
-                                </td>
                             @endforeach
-                        </tr>
-
-                        <!-- Brand -->
+                                </tbody>
+                                <tfoot class="bg-gray-50 dark:bg-gray-900/70">
                         <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                Brand
+                                    <td class="px-6 py-5 text-sm font-semibold text-gray-900 dark:text-white">
+                                        {{ __('Next steps') }}
                             </td>
                             @foreach($products as $product)
-                                <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
-                                    {{ $product->brand->name ?? 'N/A' }}
-                                </td>
-                            @endforeach
-                        </tr>
-
-                        <!-- Year of Manufacture -->
-                        <tr class="bg-gray-50 dark:bg-gray-900">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                Year
-                            </td>
-                            @foreach($products as $product)
-                                <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300" data-year="{{ $product->year_of_manufacture }}">
-                                    {{ $product->year_of_manufacture ?? 'N/A' }}
-                                </td>
-                            @endforeach
-                        </tr>
-
-                        <!-- Available Colors -->
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                Colors
-                            </td>
-                            @foreach($products as $product)
-                                <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300" data-colors="{{ json_encode($product->available_colors ?? []) }}">
-                                    {{ $product->color_list }}
-                                </td>
-                            @endforeach
-                        </tr>
-
-                        <!-- Description -->
-                        <tr class="bg-gray-50 dark:bg-gray-900">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                Description
-                            </td>
-                            @foreach($products as $product)
-                                <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
-                                    {{ Str::limit($product->description, 100) }}
-                                </td>
-                            @endforeach
-                        </tr>
-
-                        <!-- Actions -->
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                Actions
-                            </td>
-                            @foreach($products as $product)
-                                <td class="px-6 py-4">
-                                    <div class="flex flex-col gap-2">
-                                        <a href="{{ route('products.show', $product->slug) }}" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-center rounded text-sm transition">
-                                            View Details
+                                        @php
+                                            $isWishlisted = in_array($product->id, $wishlistProductIds ?? [], true);
+                                        @endphp
+                                        <td class="px-6 py-5">
+                                            <div class="flex flex-col gap-3">
+                                                <a href="{{ route('products.show', $product->slug) }}"
+                                                   class="inline-flex items-center justify-center w-full px-4 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition">
+                                                    <i class="fas fa-shopping-cart mr-2"></i> {{ __('اشتري الآن') }}
                                         </a>
-                                        <form method="POST" action="{{ route('compare.remove', $product) }}">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="w-full px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-sm transition">
-                                                Remove
+                                                <button type="button"
+                                                        class="wishlist-toggle-btn inline-flex items-center justify-center w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition {{ $isWishlisted ? 'bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-500/10 dark:text-red-200 dark:hover:bg-red-500/20' : 'bg-gray-200 hover:bg-gray-300 text-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white' }}"
+                                                        data-product-id="{{ $product->id }}"
+                                                        data-wishlisted="{{ $isWishlisted ? 'true' : 'false' }}"
+                                                        data-wishlist-label-default="{{ __('أضف لقائمة الأماني') }}"
+                                                        data-wishlist-label-active="{{ __('Remove from Wishlist') }}"
+                                                        data-wishlist-icon-default="fas fa-heart"
+                                                        data-wishlist-icon-active="fas fa-heart-broken"
+                                                        data-wishlist-class-default="bg-gray-200 hover:bg-gray-300 text-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
+                                                        data-wishlist-class-active="bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-500/10 dark:text-red-200 dark:hover:bg-red-500/20">
+                                                    <i class="wishlist-icon {{ $isWishlisted ? 'fas fa-heart-broken' : 'fas fa-heart' }} mr-2"></i>
+                                                    <span class="wishlist-label">{{ $isWishlisted ? __('Remove from Wishlist') : __('أضف لقائمة الأماني') }}</span>
                                             </button>
-                                        </form>
                                     </div>
                                 </td>
                             @endforeach
                         </tr>
-                    </tbody>
+                                </tfoot>
                 </table>
             </div>
-        @else
-            <!-- Empty State -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-12 text-center">
-                <i class="fas fa-balance-scale fa-5x text-gray-300 dark:text-gray-600 mb-4"></i>
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">No Products to Compare</h2>
-                <p class="text-gray-600 dark:text-gray-400 mb-6">Add products from the listing pages to compare them side by side.</p>
-                <a href="{{ route('products.index') }}" class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">
-                    <i class="fas fa-shopping-bag mr-2"></i>Browse Products
-                </a>
+                    </div>
+                </div>
             </div>
         @endif
     </div>
 </div>
-
-@if($products->count() > 0 && ($availableYears->count() > 0 || $availableColors->count() > 0))
-    <!-- Filter JavaScript -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const yearFilter = document.getElementById('yearFilter');
-            const colorFilter = document.getElementById('colorFilter');
-
-            function applyFilters() {
-                const selectedYear = yearFilter ? yearFilter.value : '';
-                const selectedColor = colorFilter ? colorFilter.value : '';
-
-                // This is a basic client-side filter
-                // For a more robust solution, you'd want to implement server-side filtering
-                console.log('Filter by year:', selectedYear, 'color:', selectedColor);
-            }
-
-            if (yearFilter) {
-                yearFilter.addEventListener('change', applyFilters);
-            }
-
-            if (colorFilter) {
-                colorFilter.addEventListener('change', applyFilters);
-            }
-        });
-    </script>
-@endif
 @endsection

@@ -159,10 +159,15 @@ return new class extends Migration {
         $storeParam = is_string($cacheStore) && 'default' !== $cacheStore ? $cacheStore : null;
         $keyParam = is_string($cacheKey) ? $cacheKey : 'spatie.permission.cache';
 
-        app('cache')
-            ->store($storeParam)
-            ->forget($keyParam)
-        ;
+        try {
+            app('cache')
+                ->store($storeParam)
+                ->forget($keyParam)
+            ;
+        } catch (\Throwable $e) {
+            // In testing environments without Redis (e.g. CI or local),
+            // gracefully skip cache invalidation.
+        }
     }
 
     /**

@@ -29,7 +29,7 @@
         <div class="flex flex-col md:flex-row gap-6">
             <!-- Product Image -->
             <div class="md:w-1/4">
-                <img src="{{ $product->image_url }}" alt="{{ $product->name }}" 
+                <img src="{{ $product->image_url }}" alt="{{ $product->name }}"
                      class="w-full rounded-lg shadow-sm">
             </div>
 
@@ -81,25 +81,35 @@
 
                 <!-- Action Buttons -->
                 <div class="flex flex-wrap gap-3">
-                    <button onclick="refreshPrices()" 
+                    <button onclick="refreshPrices()"
                             class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition">
                         <i class="fas fa-sync-alt mr-2"></i>
                         {{ __('Refresh Prices') }}
                     </button>
 
-                    <a href="{{ route('products.show', $product) }}" 
+                    <a href="{{ route('products.show', $product) }}"
                        class="inline-flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-md transition">
                         <i class="fas fa-arrow-left mr-2"></i>
                         {{ __('Back to Product') }}
                     </a>
 
-                    @auth
-                    <button onclick="addToWishlist({{ $product->id }})" 
-                            class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-md transition">
-                        <i class="fas fa-heart mr-2"></i>
-                        {{ __('Add to Wishlist') }}
+                    <button
+                        type="button"
+                        class="wishlist-toggle-btn inline-flex items-center px-4 py-2 rounded-md font-medium transition {{ ($isWishlisted ?? false) ? 'bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-500/10 dark:text-red-200 dark:hover:bg-red-500/20' : 'bg-red-600 hover:bg-red-700 text-white' }}"
+                        data-product-id="{{ $product->id }}"
+                        data-wishlisted="{{ ($isWishlisted ?? false) ? 'true' : 'false' }}"
+                        data-wishlist-label-default="{{ __('Add to Wishlist') }}"
+                        data-wishlist-label-active="{{ __('Remove from Wishlist') }}"
+                        data-wishlist-icon-default="fas fa-heart"
+                        data-wishlist-icon-active="fas fa-heart-broken"
+                        data-wishlist-class-default="bg-red-600 hover:bg-red-700 text-white"
+                        data-wishlist-class-active="bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-500/10 dark:text-red-200 dark:hover:bg-red-500/20"
+                    >
+                        <i class="wishlist-icon {{ ($isWishlisted ?? false) ? 'fas fa-heart-broken' : 'fas fa-heart' }} mr-2"></i>
+                        <span class="wishlist-label">
+                            {{ ($isWishlisted ?? false) ? __('Remove from Wishlist') : __('Add to Wishlist') }}
+                        </span>
                     </button>
-                    @endauth
                 </div>
             </div>
         </div>
@@ -107,10 +117,10 @@
 
     <!-- Price Comparison Table -->
     @if(count($prices) > 0)
-        <x-price-comparison-table 
-            :product="$product" 
-            :prices="$prices" 
-            :showHistory="$showHistory" 
+        <x-price-comparison-table
+            :product="$product"
+            :prices="$prices"
+            :showHistory="$showHistory"
         />
     @else
         <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6 text-center">
@@ -121,7 +131,7 @@
             <p class="text-gray-600 dark:text-gray-400 mb-4">
                 {{ __('We couldn\'t find any prices for this product at the moment.') }}
             </p>
-            <button onclick="refreshPrices()" 
+            <button onclick="refreshPrices()"
                     class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition">
                 <i class="fas fa-sync-alt mr-2"></i>
                 {{ __('Try Again') }}
@@ -142,7 +152,7 @@
                     {{ __('Get notified when the price drops below your target') }}
                 </p>
             </div>
-            <button onclick="setupPriceAlert()" 
+            <button onclick="setupPriceAlert()"
                     class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition">
                 {{ __('Set Alert') }}
             </button>
@@ -231,11 +241,6 @@ function setupPriceAlert() {
     alert('{{ __("Price alert feature coming soon!") }}');
 }
 
-function addToWishlist(productId) {
-    // TODO: Implement wishlist functionality
-    alert('{{ __("Added to wishlist!") }}');
-}
 </script>
 @endpush
 @endsection
-

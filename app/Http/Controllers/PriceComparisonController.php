@@ -45,12 +45,17 @@ class PriceComparisonController extends Controller
         $showHistory = $request->boolean('history', false);
         $priceHistory = $showHistory ? $this->getPriceHistory() : [];
 
+        $isWishlisted = auth()->check()
+            ? auth()->user()->wishlist()->where('products.id', $product->id)->exists()
+            : false;
+
         return view('products.price-comparison', [
             'product' => $product,
             'prices' => $prices,
             'showHistory' => $showHistory,
             'priceHistory' => $priceHistory,
             'availableStores' => $this->storeAdapterManager->getAvailableStores(),
+            'isWishlisted' => $isWishlisted,
         ]);
     }
 

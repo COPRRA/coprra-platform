@@ -11,42 +11,47 @@ use Illuminate\View\View;
 
 class CompareController extends Controller
 {
+    private const MAX_ITEMS = 4;
+
     /**
      * Show the comparison page.
      */
     public function index(Request $request): View
     {
-        $compareIds = session()->get('compare', []);
+        /** @var array<int, int> $compareIds */
+        $compareIds = $request->session()->get('compare', []);
 
-        $products = Product::whereIn('id', $compareIds)
+        $products = Product::query()
+            ->whereIn('id', $compareIds)
             ->with(['category', 'brand'])
             ->get()
-        ;
+            ->sortBy(static function (Product $product) use ($compareIds): int {
+                $position = array_search($product->id, $compareIds, true);
 
-        // Get available years and colors for filters
-        $availableYears = Product::query()
-            ->whereIn('id', $compareIds)
-            ->whereNotNull('year_of_manufacture')
-            ->distinct()
-            ->pluck('year_of_manufacture')
-            ->sort()
+                return $position === false ? PHP_INT_MAX : $position;
+            })
             ->values();
 
-        $availableColors = Product::query()
-            ->whereIn('id', $compareIds)
-            ->whereNotNull('available_colors')
-            ->get()
-            ->pluck('available_colors')
-            ->flatten()
-            ->unique()
-            ->sort()
-            ->values();
+        $attributeLabels = [
+            'image' => __('Image'),
+            'name' => __('Name'),
+            'brand' => __('Brand'),
+            'price' => __('Official Price (السعر الرسمي)'),
+            'category' => __('Category'),
+            'year' => __('Year of Manufacture'),
+            'colors' => __('Available Colors'),
+            'description' => __('Description'),
+        ];
+
+        $wishlistProductIds = auth()->check()
+            ? auth()->user()->wishlist()->pluck('products.id')->all()
+            : [];
 
         return view('compare.index', [
             'products' => $products,
-            'availableYears' => $availableYears,
-            'availableColors' => $availableColors,
-            'maxProducts' => 4,
+            'attributeLabels' => $attributeLabels,
+            'maxProducts' => self::MAX_ITEMS,
+            'wishlistProductIds' => $wishlistProductIds,
         ]);
     }
 
@@ -58,15 +63,20 @@ class CompareController extends Controller
         $compare = session()->get('compare', []);
 
         // Limit to 4 products
-        if (\count($compare) >= 4) {
-            return back()->with('warning', 'You can only compare up to 4 products at once.');
+        if (\count($compare) >= self::MAX_ITEMS) {
+            return back()->with('warning', __('Comparison limit reached. You can only compare up to :count products.', [
+                'count' => self::MAX_ITEMS,
+            ]));
         }
 
         if (! \in_array($product->id, $compare, true)) {
             $compare[] = $product->id;
             session()->put('compare', $compare);
 
-            return back()->with('success', 'Product added to comparison list! ('.\count($compare).'/4)');
+            return back()->with('success', __('Product added to comparison list! (:current/:max)', [
+                'current' => \count($compare),
+                'max' => self::MAX_ITEMS,
+            ]));
         }
 
         return back()->with('info', 'Product is already in your comparison list.');

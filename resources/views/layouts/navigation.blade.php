@@ -1,3 +1,7 @@
+@php
+    $initialCompareCount = count(session()->get('compare', []));
+    $initialWishlistCount = auth()->check() ? auth()->user()->wishlist()->count() : 0;
+@endphp
 <nav class="bg-white dark:bg-gray-800 shadow" x-data="{ mobileMenuOpen: false, searchOpen: false }">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
@@ -22,6 +26,27 @@
                 </a>
                 <a href="{{ route('brands.index') }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition duration-150 ease-in-out {{ request()->routeIs('brands.*') ? 'text-blue-600 dark:text-blue-400 font-semibold' : '' }}">
                     <i class="fas fa-building mr-2"></i> {{ __('Brands') }}
+                </a>
+                <a href="{{ route('account.wishlist') }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition duration-150 ease-in-out {{ request()->routeIs('account.wishlist') ? 'text-blue-600 dark:text-blue-400 font-semibold' : '' }}">
+                    <i class="fas fa-heart mr-2"></i> {{ __('Wishlist') }}
+                    <span
+                        class="ml-2 inline-flex items-center justify-center min-w-[1.75rem] px-2 py-1 text-xs font-semibold leading-none rounded-full bg-pink-600/10 text-pink-600 dark:bg-pink-500/20 dark:text-pink-300 {{ $initialWishlistCount > 0 ? '' : 'hidden opacity-0' }}"
+                        data-wishlist-count
+                        data-initial-count="{{ $initialWishlistCount }}"
+                    >
+                        {{ $initialWishlistCount }}
+                    </span>
+                </a>
+                <a href="{{ route('compare.index') }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition duration-150 ease-in-out {{ request()->routeIs('compare.*') ? 'text-blue-600 dark:text-blue-400 font-semibold' : '' }}">
+                    <i class="fas fa-balance-scale mr-2"></i>
+                    <span>{{ __('Compare') }}</span>
+                    <span
+                        class="ml-2 inline-flex items-center justify-center min-w-[1.75rem] px-2 py-1 text-xs font-semibold leading-none rounded-full bg-blue-600/10 text-blue-600 dark:bg-blue-500/15 dark:text-blue-300 {{ $initialCompareCount > 0 ? '' : 'hidden opacity-0' }}"
+                        data-compare-count
+                        data-initial-count="{{ $initialCompareCount }}"
+                    >
+                        {{ $initialCompareCount }}
+                    </span>
                 </a>
             </div>
 
@@ -99,18 +124,29 @@
             <a href="{{ route('brands.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700 {{ request()->routeIs('brands.*') ? 'bg-gray-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400' : '' }}">
                 <i class="fas fa-building mr-2"></i> {{ __('Brands') }}
             </a>
+            <a href="{{ route('account.wishlist') }}" class="flex items-center justify-between px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-pink-600 dark:hover:text-pink-400 hover:bg-gray-50 dark:hover:bg-gray-700 {{ request()->routeIs('account.wishlist') ? 'bg-gray-50 dark:bg-gray-700 text-pink-600 dark:text-pink-400' : '' }}">
+                <span>
+                    <i class="fas fa-heart mr-2"></i> {{ __('Wishlist') }}
+                </span>
+                <span
+                    class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-pink-600 rounded-full {{ $initialWishlistCount > 0 ? '' : 'hidden opacity-0' }}"
+                    data-wishlist-count
+                    data-initial-count="{{ $initialWishlistCount }}"
+                >
+                    {{ $initialWishlistCount }}
+                </span>
+            </a>
             <a href="{{ route('compare.index') }}" class="flex items-center justify-between px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700 {{ request()->routeIs('compare.*') ? 'bg-gray-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400' : '' }}">
                 <span>
                     <i class="fas fa-balance-scale mr-2"></i> {{ __('Compare') }}
                 </span>
-                @php
-                    $compareCount = count(session()->get('compare', []));
-                @endphp
-                @if($compareCount > 0)
-                    <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-blue-600 rounded-full">
-                        {{ $compareCount }}
+                <span
+                    class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-blue-600 rounded-full {{ $initialCompareCount > 0 ? '' : 'hidden opacity-0' }}"
+                    data-compare-count
+                    data-initial-count="{{ $initialCompareCount }}"
+                >
+                    {{ $initialCompareCount }}
                     </span>
-                @endif
             </a>
         </div>
 

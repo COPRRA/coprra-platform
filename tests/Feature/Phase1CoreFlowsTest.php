@@ -42,9 +42,8 @@ final class Phase1CoreFlowsTest extends TestCase
     /** @test */
     public function wishlist_redirects_to_login_when_unauthenticated(): void
     {
-        $response = $this->get('/wishlist');
+        $response = $this->get('/account/wishlist');
         $response->assertStatus(302);
         $response->assertRedirect('/login');
     }
 }
-

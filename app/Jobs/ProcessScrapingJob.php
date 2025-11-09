@@ -66,6 +66,15 @@ class ProcessScrapingJob implements ShouldQueue
      */
     public $timeout = 300;
 
+    private const BLOCKED_HOST_KEYWORDS = [
+        'amazon.',
+        'noon.',
+        'ebay.',
+        'walmart.',
+        'bestbuy.',
+        'target.',
+    ];
+
     /**
      * Create a new job instance.
      */
@@ -111,6 +120,8 @@ class ProcessScrapingJob implements ShouldQueue
                 throw new \Exception("Invalid URL format");
             }
 
+            $this->assertAllowedSource($this->url);
+
             // Initialize Mock Store Adapter
             $adapter = app(MockStoreAdapter::class);
 
@@ -123,6 +134,8 @@ class ProcessScrapingJob implements ShouldQueue
 
             // Store the adapter name
             $scraperJob->update(['store_adapter' => $adapter->getStoreName()]);
+
+            $this->validateScrapedData($data);
 
             // Create product from scraped data
             $product = $this->createProduct($data);
@@ -150,6 +163,25 @@ class ProcessScrapingJob implements ShouldQueue
         }
     }
 
+    private function validateScrapedData(array $data): void
+    {
+        $name = trim((string) ($data['name'] ?? ''));
+
+        if ($name === '') {
+            throw new \Exception('Failed to extract a valid product title.');
+        }
+
+        $normalized = Str::of($name)->lower();
+
+        if ($normalized->contains('www.') || $normalized->contains('.com')) {
+            throw new \Exception('Failed to extract a valid product title.');
+            }
+
+        if ($normalized->length() < 8) {
+            throw new \Exception('Failed to extract a valid product title.');
+        }
+    }
+
     /**
      * Handle job failure.
      */
@@ -174,6 +206,17 @@ class ProcessScrapingJob implements ShouldQueue
     private function isValidUrl(string $url): bool
     {
         return filter_var($url, FILTER_VALIDATE_URL) !== false;
+    }
+
+    private function assertAllowedSource(string $url): void
+    {
+        $host = strtolower((string) parse_url($url, PHP_URL_HOST));
+
+        foreach (self::BLOCKED_HOST_KEYWORDS as $keyword) {
+            if ($host !== '' && str_contains($host, $keyword)) {
+                throw new \Exception('Scraping from marketplaces is currently disabled.');
+            }
+        }
     }
 
     /**

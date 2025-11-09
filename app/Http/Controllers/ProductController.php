@@ -43,13 +43,20 @@ class ProductController extends Controller
             }
 
             // If any filter or search query is present, use the search pipeline
-            if ($query !== '' || !empty($filters)) {
+            if ($query !== '' || ! empty($filters)) {
                 $products = $this->productService->searchProducts($query, $filters, $perPage);
             } else {
                 $products = $this->productService->getPaginatedProducts($perPage);
             }
 
-            return view('products.index', compact('products'));
+            $wishlistProductIds = auth()->check()
+                ? auth()->user()->wishlist()->pluck('products.id')->all()
+                : [];
+
+            return view('products.index', [
+                'products' => $products,
+                'wishlistProductIds' => $wishlistProductIds,
+            ]);
         } catch (\Throwable $e) {
             Log::error('Products index failure', [
                 'exception' => $e->getMessage(),
@@ -75,7 +82,15 @@ class ProductController extends Controller
 
             $relatedProducts = $this->productService->getRelatedProducts($product);
 
-            return view('products.show', compact('product', 'relatedProducts'));
+            $isWishlisted = auth()->check()
+                ? auth()->user()->wishlist()->where('products.id', $product->id)->exists()
+                : false;
+
+            return view('products.show', [
+                'product' => $product,
+                'relatedProducts' => $relatedProducts,
+                'isWishlisted' => $isWishlisted,
+            ]);
         } catch (\Throwable $e) {
             Log::error('Product show failure', [
                 'exception' => $e->getMessage(),
@@ -113,7 +128,14 @@ class ProductController extends Controller
 
             $products = $this->productService->searchProducts($query, $filters, $perPage);
 
-            return view('products.index', compact('products'));
+            $wishlistProductIds = auth()->check()
+                ? auth()->user()->wishlist()->pluck('products.id')->all()
+                : [];
+
+            return view('products.index', [
+                'products' => $products,
+                'wishlistProductIds' => $wishlistProductIds,
+            ]);
         } catch (\Throwable $e) {
             Log::error('Products search failure', [
                 'exception' => $e->getMessage(),

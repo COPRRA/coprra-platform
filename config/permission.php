@@ -191,6 +191,8 @@ return [
          * file. Using 'default' here means to use the `default` set in cache.php.
          */
 
-        'store' => 'default',
+        'store' => env('APP_ENV') === 'testing'
+            ? 'array'
+            : env('PERMISSION_CACHE_STORE', 'default'),
     ],
 ];

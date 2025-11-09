@@ -67,6 +67,9 @@
         @if(isset($products) && $products->count())
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach($products as $product)
+                    @php
+                        $isWishlisted = in_array($product->id, $wishlistProductIds ?? [], true);
+                    @endphp
                     <article class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
                         @if($product->image)
                             <img src="{{ $product->image }}" alt="{{ $product->name }}" class="w-full h-48 object-cover">
@@ -90,15 +93,38 @@
 
                             <!-- Action Buttons -->
                             <div class="flex gap-2 mt-3">
-                                <button class="flex-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white py-2 px-3 rounded text-sm transition">
-                                    <i class="fas fa-heart mr-1"></i> Wishlist
+                                <button
+                                    type="button"
+                                    class="wishlist-toggle-btn flex-1 inline-flex items-center justify-center gap-2 py-2 px-3 rounded text-sm font-medium transition border {{ $isWishlisted ? 'border-red-500 text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-500/10 dark:text-red-200 dark:hover:bg-red-500/20' : 'border-gray-300 text-gray-900 dark:text-white hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600' }}"
+                                    data-product-id="{{ $product->id }}"
+                                    data-wishlisted="{{ $isWishlisted ? 'true' : 'false' }}"
+                                    data-wishlist-label-default="{{ __('Wishlist') }}"
+                                    data-wishlist-label-active="{{ __('Remove') }}"
+                                    data-wishlist-icon-default="fas fa-heart"
+                                    data-wishlist-icon-active="fas fa-heart-broken"
+                                    data-wishlist-class-default="border-gray-300 text-gray-900 dark:text-white hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
+                                    data-wishlist-class-active="border-red-500 text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-500/10 dark:text-red-200 dark:hover:bg-red-500/20"
+                                >
+                                    <i class="wishlist-icon {{ $isWishlisted ? 'fas fa-heart-broken' : 'fas fa-heart' }}"></i>
+                                    <span class="wishlist-label">{{ $isWishlisted ? __('Remove') : __('Wishlist') }}</span>
                                 </button>
-                                <form method="POST" action="{{ route('compare.add', $product) }}" class="flex-1">
-                                    @csrf
-                                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded text-sm transition">
-                                        <i class="fas fa-balance-scale mr-1"></i> Compare
+                                @php
+                                    $alreadyCompared = in_array($product->id, session()->get('compare', []), true);
+                                @endphp
+                                <button
+                                    type="button"
+                                    class="flex-1 py-2 px-3 rounded text-sm transition text-white {{ $alreadyCompared ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700' }}"
+                                    data-compare-add="{{ $product->id }}"
+                                    data-compare-added="{{ $alreadyCompared ? 'true' : 'false' }}"
+                                    data-compare-label-default="{{ __('Compare') }}"
+                                    data-compare-label-added="{{ __('Added to Compare') }}"
+                                    data-compare-class-default="bg-blue-600 hover:bg-blue-700"
+                                    data-compare-class-added="bg-green-600 hover:bg-green-700"
+                                    aria-pressed="{{ $alreadyCompared ? 'true' : 'false' }}"
+                                >
+                                    <i class="fas fa-balance-scale mr-1"></i>
+                                    {{ $alreadyCompared ? __('Added to Compare') : __('Compare') }}
                                     </button>
-                                </form>
                             </div>
                         </div>
                     </article>

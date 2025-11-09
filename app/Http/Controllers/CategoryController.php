@@ -83,7 +83,15 @@ class CategoryController extends Controller
                 ['products', 'categories']
             );
 
-            return view('categories.show', compact('category', 'products'));
+            $wishlistProductIds = auth()->check()
+                ? auth()->user()->wishlist()->pluck('products.id')->all()
+                : [];
+
+            return view('categories.show', [
+                'category' => $category,
+                'products' => $products,
+                'wishlistProductIds' => $wishlistProductIds,
+            ]);
         } catch (\Throwable $e) {
             Log::error('Category show failure', [
                 'exception' => $e->getMessage(),

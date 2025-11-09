@@ -1,3 +1,7 @@
+User-agent: *
+Disallow:
+
+Sitemap: https://coprra.com/sitemap.xml
 # COPRRA - Price Comparison Platform
 # robots.txt
 

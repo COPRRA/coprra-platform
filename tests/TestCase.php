@@ -288,6 +288,35 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
+     * Ensure critical configuration is set before database refresh occurs.
+     */
+    protected function beforeRefreshingDatabase()
+    {
+        if (function_exists('putenv')) {
+            putenv('CACHE_DRIVER=array');
+            putenv('SESSION_DRIVER=array');
+            putenv('QUEUE_CONNECTION=sync');
+            putenv('PERMISSION_CACHE_STORE=array');
+        }
+
+        if (function_exists('app') && app()->bound('config')) {
+            try {
+                app('config')->set([
+                    'cache.default' => 'array',
+                    'cache.stores.array' => [
+                        'driver' => 'array',
+                    ],
+                    'session.driver' => 'array',
+                    'queue.default' => 'sync',
+                    'permission.cache.store' => 'array',
+                ]);
+            } catch (\Throwable $e) {
+                // ignore configuration errors in tests
+            }
+        }
+    }
+
+    /**
      * Set up security testing environment.
      */
     protected function setUpSecurityTesting(): void

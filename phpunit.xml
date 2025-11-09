@@ -69,20 +69,6 @@
       <file>./app/Http/Kernel.php</file>
     </exclude>
   </source>
-  <coverage ignoreDeprecatedCodeUnits="false" 
-            pathCoverage="false" 
-            disableCodeCoverageIgnore="false"
-            includeUncoveredFiles="true">
-    <report>
-      <clover outputFile="reports/coverage.xml"/>
-      <cobertura outputFile="reports/cobertura.xml"/>
-      <crap4j outputFile="reports/crap4j.xml" threshold="5"/>
-      <html outputDirectory="reports/coverage" lowUpperBound="35" highLowerBound="70"/>
-      <php outputFile="reports/coverage.php"/>
-      <text outputFile="reports/coverage.txt" showUncoveredFiles="true" showOnlySummary="false"/>
-      <xml outputDirectory="reports/coverage-xml"/>
-    </report>
-  </coverage>
   <php>
     <env name="APP_ENV" value="testing"/>
     <env name="APP_DEBUG" value="false"/>

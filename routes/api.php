@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\DocumentationController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PriceSearchController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\WishlistController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PointsController;
@@ -59,10 +60,6 @@ Route::middleware(['throttle:public'])->group(static function (): void {
         return response()->json(['data' => [], 'message' => 'Brands endpoint']);
     });
 
-    Route::get('/wishlist', static function () {
-        return response()->json(['data' => [], 'message' => 'Wishlist endpoint']);
-    });
-
     Route::get('/price-alerts', static function () {
         return response()->json(['data' => [], 'message' => 'Price alerts endpoint']);
     });
@@ -88,6 +85,17 @@ Route::middleware(['auth:sanctum', 'throttle:authenticated'])->group(static func
     // Protected product routes
     Route::put('/products/{id}', [ProductController::class, 'update']);
     Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+
+    Route::prefix('wishlist')->name('api.wishlist.')->group(static function (): void {
+        Route::get('/', [WishlistController::class, 'index'])->name('index');
+        Route::post('/', [WishlistController::class, 'store'])->name('store');
+        Route::post('/{product}', [WishlistController::class, 'store'])
+            ->whereNumber('product')
+            ->name('store-with-product');
+        Route::delete('/{product}', [WishlistController::class, 'destroy'])
+            ->whereNumber('product')
+            ->name('destroy');
+    });
 
     // Reviews routes
     Route::post('/products/{product}/reviews', [ReviewController::class, 'store']);

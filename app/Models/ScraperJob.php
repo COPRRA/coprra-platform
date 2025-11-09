@@ -108,7 +108,7 @@ class ScraperJob extends Model
     public function getDuration(): ?int
     {
         if ($this->started_at && $this->completed_at) {
-            return $this->completed_at->diffInSeconds($this->started_at);
+            return (int) round($this->completed_at->diffInSeconds($this->started_at));
         }
 
         return null;

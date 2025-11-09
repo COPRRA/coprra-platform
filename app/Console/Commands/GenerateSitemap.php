@@ -6,121 +6,95 @@ namespace App\Console\Commands;
 
 use App\Models\Category;
 use App\Models\Product;
-use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Support\Str;
-use Spatie\Sitemap\Sitemap;
-use Spatie\Sitemap\Tags\Url;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\URL;
 
 class GenerateSitemap extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'sitemap:generate';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Generate sitemap.xml for static pages and dynamic content (products, categories).';
+    protected $description = 'Generate the public sitemap.xml file.';
 
-    /**
-     * Execute the console command.
-     */
     public function handle(): int
     {
-        $baseUrl = rtrim((string) config('app.url', 'http://127.0.0.1:8000'), '/');
+        $baseUrl = rtrim((string) (config('app.url') ?? URL::to('/')), '/');
 
-        $sitemap = Sitemap::create();
+        $urls = [];
+        $now = now()->toAtomString();
 
-        // Static pages
-        $sitemap->add(
-            Url::create($baseUrl.'/')
-                ->setLastModificationDate(Carbon::now())
-                ->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY)
-                ->setPriority(1.0)
-        );
+        $urls[] = [
+            'loc' => $baseUrl . '/',
+            'lastmod' => $now,
+            'changefreq' => 'daily',
+            'priority' => '1.0',
+        ];
 
-        $sitemap->add(
-            Url::create($baseUrl.'/products')
-                ->setLastModificationDate(Carbon::now())
-                ->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY)
-                ->setPriority(0.9)
-        );
+        $categoryQuery = Category::query();
+        if (Schema::hasColumn(Category::make()->getTable(), 'is_active')) {
+            $categoryQuery->where('is_active', true);
+        }
 
-        $sitemap->add(
-            Url::create($baseUrl.'/categories')
-                ->setLastModificationDate(Carbon::now())
-                ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
-                ->setPriority(0.6)
-        );
+        $categoryQuery->orderBy('updated_at', 'desc')->each(function (Category $category) use (&$urls, $baseUrl): void {
+            try {
+                $loc = $baseUrl . route('categories.show', $category->slug, false);
+            } catch (\Throwable) {
+                $loc = $baseUrl . '/categories/' . $category->slug;
+            }
 
-        $sitemap->add(
-            Url::create($baseUrl.'/contact')
-                ->setLastModificationDate(Carbon::now())
-                ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY)
-                ->setPriority(0.3)
-        );
+            $lastModified = optional($category->updated_at ?? $category->created_at)->toAtomString() ?? now()->toAtomString();
 
-        // Dynamic products
-        Product::query()
-            ->where('is_active', true)
-            ->orderByDesc('updated_at')
-            ->select(['slug', 'updated_at'])
-            ->chunk(500, function ($products) use ($sitemap, $baseUrl): void {
-                foreach ($products as $product) {
-                    $slug = (string) $product->slug;
-                    if ('' === $slug) {
-                        continue;
+            $urls[] = [
+                'loc' => $loc,
+                'lastmod' => $lastModified,
+                'changefreq' => 'weekly',
+                'priority' => '0.6',
+            ];
+        });
+
+        $productQuery = Product::query();
+        if (Schema::hasColumn(Product::make()->getTable(), 'is_active')) {
+            $productQuery->where('is_active', true);
+        }
+
+        $productQuery->latest('updated_at')->each(function (Product $product) use (&$urls, $baseUrl): void {
+            try {
+                $loc = $baseUrl . route('products.show', $product->slug, false);
+            } catch (\Throwable) {
+                $loc = $baseUrl . '/products/' . $product->slug;
                     }
-                    $lastmod = $product->updated_at instanceof Carbon
-                        ? Carbon::create($product->updated_at)
-                        : Carbon::now();
 
-                    $sitemap->add(
-                        Url::create($baseUrl.'/products/'.Str::of($slug)->ltrim('/'))
-                            ->setLastModificationDate($lastmod)
-                            ->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY)
-                            ->setPriority(0.8)
-                    );
+            $lastModified = optional($product->updated_at ?? $product->created_at)->toAtomString() ?? now()->toAtomString();
+
+            $urls[] = [
+                'loc' => $loc,
+                'lastmod' => $lastModified,
+                'changefreq' => 'weekly',
+                'priority' => '0.8',
+            ];
+        });
+
+        $xmlLines = [
+            '<?xml version="1.0" encoding="UTF-8"?>',
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+        ];
+
+        foreach ($urls as $entry) {
+            $xmlLines[] = '  <url>';
+            $xmlLines[] = '    <loc>' . htmlspecialchars($entry['loc'], ENT_XML1) . '</loc>';
+            $xmlLines[] = '    <lastmod>' . htmlspecialchars($entry['lastmod'], ENT_XML1) . '</lastmod>';
+            $xmlLines[] = '    <changefreq>' . htmlspecialchars($entry['changefreq'], ENT_XML1) . '</changefreq>';
+            $xmlLines[] = '    <priority>' . htmlspecialchars($entry['priority'], ENT_XML1) . '</priority>';
+            $xmlLines[] = '  </url>';
                 }
-            });
 
-        // Dynamic categories
-        Category::query()
-            ->where('is_active', true)
-            ->orderByDesc('updated_at')
-            ->select(['slug', 'updated_at'])
-            ->chunk(500, function ($categories) use ($sitemap, $baseUrl): void {
-                foreach ($categories as $category) {
-                    $slug = (string) $category->slug;
-                    if ('' === $slug) {
-                        continue;
-                    }
-                    $lastmod = $category->updated_at instanceof Carbon
-                        ? Carbon::create($category->updated_at)
-                        : Carbon::now();
+        $xmlLines[] = '</urlset>';
 
-                    $sitemap->add(
-                        Url::create($baseUrl.'/categories/'.Str::of($slug)->ltrim('/'))
-                            ->setLastModificationDate($lastmod)
-                            ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
-                            ->setPriority(0.5)
-                    );
-                }
-            });
+        File::put(public_path('sitemap.xml'), implode(PHP_EOL, $xmlLines) . PHP_EOL);
 
-        // Write sitemap to public folder
-        $path = public_path('sitemap.xml');
-        $sitemap->writeToFile($path);
-
-        $this->info("Sitemap generated: {$path}");
+        $this->info('Sitemap generated successfully at ' . public_path('sitemap.xml'));
 
         return self::SUCCESS;
     }
 }
-
