@@ -132,3 +132,14 @@ HTACC
             echo "Homepage not healthy (status $code)" >&2
             exit 1
           fi
+
+      - name: Verify sensitive endpoints are gone
+        shell: bash
+        run: |
+          echo "Checking phpinfo.php returns non-200..."
+          code=$(curl -s -o /dev/null -w "%{http_code}" https://coprra.com/phpinfo.php || echo 000)
+          echo "phpinfo.php status: $code"
+          if [ "$code" = "200" ]; then
+            echo "phpinfo.php still accessible (status 200). Failing." >&2
+            exit 1
+          fi
