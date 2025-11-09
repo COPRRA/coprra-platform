@@ -5,6 +5,7 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs: {}
 
 concurrency:
   group: deploy-production
@@ -92,7 +93,7 @@ jobs:
           cat > .htaccess << 'HTACC'
           <IfModule mod_rewrite.c>
               RewriteEngine On
-              RewriteRule ^(.*)$ public/$1 [L]
+              RewriteRule ^(.* )$ public/$1 [L]
           </IfModule>
 HTACC
 
@@ -126,7 +127,7 @@ HTACC
         shell: bash
         run: |
           echo "Running homepage health check..."
-          code=$(curl -s -o /dev/null -w "%{http_code}" https://coprra.com/)
+          code=$(curl -s -o /dev/null -w "%{http_code}" https://coprra.com/ )
           echo "Home status: $code"
           if [ "$code" != "200" ]; then
             echo "Homepage not healthy (status $code)" >&2
@@ -137,7 +138,7 @@ HTACC
         shell: bash
         run: |
           echo "Checking phpinfo.php returns non-200..."
-          code=$(curl -s -o /dev/null -w "%{http_code}" https://coprra.com/phpinfo.php || echo 000)
+          code=$(curl -s -o /dev/null -w "%{http_code}" https://coprra.com/phpinfo.php || echo 000 )
           echo "phpinfo.php status: $code"
           if [ "$code" = "200" ]; then
             echo "phpinfo.php still accessible (status 200). Failing." >&2
