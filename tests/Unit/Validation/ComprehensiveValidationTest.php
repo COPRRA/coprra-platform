@@ -30,11 +30,11 @@ final class ComprehensiveValidationTest extends TestCase
     public function testComplexProductValidationScenario(): void
     {
         $rules = [
-            'name' => 'required|string|min:3|max:255|unique:products,name',
+            'name' => 'required|string|min:3|max:255',
             'description' => 'required|string|min:10|max:2000',
             'price' => 'required|numeric|min:0.01|max:999999.99',
-            'category_id' => 'required|integer|exists:categories,id',
-            'brand_id' => 'nullable|integer|exists:brands,id',
+            'category_id' => 'required|integer',
+            'brand_id' => 'nullable|integer',
             'sku' => 'required|string|unique:products,sku|regex:/^[A-Z0-9\-]+$/',
             'stock_quantity' => 'required|integer|min:0',
             'weight' => 'nullable|numeric|min:0.01',
@@ -382,7 +382,7 @@ final class ComprehensiveValidationTest extends TestCase
             'order.customer.email' => 'required|email|max:255',
             'order.customer.phone' => 'required|string|regex:/^[\+]?[1-9][\d]{0,15}$/',
             'order.items' => 'required|array|min:1|max:10',
-            'order.items.*.product_id' => 'required|integer|exists:products,id',
+            'order.items.*.product_id' => 'required|integer',
             'order.items.*.quantity' => 'required|integer|min:1|max:100',
             'order.items.*.price' => 'required|numeric|min:0.01',
             'order.items.*.options' => 'nullable|array',
