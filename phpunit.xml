@@ -75,7 +75,7 @@
     <env name="APP_KEY" value="base64:2fl+K+k3WPMO+QrdnDWEbVjQo7EjXQYWmYNgayUk5P0="/>
     <env name="BCRYPT_ROUNDS" value="4"/>
     <env name="CACHE_DRIVER" value="array"/>
-    <env name="DB_CONNECTION" value="testing"/>
+    <env name="DB_CONNECTION" value="sqlite"/>
     <env name="DB_DATABASE" value=":memory:"/>
     <env name="DB_FOREIGN_KEYS" value="true"/>
     <env name="DB_HOST" value=""/>

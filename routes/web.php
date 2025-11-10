@@ -14,6 +14,7 @@ use App\Http\Controllers\AI\AgentHealthController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CompareController;
 use App\Http\Controllers\CategoryController;
@@ -102,6 +103,9 @@ Route::prefix('ai/health')->name('ai.health.')->group(static function () {
 });
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// SEO: dynamic sitemap
+Route::get('sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
 // Static Pages
 Route::get('/about', fn () => view('about'))->name('about');
