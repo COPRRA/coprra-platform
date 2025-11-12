@@ -488,3 +488,23 @@ TEST_EXECUTION_DIRECT.txt
 app_config_fixed.php
 create_admin_temp.php
 fix_appcomposer_now.sh
+
+# ===================================================================
+#  DKIM Keys and Temporary Directories (Technical Debt Cleanup)
+# ===================================================================
+# DKIM keys directory (contains sensitive cryptographic keys)
+dkim_keys/
+
+# Temporary CI/CD artifacts
+downloaded-ci/
+downloaded-ci-*/
+downloaded-ci-test-results/
+downloaded-ci-test-results-*/
+
+# Temporary audit and analysis outputs
+final_audit_outputs/
+raw_outputs/
+generated/
+
+# Local temporary files
+local/
