@@ -1,0 +1,58 @@
+name: Deploy to Production (V2)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Deploy to Server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.PROD_SSH_HOST }}
+        username: ${{ secrets.PROD_SSH_USER }}
+        password: ${{ secrets.PROD_SSH_PASS }}
+        port: ${{ secrets.PROD_SSH_PORT }}
+        script: |
+          set -e
+          echo "🚀 Starting deployment..."
+          cd /home/u990109832/domains/coprra.com/public_html
+
+          # 1. Enable maintenance mode
+          echo "🔒 Enabling maintenance mode..."
+          php artisan down
+
+          # 2. Pull latest changes
+          echo "🚚 Pulling latest changes from main branch..."
+          git pull origin main
+
+          # 3. Install Composer dependencies
+          echo "📦 Installing Composer dependencies..."
+          composer install --no-dev --optimize-autoloader
+
+          # 4. Install NPM dependencies and build assets
+          echo "🎨 Installing NPM dependencies and building assets..."
+          npm ci
+          npm run build
+
+          # 5. Run database migrations
+          echo " migrating database..."
+          php artisan migrate --force
+
+          # 6. Clear caches and optimize
+          echo "✨ Clearing and caching configurations..."
+          php artisan optimize:clear
+
+          # 7. Disable maintenance mode
+          echo "✅ Disabling maintenance mode..."
+          php artisan up
+
+          echo "🎉 Deployment successful!"
