@@ -146,7 +146,7 @@
                     data-initial-count="{{ $initialCompareCount }}"
                 >
                     {{ $initialCompareCount }}
-                    </span>
+                </span>
             </a>
         </div>
 

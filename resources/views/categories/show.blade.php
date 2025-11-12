@@ -77,7 +77,7 @@
                                 >
                                     <i class="fas fa-balance-scale mr-1"></i>
                                     {{ $alreadyCompared ? __('Added to Compare') : __('Compare') }}
-                                    </button>
+                                </button>
                             </div>
                         </div>
                     </article>

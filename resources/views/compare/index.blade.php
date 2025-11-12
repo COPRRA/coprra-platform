@@ -47,7 +47,7 @@
                    class="inline-flex items-center px-6 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition">
                     <i class="fas fa-shopping-bag mr-2"></i> {{ __('Start Shopping') }}
                 </a>
-                            </div>
+            </div>
         @else
             <div class="flex flex-col xl:flex-row gap-6">
                 <aside class="xl:w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm p-6 h-fit">
@@ -71,20 +71,20 @@
                                     {{ $attributeLabel }}
                                 </span>
                             </label>
-                                    @endforeach
+                        @endforeach
                     </div>
                 </aside>
 
                 <div class="flex-1">
                     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
                         <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead class="bg-gray-50 dark:bg-gray-900">
-                        <tr>
+                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead class="bg-gray-50 dark:bg-gray-900">
+                                <tr>
                                     <th scope="col" class="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 dark:text-gray-400 uppercase">
                                         {{ __('Specification') }}
-                            </th>
-                            @foreach($products as $product)
+                                    </th>
+                                    @foreach($products as $product)
                                         @php
                                             $isWishlisted = in_array($product->id, $wishlistProductIds ?? [], true);
                                         @endphp
@@ -101,10 +101,10 @@
                                                     <i class="fas fa-times mr-1"></i> {{ __('Remove') }}
                                                 </button>
                                             </div>
-                                </th>
-                            @endforeach
-                        </tr>
-                    </thead>
+                                        </th>
+                                    @endforeach
+                                </tr>
+                                </thead>
                                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                                 @foreach($attributeLabels as $attributeKey => $attributeLabel)
                                     @php $isZebra = $loop->odd; @endphp
@@ -114,26 +114,26 @@
                                     >
                                         <td class="px-6 py-5 text-sm font-semibold text-gray-900 dark:text-white align-top">
                                             {{ $attributeLabel }}
-                            </td>
-                            @foreach($products as $product)
+                                        </td>
+                                        @foreach($products as $product)
                                             <td class="px-6 py-5 text-sm text-gray-700 dark:text-gray-200 align-top">
                                                 @switch($attributeKey)
                                                     @case('image')
                                                         <div class="flex items-center justify-center">
                                                             @if($product->image ?? $product->image_url)
                                                                 <img src="{{ $product->image ?? $product->image_url }}" alt="{{ $product->name }}" class="w-36 h-36 object-cover rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-                                    @else
+                                                            @else
                                                                 <div class="w-36 h-36 bg-gray-200 dark:bg-gray-700 rounded-xl flex items-center justify-center">
-                                            <i class="fas fa-image fa-2x text-gray-400"></i>
-                                        </div>
-                                    @endif
+                                                                    <i class="fas fa-image fa-2x text-gray-400"></i>
+                                                                </div>
+                                                            @endif
                                                         </div>
                                                         @break
 
                                                     @case('name')
                                                         <a href="{{ route('products.show', $product->slug) }}" class="block text-base font-semibold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition">
-                                        {{ $product->name }}
-                                    </a>
+                                                            {{ $product->name }}
+                                                        </a>
                                                         @break
 
                                                     @case('brand')
@@ -142,9 +142,9 @@
 
                                                     @case('price')
                                                         @if(!is_null($product->price))
-                                    <span class="text-xl font-bold text-blue-600 dark:text-blue-400">
+                                                            <span class="text-xl font-bold text-blue-600 dark:text-blue-400">
                                                                 ${{ number_format((float) $product->price, 2) }}
-                                    </span>
+                                                            </span>
                                                         @else
                                                             <span class="text-gray-400">{{ __('Not available') }}</span>
                                                         @endif
@@ -177,17 +177,17 @@
                                                     @default
                                                         <span>{{ __('N/A') }}</span>
                                                 @endswitch
-                                </td>
-                            @endforeach
-                        </tr>
-                            @endforeach
+                                            </td>
+                                        @endforeach
+                                    </tr>
+                                @endforeach
                                 </tbody>
                                 <tfoot class="bg-gray-50 dark:bg-gray-900/70">
-                        <tr>
+                                <tr>
                                     <td class="px-6 py-5 text-sm font-semibold text-gray-900 dark:text-white">
                                         {{ __('Next steps') }}
-                            </td>
-                            @foreach($products as $product)
+                                    </td>
+                                    @foreach($products as $product)
                                         @php
                                             $isWishlisted = in_array($product->id, $wishlistProductIds ?? [], true);
                                         @endphp
@@ -196,7 +196,7 @@
                                                 <a href="{{ route('products.show', $product->slug) }}"
                                                    class="inline-flex items-center justify-center w-full px-4 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition">
                                                     <i class="fas fa-shopping-cart mr-2"></i> {{ __('اشتري الآن') }}
-                                        </a>
+                                                </a>
                                                 <button type="button"
                                                         class="wishlist-toggle-btn inline-flex items-center justify-center w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition {{ $isWishlisted ? 'bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-500/10 dark:text-red-200 dark:hover:bg-red-500/20' : 'bg-gray-200 hover:bg-gray-300 text-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white' }}"
                                                         data-product-id="{{ $product->id }}"
@@ -209,14 +209,14 @@
                                                         data-wishlist-class-active="bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-500/10 dark:text-red-200 dark:hover:bg-red-500/20">
                                                     <i class="wishlist-icon {{ $isWishlisted ? 'fas fa-heart-broken' : 'fas fa-heart' }} mr-2"></i>
                                                     <span class="wishlist-label">{{ $isWishlisted ? __('Remove from Wishlist') : __('أضف لقائمة الأماني') }}</span>
-                                            </button>
-                                    </div>
-                                </td>
-                            @endforeach
-                        </tr>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    @endforeach
+                                </tr>
                                 </tfoot>
-                </table>
-            </div>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
