@@ -6,7 +6,8 @@ return [
     'dsn' => env('SENTRY_LARAVEL_DSN'),
 
     // Capture release information
-    'release' => env('SENTRY_RELEASE', exec('git log --pretty="%h" -n1 HEAD') ?: null),
+    // Note: exec() is disabled on Hostinger shared hosting, so we use env variable or null
+    'release' => env('SENTRY_RELEASE', null),
 
     // Environment
     'environment' => env('SENTRY_ENVIRONMENT', env('APP_ENV', 'production')),
