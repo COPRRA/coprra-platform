@@ -1,423 +1,370 @@
-const CompareManager = (() => {
-    const API_ENDPOINT = '/api/compare';
-    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '';
+const COMPARE_ENDPOINT = '/api/compare';
 
-    const requestHeaders = {
-        'Accept': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-    };
+const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '';
 
-    if (csrfToken !== '') {
-        requestHeaders['X-CSRF-TOKEN'] = csrfToken;
+const ensureToastStyles = () => {
+  if (document.querySelector('#coprra-toast-styles')) {
+    return;
+  }
+
+  const style = document.createElement('style');
+  style.id = 'coprra-toast-styles';
+  style.textContent = `
+        .coprra-toast-container {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            z-index: 2147483647;
+            pointer-events: none;
+        }
+
+        .coprra-toast {
+            min-width: 18rem;
+            max-width: 22rem;
+            background-color: rgba(17, 24, 39, 0.95);
+            color: #fff;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 12px 35px rgba(15, 23, 42, 0.25);
+            opacity: 0;
+            transform: translateY(-6px);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            pointer-events: auto;
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+
+        .coprra-toast--visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .coprra-toast__title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            display: block;
+        }
+
+        .coprra-toast--success { background-color: rgba(22, 163, 74, 0.95); }
+        .coprra-toast--warning { background-color: rgba(217, 119, 6, 0.95); }
+        .coprra-toast--error { background-color: rgba(220, 38, 38, 0.95); }
+    `;
+
+  document.head.append(style);
+};
+
+const getToastContainer = () => {
+  let container = document.querySelector('.coprra-toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.className = 'coprra-toast-container';
+    document.body.append(container);
+  }
+
+  return container;
+};
+
+const notify = (message, type = 'info', title = '') => {
+  if (typeof document === 'undefined') {
+    return;
+  }
+
+  ensureToastStyles();
+  const container = getToastContainer();
+  const toast = document.createElement('div');
+  toast.className = `coprra-toast coprra-toast--${type}`;
+  toast.setAttribute('role', type === 'error' ? 'alert' : 'status');
+
+  if (title) {
+    const heading = document.createElement('span');
+    heading.className = 'coprra-toast__title';
+    heading.textContent = title;
+    toast.append(heading);
+  }
+
+  const body = document.createElement('span');
+  body.textContent = message;
+  toast.append(body);
+
+  container.append(toast);
+
+  requestAnimationFrame(() => {
+    toast.classList.add('coprra-toast--visible');
+  });
+
+  const lifetime = Math.min(6000, Math.max(2500, message.length * 70));
+  setTimeout(() => {
+    toast.classList.remove('coprra-toast--visible');
+  }, lifetime);
+  setTimeout(() => {
+    toast.remove();
+  }, lifetime + 400);
+};
+
+const parseClassList = (value = '') =>
+  value
+    .split(/\s+/)
+    .map(token => token.trim())
+    .filter(Boolean);
+
+const updateCompareBadge = count => {
+  for (const badge of document.querySelectorAll('[data-compare-count]')) {
+    badge.textContent = String(count);
+
+    if (count > 0) {
+      badge.classList.remove('hidden', 'opacity-0');
+    } else {
+      badge.classList.add('hidden', 'opacity-0');
+    }
+  }
+};
+
+const applyButtonState = (button, isAdded) => {
+  if (!button) {
+    return;
+  }
+
+  const defaultClasses = parseClassList(button.dataset.compareClassDefault);
+  const activeClasses = parseClassList(button.dataset.compareClassAdded);
+  const labelDefault = button.dataset.compareLabelDefault ?? 'Add to Compare';
+  const labelAdded = button.dataset.compareLabelAdded ?? 'Added to Compare';
+
+  if (defaultClasses.length > 0) {
+    button.classList.remove(...defaultClasses);
+  }
+
+  if (activeClasses.length > 0) {
+    button.classList.remove(...activeClasses);
+  }
+
+  const classSet = isAdded ? activeClasses : defaultClasses;
+  if (classSet.length > 0) {
+    button.classList.add(...classSet);
+  }
+
+  const labelSpan = button.querySelector('[data-compare-label]');
+  if (labelSpan) {
+    labelSpan.textContent = isAdded ? labelAdded : labelDefault;
+  } else {
+    button.textContent = isAdded ? labelAdded : labelDefault;
+  }
+
+  button.dataset.compareAdded = isAdded ? 'true' : 'false';
+  button.setAttribute('aria-pressed', isAdded ? 'true' : 'false');
+};
+
+const escapeSelector = value => {
+  if (typeof CSS !== 'undefined' && typeof CSS.escape === 'function') {
+    return CSS.escape(value);
+  }
+
+  return String(value).replaceAll(/([ #.;?+*~':"!^$[\]()=>|/@])/g, String.raw`\$1`);
+};
+
+const syncButtonState = ids => {
+  for (const button of document.querySelectorAll('[data-compare-add]')) {
+    const productId = button.dataset.compareAdd;
+    const isAdded = productId && ids.includes(Number.parseInt(productId, 10));
+    applyButtonState(button, Boolean(isAdded));
+  }
+};
+
+const handleAddRemove = async button => {
+  if (!button || button.disabled) {
+    return;
+  }
+
+  const productId = button.dataset.compareAdd;
+
+  if (!productId) {
+    return;
+  }
+
+  const isCurrentlyAdded = button.dataset.compareAdded === 'true';
+  const endpoint = `${COMPARE_ENDPOINT}/${productId}`;
+  const method = isCurrentlyAdded ? 'DELETE' : 'POST';
+
+  button.disabled = true;
+
+  try {
+    const response = await fetch(endpoint, {
+      method,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': csrfToken,
+      },
+      credentials: 'same-origin',
+    });
+
+    const payload = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      const message = payload?.message ?? 'Unable to update compare list.';
+      const severity = response.status === 409 ? 'warning' : 'error';
+      const title = severity === 'warning' ? 'Limit reached' : 'Action failed';
+      notify(message, severity, title);
+
+      return;
     }
 
-    let currentCount = 0;
+    const items = Array.isArray(payload.items) ? payload.items : [];
+    syncButtonState(items);
+    updateCompareBadge(Number(payload.count ?? items.length));
 
-    const parseClassList = (value) => value?.split(/\s+/).filter(Boolean) ?? [];
+    if (globalThis.location.pathname === '/compare') {
+      globalThis.location.reload();
+    }
+  } catch {
+    notify('We could not update the comparison list. Please try again.', 'error');
+  } finally {
+    button.disabled = false;
+  }
+};
 
-    const applyStateClasses = (button, isAdded) => {
-        const defaultClasses = parseClassList(button.dataset.compareClassDefault);
-        const addedClasses = parseClassList(button.dataset.compareClassAdded);
+const handleRemove = async button => {
+  const productId = button.dataset.compareRemove;
 
-        if (defaultClasses.length > 0) {
-            if (isAdded) {
-                button.classList.remove(...defaultClasses);
-            } else {
-                button.classList.add(...defaultClasses);
-            }
-        }
+  if (!productId) {
+    return;
+  }
 
-        if (addedClasses.length > 0) {
-            if (isAdded) {
-                button.classList.add(...addedClasses);
-            } else {
-                button.classList.remove(...addedClasses);
-            }
-        }
-    };
+  button.disabled = true;
 
-    /**
-     * @param {HTMLElement} button
-     */
-    const markButtonAsAdded = (button) => {
-        if (!button) {
-            return;
-        }
+  try {
+    const response = await fetch(`${COMPARE_ENDPOINT}/${productId}`, {
+      method: 'DELETE',
+      headers: {
+        Accept: 'application/json',
+        'X-CSRF-TOKEN': csrfToken,
+      },
+      credentials: 'same-origin',
+    });
 
-        button.dataset.compareAdded = 'true';
-        const addedLabel = button.dataset.compareLabelAdded ?? 'Added to Compare';
-        button.textContent = addedLabel;
-        applyStateClasses(button, true);
-        button.setAttribute('aria-pressed', 'true');
-    };
+    const payload = await response.json().catch(() => ({}));
 
-    /**
-     * @param {HTMLElement} button
-     */
-    const resetButtonState = (button) => {
-        if (!button) {
-            return;
-        }
+    if (!response.ok) {
+      return;
+    }
 
-        const defaultLabel = button.dataset.compareLabelDefault ?? 'Compare';
-        button.textContent = defaultLabel;
-        applyStateClasses(button, false);
-        button.setAttribute('aria-pressed', 'false');
-        button.dataset.compareAdded = 'false';
-    };
+    const items = Array.isArray(payload.items) ? payload.items : [];
+    syncButtonState(items);
+    updateCompareBadge(Number(payload.count ?? items.length));
+    globalThis.location.reload();
+  } catch {
+    notify('We could not remove that product. Please try again.', 'error');
+  }
+};
 
-    /**
-     * @param {string} message
-     * @param {'success'|'error'|'info'} variant
-     */
-    const notify = (message, variant = 'info') => {
-        if (!message) {
-            return;
-        }
+const handleClear = async button => {
+  button.disabled = true;
 
-        const containerId = 'compare-toast-container';
-        let container = document.getElementById(containerId);
+  try {
+    const response = await fetch(`${COMPARE_ENDPOINT}/clear`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': csrfToken,
+      },
+      credentials: 'same-origin',
+    });
 
-        if (!container) {
-            container = document.createElement('div');
-            container.id = containerId;
-            container.style.position = 'fixed';
-            container.style.top = '1.5rem';
-            container.style.right = '1.5rem';
-            container.style.zIndex = '9999';
-            container.style.display = 'flex';
-            container.style.flexDirection = 'column';
-            container.style.gap = '0.75rem';
-            document.body.appendChild(container);
-        }
+    if (!response.ok) {
+      return;
+    }
 
-        const toast = document.createElement('div');
-        toast.textContent = message;
-        toast.style.padding = '0.75rem 1.25rem';
-        toast.style.borderRadius = '0.75rem';
-        toast.style.boxShadow = '0 10px 30px rgba(15, 23, 42, 0.15)';
-        toast.style.fontSize = '0.95rem';
-        toast.style.fontWeight = '600';
-        toast.style.color = '#fff';
-        toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(-10px)';
+    syncButtonState([]);
+    updateCompareBadge(0);
+    globalThis.location.reload();
+  } catch {
+    notify('Unable to clear comparison list right now.', 'error');
+  } finally {
+    button.disabled = false;
+  }
+};
 
-        switch (variant) {
-            case 'success':
-                toast.style.background = 'linear-gradient(135deg, #10b981, #059669)';
-                break;
-            case 'error':
-                toast.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
-                break;
-            default:
-                toast.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
-                break;
-        }
+const initializeAttributeFilters = () => {
+  for (const checkbox of document.querySelectorAll('[data-compare-attribute-toggle]')) {
+    checkbox.addEventListener('change', () => {
+      const attribute = checkbox.dataset.compareAttributeToggle;
+      if (!attribute) {
+        return;
+      }
 
-        container.appendChild(toast);
+      for (const row of document.querySelectorAll(
+        `[data-compare-attribute-row="${escapeSelector(attribute)}"]`
+      )) {
+        row.classList.toggle('hidden', !checkbox.checked);
+      }
+    });
+  }
+};
 
-        requestAnimationFrame(() => {
-            toast.style.opacity = '1';
-            toast.style.transform = 'translateY(0)';
-        });
+const bootstrapCompare = () => {
+  for (const button of document.querySelectorAll('[data-compare-add]')) {
+    button.addEventListener('click', event => {
+      event.preventDefault();
+      handleAddRemove(button);
+    });
+  }
 
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateY(-10px)';
-            setTimeout(() => {
-                toast.remove();
-                if (container.childElementCount === 0) {
-                    container.remove();
-                }
-            }, 300);
-        }, 2600);
-    };
+  for (const button of document.querySelectorAll('[data-compare-remove]')) {
+    button.addEventListener('click', event => {
+      event.preventDefault();
+      handleRemove(button);
+    });
+  }
 
-    /**
-     * @param {number} count
-     */
-    const syncCountBadges = (count) => {
-        currentCount = count;
+  const clearButton = document.querySelector('[data-compare-clear="true"]');
+  let clearConfirmTimer;
 
-        document.querySelectorAll('[data-compare-count]').forEach((badge) => {
-            badge.textContent = String(count);
-            if (count > 0) {
-                badge.classList.remove('hidden', 'opacity-0');
-            } else {
-                badge.classList.add('hidden', 'opacity-0');
-            }
-        });
-    };
+  if (clearButton) {
+    clearButton.addEventListener('click', event => {
+      event.preventDefault();
 
-    /**
-     * Attach listeners to add buttons.
-     */
-    const initAddButtons = () => {
-        document.querySelectorAll('[data-compare-add]').forEach((button) => {
-            if (button.dataset.compareInit === 'true') {
-                return;
-            }
+      if (clearButton.dataset.confirmPending === 'true') {
+        clearButton.dataset.confirmPending = 'false';
+        clearTimeout(clearConfirmTimer);
+        handleClear(clearButton);
 
-            button.dataset.compareInit = 'true';
-            const defaultLabel = button.dataset.compareLabelDefault ?? button.textContent?.trim() ?? 'Compare';
-            button.dataset.compareLabelDefault = defaultLabel;
-            button.dataset.compareLabelAdded = button.dataset.compareLabelAdded ?? 'Added to Compare';
-        button.dataset.compareClassDefault = button.dataset.compareClassDefault ?? 'bg-blue-600 hover:bg-blue-700';
-        button.dataset.compareClassAdded = button.dataset.compareClassAdded ?? 'bg-green-600 hover:bg-green-700';
+        return;
+      }
 
-            if (button.dataset.compareAdded === 'true') {
-                markButtonAsAdded(button);
-            } else {
-                resetButtonState(button);
-            }
+      clearButton.dataset.confirmPending = 'true';
+      notify('اضغط مرة أخرى خلال 5 ثوانٍ لتأكيد مسح المقارنة.', 'warning', 'Confirm action');
 
-            button.addEventListener('click', async (event) => {
-                event.preventDefault();
-                const productId = Number.parseInt(button.dataset.compareAdd ?? '', 10);
+      clearConfirmTimer = setTimeout(() => {
+        clearButton.dataset.confirmPending = 'false';
+      }, 5000);
+    });
+  }
 
-                if (!productId) {
-                    return;
-                }
+  initializeAttributeFilters();
 
-                button.disabled = true;
-                button.classList.add('opacity-70', 'cursor-not-allowed');
+  fetch(COMPARE_ENDPOINT, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+    },
+    credentials: 'same-origin',
+  })
+    .then(response => (response.ok ? response.json() : undefined))
+    .then(payload => {
+      if (!payload) {
+        return;
+      }
 
-                try {
-                    const response = await fetch(`${API_ENDPOINT}/${productId}`, {
-                        method: 'POST',
-                        headers: requestHeaders,
-                    });
+      const items = Array.isArray(payload.items) ? payload.items : [];
+      syncButtonState(items);
+      updateCompareBadge(Number(payload.count ?? items.length));
+    })
+    .catch(() => {
+      notify('Unable to synchronise comparison data.', 'error');
+    });
+};
 
-                    const payload = await response.json();
-
-                    if (response.status === 409) {
-                        notify(payload.message ?? 'Comparison limit reached.', 'error');
-                        return;
-                    }
-
-                    if (!response.ok) {
-                        notify(payload.message ?? 'Failed to add product to compare.', 'error');
-                        return;
-                    }
-
-                    const itemIds = Array.isArray(payload.items) ? payload.items.map(Number) : [];
-                    if (itemIds.includes(productId)) {
-                        markButtonAsAdded(button);
-                    }
-
-                    syncCountBadges(payload.count ?? currentCount);
-                    notify(payload.message ?? 'Product added to comparison.', 'success');
-                } catch (error) {
-                    console.error(error);
-                    notify('Failed to reach the comparison service. Please try again.', 'error');
-                } finally {
-                    button.disabled = false;
-                    button.classList.remove('opacity-70', 'cursor-not-allowed');
-                }
-            });
-        });
-    };
-
-    /**
-     * Attach listeners to remove buttons.
-     */
-    const initRemoveButtons = () => {
-        document.querySelectorAll('[data-compare-remove]').forEach((button) => {
-            if (button.dataset.compareInit === 'true') {
-                return;
-            }
-
-            button.dataset.compareInit = 'true';
-
-            button.addEventListener('click', async (event) => {
-                event.preventDefault();
-                const productId = Number.parseInt(button.dataset.compareRemove ?? '', 10);
-
-                if (!productId) {
-                    return;
-                }
-
-                button.disabled = true;
-                button.classList.add('opacity-70', 'cursor-not-allowed');
-
-                try {
-                    const response = await fetch(`${API_ENDPOINT}/${productId}`, {
-                        method: 'DELETE',
-                        headers: requestHeaders,
-                    });
-
-                    const payload = await response.json();
-
-                    if (!response.ok) {
-                        const message = payload?.message ?? 'Unable to update compare list.';
-                        const severity = response.status === 409 ? 'warning' : 'error';
-                        const title = severity === 'warning' ? 'Limit reached' : 'Action failed';
-                        notify(message, severity, title);
-
-                        return;
-                    }
-
-                    syncCountBadges(payload.count ?? currentCount);
-                    notify(payload.message ?? 'Product removed from comparison.', 'success');
-
-                    if (window.location.pathname.startsWith('/compare')) {
-                        window.location.reload();
-                    } else {
-                        // Reset any corresponding add buttons so the user can add again.
-                        document.querySelectorAll(`[data-compare-add="${productId}"]`).forEach((btn) => {
-                            btn.dataset.compareAdded = 'false';
-                            resetButtonState(btn);
-                        });
-                    }
-                } catch {
-                    notify('We could not remove that product. Please try again.', 'error');
-                } finally {
-                    button.disabled = false;
-                    button.classList.remove('opacity-70', 'cursor-not-allowed');
-                }
-            });
-        });
-    };
-
-    /**
-     * Bind attribute filter toggles for the comparison table.
-     */
-    const initAttributeFilters = () => {
-        const toggles = document.querySelectorAll('[data-compare-attribute-toggle]');
-        if (toggles.length === 0) {
-            return;
-        }
-
-        toggles.forEach((toggle) => {
-            toggle.addEventListener('change', () => {
-                const attribute = toggle.getAttribute('data-compare-attribute-toggle');
-                if (!attribute) {
-                    return;
-                }
-
-                const rows = document.querySelectorAll(`[data-compare-attribute-row="${attribute}"]`);
-                rows.forEach((row) => {
-                    if (toggle.checked) {
-                        row.classList.remove('hidden');
-                        row.style.display = '';
-                    } else {
-                        row.classList.add('hidden');
-                        row.style.display = 'none';
-                    }
-                });
-            });
-        });
-    };
-
-    /**
-     * Handle clear comparison button.
-     */
-    const initClearButton = () => {
-        const button = document.querySelector('[data-compare-clear]');
-        if (!button) {
-            return;
-        }
-
-        const form = button.closest('[data-compare-clear-form]');
-        const target = form ?? button;
-        if (target.dataset.compareInit === 'true') {
-            return;
-        }
-
-        target.dataset.compareInit = 'true';
-
-        const handleClear = async (event) => {
-            event.preventDefault();
-
-            button.disabled = true;
-            button.classList.add('opacity-70', 'cursor-not-allowed');
-
-            try {
-                const response = await fetch(`${API_ENDPOINT}/clear`, {
-                    method: 'POST',
-                    headers: {
-                        ...requestHeaders,
-                        'Content-Type': 'application/json',
-                    },
-                });
-
-                const payload = await response.json();
-
-                if (!response.ok) {
-                    notify(payload.message ?? 'Failed to clear comparison list.', 'error');
-                    return;
-                }
-
-                syncCountBadges(0);
-                notify(payload.message ?? 'Comparison list cleared.', 'success');
-
-                if (window.location.pathname.startsWith('/compare')) {
-                    window.location.reload();
-                } else {
-                    document.querySelectorAll('[data-compare-add]').forEach((btn) => {
-                        btn.dataset.compareAdded = 'false';
-                        resetButtonState(btn);
-                    });
-                }
-            } catch {
-                notify('Unable to clear comparison list right now.', 'error');
-            } finally {
-                button.disabled = false;
-                button.classList.remove('opacity-70', 'cursor-not-allowed');
-            }
-        };
-
-        if (form) {
-            form.addEventListener('submit', handleClear);
-        } else {
-            button.addEventListener('click', handleClear);
-        }
-    };
-
-    /**
-     * Fetch initial count to ensure consistency.
-     */
-    const hydrateInitialCount = async () => {
-        try {
-            const response = await fetch(API_ENDPOINT, {
-                headers: requestHeaders,
-            });
-
-            if (!response.ok) {
-                return;
-            }
-
-            const payload = await response.json();
-            if (typeof payload.count === 'number') {
-                syncCountBadges(payload.count);
-            }
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    return {
-        init() {
-            const initialTarget = document.querySelector('[data-compare-count]');
-            if (initialTarget) {
-                const initialCount = Number.parseInt(initialTarget.dataset.initialCount ?? initialTarget.textContent ?? '0', 10);
-                syncCountBadges(Number.isNaN(initialCount) ? 0 : initialCount);
-            }
-
-            initAddButtons();
-            initRemoveButtons();
-            initAttributeFilters();
-            initClearButton();
-            hydrateInitialCount();
-        },
-    };
-})();
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => CompareManager.init());
-} else {
-    CompareManager.init();
-}
-
-export default CompareManager;
+document.addEventListener('DOMContentLoaded', bootstrapCompare);

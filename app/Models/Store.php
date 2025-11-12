@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\MessageBag;
+use Illuminate\Support\Str;
 
 /**
  * @property int                $id
@@ -203,6 +204,6 @@ class Store extends ValidatableModel
      */
     private function generateSlug(): void
     {
-        $this->slug = \Str::slug($this->name);
+        $this->slug = Str::slug($this->name);
     }
 }

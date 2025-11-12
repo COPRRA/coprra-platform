@@ -73,6 +73,7 @@ final class ProductQueryBuilderService
     public function buildActiveProductsQuery(): Builder
     {
         return Product::query()
+            ->select(['id', 'name', 'slug', 'price', 'image', 'category_id', 'brand_id', 'description'])
             ->with(['category', 'brand'])
             ->where('is_active', true)
             ->latest()

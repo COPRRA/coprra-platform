@@ -1,157 +1,16 @@
 {
-  "name": "coprra",
-  "version": "0.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "dev:host": "vite --host",
     "build": "vite build",
-    "build:production": "cross-env NODE_ENV=production vite build --mode production",
-    "build:staging": "cross-env NODE_ENV=staging vite build --mode staging",
-    "build:analyze": "cross-env NODE_ENV=production vite build --mode production && npx vite-bundle-analyzer",
-    "optimize": "npm run build:production",
-    "watch": "vite build --watch",
-    "preview": "vite preview",
-    "clean": "rimraf dist public/build && rimraf node_modules/.vite",
-    "clean:all": "npm run clean && rimraf node_modules package-lock.json",
-    "clean:cache": "rimraf node_modules/.cache .eslintcache",
-    "assets": "npm run clean && npm run build",
-    "lint": "eslint --ext .js,.ts,.vue resources/js --max-warnings 0 --cache",
-    "lint:fix": "eslint --ext .js,.ts,.vue resources/js --fix --cache",
-    "lint:report": "eslint --ext .js,.ts,.vue resources/js --format html --output-file reports/eslint.html",
-    "stylelint": "stylelint \"resources/**/*.{css,scss,vue}\" --allow-empty-input --cache",
-    "stylelint:fix": "stylelint \"resources/**/*.{css,scss,vue}\" --fix --allow-empty-input --cache",
-    "stylelint:report": "stylelint \"resources/**/*.{css,scss,vue}\" --formatter verbose --output-file reports/stylelint.txt",
-    "prettier": "prettier --check \"resources/**/*.{js,ts,vue,css,scss}\" --cache",
-    "prettier:fix": "prettier --write \"resources/**/*.{js,ts,vue,css,scss}\" --cache",
-    "test": "vitest",
-    "test:run": "vitest run",
-    "test:frontend": "vitest run --reporter=verbose",
-    "test:coverage": "vitest run --coverage --reporter=verbose",
-    "test:ui": "vitest --ui",
-    "test:watch": "vitest --watch",
-    "security:audit": "npm audit --audit-level moderate --json > reports/npm-audit.json || npm audit --audit-level moderate",
-    "security:fix": "npm audit fix --force",
-    "security:licenses": "license-checker --onlyAllow 'MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC;0BSD;CC0-1.0' --json > reports/licenses.json",
-    "security:outdated": "npm outdated --json > reports/outdated.json || npm outdated",
-    "security:update": "ncu -u && npm install",
-    "security:all": "npm run security:audit && npm run security:licenses",
-    "quality:duplicates": "jscpd resources/js --reporters html --output reports/jscpd",
-    "quality:bundle": "npm run build:analyze",
-    "quality:complexity": "npx complexity-report --output reports/complexity.json resources/js",
-    "quality:size": "npx size-limit",
-    "check": "run-p security:audit lint stylelint prettier test:frontend",
-    "check:fix": "run-s lint:fix stylelint:fix prettier:fix",
-    "check:reports": "run-p lint:report stylelint:report security:licenses quality:duplicates",
-    "ci": "npm ci && npm run check && npm run build:production",
-    "ci:test": "npm ci && npm run test:coverage && npm run check:reports",
-    "prepare": "husky",
-    "precommit": "lint-staged",
-    "prepush": "npm run check",
-    "postinstall": "npm run security:audit || exit 0"
+    "dev": "vite dev"
   },
   "devDependencies": {
-    "@eslint/js": "^9.35.0",
-    "@fullhuman/postcss-purgecss": "^7.0.2",
-    "@testing-library/vue": "^8.1.0",
-    "@types/node": "^24.9.2",
-    "@typescript-eslint/eslint-plugin": "^8.15.0",
-    "@typescript-eslint/parser": "^8.15.0",
-    "@vitest/coverage-v8": "^4.0.3",
-    "@vitest/ui": "^4.0.3",
-    "autoprefixer": "^10.4.21",
-    "codecov": "^3.8.0",
-    "cross-env": "^7.0.3",
-    "eslint": "^9.35.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-prettier": "^5.2.1",
-    "eslint-plugin-security": "^3.0.1",
-    "eslint-plugin-sonarjs": "^2.0.4",
-    "eslint-plugin-unicorn": "^62.0.0",
-    "eslint-plugin-vue": "^9.31.0",
-    "globals": "^16.4.0",
-    "happy-dom": "^20.0.8",
-    "husky": "^9.1.7",
-    "jscpd": "^4.0.5",
-    "jsdom": "^27.0.1",
-    "laravel-vite-plugin": "^2.0.1",
-    "license-checker": "^25.0.1",
-    "lint-staged": "^16.2.0",
-    "npm-check-updates": "^17.1.11",
-    "npm-run-all2": "^7.0.2",
-    "postcss": "^8.5.1",
-    "postcss-scss": "^4.0.9",
-    "prettier": "^3.6.2",
-    "rimraf": "^6.0.1",
-    "rollup-plugin-visualizer": "^6.0.5",
-    "stylelint": "^16.24.0",
-    "stylelint-config-prettier-scss": "^1.0.0",
-    "stylelint-config-recommended-scss": "^15.0.0",
-    "stylelint-config-standard": "^39.0.0",
-    "stylelint-config-standard-scss": "^16.0.0",
-    "stylelint-order": "^6.0.4",
-    "stylelint-prettier": "^5.0.3",
-    "stylelint-scss": "^6.12.1",
-    "typescript": "^5.7.2",
-    "vite": "^7.1.11",
-    "vite-bundle-analyzer": "^1.2.3",
-    "vite-plugin-pwa": "^1.0.3",
-    "vitest": "^4.0.3",
-    "webpack-bundle-analyzer": "^4.10.2"
+    "laravel-vite-plugin": "^1.0",
+    "vite": "^5.0"
   },
   "dependencies": {
-    "axios": "^1.6.4"
-  },
-  "engines": {
-    "node": ">=20.0.0",
-    "npm": ">=10.0.0"
-  },
-  "engineStrict": true,
-  "lint-staged": {
-    "*.php": [
-      "bash -c 'test -f vendor/bin/pint && vendor/bin/pint || echo Skipping Pint - vendor not found'",
-      "bash -c 'test -f vendor/bin/phpstan && vendor/bin/phpstan analyse --memory-limit=1G --no-progress || echo Skipping PHPStan - vendor not found'"
-    ],
-    "resources/js/**/*.{js,vue}": [
-      "npx eslint --fix",
-      "npx prettier --write"
-    ],
-    "resources/**/*.{css,scss,vue}": [
-      "npx stylelint --fix",
-      "npx prettier --write"
-    ]
-  },
-  "browserslist": [
-    ">= 0.5%",
-    "last 2 versions",
-    "Firefox ESR",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/coprra/coprra.git"
-  },
-  "bugs": {
-    "url": "https://github.com/coprra/coprra/issues"
-  },
-  "homepage": "https://coprra.com",
-  "keywords": [
-    "price-comparison",
-    "e-commerce",
-    "laravel",
-    "vue",
-    "shopping",
-    "deals"
-  ],
-  "author": "COPRRA Team",
-  "license": "UNLICENSED",
-  "funding": {
-    "type": "individual",
-    "url": "https://coprra.com/support"
+    "bootstrap": "^5.3.0",
+    "@fortawesome/fontawesome-free": "^6.0.0"
   }
 }

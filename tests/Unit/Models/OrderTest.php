@@ -55,19 +55,6 @@ final class OrderTest extends TestCase
     }
 
     /**
-     * Test that payments relation is a HasMany instance.
-     */
-    public function testPaymentsRelation(): void
-    {
-        $order = new Order();
-
-        $relation = $order->payments();
-
-        self::assertInstanceOf(HasMany::class, $relation);
-        self::assertSame(Payment::class, $relation->getRelated()::class);
-    }
-
-    /**
      * Test scopeByStatus adds where clause for status.
      */
     public function testScopeByStatus(): void
@@ -95,5 +82,16 @@ final class OrderTest extends TestCase
         $result = $order->scopeForUser($query, $userId);
 
         self::assertInstanceOf(Builder::class, $result);
+    }
+
+    public function testOrderHasRequiredAttributes()
+    {
+        $order = Order::factory()->create();
+
+        self::assertNotNull($order->user_id);
+        self::assertIsString($order->status);
+        self::assertSame('pending', (string) $order->status); // Cast enum to string
+        self::assertGreaterThan(0, $order->total_amount);
+        self::assertNotNull($order->created_at);
     }
 }

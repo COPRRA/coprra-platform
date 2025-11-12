@@ -66,6 +66,17 @@
                             </svg>
                             Start Scraping Batch
                         </button>
+
+                        <form action="{{ route('admin.scraper.clear-logs') }}" method="POST" class="inline">
+                            @csrf
+                            <button
+                                type="submit"
+                                class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 px-6 rounded-lg transition duration-200"
+                                onclick="return confirm('Are you sure you want to clear all logs?')"
+                            >
+                                🗑️ Clear Logs
+                            </button>
+                        </form>
                     </div>
                 </form>
 
@@ -110,7 +121,7 @@
                         </li>
                         <li class="flex items-start">
                             <span class="mr-2">•</span>
-                            <span>Scraping happens in background - check status dashboard for progress</span>
+                            <span>Scraping happens in background - check logs for progress</span>
                         </li>
                         <li class="flex items-start">
                             <span class="mr-2">💡</span>
@@ -124,24 +135,12 @@
             <div class="bg-gray-900 rounded-lg shadow-lg overflow-hidden">
                 <div class="bg-gray-800 px-6 py-4 flex items-center justify-between">
                     <h2 class="text-xl font-bold text-white">📋 Scraping Logs (Real-Time)</h2>
-                    <div class="flex gap-2">
-                        <button
-                            onclick="refreshLogs()"
-                            class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm transition"
-                        >
-                            🔄 Refresh
-                        </button>
-                        <form action="{{ route('admin.scraper.clear-logs') }}" method="POST" class="inline">
-                            @csrf
-                            <button
-                                type="submit"
-                                class="bg-red-700 hover:bg-red-600 text-white px-4 py-2 rounded text-sm transition"
-                                onclick="return confirm('Clear all logs?')"
-                            >
-                                🗑️ Clear
-                            </button>
-                        </form>
-                    </div>
+                    <button
+                        onclick="refreshLogs()"
+                        class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm transition"
+                    >
+                        🔄 Refresh
+                    </button>
                 </div>
 
                 <div class="p-6">
@@ -160,134 +159,21 @@
 
         </div>
 
-        <!-- Status Dashboard -->
-        <div class="mt-8 bg-white rounded-lg shadow-lg overflow-hidden">
-            <div class="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4 flex items-center justify-between">
+        <!-- Help Section -->
+        <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-blue-900 mb-3">💡 Quick Start Guide</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-blue-800">
                 <div>
-                    <h2 class="text-2xl font-bold text-white">📊 Status Dashboard</h2>
-                    <p class="text-blue-100 text-sm">Real-time tracking of all scraping jobs</p>
+                    <strong class="block mb-2">Step 1: Collect URLs</strong>
+                    <p>Browse ANY online store and copy product page URLs</p>
                 </div>
-                <div class="flex gap-2">
-                    <button
-                        onclick="refreshJobs()"
-                        class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded text-sm transition"
-                    >
-                        🔄 Refresh Status
-                    </button>
-                    <form action="{{ route('admin.scraper.clear-jobs') }}" method="POST" class="inline">
-                        @csrf
-                        <button
-                            type="submit"
-                            class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm transition"
-                            onclick="return confirm('Clear completed and failed jobs?')"
-                        >
-                            🗑️ Clear History
-                        </button>
-                    </form>
+                <div>
+                    <strong class="block mb-2">Step 2: Paste & Submit</strong>
+                    <p>Paste URLs (one per line) and click "Start Scraping"</p>
                 </div>
-            </div>
-
-            <!-- Job Statistics -->
-            <div class="grid grid-cols-4 gap-6 p-6 border-b border-gray-200" id="job-stats">
-                <div class="text-center">
-                    <p class="text-3xl font-bold text-gray-800" id="stat-total">{{ $stats['total_jobs'] }}</p>
-                    <p class="text-sm text-gray-600 mt-1">Total Jobs</p>
-                </div>
-                <div class="text-center">
-                    <p class="text-3xl font-bold text-green-600" id="stat-completed">{{ $stats['completed_jobs'] }}</p>
-                    <p class="text-sm text-gray-600 mt-1">✅ Completed</p>
-                </div>
-                <div class="text-center">
-                    <p class="text-3xl font-bold text-red-600" id="stat-failed">{{ $stats['failed_jobs'] }}</p>
-                    <p class="text-sm text-gray-600 mt-1">❌ Failed</p>
-                </div>
-                <div class="text-center">
-                    <p class="text-3xl font-bold text-yellow-600" id="stat-pending">{{ $stats['pending_jobs'] }}</p>
-                    <p class="text-sm text-gray-600 mt-1">⏳ Pending</p>
-                </div>
-            </div>
-
-            <!-- Jobs Table -->
-            <div class="overflow-x-auto">
-                <table class="w-full" id="jobs-table">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">URL</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Error</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200" id="jobs-tbody">
-                        @forelse($recentJobs as $job)
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {{ $job->batch_id }}-{{ $job->job_number }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                @if($job->status === 'completed')
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                        ✅ Completed
-                                    </span>
-                                @elseif($job->status === 'failed')
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                        ❌ Failed
-                                    </span>
-                                @elseif($job->status === 'running')
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                        ⏳ Running
-                                    </span>
-                                @else
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                        ⏸️ Queued
-                                    </span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
-                                <a href="{{ $job->url }}" target="_blank" class="text-blue-600 hover:text-blue-800">
-                                    {{ Str::limit($job->url, 50) }}
-                                </a>
-                            </td>
-                            <td class="px-6 py-4 text-sm">
-                                @if($job->product)
-                                    <a href="{{ route('products.show', $job->product) }}" class="text-green-600 hover:text-green-800 font-medium">
-                                        {{ Str::limit($job->product->name, 30) }}
-                                    </a>
-                                @else
-                                    <span class="text-gray-400">-</span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                <div>{{ $job->created_at->diffForHumans() }}</div>
-                                @if($job->getDuration())
-                                    <div class="text-xs text-gray-400">{{ $job->getDuration() }}s</div>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 text-sm text-red-600 max-w-xs truncate">
-                                {{ $job->error_message ? Str::limit($job->error_message, 40) : '-' }}
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="6" class="px-6 py-4 text-center text-gray-500">
-                                No scraping jobs yet. Submit some URLs above to get started!
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Auto-refresh indicator -->
-            <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
-                <div class="flex items-center justify-between text-xs text-gray-500">
-                    <div class="flex items-center">
-                        <div class="w-2 h-2 bg-blue-500 rounded-full mr-2 animate-pulse"></div>
-                        <span>Dashboard auto-refreshing every 3 seconds</span>
-                    </div>
-                    <span id="last-update">Last updated: {{ now()->format('H:i:s') }}</span>
+                <div>
+                    <strong class="block mb-2">Step 3: Monitor Progress</strong>
+                    <p>Watch real-time logs and check database stats</p>
                 </div>
             </div>
         </div>
@@ -299,7 +185,6 @@
 <script>
 // Auto-refresh logs every 5 seconds
 let autoRefreshInterval = null;
-let jobsRefreshInterval = null;
 
 function refreshLogs() {
     fetch('{{ route("admin.scraper.logs") }}')
@@ -319,94 +204,19 @@ function refreshLogs() {
         });
 }
 
-function refreshJobs() {
-    fetch('{{ route("admin.scraper.jobs") }}')
-        .then(response => response.json())
-        .then(data => {
-            // Update statistics
-            document.getElementById('stat-total').textContent = data.stats.total_jobs;
-            document.getElementById('stat-completed').textContent = data.stats.completed_jobs;
-            document.getElementById('stat-failed').textContent = data.stats.failed_jobs;
-            document.getElementById('stat-pending').textContent = data.stats.pending_jobs;
-
-            // Update jobs table
-            const tbody = document.getElementById('jobs-tbody');
-            if (data.jobs && data.jobs.length > 0) {
-                tbody.innerHTML = data.jobs.map(job => {
-                    const statusBadge = getStatusBadge(job.status);
-                    const productLink = job.product_id ?
-                        `<a href="/products/${job.product_id}" class="text-green-600 hover:text-green-800 font-medium">${truncate(job.product_name, 30)}</a>` :
-                        '<span class="text-gray-400">-</span>';
-
-                    return `
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                ${job.batch_id}-${job.job_number}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">${statusBadge}</td>
-                            <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
-                                <a href="${job.url}" target="_blank" class="text-blue-600 hover:text-blue-800">
-                                    ${truncate(job.url, 50)}
-                                </a>
-                            </td>
-                            <td class="px-6 py-4 text-sm">${productLink}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                <div>${job.created_at}</div>
-                                ${job.duration ? `<div class="text-xs text-gray-400">${job.duration}s</div>` : ''}
-                            </td>
-                            <td class="px-6 py-4 text-sm text-red-600 max-w-xs truncate">
-                                ${job.error_message ? truncate(job.error_message, 40) : '-'}
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
-            } else {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
-                            No scraping jobs yet. Submit some URLs above to get started!
-                        </td>
-                    </tr>
-                `;
-            }
-
-            // Update last update time
-            document.getElementById('last-update').textContent = 'Last updated: ' + new Date().toLocaleTimeString();
-        })
-        .catch(error => {
-            console.error('Error fetching jobs:', error);
-        });
-}
-
-function getStatusBadge(status) {
-    const badges = {
-        'completed': '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">✅ Completed</span>',
-        'failed': '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">❌ Failed</span>',
-        'running': '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">⏳ Running</span>',
-        'queued': '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">⏸️ Queued</span>'
-    };
-    return badges[status] || badges['queued'];
-}
-
-function truncate(str, length) {
-    if (!str) return '-';
-    return str.length > length ? str.substring(0, length - 3) + '...' : str;
-}
-
 // Start auto-refresh when page loads
 document.addEventListener('DOMContentLoaded', function() {
     autoRefreshInterval = setInterval(refreshLogs, 5000);
-    jobsRefreshInterval = setInterval(refreshJobs, 3000);
 });
 
 // Stop auto-refresh when page is hidden (battery saving)
 document.addEventListener('visibilitychange', function() {
     if (document.hidden) {
-        if (autoRefreshInterval) clearInterval(autoRefreshInterval);
-        if (jobsRefreshInterval) clearInterval(jobsRefreshInterval);
+        if (autoRefreshInterval) {
+            clearInterval(autoRefreshInterval);
+        }
     } else {
         autoRefreshInterval = setInterval(refreshLogs, 5000);
-        jobsRefreshInterval = setInterval(refreshJobs, 3000);
     }
 });
 </script>
