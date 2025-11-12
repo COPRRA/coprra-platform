@@ -54,9 +54,9 @@
     # Referrer Policy
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
 
-    # Content Security Policy is set by application middleware with nonce.
+    # Content Security Policy is set by application middleware (AddCspNonce) with nonce.
     # Do not set a static CSP here to avoid conflicts and allow per-request nonces.
-    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; frame-ancestors 'self';"
+    # CSP is handled by: app/Http/Middleware/AddCspNonce.php
 
     # Permissions Policy
     Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=(), speaker=(), vibrate=(), fullscreen=(self), sync-xhr=()"
