@@ -63,7 +63,7 @@ class ProductController extends Controller
                 'url' => $request->fullUrl(),
                 'trace' => $e->getTraceAsString(),
             ]);
-            abort(500);
+            return back()->with('error', 'An unexpected error occurred. Please try again later.');
         }
     }
 
@@ -97,7 +97,7 @@ class ProductController extends Controller
                 'slug' => $slug,
                 'trace' => $e->getTraceAsString(),
             ]);
-            abort(500);
+            return back()->with('error', 'An unexpected error occurred. Please try again later.');
         }
     }
 
@@ -143,7 +143,7 @@ class ProductController extends Controller
                 'url' => $request->fullUrl(),
                 'trace' => $e->getTraceAsString(),
             ]);
-            abort(500);
+            return back()->with('error', 'An unexpected error occurred. Please try again later.');
         }
     }
 }

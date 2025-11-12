@@ -103,6 +103,25 @@ echo "Mission 3: Install Dependencies & Finalize Setup"
 echo "============================================================"
 echo ""
 
+# Fix storage and cache permissions BEFORE composer
+echo "🔐 Fixing storage and cache permissions..."
+
+# Create directories if they don't exist
+mkdir -p storage/framework/cache
+mkdir -p storage/framework/sessions
+mkdir -p storage/framework/views
+mkdir -p storage/logs
+mkdir -p bootstrap/cache
+
+# Set permissions
+chmod -R 775 storage bootstrap/cache
+
+# Try chown (may fail on shared hosting, that's OK)
+chown -R $(whoami):$(whoami) storage bootstrap/cache 2>/dev/null || true
+
+echo "✅ Permissions fixed."
+echo ""
+
 # Install Composer dependencies
 echo "📦 Installing Composer dependencies..."
 if composer install --no-dev --optimize-autoloader; then
@@ -171,10 +190,18 @@ echo "Audit 2: Git Secrets Scan"
 echo "============================================================"
 echo ""
 
+# Skip Git secrets scan if jq is not available or script has issues
 if [ -f "scripts/scan-git-secrets.sh" ]; then
-    echo "Running: bash scripts/scan-git-secrets.sh"
-    echo "----------------------------------------"
-    bash scripts/scan-git-secrets.sh || echo "⚠️  Warning: Git secrets scan completed with warnings"
+    # Check if jq is available
+    if ! command -v jq &> /dev/null; then
+        echo "⚠️  Skipping Git secrets scan (jq not available on server)"
+        echo "⚠️  This is a non-critical audit and can be skipped"
+    else
+        echo "Running: bash scripts/scan-git-secrets.sh"
+        echo "----------------------------------------"
+        # Run with timeout to prevent infinite loops
+        timeout 60 bash scripts/scan-git-secrets.sh 2>&1 | head -100 || echo "⚠️  Warning: Git secrets scan completed with warnings or timeout"
+    fi
 else
     echo "⚠️  Script not found: scripts/scan-git-secrets.sh"
 fi

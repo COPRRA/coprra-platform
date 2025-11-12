@@ -17,7 +17,7 @@
         </div>
 
         <!-- Featured Products -->
-        @if(isset($featuredProducts) && $featuredProducts->count() > 0)
+        @if(!empty($featuredProducts) && $featuredProducts->isNotEmpty())
         <div class="mb-12">
             <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-6">{{ __('Featured Products') }}</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -56,7 +56,7 @@
         @endif
 
         <!-- Categories -->
-        @if(isset($categories) && count($categories) > 0)
+        @if(!empty($categories) && $categories->isNotEmpty())
         <div class="mb-12">
             <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-6">{{ __('main.categories') }}</h2>
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
@@ -80,7 +80,7 @@
         @endif
 
         <!-- Brands -->
-        @if(isset($brands) && count($brands) > 0)
+        @if(!empty($brands) && $brands->isNotEmpty())
         <div class="mb-12">
             <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-6">{{ __('main.brands') }}</h2>
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">

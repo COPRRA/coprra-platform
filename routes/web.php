@@ -24,7 +24,6 @@ use App\Http\Controllers\FileController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LocaleController;
-use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PriceAlertController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
@@ -124,8 +123,9 @@ Route::get('/dashboard', static function () {
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1')->name('login.post');
 
-Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
-Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:3,1')->name('register.post');
+// Registration routes - DISABLED (view shows registration is disabled)
+// Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
+// Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:3,1')->name('register.post');
 
 // Alias route for password reset request expected by tests
 Route::post('/forgot-password', [AuthController::class, 'sendResetLinkEmail'])->middleware('throttle:3,1')->name('password.forgot');
@@ -191,7 +191,7 @@ Route::middleware('auth')->group(static function (): void {
 
 // Cart Routes (public, ensure web middleware is explicitly applied)
 Route::middleware('web')->group(static function (): void {
-    Route::get('cartx', [CartController::class, 'index'])->name('cart.index');
+    Route::get('cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('cart', [CartController::class, 'addFromRequest'])->name('cart.store');
     Route::post('cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
     Route::post('cart/update', [CartController::class, 'update'])->name('cart.update');
@@ -199,19 +199,6 @@ Route::middleware('web')->group(static function (): void {
     Route::post('cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 });
 
-// Checkout route expected by tests
-Route::get('/checkout', static function () {
-    return response('Checkout', 200);
-})->middleware('auth')->name('checkout');
-
-// Web Order routes for E2E tests
-Route::middleware('auth')->group(static function (): void {
-    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
-    Route::post('/orders', [OrderController::class, 'storeFromCart'])->name('orders.store');
-    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
-    Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
-    Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
-});
 
 // --- Admin Routes (تتطلب صلاحيات إدارية) ---
 
@@ -301,6 +288,7 @@ Route::get('/files/{path}', [FileController::class, 'show'])
 ;
 
 // --- Debug & Test Routes (Non-Production Only) ---
+// WARNING: These routes are for development and debugging only. Ensure APP_DEBUG is set to false in production.
 if (config('app.env') !== 'production') {
     Route::get('/public-test-ai', static function () {
         return response()->json(['success' => true, 'message' => 'Test OK']);

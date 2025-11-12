@@ -128,7 +128,27 @@ for commit in $(git rev-list --all); do
             echo "      \"commit_date\": \"$COMMIT_DATE\"," >> "$JSON_OUTPUT"
             echo "      \"author\": \"$COMMIT_AUTHOR\"," >> "$JSON_OUTPUT"
             echo "      \"message\": \"$COMMIT_MESSAGE\"," >> "$JSON_OUTPUT"
-            echo "      \"matches\": $(echo "$MATCHES" | jq -R -s -c 'split("\n") | map(select(. != ""))')" >> "$JSON_OUTPUT"
+            # Convert matches to JSON array (without jq dependency)
+            if command -v jq &> /dev/null; then
+                echo "      \"matches\": $(echo "$MATCHES" | jq -R -s -c 'split("\n") | map(select(. != ""))')" >> "$JSON_OUTPUT"
+            else
+                # Manual JSON array conversion without jq
+                echo -n "      \"matches\": [" >> "$JSON_OUTPUT"
+                FIRST_MATCH=1
+                echo "$MATCHES" | while IFS= read -r line; do
+                    if [ -n "$line" ]; then
+                        if [ $FIRST_MATCH -eq 1 ]; then
+                            FIRST_MATCH=0
+                        else
+                            echo -n "," >> "$JSON_OUTPUT"
+                        fi
+                        # Escape JSON special characters
+                        ESCAPED_LINE=$(echo "$line" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/\t/\\t/g' | sed 's/\r/\\r/g' | sed 's/\n/\\n/g')
+                        echo -n "\"$ESCAPED_LINE\"" >> "$JSON_OUTPUT"
+                    fi
+                done
+                echo "]" >> "$JSON_OUTPUT"
+            fi
             echo "    }" >> "$JSON_OUTPUT"
         fi
     done
