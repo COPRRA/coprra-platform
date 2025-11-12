@@ -322,3 +322,69 @@ if (config('app.env') !== 'production') {
         throw new Exception('Sentry test exception');
     });
 }
+
+// --- Sentry Debug Route (APP_DEBUG Only) ---
+// This route is only accessible when APP_DEBUG=true
+// Used to verify Sentry integration is working correctly
+if (config('app.debug')) {
+    Route::get('/debug-sentry', static function () {
+        try {
+            // Verify Sentry is bound
+            if (!app()->bound('sentry')) {
+                return response()->json([
+                    'error' => 'Sentry not bound',
+                    'message' => 'Sentry service is not available. Check configuration.',
+                    'sentry_dsn' => config('sentry.dsn') ? 'configured' : 'not configured',
+                ], 500);
+            }
+
+            // Get Sentry instance
+            $sentry = app('sentry');
+
+            // Add context
+            $sentry->configureScope(function (\Sentry\State\Scope $scope): void {
+                $scope->setTag('debug_route', 'true');
+                $scope->setContext('debug_info', [
+                    'route' => '/debug-sentry',
+                    'timestamp' => now()->toIso8601String(),
+                    'environment' => config('app.env'),
+                ]);
+            });
+
+            // Capture a test message first
+            $sentry->captureMessage('Sentry debug route accessed - test message', \Sentry\Severity::info());
+
+            // Throw a test exception
+            throw new \Exception('This is a test exception from the Sentry debug route. If you see this in Sentry, the integration is working correctly.');
+
+        } catch (\Exception $e) {
+            // Capture the exception
+            if (app()->bound('sentry')) {
+                app('sentry')->captureException($e);
+            }
+
+            // Return JSON response with details
+            return response()->json([
+                'success' => true,
+                'message' => 'Test exception thrown and captured by Sentry',
+                'exception' => [
+                    'message' => $e->getMessage(),
+                    'class' => get_class($e),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+                'sentry' => [
+                    'bound' => app()->bound('sentry'),
+                    'dsn_configured' => config('sentry.dsn') ? 'yes' : 'no',
+                    'environment' => config('sentry.environment', config('app.env')),
+                ],
+                'instructions' => [
+                    'step1' => 'Check your Sentry dashboard for this exception',
+                    'step2' => 'Look for both the test message and this exception',
+                    'step3' => 'Verify the context and tags are present',
+                    'step4' => 'If you see this in Sentry, integration is working!',
+                ],
+            ], 500);
+        }
+    })->name('debug.sentry');
+}
