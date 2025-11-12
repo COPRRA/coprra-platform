@@ -19,7 +19,7 @@ jobs:
       with:
         host: ${{ secrets.PROD_SSH_HOST }}
         username: ${{ secrets.PROD_SSH_USER }}
-        password: ${{ secrets.PROD_SSH_PASS }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: ${{ secrets.PROD_SSH_PORT }}
         script: |
           set -e
