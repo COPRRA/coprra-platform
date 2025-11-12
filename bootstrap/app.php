@@ -56,6 +56,7 @@ return Application::configure(basePath: dirname(__DIR__))
             SubstituteBindings::class,
             LocaleMiddleware::class,
             SetLocaleAndCurrency::class,
+            \App\Http\Middleware\SentryContext::class,
         ]);
 
         // API middleware group

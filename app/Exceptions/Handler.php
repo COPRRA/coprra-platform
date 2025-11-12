@@ -29,6 +29,11 @@ class Handler extends ExceptionHandler
     public function register(): void
     {
         $this->reportable(function (\Throwable $e): void {
+            // Report to Sentry if available
+            if (app()->bound('sentry')) {
+                app('sentry')->captureException($e);
+            }
+
             if ($this->isSecurityException($e)) {
                 $this->logSecurityException($e);
             }

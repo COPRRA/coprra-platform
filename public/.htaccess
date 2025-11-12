@@ -26,6 +26,11 @@
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
 
+    # Serve static files directly (images, CSS, JS, fonts, etc.)
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteCond %{REQUEST_URI} \.(css|js|png|jpg|jpeg|gif|ico|svg|webp|woff|woff2|ttf|eot|json|xml|txt)$ [NC]
+    RewriteRule . - [L]
+
     # Send Requests To Front Controller...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
@@ -113,6 +118,18 @@ Options -Indexes
     Deny from all
 </DirectoryMatch>
 
+# MIME Types (ensure proper content types)
+<IfModule mod_mime.c>
+    AddType image/svg+xml .svg .svgz
+    AddType image/webp .webp
+    AddType application/javascript .js
+    AddType text/css .css
+    AddType font/woff .woff
+    AddType font/woff2 .woff2
+    AddType application/json .json
+    AddEncoding gzip .svgz
+</IfModule>
+
 # Cache Control
 <IfModule mod_expires.c>
     ExpiresActive On
@@ -142,6 +159,7 @@ Options -Indexes
     AddOutputFilterByType DEFLATE application/javascript
     AddOutputFilterByType DEFLATE application/x-javascript
     AddOutputFilterByType DEFLATE application/json
+    AddOutputFilterByType DEFLATE image/svg+xml
 </IfModule>
 
 # Rate Limiting (if mod_security is available)
