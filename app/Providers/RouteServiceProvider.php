@@ -33,6 +33,11 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute(100)->by($request->ip());
         });
 
+        // Route model binding: Use slug for Product model
+        Route::bind('product', function ($value) {
+            return \App\Models\Product::where('slug', $value)->firstOrFail();
+        });
+
         $this->routes(function () {
             Route::middleware('api')
                 ->prefix('api')
