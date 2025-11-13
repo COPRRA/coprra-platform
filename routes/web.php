@@ -147,9 +147,10 @@ Route::post('/email/verification-notification', [EmailVerificationController::cl
 // المنتجات والفئات
 Route::get('products', [ProductController::class, 'index'])->name('products.index');
 Route::get('products/search', [ProductController::class, 'search'])->name('products.search');
-Route::get('products/{slug}', [ProductController::class, 'show'])->name('products.show');
+// Price comparison routes must come before the generic product show route
 Route::get('products/{product}/price-comparison', [PriceComparisonController::class, 'show'])->name('products.price-comparison');
 Route::post('products/{product}/price-comparison/refresh', [PriceComparisonController::class, 'refresh'])->name('products.price-comparison.refresh');
+Route::get('products/{slug}', [ProductController::class, 'show'])->name('products.show');
 
 // Compare Routes (public, session-based)
 Route::get('compare', [CompareController::class, 'index'])->name('compare.index');
