@@ -6,8 +6,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Services\AIService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class CompareController extends Controller
 {
@@ -112,6 +115,152 @@ class CompareController extends Controller
         }
 
         return array_values(array_unique(array_map('intval', $ids)));
+    }
+
+    /**
+     * Analyze products using AI to generate pros/cons and smart verdict.
+     */
+    public function analyze(Request $request, AIService $aiService): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'product_ids' => 'required|array|min:2|max:4',
+                'product_ids.*' => 'required|integer|exists:products,id',
+            ]);
+
+            /** @var array<int, int> $productIds */
+            $productIds = $validated['product_ids'];
+
+            // Fetch products with relationships
+            $products = Product::query()
+                ->whereIn('id', $productIds)
+                ->with(['category', 'brand'])
+                ->get();
+
+            if ($products->count() < 2) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('At least 2 products are required for comparison.'),
+                ], 422);
+            }
+
+            // Build detailed prompt for AI analysis
+            $prompt = $this->buildComparisonPrompt($products);
+
+            // Call AI service with custom prompt
+            $aiResult = $aiService->analyzeText($prompt, [
+                'type' => 'product_comparison',
+                'max_tokens' => 1000,
+            ]);
+
+            // Parse AI response to extract pros_and_cons and smart_verdict
+            $analysis = $this->parseAIResponse($aiResult, $products);
+
+            return response()->json([
+                'success' => true,
+                'data' => $analysis,
+                'message' => __('AI analysis completed successfully.'),
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('Validation failed.'),
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('AI Compare Analysis Error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => __('Failed to generate AI analysis. Please try again later.'),
+                'error' => config('app.debug') ? $e->getMessage() : null,
+            ], 500);
+        }
+    }
+
+    /**
+     * Build a detailed prompt for AI product comparison.
+     *
+     * @param \Illuminate\Database\Eloquent\Collection<int, Product> $products
+     */
+    private function buildComparisonPrompt($products): string
+    {
+        $productDetails = [];
+        foreach ($products as $product) {
+            $productDetails[] = sprintf(
+                "Product: %s\nBrand: %s\nPrice: %s\nCategory: %s\nDescription: %s\nYear: %s\nColors: %s",
+                $product->name,
+                $product->brand?->name ?? 'N/A',
+                $product->price ? '$' . number_format((float) $product->price, 2) : 'N/A',
+                $product->category?->name ?? 'N/A',
+                $product->description ? Str::limit(strip_tags((string) $product->description), 300) : 'No description',
+                $product->year_of_manufacture ?? 'N/A',
+                is_array($product->available_colors) && count($product->available_colors) > 0
+                    ? implode(', ', $product->available_colors)
+                    : ($product->color_list ?? 'N/A')
+            );
+        }
+
+        $prompt = "You are an expert product comparison analyst. Analyze the following products and provide a detailed comparison.\n\n";
+        $prompt .= implode("\n\n---\n\n", $productDetails);
+        $prompt .= "\n\nPlease provide your analysis in the following JSON format:\n";
+        $prompt .= "{\n";
+        $prompt .= '  "pros_and_cons": {\n';
+        foreach ($products as $product) {
+            $prompt .= sprintf('    "%s": ["pro 1", "pro 2", "con 1", "con 2"],\n', $product->name);
+        }
+        $prompt .= "  },\n";
+        $prompt .= '  "smart_verdict": "A concise summary and recommendation based on the comparison."\n';
+        $prompt .= "}\n\n";
+        $prompt .= "For each product, list 3-5 pros and 2-3 cons. The smart_verdict should be a clear, actionable recommendation (2-3 sentences).";
+
+        return $prompt;
+    }
+
+    /**
+     * Parse AI response and extract structured data.
+     *
+     * @param array<string, mixed> $aiResult
+     * @param \Illuminate\Database\Eloquent\Collection<int, Product> $products
+     *
+     * @return array<string, mixed>
+     */
+    private function parseAIResponse(array $aiResult, $products): array
+    {
+        $result = $aiResult['result'] ?? '';
+        
+        // Try to extract JSON from the response
+        $jsonMatch = [];
+        if (preg_match('/\{[\s\S]*\}/', $result, $jsonMatch)) {
+            try {
+                $parsed = json_decode($jsonMatch[0], true);
+                if (json_last_error() === JSON_ERROR_NONE && isset($parsed['pros_and_cons']) && isset($parsed['smart_verdict'])) {
+                    return [
+                        'pros_and_cons' => $parsed['pros_and_cons'],
+                        'smart_verdict' => $parsed['smart_verdict'],
+                    ];
+                }
+            } catch (\Exception $e) {
+                Log::warning('Failed to parse AI JSON response', ['error' => $e->getMessage()]);
+            }
+        }
+
+        // Fallback: Generate structured response from text
+        $prosAndCons = [];
+        foreach ($products as $product) {
+            $prosAndCons[$product->name] = [
+                'Pros: ' . ($product->price ? 'Good value at $' . number_format((float) $product->price, 2) : 'Available'),
+                'Cons: Limited information available',
+            ];
+        }
+
+        return [
+            'pros_and_cons' => $prosAndCons,
+            'smart_verdict' => $result ?: 'Based on the available information, compare the products based on your specific needs and preferences.',
+        ];
     }
 
     /**
