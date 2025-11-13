@@ -25,6 +25,7 @@ use App\Http\Controllers\FileController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\PointsController;
 use App\Http\Controllers\PriceAlertController;
 use App\Http\Controllers\PriceComparisonController;
 use App\Http\Controllers\ProductController;
@@ -194,6 +195,11 @@ Route::middleware('auth')->group(static function (): void {
     ]);
 
     Route::get('account/wishlist', [AccountWishlistController::class, 'index'])->name('account.wishlist');
+
+    // Points & Rewards Routes
+    Route::get('account/points', [PointsController::class, 'index'])->name('account.points');
+    Route::post('points/redeem', [PointsController::class, 'redeem'])->name('points.redeem');
+    Route::post('points/redeem-reward/{reward}', [PointsController::class, 'redeemReward'])->name('points.redeemReward');
 
     // Review Routes
     Route::get('products/{product}/reviews/create', [ReviewController::class, 'create'])->name('reviews.create');
