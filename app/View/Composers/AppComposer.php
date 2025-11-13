@@ -137,7 +137,8 @@ final class AppComposer
                 'url' => $category->slug ? route('categories.show', $category->slug) : '',
             ];
 
-        return $this->getCachedData('categories_menu', Category::class, $mapper);
+        // Cache categories for 240 minutes (4 hours) as they change infrequently
+        return $this->getCachedData('categories_menu', Category::class, $mapper, 'name', 14400);
     }
 
     /**
@@ -163,7 +164,8 @@ final class AppComposer
                 'url' => $brand->slug ? route('brands.show', $brand->slug) : '',
             ];
 
-        return $this->getCachedData('brands_menu', Brand::class, $mapper);
+        // Cache brands for 240 minutes (4 hours) as they change infrequently
+        return $this->getCachedData('brands_menu', Brand::class, $mapper, 'name', 14400);
     }
 
     /**

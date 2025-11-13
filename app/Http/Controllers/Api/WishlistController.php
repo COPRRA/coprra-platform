@@ -62,7 +62,7 @@ class WishlistController extends Controller
         /** @var \App\Models\User $user */
         $user = $request->user();
 
-        $productModel = $product ?? Product::query()->findOrFail((int) $request->input('product_id'));
+        $productModel = $product ?? Product::query()->with(['category', 'brand'])->findOrFail((int) $request->input('product_id'));
 
         $alreadyExists = $user->wishlist()->where('products.id', $productModel->id)->exists();
 
