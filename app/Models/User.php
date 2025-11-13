@@ -149,6 +149,16 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the points for the user.
+     *
+     * @return HasMany<UserPoint, User>
+     */
+    public function points(): HasMany
+    {
+        return $this->hasMany(UserPoint::class);
+    }
+
+    /**
      * Check if user is admin.
      */
     public function isAdmin(): bool

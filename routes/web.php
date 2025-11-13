@@ -196,6 +196,8 @@ Route::middleware('auth')->group(static function (): void {
     Route::get('account/wishlist', [AccountWishlistController::class, 'index'])->name('account.wishlist');
 
     // Review Routes
+    Route::get('products/{product}/reviews/create', [ReviewController::class, 'create'])->name('reviews.create');
+    Route::get('reviews/{review}/edit', [ReviewController::class, 'edit'])->name('reviews.edit');
     Route::resource('reviews', ReviewController::class)->only(['store', 'update', 'destroy']);
 
     // (Moved to public routes)

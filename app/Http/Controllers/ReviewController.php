@@ -25,7 +25,7 @@ class ReviewController extends Controller
         $existingReview = $product->reviews()->where('user_id', $auth->id())->exists();
 
         if ($existingReview) {
-            return redirect()->route('products.show', $product->id)
+            return redirect()->route('products.show', $product->slug)
                 ->with('error', 'You have already reviewed this product.')
             ;
         }
@@ -34,6 +34,55 @@ class ReviewController extends Controller
         $view = 'reviews.create';
 
         return view($view, ['product' => $product]);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(\Illuminate\Http\Request $request, Guard $auth): RedirectResponse
+    {
+        $validated = $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'title' => 'nullable|string|max:255',
+            'content' => 'required|string|max:1000',
+            'rating' => 'required|integer|min:1|max:5',
+        ]);
+
+        // Check if user already reviewed this product
+        $existingReview = Review::where('user_id', $auth->id())
+            ->where('product_id', $validated['product_id'])
+            ->first();
+
+        if ($existingReview) {
+            $product = Product::findOrFail($validated['product_id']);
+            return redirect()->route('products.show', $product->slug)
+                ->with('error', 'You have already reviewed this product.');
+        }
+
+        Review::create([
+            'user_id' => $auth->id(),
+            'product_id' => $validated['product_id'],
+            'title' => $validated['title'] ?? null,
+            'content' => $validated['content'],
+            'rating' => $validated['rating'],
+            'is_approved' => true, // Auto-approve for now
+        ]);
+
+        $product = Product::findOrFail($validated['product_id']);
+        return redirect()->route('products.show', $product->slug)
+            ->with('success', 'Review submitted successfully!');
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Review $review, Guard $auth): View|RedirectResponse
+    {
+        if ($review->user_id !== $auth->id()) {
+            abort(403, self::UNAUTHORIZED_MESSAGE);
+        }
+
+        return view('reviews.edit', ['review' => $review]);
     }
 
     /**
@@ -48,8 +97,27 @@ class ReviewController extends Controller
 
         $review->update($request->validated());
 
-        return redirect()->route('products.show', $review->product_id)
+        $product = \App\Models\Product::findOrFail($review->product_id);
+
+        return redirect()->route('products.show', $product->slug)
             ->with('success', 'Review updated successfully!')
         ;
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Review $review, Guard $auth): RedirectResponse
+    {
+        if ($review->user_id !== $auth->id()) {
+            abort(403, self::UNAUTHORIZED_MESSAGE);
+        }
+
+        $productId = $review->product_id;
+        $product = \App\Models\Product::findOrFail($productId);
+        $review->delete();
+
+        return redirect()->route('products.show', $product->slug)
+            ->with('success', 'Review deleted successfully!');
     }
 }
