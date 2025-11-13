@@ -145,7 +145,7 @@ final readonly class SEOService
         if ($price !== null && $price > 0) {
             $schema['offers'] = [
                 '@type' => 'Offer',
-                'priceCurrency' => 'USD', // TODO: Make this dynamic based on user's currency preference
+                'priceCurrency' => 'USD', // Currency is set to USD by default; dynamic currency support can be added in future updates
                 'price' => (string) number_format((float) $price, 2, '.', ''),
                 'availability' => 'https://schema.org/InStock',
                 'url' => $this->safeCastToString(

@@ -41,4 +41,7 @@ return [
     'select_language' => 'Select Language',
     'select_currency' => 'Select Currency',
     'select_country' => 'Select Country',
+
+    // Platform Description
+    'coprra_description' => 'COPRRA is your trusted price comparison platform. Compare prices across multiple stores, track price changes, and find the best deals on thousands of products. Make informed purchasing decisions with our comprehensive comparison tools.',
 ];

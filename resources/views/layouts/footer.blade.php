@@ -21,7 +21,7 @@
                     <li><a href="{{ route('products.index') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('main.products') }}</a></li>
                     <li><a href="{{ route('categories.index') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('main.categories') }}</a></li>
                     <li><a href="{{ route('brands.index') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('main.brands') }}</a></li>
-                    <li><a href="#" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('main.stores') }}</a></li>
+                    <li><a href="{{ route('stores.index') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ __('main.stores') }}</a></li>
                 </ul>
             </div>
 

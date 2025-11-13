@@ -155,19 +155,6 @@ Route::get('/documentation', [DocumentationController::class, 'index']);
 Route::get('/health', [HealthController::class, 'check'])->name('api.health.check');
 Route::get('/health/ping', [HealthController::class, 'ping'])->name('api.health.ping');
 
-// CSRF token route for testing - REMOVED FOR PRODUCTION
-// Route::get('/csrf-token', function () {
-//     return response()->json(['token' => uniqid('csrf_', true)]);
-// });
-
-// Debug route for best offer - REMOVED FOR PRODUCTION
-// Route::get('/debug-best-offer', function (Request $request) {
-//     return response()->json([
-//         'message' => 'Debug route working',
-//         'params' => $request->all(),
-//         'url' => $request->url()
-//     ]);
-// });
 
 
 

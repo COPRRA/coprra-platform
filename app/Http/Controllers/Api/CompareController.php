@@ -6,16 +6,20 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Services\AI\ComparisonPromptBuilder;
 use App\Services\AIService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class CompareController extends Controller
 {
     private const SESSION_KEY = 'compare';
     private const MAX_ITEMS = 4;
+
+    public function __construct(
+        private readonly ComparisonPromptBuilder $promptBuilder
+    ) {}
 
     public function index(Request $request): JsonResponse
     {
@@ -145,7 +149,7 @@ class CompareController extends Controller
             }
 
             // Build detailed prompt for AI analysis
-            $prompt = $this->buildComparisonPrompt($products);
+            $prompt = $this->promptBuilder->build($products);
 
             // Call AI service with custom prompt
             $aiResult = $aiService->analyzeText($prompt, [
@@ -181,44 +185,6 @@ class CompareController extends Controller
         }
     }
 
-    /**
-     * Build a detailed prompt for AI product comparison.
-     *
-     * @param \Illuminate\Database\Eloquent\Collection<int, Product> $products
-     */
-    private function buildComparisonPrompt($products): string
-    {
-        $productDetails = [];
-        foreach ($products as $product) {
-            $productDetails[] = sprintf(
-                "Product: %s\nBrand: %s\nPrice: %s\nCategory: %s\nDescription: %s\nYear: %s\nColors: %s",
-                $product->name,
-                $product->brand?->name ?? 'N/A',
-                $product->price ? '$' . number_format((float) $product->price, 2) : 'N/A',
-                $product->category?->name ?? 'N/A',
-                $product->description ? Str::limit(strip_tags((string) $product->description), 300) : 'No description',
-                $product->year_of_manufacture ?? 'N/A',
-                is_array($product->available_colors) && count($product->available_colors) > 0
-                    ? implode(', ', $product->available_colors)
-                    : ($product->color_list ?? 'N/A')
-            );
-        }
-
-        $prompt = "You are an expert product comparison analyst. Analyze the following products and provide a detailed comparison.\n\n";
-        $prompt .= implode("\n\n---\n\n", $productDetails);
-        $prompt .= "\n\nPlease provide your analysis in the following JSON format:\n";
-        $prompt .= "{\n";
-        $prompt .= '  "pros_and_cons": {\n';
-        foreach ($products as $product) {
-            $prompt .= sprintf('    "%s": ["pro 1", "pro 2", "con 1", "con 2"],\n', $product->name);
-        }
-        $prompt .= "  },\n";
-        $prompt .= '  "smart_verdict": "A concise summary and recommendation based on the comparison."\n';
-        $prompt .= "}\n\n";
-        $prompt .= "For each product, list 3-5 pros and 2-3 cons. The smart_verdict should be a clear, actionable recommendation (2-3 sentences).";
-
-        return $prompt;
-    }
 
     /**
      * Parse AI response and extract structured data.

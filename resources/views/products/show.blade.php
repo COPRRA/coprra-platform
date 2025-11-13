@@ -85,7 +85,7 @@
 
                     <!-- Call to Action Buttons -->
                     <div class="mt-8 flex gap-4 flex-wrap">
-                        <a href="#" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition" aria-label="{{ __('messages.view_stores_selling') }} {{ $product->name }}">
+                        <a href="{{ route('stores.index') }}" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition" aria-label="{{ __('messages.view_stores_selling') }} {{ $product->name }}">
                             <i class="fas fa-shopping-cart mr-2" aria-hidden="true"></i>{{ __('messages.view_stores') }}
                         </a>
                         <button
