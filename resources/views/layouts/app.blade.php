@@ -6,19 +6,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @if(isset($seoMeta))
-        <meta name="description" content="{{ $seoMeta['description'] ?? @yield('description', __('messages.coprra_description')) }}">
-        <meta name="keywords" content="{{ $seoMeta['keywords'] ?? @yield('keywords', 'price comparison, shopping, deals, discounts, COPRRA') }}">
+        @php
+            $defaultDescription = View::hasSection('description') ? View::yieldContent('description') : __('messages.coprra_description');
+            $defaultKeywords = View::hasSection('keywords') ? View::yieldContent('keywords') : 'price comparison, shopping, deals, discounts, COPRRA';
+            $defaultOgTitle = View::hasSection('og_title') ? View::yieldContent('og_title') : (View::hasSection('title') ? View::yieldContent('title') : config('app.name', 'COPRRA'));
+            $defaultOgDescription = View::hasSection('og_description') ? View::yieldContent('og_description') : __('messages.coprra_description');
+            $defaultOgImage = View::hasSection('og_image') ? View::yieldContent('og_image') : asset('images/logo/coprra-logo.svg');
+            $defaultTitle = View::hasSection('title') ? View::yieldContent('title') : config('app.name', 'COPRRA');
+        @endphp
+        <meta name="description" content="{{ $seoMeta['description'] ?? $defaultDescription }}">
+        <meta name="keywords" content="{{ $seoMeta['keywords'] ?? $defaultKeywords }}">
         <meta name="robots" content="{{ $seoMeta['robots'] ?? 'index, follow' }}">
         <link rel="canonical" href="{{ $seoMeta['canonical'] ?? url()->current() }}">
         
         <!-- Open Graph -->
-        <meta property="og:title" content="{{ $seoMeta['og_title'] ?? @yield('og_title', View::getSection('title') ?? config('app.name', 'COPRRA')) }}">
-        <meta property="og:description" content="{{ $seoMeta['og_description'] ?? @yield('og_description', __('messages.coprra_description')) }}">
+        <meta property="og:title" content="{{ $seoMeta['og_title'] ?? $defaultOgTitle }}">
+        <meta property="og:description" content="{{ $seoMeta['og_description'] ?? $defaultOgDescription }}">
         <meta property="og:type" content="{{ $seoMeta['og_type'] ?? 'website' }}">
         <meta property="og:url" content="{{ $seoMeta['og_url'] ?? url()->current() }}">
-        <meta property="og:image" content="{{ $seoMeta['og_image'] ?? @yield('og_image', asset('images/logo/coprra-logo.svg')) }}">
+        <meta property="og:image" content="{{ $seoMeta['og_image'] ?? $defaultOgImage }}">
         
-        <title>{{ $seoMeta['title'] ?? @yield('title', config('app.name', 'COPRRA')) }}</title>
+        <title>{{ $seoMeta['title'] ?? $defaultTitle }}</title>
     @else
         <meta name="description" content="@yield('description', __('messages.coprra_description'))">
         <meta name="keywords" content="@yield('keywords', 'price comparison, shopping, deals, discounts, COPRRA')">
@@ -27,7 +35,7 @@
         <meta name="color-scheme" content="light dark">
 
         <!-- Open Graph -->
-        <meta property="og:title" content="@yield('og_title', View::getSection('title') ?? config('app.name', 'COPRRA'))">
+        <meta property="og:title" content="@yield('og_title', View::hasSection('title') ? View::yieldContent('title') : config('app.name', 'COPRRA'))">
         <meta property="og:description" content="@yield('og_description', __('messages.coprra_description'))">
         <meta property="og:type" content="website">
         <meta property="og:url" content="{{ url()->current() }}">
