@@ -154,4 +154,143 @@
         @endif
     </div>
 </div>
+
+@push('scripts')
+<script>
+// Temporary inline wishlist handler until assets are properly built
+(function() {
+    const WISHLIST_ENDPOINT = '/api/wishlist';
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '';
+    const isAuthenticated = document.body.dataset.authenticated === 'true';
+    const loginUrl = document.body.dataset.loginUrl ?? '/login';
+    const registerUrl = document.body.dataset.registerUrl ?? '#';
+
+    const showAuthPrompt = () => {
+        // Create toast notification
+        const container = document.querySelector('.coprra-toast-container') || (() => {
+            const div = document.createElement('div');
+            div.className = 'coprra-toast-container';
+            div.style.cssText = 'position:fixed;top:1.5rem;right:1.5rem;z-index:2147483647;pointer-events:none;';
+            document.body.appendChild(div);
+            return div;
+        })();
+
+        const toast = document.createElement('div');
+        toast.className = 'coprra-toast coprra-toast--warning';
+        toast.style.cssText = 'min-width:18rem;max-width:22rem;background-color:rgba(217,119,6,0.95);color:#fff;padding:0.75rem 1rem;border-radius:0.75rem;box-shadow:0 12px 35px rgba(15,23,42,0.25);opacity:0;transform:translateY(-6px);transition:opacity 0.2s ease,transform 0.2s ease;pointer-events:auto;font-size:0.875rem;line-height:1.4;';
+        
+        const title = document.createElement('span');
+        title.style.cssText = 'font-weight:600;margin-bottom:0.25rem;display:block;';
+        title.textContent = 'Login Required';
+        toast.appendChild(title);
+
+        const message = document.createElement('span');
+        message.textContent = 'Please log in or create an account to save items to your wishlist.';
+        toast.appendChild(message);
+
+        const actions = document.createElement('div');
+        actions.style.cssText = 'display:flex;gap:0.5rem;margin-top:0.75rem;';
+        
+        const loginBtn = document.createElement('a');
+        loginBtn.href = loginUrl;
+        loginBtn.textContent = 'Log In';
+        loginBtn.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;padding:0.35rem 0.75rem;border-radius:999px;background-color:rgba(255,255,255,0.18);color:#fff;font-size:0.75rem;font-weight:600;text-decoration:none;transition:background-color 0.2s ease;';
+        loginBtn.onmouseover = () => loginBtn.style.backgroundColor = 'rgba(255,255,255,0.3)';
+        loginBtn.onmouseout = () => loginBtn.style.backgroundColor = 'rgba(255,255,255,0.18)';
+        actions.appendChild(loginBtn);
+
+        const registerBtn = document.createElement('a');
+        registerBtn.href = registerUrl;
+        registerBtn.textContent = 'Register';
+        registerBtn.style.cssText = loginBtn.style.cssText;
+        registerBtn.onmouseover = () => registerBtn.style.backgroundColor = 'rgba(255,255,255,0.3)';
+        registerBtn.onmouseout = () => registerBtn.style.backgroundColor = 'rgba(255,255,255,0.18)';
+        actions.appendChild(registerBtn);
+
+        toast.appendChild(actions);
+        container.appendChild(toast);
+
+        requestAnimationFrame(() => {
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateY(0)';
+        });
+
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(-6px)';
+            setTimeout(() => toast.remove(), 400);
+        }, 5000);
+    };
+
+    const toggleWishlist = async (button) => {
+        if (!button || button.disabled) return;
+
+        if (!isAuthenticated) {
+            showAuthPrompt();
+            return;
+        }
+
+        const productId = button.dataset.productId;
+        if (!productId) return;
+
+        const currentlyWishlisted = button.dataset.wishlisted === 'true';
+        const method = currentlyWishlisted ? 'DELETE' : 'POST';
+        const endpoint = `${WISHLIST_ENDPOINT}/${productId}`;
+
+        button.disabled = true;
+
+        try {
+            const response = await fetch(endpoint, {
+                method,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-XSRF-TOKEN': csrfToken,
+                },
+                credentials: 'same-origin',
+            });
+
+            if (response.status === 401 || response.status === 419) {
+                showAuthPrompt();
+                return;
+            }
+
+            const payload = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                alert(payload?.message ?? 'Unable to update wishlist right now.');
+                return;
+            }
+
+            const nextState = method !== 'DELETE';
+            button.dataset.wishlisted = nextState ? 'true' : 'false';
+            
+            const icon = button.querySelector('.wishlist-icon');
+            const label = button.querySelector('.wishlist-label');
+            
+            if (icon) {
+                icon.className = `wishlist-icon ${nextState ? 'fas fa-heart-broken' : 'fas fa-heart'} mr-2`;
+            }
+            if (label) {
+                label.textContent = nextState ? 'Remove from Wishlist' : 'Add to Wishlist';
+            }
+        } catch (error) {
+            alert('An unexpected error occurred while updating your wishlist.');
+        } finally {
+            button.disabled = false;
+        }
+    };
+
+    // Bootstrap wishlist buttons
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.wishlist-toggle-btn[data-product-id]').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                toggleWishlist(button);
+            });
+        });
+    });
+})();
+</script>
+@endpush
 @endsection
