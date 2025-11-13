@@ -285,10 +285,11 @@ Route::middleware(['auth', \App\Http\Middleware\IsAdmin::class])->prefix('admin'
 });
 
 // --- Brand Routes ---
-// Make brands index public, keep other resource actions behind auth
+// Make brands index and show public, keep other resource actions behind auth
 Route::get('brands', [BrandController::class, 'index'])->name('brands.index');
+Route::get('brands/{slug}', [BrandController::class, 'show'])->name('brands.show');
 Route::middleware('auth')->group(static function (): void {
-    Route::resource('brands', BrandController::class)->except(['index']);
+    Route::resource('brands', BrandController::class)->except(['index', 'show']);
 });
 
 // Secure file serving via signed URLs (private storage)
