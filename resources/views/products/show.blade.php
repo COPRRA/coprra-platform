@@ -85,8 +85,8 @@
 
                     <!-- Call to Action Buttons -->
                     <div class="mt-8 flex gap-4 flex-wrap">
-                        <a href="{{ route('products.price-comparison', $product->slug) }}" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition" aria-label="{{ __('Compare All Prices for') }} {{ $product->name }}">
-                            <i class="fas fa-dollar-sign mr-2" aria-hidden="true"></i>{{ __('Compare All Prices') }}
+                        <a href="{{ route('products.price-comparison', $product->slug) }}" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition" aria-label="{{ __('messages.compare_prices_for') }} {{ $product->name }}">
+                            <i class="fas fa-dollar-sign mr-2" aria-hidden="true"></i>{{ __('messages.compare_all_prices') }}
                         </a>
                         <a href="{{ route('stores.index') }}" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition" aria-label="{{ __('messages.view_stores_selling') }} {{ $product->name }}">
                             <i class="fas fa-shopping-cart mr-2" aria-hidden="true"></i>{{ __('messages.view_stores') }}
