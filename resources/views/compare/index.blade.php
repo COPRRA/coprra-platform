@@ -269,4 +269,175 @@
         @endif
     </div>
 </div>
+
+@push('scripts')
+<script>
+(function() {
+    const analyzeBtn = document.getElementById('generate-ai-analysis-btn');
+    const loadingDiv = document.getElementById('ai-analysis-loading');
+    const analysisContainer = document.getElementById('ai-analysis-container');
+    const prosConsDiv = document.getElementById('ai-pros-cons');
+    const prosConsContent = document.getElementById('ai-pros-cons-content');
+    const verdictDiv = document.getElementById('ai-verdict');
+    const verdictContent = document.getElementById('ai-verdict-content');
+    const closeBtn = document.getElementById('ai-analysis-close');
+
+    if (!analyzeBtn) return;
+
+    // Get product IDs from the comparison table
+    function getProductIds() {
+        const productIds = [];
+        const table = document.querySelector('table');
+        if (!table) return [];
+
+        // Extract product IDs from remove buttons
+        const removeButtons = table.querySelectorAll('[data-compare-remove]');
+        removeButtons.forEach(btn => {
+            const productId = parseInt(btn.getAttribute('data-compare-remove'), 10);
+            if (productId && !isNaN(productId)) {
+                productIds.push(productId);
+            }
+        });
+
+        return productIds;
+    }
+
+    // Generate AI Analysis
+    analyzeBtn.addEventListener('click', async function() {
+        const productIds = getProductIds();
+
+        if (productIds.length < 2) {
+            alert('{{ __("Please add at least 2 products to compare.") }}');
+            return;
+        }
+
+        // Show loading state
+        analyzeBtn.disabled = true;
+        analyzeBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        loadingDiv.classList.remove('hidden');
+        analysisContainer.classList.add('hidden');
+
+        try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+            
+            const response = await fetch('/api/compare/analyze', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    product_ids: productIds,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || 'Failed to generate AI analysis');
+            }
+
+            // Display results
+            displayAnalysisResults(data.data);
+
+        } catch (error) {
+            console.error('AI Analysis Error:', error);
+            alert('{{ __("Failed to generate AI analysis. Please try again later.") }}');
+        } finally {
+            // Hide loading state
+            analyzeBtn.disabled = false;
+            analyzeBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            loadingDiv.classList.add('hidden');
+        }
+    });
+
+    // Display AI Analysis Results
+    function displayAnalysisResults(analysis) {
+        if (!analysis.pros_and_cons || !analysis.smart_verdict) {
+            console.error('Invalid analysis data structure');
+            return;
+        }
+
+        // Clear previous content
+        prosConsContent.innerHTML = '';
+        verdictContent.innerHTML = '';
+
+        // Display Pros & Cons
+        const prosAndCons = analysis.pros_and_cons;
+        Object.keys(prosAndCons).forEach(productName => {
+            const items = prosAndCons[productName];
+            if (!Array.isArray(items)) return;
+
+            const productCard = document.createElement('div');
+            productCard.className = 'bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700';
+
+            const productTitle = document.createElement('h4');
+            productTitle.className = 'font-semibold text-gray-900 dark:text-white mb-3 text-lg';
+            productTitle.textContent = productName;
+            productCard.appendChild(productTitle);
+
+            const prosList = document.createElement('div');
+            prosList.className = 'mb-3';
+            const prosTitle = document.createElement('div');
+            prosTitle.className = 'text-sm font-medium text-green-700 dark:text-green-400 mb-2';
+            prosTitle.innerHTML = '<i class="fas fa-check-circle mr-1"></i> Pros:';
+            prosList.appendChild(prosTitle);
+
+            const prosUl = document.createElement('ul');
+            prosUl.className = 'list-disc list-inside space-y-1 text-sm text-gray-700 dark:text-gray-300 ml-4';
+
+            const consList = document.createElement('div');
+            const consTitle = document.createElement('div');
+            consTitle.className = 'text-sm font-medium text-red-700 dark:text-red-400 mb-2';
+            consTitle.innerHTML = '<i class="fas fa-times-circle mr-1"></i> Cons:';
+            consList.appendChild(consTitle);
+
+            const consUl = document.createElement('ul');
+            consUl.className = 'list-disc list-inside space-y-1 text-sm text-gray-700 dark:text-gray-300 ml-4';
+
+            items.forEach(item => {
+                const itemText = String(item).trim();
+                const isPro = itemText.toLowerCase().includes('pro') || 
+                             itemText.toLowerCase().startsWith('+') ||
+                             (!itemText.toLowerCase().includes('con') && !itemText.toLowerCase().startsWith('-'));
+
+                const li = document.createElement('li');
+                li.textContent = itemText.replace(/^(pro|con|pros|cons):\s*/i, '').trim();
+                
+                if (isPro) {
+                    prosUl.appendChild(li);
+                } else {
+                    consUl.appendChild(li);
+                }
+            });
+
+            prosList.appendChild(prosUl);
+            consList.appendChild(consUl);
+            productCard.appendChild(prosList);
+            productCard.appendChild(consList);
+            prosConsContent.appendChild(productCard);
+        });
+
+        prosConsDiv.classList.remove('hidden');
+
+        // Display Smart Verdict
+        verdictContent.innerHTML = `<p class="text-gray-700 dark:text-gray-300 leading-relaxed">${analysis.smart_verdict}</p>`;
+        verdictDiv.classList.remove('hidden');
+
+        // Show analysis container and scroll to it
+        analysisContainer.classList.remove('hidden');
+        analysisContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // Close AI Analysis
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function() {
+            analysisContainer.classList.add('hidden');
+        });
+    }
+})();
+</script>
+@endpush
 @endsection
