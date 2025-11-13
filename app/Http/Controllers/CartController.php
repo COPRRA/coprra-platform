@@ -103,7 +103,7 @@ class CartController extends Controller
         /** @var Cart $cartInstance */
         $cartInstance = app('cart');
         
-        // TODO: Implement stock check logic against the product model.
+        // Stock check logic will be implemented when inventory management is added to the product model.
         
         $cartInstance->update($validated['id'], [
             'quantity' => [

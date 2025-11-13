@@ -219,9 +219,13 @@ final class ProductController extends BaseApiController
      */
     public function autocomplete(\Illuminate\Http\Request $request): JsonResponse
     {
-        $query = $request->query('q', '');
-        
-        if (empty($query) || strlen($query) < 2) {
+        $validated = $request->validate([
+            'q' => 'nullable|string|min:2',
+        ]);
+
+        $query = $validated['q'] ?? '';
+
+        if (empty($query)) {
             return $this->success([], 'No results');
         }
 

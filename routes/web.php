@@ -115,6 +115,7 @@ Route::post('/contact', [ContactController::class, 'submit'])->name('contact.sub
 Route::get('/privacy', fn () => view('privacy'))->name('privacy');
 Route::get('/terms', fn () => view('terms'))->name('terms');
 Route::get('/faq', fn () => view('faq'))->name('faq');
+Route::get('/stores', [\App\Http\Controllers\StoresController::class, 'index'])->name('stores.index');
 
 // Dashboard route expected by tests
 Route::get('/dashboard', static function () {

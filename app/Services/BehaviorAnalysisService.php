@@ -345,11 +345,29 @@ class BehaviorAnalysisService
     {
         $productViews = $this->behaviorRepository->getUserBehaviorsByAction($user, 'product_view', 30);
 
+        // Extract all unique product IDs from views (prevent N+1 query)
+        $productIds = collect($productViews)
+            ->map(static function ($view) {
+                $data = json_decode($view->data, true);
+                return $data['product_id'] ?? null;
+            })
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        // Fetch all products in a single query
+        $products = Product::whereIn('id', $productIds)
+            ->select('id', 'category_id')
+            ->get()
+            ->keyBy('id');
+
+        // Count category views
         $categoryViews = [];
         foreach ($productViews as $view) {
             $data = json_decode($view->data, true);
             if (isset($data['product_id'])) {
-                $product = Product::find($data['product_id']);
+                $product = $products->get($data['product_id']);
                 if ($product && $product->category_id) {
                     $categoryViews[$product->category_id] = ($categoryViews[$product->category_id] ?? 0) + 1;
                 }
