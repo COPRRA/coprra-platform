@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\AIController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DocumentationController;
 use App\Http\Controllers\Api\PriceSearchController;
+use App\Http\Controllers\Api\CompareController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\WishlistController;
 use App\Http\Controllers\HealthController;
@@ -60,6 +61,9 @@ Route::middleware(['throttle:public'])->group(static function (): void {
     Route::get('/products', [ProductController::class, 'index']);
     Route::get('/products/{id}', [ProductController::class, 'show'])->whereNumber('id');
     Route::get('/products/autocomplete', [ProductController::class, 'autocomplete']);
+
+    // Compare routes
+    Route::post('/compare/analyze', [CompareController::class, 'analyze']);
 
     // Additional API routes for testing
     Route::get('/categories', static function () {
