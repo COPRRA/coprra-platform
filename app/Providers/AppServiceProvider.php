@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Observers\CategoryObserver;
 use App\Observers\ProductObserver;
+use App\Observers\SitemapObserver;
 use App\Repositories\ProductRepository;
 use App\Services\CacheService;
 use App\Services\Contracts\CacheServiceContract;
@@ -63,6 +64,7 @@ final class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Product::observe(ProductObserver::class);
+        Product::observe(SitemapObserver::class);
         Category::observe(CategoryObserver::class);
 
         // Register rate limiters

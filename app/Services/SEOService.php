@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Store;
@@ -40,6 +41,7 @@ final readonly class SEOService
             'Category' => $model instanceof Category
                 ? $this->generateCategoryMeta($model)
                 : $this->generateDefaultMeta(),
+            'Brand' => $model instanceof Brand ? $this->generateBrandMeta($model) : $this->generateDefaultMeta(),
             'Store' => $model instanceof Store ? $this->generateStoreMeta($model) : $this->generateDefaultMeta(),
             default => $this->generateDefaultMeta(),
         };
@@ -75,10 +77,11 @@ final readonly class SEOService
      */
     private function generateProductMeta(Product $product): array
     {
-        $title = $this->generateTitle($this->safeCastToString($product->name));
+        $productName = $this->safeCastToString($product->name);
+        $title = $productName.' - Coprra';
         $productDescription = $product->description && '' !== $product->description
             ? $product->description
-            : $product->name;
+            : $productName;
         $description = $this->generateDescription($this->safeCastToString($productDescription));
         $keywords = $this->generateKeywords($product);
 
@@ -105,6 +108,56 @@ final readonly class SEOService
     }
 
     /**
+     * Generate Product Schema (JSON-LD) for structured data.
+     *
+     * @return array<string, mixed>
+     */
+    public function generateProductSchema(Product $product): array
+    {
+        $schema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'Product',
+            'name' => $this->safeCastToString($product->name),
+            'description' => $this->generateDescription(
+                $this->safeCastToString($product->description ?: $product->name)
+            ),
+            'sku' => (string) $product->id,
+            'url' => $this->safeCastToString(
+                $this->urlGenerator->route('products.show', $product->slug)
+            ),
+        ];
+
+        // Add image
+        if ($product->image_url && '' !== $product->image_url) {
+            $schema['image'] = $this->safeCastToString($product->image_url);
+        }
+
+        // Add brand
+        if ($product->brand && ($product->brand->name ?? '') !== '') {
+            $schema['brand'] = [
+                '@type' => 'Brand',
+                'name' => $this->safeCastToString($product->brand->name),
+            ];
+        }
+
+        // Add offers
+        $price = $product->price;
+        if ($price !== null && $price > 0) {
+            $schema['offers'] = [
+                '@type' => 'Offer',
+                'priceCurrency' => 'USD', // TODO: Make this dynamic based on user's currency preference
+                'price' => (string) number_format((float) $price, 2, '.', ''),
+                'availability' => 'https://schema.org/InStock',
+                'url' => $this->safeCastToString(
+                    $this->urlGenerator->route('products.show', $product->slug)
+                ),
+            ];
+        }
+
+        return $schema;
+    }
+
+    /**
      * Generate meta data for a category.
      *
      * @return array<string>
@@ -113,11 +166,11 @@ final readonly class SEOService
      */
     private function generateCategoryMeta(Category $category): array
     {
-        $title = $this->generateTitle($this->safeCastToString($category->name).' - Products');
-        $categoryDescription = $category->description && '' !== $category->description
-            ? $category->description
-            : 'Browse '.$this->safeCastToString($category->name).' products and compare prices';
-        $description = $this->generateDescription($this->safeCastToString($categoryDescription));
+        $categoryName = $this->safeCastToString($category->name);
+        $title = $this->generateTitle($categoryName.' Products');
+        $description = $this->generateDescription(
+            'Compare the best '.$categoryName.' products and find the best prices on Coprra.'
+        );
 
         $imageUrl = $category->image_url && '' !== $category->image_url
             ? $category->image_url
@@ -137,6 +190,43 @@ final readonly class SEOService
             'canonical' => $this->safeCastToString(
                 $this->urlGenerator->route('categories.show', $category->slug)
             ),
+            'robots' => 'index, follow',
+        ];
+    }
+
+    /**
+     * Generate meta data for a brand.
+     *
+     * @return array<string>
+     *
+     * @psalm-return array{title: string, description: string, keywords: string, og_title: string, og_description: string, og_image: string, og_type: 'website', og_url: string, canonical: string, robots: 'index, follow'}
+     */
+    private function generateBrandMeta(Brand $brand): array
+    {
+        $brandName = $this->safeCastToString($brand->name);
+        $title = $this->generateTitle($brandName.' Products');
+        $description = $this->generateDescription(
+            'Discover and compare the latest '.$brandName.' products on Coprra.'
+        );
+
+        $imageUrl = $brand->logo_url && '' !== $brand->logo_url
+            ? $brand->logo_url
+            : $this->urlGenerator->asset('images/default-brand.png');
+
+        $brandUrl = Route::has('brands.show')
+            ? $this->urlGenerator->route('brands.show', $brand->slug)
+            : $this->urlGenerator->to('brands/'.$this->safeCastToString($brand->slug));
+
+        return [
+            'title' => $title,
+            'description' => $description,
+            'keywords' => $this->generateKeywords($brand),
+            'og_title' => $title,
+            'og_description' => $description,
+            'og_image' => $this->safeCastToString($imageUrl),
+            'og_type' => 'website',
+            'og_url' => $this->safeCastToString($brandUrl),
+            'canonical' => $this->safeCastToString($brandUrl),
             'robots' => 'index, follow',
         ];
     }
@@ -223,7 +313,7 @@ final readonly class SEOService
             );
         }
 
-        return $title.' | '.$appName;
+        return $title.' - '.$appName;
     }
 
     /**
