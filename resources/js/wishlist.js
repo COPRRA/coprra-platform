@@ -162,11 +162,11 @@ const parseClassList = (input = '') =>
     .filter(Boolean);
 
 const showAuthPrompt = () => {
-  notify('Please log in or create an account to save products to your wishlist.', 'warning', {
-    title: 'تسجيل الدخول مطلوب',
+  notify('Please log in or create an account to save items to your wishlist.', 'warning', {
+    title: 'Login Required',
     actions: [
-      { label: 'تسجيل الدخول', href: loginUrl },
-      { label: 'إنشاء حساب', href: registerUrl },
+      { label: 'Log In', href: loginUrl },
+      { label: 'Register', href: registerUrl },
     ],
   });
 };

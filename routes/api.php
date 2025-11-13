@@ -59,6 +59,7 @@ Route::middleware(['throttle:public'])->group(static function (): void {
     // Public product routes
     Route::get('/products', [ProductController::class, 'index']);
     Route::get('/products/{id}', [ProductController::class, 'show'])->whereNumber('id');
+    Route::get('/products/autocomplete', [ProductController::class, 'autocomplete']);
 
     // Additional API routes for testing
     Route::get('/categories', static function () {

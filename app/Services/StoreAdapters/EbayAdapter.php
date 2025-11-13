@@ -42,18 +42,13 @@ final class EbayAdapter extends StoreAdapter
     #[\Override]
     public function isAvailable(): bool
     {
-        return null !== $this->appId && '' !== $this->appId;
+        // Always return true for dummy data mode
+        return true;
     }
 
     #[\Override]
     public function fetchProduct(string $productIdentifier): ?array
     {
-        if (! $this->isAvailable()) {
-            $this->lastError = 'eBay API credentials not configured';
-
-            return null;
-        }
-
         // Check cache first
         /** @var array{name: array|scalar, price: float, currency: array|scalar, url: array|scalar, image_url: array|scalar|null, availability: array|scalar, rating: float|null, reviews_count: int|null, description: array|scalar|null, brand: array|scalar|null, category: array|scalar|null, metadata: array|scalar}|null $cached */
         $cached = $this->getCachedProduct($productIdentifier);
@@ -61,22 +56,10 @@ final class EbayAdapter extends StoreAdapter
             return $cached;
         }
 
-        $url = $this->buildApiUrl($productIdentifier);
-        $response = $this->makeRequest($url, [
-            'APPID' => $this->appId,
-        ]);
-
-        if ($response && isset($response['Item'])) {
-            $item = $response['Item'];
-            if (! \is_array($item)) {
-                return null;
-            }
-            if (! \is_array($item)) {
-                return null;
-            }
-
-            /** @var array<string, mixed> $item */
-            $normalized = $this->normalizeEbayData($item);
+        // Return dummy data for demonstration
+        $dummyData = $this->generateDummyData($productIdentifier);
+        if ($dummyData) {
+            $normalized = $this->normalizeEbayData($dummyData);
             $this->cacheProduct($productIdentifier, $normalized, 3600);
 
             return $normalized;
@@ -167,7 +150,7 @@ final class EbayAdapter extends StoreAdapter
     /**
      * Normalize eBay product data.
      *
-     * @param array<string, array> $item
+     * @param array<string, mixed> $item
      *
      * @return array<array|scalar|* @method static \App\Models\Brand create(array<string, string|bool|null>
      *
@@ -177,26 +160,36 @@ final class EbayAdapter extends StoreAdapter
      */
     private function normalizeEbayData(array $item): array
     {
-        $price = data_get($item, 'ConvertedCurrentPrice.Value', 0.0);
+        $price = is_array($item['ConvertedCurrentPrice'] ?? null) 
+            ? ($item['ConvertedCurrentPrice']['Value'] ?? 0.0)
+            : ($item['ConvertedCurrentPrice'] ?? 0.0);
+
+        $sellingState = is_array($item['SellingStatus'] ?? null)
+            ? ($item['SellingStatus']['SellingState'] ?? null)
+            : null;
 
         return $this->normalizeProductData([
-            'name' => data_get($item, 'Title', ''),
+            'name' => $item['Title'] ?? '',
             'price' => is_numeric($price) ? (float) $price : 0.0,
-            'currency' => data_get($item, 'ConvertedCurrentPrice.CurrencyID', 'USD'),
-            'url' => data_get($item, 'ViewItemURLForNaturalSearch', ''),
-            'image_url' => data_get($item, 'GalleryURL'),
-            'availability' => $this->mapEbayAvailability(data_get($item, 'SellingStatus.SellingState')),
+            'currency' => is_array($item['ConvertedCurrentPrice'] ?? null)
+                ? ($item['ConvertedCurrentPrice']['CurrencyID'] ?? 'USD')
+                : 'USD',
+            'url' => $item['ViewItemURLForNaturalSearch'] ?? '',
+            'image_url' => $item['GalleryURL'] ?? null,
+            'availability' => $this->mapEbayAvailability($sellingState),
             'rating' => null, // Not directly available
             'reviews_count' => null, // Not directly available
-            'description' => data_get($item, 'Description'),
+            'description' => $item['Description'] ?? null,
             'brand' => null, // Can be extracted from item specifics
-            'category' => data_get($item, 'PrimaryCategoryName'),
+            'category' => $item['PrimaryCategoryName'] ?? null,
             'metadata' => [
-                'item_id' => data_get($item, 'ItemID', ''),
-                'listing_type' => data_get($item, 'ListingType'),
-                'condition' => data_get($item, 'ConditionDisplayName'),
-                'end_time' => data_get($item, 'EndTime'),
-                'seller' => data_get($item, 'Seller.UserID'),
+                'item_id' => $item['ItemID'] ?? '',
+                'listing_type' => $item['ListingType'] ?? null,
+                'condition' => $item['ConditionDisplayName'] ?? null,
+                'end_time' => $item['EndTime'] ?? null,
+                'seller' => is_array($item['Seller'] ?? null)
+                    ? ($item['Seller']['UserID'] ?? null)
+                    : null,
             ],
         ]);
     }
@@ -250,5 +243,38 @@ final class EbayAdapter extends StoreAdapter
                 'condition' => data_get($item, 'condition.0.conditionDisplayName.0'),
             ],
         ]);
+    }
+
+    /**
+     * Generate dummy product data for demonstration.
+     *
+     * @return array<string, mixed>
+     */
+    private function generateDummyData(string $productIdentifier): array
+    {
+        $basePrice = 79.99 + (crc32($productIdentifier) % 400);
+        $price = round($basePrice, 2);
+
+        return [
+            'Title' => "eBay Product {$productIdentifier} - Great Deal",
+            'ConvertedCurrentPrice' => [
+                'Value' => $price,
+                'CurrencyID' => 'USD',
+            ],
+            'ViewItemURLForNaturalSearch' => "https://www.ebay.com/itm/{$productIdentifier}",
+            'GalleryURL' => 'https://via.placeholder.com/500x500?text=eBay+Product',
+            'SellingStatus' => [
+                'SellingState' => 'Active',
+            ],
+            'Description' => 'High-quality product available on eBay with excellent customer reviews.',
+            'PrimaryCategoryName' => 'Electronics',
+            'ItemID' => $productIdentifier,
+            'ListingType' => 'FixedPrice',
+            'ConditionDisplayName' => 'New',
+            'EndTime' => date('Y-m-d\TH:i:s.000\Z', strtotime('+30 days')),
+            'Seller' => [
+                'UserID' => 'trusted_seller',
+            ],
+        ];
     }
 }

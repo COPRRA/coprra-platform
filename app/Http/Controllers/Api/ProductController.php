@@ -211,4 +211,37 @@ final class ProductController extends BaseApiController
 
         return $response;
     }
+
+    /**
+     * Autocomplete endpoint for live search.
+     *
+     * @return JsonResponse
+     */
+    public function autocomplete(\Illuminate\Http\Request $request): JsonResponse
+    {
+        $query = $request->query('q', '');
+        
+        if (empty($query) || strlen($query) < 2) {
+            return $this->success([], 'No results');
+        }
+
+        $products = Product::query()
+            ->where('is_active', true)
+            ->where(function ($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%")
+                  ->orWhere('description', 'like', "%{$query}%");
+            })
+            ->limit(10)
+            ->get(['id', 'name', 'slug']);
+
+        $results = $products->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'url' => route('products.show', $product->slug),
+            ];
+        })->all();
+
+        return $this->success($results, 'Autocomplete results');
+    }
 }

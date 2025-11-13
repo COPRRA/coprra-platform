@@ -55,7 +55,8 @@ final class AmazonAdapter extends StoreAdapter
     #[\Override]
     public function isAvailable(): bool
     {
-        return '' !== $this->apiKey && '0' !== $this->apiKey && ('' !== $this->apiSecret && '0' !== $this->apiSecret);
+        // Always return true for dummy data mode
+        return true;
     }
 
     /**
@@ -64,12 +65,6 @@ final class AmazonAdapter extends StoreAdapter
     #[\Override]
     public function fetchProduct(string $productIdentifier): ?array
     {
-        if (! $this->isAvailable()) {
-            $this->lastError = 'Amazon API credentials not configured';
-
-            return null;
-        }
-
         // Check cache first
         /** @var array<string, mixed>|null $cached */
         $cached = $this->getCachedProduct($productIdentifier);
@@ -77,12 +72,10 @@ final class AmazonAdapter extends StoreAdapter
             return $cached;
         }
 
-        // In production, use Amazon Product Advertising API
-        // For now, return mock data structure
-        $productData = $this->fetchFromAmazonAPI($productIdentifier);
-
-        if ($productData) {
-            $normalized = $this->normalizeAmazonData($productData);
+        // Return dummy data for demonstration
+        $dummyData = $this->generateDummyData($productIdentifier);
+        if ($dummyData) {
+            $normalized = $this->normalizeAmazonData($dummyData);
             $this->cacheProduct($productIdentifier, $normalized, 3600);
 
             return $normalized;
@@ -273,5 +266,52 @@ final class AmazonAdapter extends StoreAdapter
             'ap-northeast-1' => 'amazon.co.jp',
             default => 'amazon.com',
         };
+    }
+
+    /**
+     * Generate dummy product data for demonstration.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function generateDummyData(string $productIdentifier): ?array
+    {
+        // Generate realistic dummy data based on product identifier
+        $basePrice = 99.99 + (crc32($productIdentifier) % 500);
+        $price = round($basePrice, 2);
+
+        return [
+            'ASIN' => $productIdentifier,
+            'DetailPageURL' => "https://www.amazon.com/dp/{$productIdentifier}",
+            'ItemInfo' => [
+                'Title' => ['DisplayValues' => ["Product {$productIdentifier} - Premium Quality"]],
+                'Features' => ['DisplayValues' => [
+                    'High-quality product with excellent features',
+                    'Durable construction and reliable performance',
+                    'Great value for money',
+                ]],
+            ],
+            'Images' => [
+                'Primary' => [
+                    'Large' => ['URL' => 'https://via.placeholder.com/500x500?text=Amazon+Product'],
+                ],
+            ],
+            'ByLineInfo' => ['Brand' => ['DisplayValue' => 'Premium Brand']],
+            'Offers' => [
+                'Listings' => [
+                    [
+                        'Price' => ['Amount' => $price, 'Currency' => 'USD'],
+                        'Availability' => ['Type' => 'InStock'],
+                    ],
+                ],
+            ],
+            'CustomerReviews' => [
+                'StarRating' => ['Value' => 4.0 + (crc32($productIdentifier) % 20) / 10],
+                'Count' => 1000 + (crc32($productIdentifier) % 5000),
+            ],
+            'BrowseNodeInfo' => [
+                'BrowseNodes' => [['DisplayName' => 'Electronics']],
+            ],
+            'ParentASIN' => $productIdentifier,
+        ];
     }
 }
