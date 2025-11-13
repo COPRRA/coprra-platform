@@ -60,9 +60,9 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         // API middleware group
+        // Note: throttle is applied per-route, not globally, to allow different rate limits
         $middleware->api([
             EnsureFrontendRequestsAreStateful::class,
-            'throttle:api',
             SubstituteBindings::class,
             ApiErrorHandler::class,
         ]);
