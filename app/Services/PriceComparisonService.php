@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Product;
+use App\Models\Store;
 
 final readonly class PriceComparisonService
 {
@@ -34,6 +35,10 @@ final readonly class PriceComparisonService
                 $price = isset($productData['price']) && is_numeric($productData['price']) ? (float) $productData['price'] : 0.0;
                 $currency = isset($productData['currency']) && \is_string($productData['currency']) ? $productData['currency'] : '';
                 $inStock = isset($productData['availability']) && 'in_stock' === $productData['availability'];
+                $originalUrl = $productData['url'] ?? '';
+
+                // Generate affiliate URL using Store model
+                $affiliateUrl = $this->generateAffiliateUrlForStore($storeIdentifier, $originalUrl);
 
                 $prices[] = [
                     'store_name' => $this->getStoreName($storeIdentifier),
@@ -43,7 +48,7 @@ final readonly class PriceComparisonService
                     'formatted_price' => $this->formatPrice($price, $currency),
                     'currency' => $currency,
                     'original_price' => null,
-                    'url' => $productData['url'] ?? '',
+                    'url' => $affiliateUrl,
                     'in_stock' => $inStock,
                     'rating' => $productData['rating'] ?? null,
                     'reviews_count' => $productData['reviews_count'] ?? null,
@@ -118,5 +123,29 @@ final readonly class PriceComparisonService
     private function formatPrice(float $price, string $currency): string
     {
         return number_format($price, 2).' '.$currency;
+    }
+
+    /**
+     * Generate affiliate URL for a store using Store model's generateAffiliateUrl method.
+     */
+    private function generateAffiliateUrlForStore(string $storeIdentifier, string $productUrl): string
+    {
+        if (empty($productUrl)) {
+            return '';
+        }
+
+        // Find store by identifier (slug or name)
+        $store = Store::where('slug', $storeIdentifier)
+            ->orWhere('name', 'like', "%{$storeIdentifier}%")
+            ->first();
+
+        // If store found, use its generateAffiliateUrl method
+        if ($store) {
+            return $store->generateAffiliateUrl($productUrl);
+        }
+
+        // Fallback: use placeholder mechanism directly
+        $separator = strpos($productUrl, '?') !== false ? '&' : '?';
+        return $productUrl . $separator . 'ref=coprra';
     }
 }

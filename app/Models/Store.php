@@ -156,20 +156,27 @@ class Store extends ValidatableModel
 
     /**
      * Generate affiliate URL for a product URL.
+     * 
+     * Currently uses placeholder mechanism (?ref=coprra) until real affiliate links are available.
      */
     public function generateAffiliateUrl(string $productUrl): string
     {
-        if (empty($this->affiliate_base_url) || empty($this->affiliate_code)) {
-            return $productUrl;
+        // If real affiliate configuration exists, use it
+        if (!empty($this->affiliate_base_url) && !empty($this->affiliate_code)) {
+            $encodedUrl = str_replace(':', '%3A', $productUrl);
+
+            return str_replace(
+                ['{AFFILIATE_CODE}', '{URL}'],
+                [$this->affiliate_code, $encodedUrl],
+                $this->affiliate_base_url
+            );
         }
 
-        $encodedUrl = str_replace(':', '%3A', $productUrl);
-
-        return str_replace(
-            ['{AFFILIATE_CODE}', '{URL}'],
-            [$this->affiliate_code, $encodedUrl],
-            $this->affiliate_base_url
-        );
+        // Placeholder solution: append ?ref=coprra parameter
+        // Check if URL already has query parameters
+        $separator = strpos($productUrl, '?') !== false ? '&' : '?';
+        
+        return $productUrl . $separator . 'ref=coprra';
     }
 
     /**

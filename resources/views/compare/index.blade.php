@@ -193,7 +193,7 @@
                                         @endphp
                                         <td class="px-6 py-5">
                                             <div class="flex flex-col gap-3">
-                                                <a href="{{ route('products.show', $product->slug) }}"
+                                                <a href="{{ route('products.price-comparison', $product->slug) }}"
                                                    class="inline-flex items-center justify-center w-full px-4 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition">
                                                     <i class="fas fa-shopping-cart mr-2"></i> {{ __('اشتري الآن') }}
                                                 </a>
