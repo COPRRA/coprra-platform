@@ -15,7 +15,10 @@ use App\Services\CacheService;
 use App\Services\Contracts\CacheServiceContract;
 use App\Services\PriceSearchService;
 use App\Services\ProductService;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Dusk\DuskServiceProvider;
 
@@ -61,5 +64,14 @@ final class AppServiceProvider extends ServiceProvider
     {
         Product::observe(ProductObserver::class);
         Category::observe(CategoryObserver::class);
+
+        // Register rate limiters
+        RateLimiter::for('api', function (Request $request) {
+            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+        });
+
+        RateLimiter::for('public', function (Request $request) {
+            return Limit::perMinute(100)->by($request->ip());
+        });
     }
 }

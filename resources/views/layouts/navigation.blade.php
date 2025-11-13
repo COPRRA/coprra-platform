@@ -59,9 +59,9 @@
                     <a href="{{ route('login') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
                         <i class="fas fa-sign-in-alt mr-2"></i> {{ __('Log in') }}
                     </a>
-                    <a href="{{ route('register') }}" class="inline-flex items-center px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition">
-                        <i class="fas fa-user-plus mr-2"></i> {{ __('Register') }}
-                    </a>
+                <a href="#" class="inline-flex items-center px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition" onclick="alert('Registration is currently disabled'); return false;">
+                    <i class="fas fa-user-plus mr-2"></i> {{ __('Register') }}
+                </a>
                 @else
                     <div x-data="{ userMenuOpen: false }" class="relative">
                         <button @click="userMenuOpen = !userMenuOpen" class="flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
@@ -202,7 +202,7 @@
                     <a href="{{ route('login') }}" class="block w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition text-center">
                         <i class="fas fa-sign-in-alt mr-2"></i> {{ __('Log in') }}
                     </a>
-                    <a href="{{ route('register') }}" class="block w-full px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition text-center">
+                    <a href="#" class="block w-full px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition text-center" onclick="alert('Registration is currently disabled'); return false;">
                         <i class="fas fa-user-plus mr-2"></i> {{ __('Register') }}
                     </a>
                 </div>

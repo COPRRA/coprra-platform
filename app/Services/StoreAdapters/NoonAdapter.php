@@ -47,18 +47,13 @@ final class NoonAdapter extends StoreAdapter
     #[\Override]
     public function isAvailable(): bool
     {
-        return null !== $this->apiKey && '' !== $this->apiKey;
+        // Always return true for dummy data mode
+        return true;
     }
 
     #[\Override]
     public function fetchProduct(string $productIdentifier): ?array
     {
-        if (! $this->isAvailable()) {
-            $this->lastError = 'Noon API key not configured';
-
-            return null;
-        }
-
         // Check cache first
         /** @var array{name: array|scalar, price: float, currency: array|scalar, url: array|scalar, image_url: array|scalar|null, availability: array|scalar, rating: float|null, reviews_count: int|null, description: array|scalar|null, brand: array|scalar|null, category: array|scalar|null, metadata: array|scalar}|null $cached */
         $cached = $this->getCachedProduct($productIdentifier);
@@ -66,17 +61,10 @@ final class NoonAdapter extends StoreAdapter
             return $cached;
         }
 
-        $url = $this->buildApiUrl($productIdentifier);
-
-        /** @var array<string, array>|null $response */
-        $response = $this->makeRequest($url, [
-            'api_key' => $this->apiKey,
-        ]);
-
-        if ($response && isset($response['product'])) {
-            /** @var array<string, array> $product */
-            $product = $response['product'];
-            $normalized = $this->normalizeNoonData($product);
+        // Return dummy data for demonstration
+        $dummyData = $this->generateDummyData($productIdentifier);
+        if ($dummyData) {
+            $normalized = $this->normalizeNoonData($dummyData);
             $this->cacheProduct($productIdentifier, $normalized, 3600);
 
             return $normalized;
@@ -220,5 +208,34 @@ final class NoonAdapter extends StoreAdapter
             'eg' => 'noon.com/egypt-en',
             default => 'noon.com',
         };
+    }
+
+    /**
+     * Generate dummy product data for demonstration.
+     *
+     * @return array<string, mixed>
+     */
+    private function generateDummyData(string $productIdentifier): array
+    {
+        $basePrice = 149.99 + (crc32($productIdentifier) % 600);
+        $salePrice = $basePrice * 0.85; // 15% discount
+        $price = round($salePrice, 2);
+
+        return [
+            'name' => "Noon Product {$productIdentifier} - Premium Quality",
+            'price' => $basePrice,
+            'sale_price' => $price,
+            'sku' => $productIdentifier,
+            'url' => $this->getProductUrl($productIdentifier),
+            'image_url' => 'https://via.placeholder.com/500x500?text=Noon+Product',
+            'in_stock' => true,
+            'rating' => 4.0 + (crc32($productIdentifier) % 20) / 10,
+            'reviews_count' => 500 + (crc32($productIdentifier) % 2000),
+            'description' => 'Premium quality product available on Noon with fast delivery and excellent customer service.',
+            'brand' => 'Premium Brand',
+            'category' => 'Electronics',
+            'seller' => 'Noon Official Store',
+            'discount_percentage' => 15,
+        ];
     }
 }

@@ -5,9 +5,14 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Product;
+use App\Models\Store;
 
 final readonly class PriceComparisonService
 {
+    public function __construct(
+        private StoreAdapterManager $storeAdapterManager
+    ) {}
+
     /**
      * Fetch prices from all available stores.
      *
@@ -20,40 +25,68 @@ final readonly class PriceComparisonService
         /** @var array<string, string>|null $storeMappings */
         $storeMappings = $product->store_mappings ?? null;
 
-        if (! \is_array($storeMappings)) {
-            return $prices;
-        }
+        // If store_mappings exists, use them
+        if (\is_array($storeMappings) && !empty($storeMappings)) {
+            foreach ($storeMappings as $storeIdentifier => $productIdentifier) {
+                $productData = $this->storeAdapterManager->fetchProduct(
+                    $storeIdentifier,
+                    $productIdentifier
+                );
 
-        foreach ($storeMappings as $storeIdentifier => $productIdentifier) {
-            $productData = $this->storeAdapterManager->fetchProduct(
-                $storeIdentifier,
-                $productIdentifier
-            );
+                if ($productData) {
+                    $prices[] = $this->buildPriceArray($storeIdentifier, $productData);
+                }
+            }
+        } else {
+            // If no store_mappings, fetch from all available adapters using product slug/ID as identifier
+            $availableAdapters = $this->storeAdapterManager->getAvailableAdapters();
+            
+            foreach ($availableAdapters as $storeIdentifier => $adapter) {
+                // Use product slug or ID as identifier for dummy data
+                $productIdentifier = $product->slug ?? (string) $product->id;
+                
+                $productData = $adapter->fetchProduct($productIdentifier);
 
-            if ($productData) {
-                $price = isset($productData['price']) && is_numeric($productData['price']) ? (float) $productData['price'] : 0.0;
-                $currency = isset($productData['currency']) && \is_string($productData['currency']) ? $productData['currency'] : '';
-                $inStock = isset($productData['availability']) && 'in_stock' === $productData['availability'];
-
-                $prices[] = [
-                    'store_name' => $this->getStoreName($storeIdentifier),
-                    'store_identifier' => $storeIdentifier,
-                    'store_logo' => $this->getStoreLogo($storeIdentifier),
-                    'price' => $price,
-                    'formatted_price' => $this->formatPrice($price, $currency),
-                    'currency' => $currency,
-                    'original_price' => null,
-                    'url' => $productData['url'] ?? '',
-                    'in_stock' => $inStock,
-                    'rating' => $productData['rating'] ?? null,
-                    'reviews_count' => $productData['reviews_count'] ?? null,
-                    'shipping_cost' => null,
-                    'is_best_deal' => false,
-                ];
+                if ($productData) {
+                    $prices[] = $this->buildPriceArray($storeIdentifier, $productData);
+                }
             }
         }
 
         return $prices;
+    }
+
+    /**
+     * Build price array from product data.
+     *
+     * @param array<string, mixed> $productData
+     * @return array<string, string|float|bool|null>
+     */
+    private function buildPriceArray(string $storeIdentifier, array $productData): array
+    {
+        $price = isset($productData['price']) && is_numeric($productData['price']) ? (float) $productData['price'] : 0.0;
+        $currency = isset($productData['currency']) && \is_string($productData['currency']) ? $productData['currency'] : 'USD';
+        $inStock = isset($productData['availability']) && 'in_stock' === $productData['availability'];
+        $originalUrl = $productData['url'] ?? '';
+
+        // Generate affiliate URL using Store model
+        $affiliateUrl = $this->generateAffiliateUrlForStore($storeIdentifier, $originalUrl);
+
+        return [
+            'store_name' => $this->getStoreName($storeIdentifier),
+            'store_identifier' => $storeIdentifier,
+            'store_logo' => $this->getStoreLogo($storeIdentifier),
+            'price' => $price,
+            'formatted_price' => $this->formatPrice($price, $currency),
+            'currency' => $currency,
+            'original_price' => null,
+            'url' => $affiliateUrl,
+            'in_stock' => $inStock,
+            'rating' => $productData['rating'] ?? null,
+            'reviews_count' => $productData['reviews_count'] ?? null,
+            'shipping_cost' => null,
+            'is_best_deal' => false,
+        ];
     }
 
     /**
@@ -100,6 +133,8 @@ final readonly class PriceComparisonService
             'amazon' => 'Amazon',
             'ebay' => 'eBay',
             'noon' => 'Noon',
+            'jumia' => 'Jumia',
+            'bestbuy' => 'BestBuy',
             default => ucfirst($identifier),
         };
     }
@@ -110,6 +145,8 @@ final readonly class PriceComparisonService
             'amazon' => asset('images/stores/amazon.png'),
             'ebay' => asset('images/stores/ebay.png'),
             'noon' => asset('images/stores/noon.png'),
+            'jumia' => asset('images/stores/jumia.png'),
+            'bestbuy' => asset('images/stores/bestbuy.png'),
         ];
 
         return $logos[$identifier] ?? null;
@@ -118,5 +155,29 @@ final readonly class PriceComparisonService
     private function formatPrice(float $price, string $currency): string
     {
         return number_format($price, 2).' '.$currency;
+    }
+
+    /**
+     * Generate affiliate URL for a store using Store model's generateAffiliateUrl method.
+     */
+    private function generateAffiliateUrlForStore(string $storeIdentifier, string $productUrl): string
+    {
+        if (empty($productUrl)) {
+            return '';
+        }
+
+        // Find store by identifier (slug or name)
+        $store = Store::where('slug', $storeIdentifier)
+            ->orWhere('name', 'like', "%{$storeIdentifier}%")
+            ->first();
+
+        // If store found, use its generateAffiliateUrl method
+        if ($store) {
+            return $store->generateAffiliateUrl($productUrl);
+        }
+
+        // Fallback: use placeholder mechanism directly
+        $separator = strpos($productUrl, '?') !== false ? '&' : '?';
+        return $productUrl . $separator . 'ref=coprra';
     }
 }

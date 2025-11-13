@@ -6,7 +6,9 @@ namespace App\Services;
 
 use App\Contracts\StoreAdapter;
 use App\Services\StoreAdapters\AmazonAdapter;
+use App\Services\StoreAdapters\BestBuyAdapter;
 use App\Services\StoreAdapters\EbayAdapter;
+use App\Services\StoreAdapters\JumiaAdapter;
 use App\Services\StoreAdapters\NoonAdapter;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Http\Client\Factory as HttpFactory;
@@ -20,7 +22,7 @@ final class StoreAdapterManager
     /**
      * @var array<string, StoreAdapter>
      */
-    private array $defaultAdapters = [];
+    private array $adapters = [];
 
     /**
      * @param array<string, mixed> $config
@@ -185,5 +187,7 @@ final class StoreAdapterManager
         $this->register(new AmazonAdapter($http, $cache, $logger));
         $this->register(new EbayAdapter($http, $cache, $logger));
         $this->register(new NoonAdapter($http, $cache, $logger));
+        $this->register(new JumiaAdapter($http, $cache, $logger));
+        $this->register(new BestBuyAdapter($http, $cache, $logger));
     }
 }

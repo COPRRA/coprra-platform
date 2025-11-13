@@ -13,6 +13,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AI\AgentHealthController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\EmailVerificationController;
+use App\Http\Controllers\SocialLoginController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\CartController;
@@ -25,6 +26,7 @@ use App\Http\Controllers\HealthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PriceAlertController;
+use App\Http\Controllers\PriceComparisonController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
@@ -143,9 +145,18 @@ Route::get('/email/verify', [EmailVerificationController::class, 'notice'])->mid
 Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])->middleware(['auth', 'signed', 'throttle:6,1'])->name('verification.verify');
 Route::post('/email/verification-notification', [EmailVerificationController::class, 'resend'])->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
+// Social Login routes
+Route::get('/auth/google/redirect', [SocialLoginController::class, 'redirectToGoogle'])->name('auth.google.redirect');
+Route::get('/auth/google/callback', [SocialLoginController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+Route::get('/auth/facebook/redirect', [SocialLoginController::class, 'redirectToFacebook'])->name('auth.facebook.redirect');
+Route::get('/auth/facebook/callback', [SocialLoginController::class, 'handleFacebookCallback'])->name('auth.facebook.callback');
+
 // المنتجات والفئات
 Route::get('products', [ProductController::class, 'index'])->name('products.index');
 Route::get('products/search', [ProductController::class, 'search'])->name('products.search');
+// Price comparison routes must come before the generic product show route
+Route::get('products/{product}/price-comparison', [PriceComparisonController::class, 'show'])->name('products.price-comparison');
+Route::post('products/{product}/price-comparison/refresh', [PriceComparisonController::class, 'refresh'])->name('products.price-comparison.refresh');
 Route::get('products/{slug}', [ProductController::class, 'show'])->name('products.show');
 
 // Compare Routes (public, session-based)

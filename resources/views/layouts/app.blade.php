@@ -80,7 +80,7 @@
 <body class="font-sans antialiased"
       data-authenticated="{{ auth()->check() ? 'true' : 'false' }}"
       data-login-url="{{ route('login') }}"
-      data-register-url="{{ route('register') }}">
+      data-register-url="#">
     <!-- Skip Links for Accessibility -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <a href="#navigation" class="skip-link">Skip to navigation</a>

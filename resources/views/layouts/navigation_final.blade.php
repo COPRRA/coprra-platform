@@ -52,7 +52,7 @@
             <div class="hidden sm:flex sm:items-center sm:ml-6">
                 @guest
                     <a href="{{ route('login') }}" class="text-sm text-gray-700 dark:text-gray-500 underline">Log in</a>
-                    <a href="{{ route('register') }}" class="ml-4 text-sm text-gray-700 dark:text-gray-500 underline">Register</a>
+                    <a href="#" class="ml-4 text-sm text-gray-700 dark:text-gray-500 underline" onclick="alert('Registration is currently disabled'); return false;">Register</a>
                 @else
                     <div class="ml-3 relative">
                         <div class="flex items-center space-x-4">

@@ -69,7 +69,7 @@
                             تسجيل الدخول
                         </a>
                         <a
-                            href="{{ route('register') }}"
+                            href="#"
                             class="btn btn-primary btn-sm"
                         >
                             إنشاء حساب
