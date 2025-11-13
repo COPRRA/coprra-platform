@@ -15,15 +15,12 @@ use App\Http\Middleware\OverrideHealthEndpoint;
 use App\Http\Middleware\SecurityHeadersMiddleware;
 use App\Http\Middleware\SetLocaleAndCurrency;
 use App\Http\Middleware\VerifyCsrfToken;
-use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
-use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 
@@ -39,15 +36,6 @@ return Application::configure(basePath: dirname(__DIR__))
         StatsCommand::class,
         UpdatePricesCommand::class,
     ])
-    ->withRateLimiting(static function () {
-        RateLimiter::for('api', function (Request $request) {
-            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
-        });
-
-        RateLimiter::for('public', function (Request $request) {
-            return Limit::perMinute(100)->by($request->ip());
-        });
-    })
     ->withMiddleware(static function (Middleware $middleware) {
         // Global middleware - applied to all requests
         // Ensure CSP nonce is generated before applying security headers
