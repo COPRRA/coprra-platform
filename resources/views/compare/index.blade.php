@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Compare Products - ' . config('app.name'))
-@section('description', 'Compare up to 4 products side by side with detailed specifications')
+@section('title', __('messages.compare_page_title') . ' - ' . config('app.name'))
+@section('description', __('messages.compare_page_description'))
 
 @section('content')
 <div class="py-10">
@@ -112,14 +112,15 @@
                         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20">
                             <button type="button" 
                                     id="generate-ai-analysis-btn"
-                                    class="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-lg transition-all duration-200 shadow-md hover:shadow-lg">
-                                <i class="fas fa-robot"></i>
-                                <span>{{ __('Generate AI Analysis') }}</span>
+                                    class="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
+                                    aria-label="{{ __('messages.generate_ai_powered_analysis_comparing_selected_products') }}">
+                                <i class="fas fa-robot" aria-hidden="true"></i>
+                                <span>{{ __('messages.generate_ai_analysis') }}</span>
                             </button>
                             <div id="ai-analysis-loading" class="hidden mt-4 text-center">
                                 <div class="inline-flex items-center gap-3 text-purple-600 dark:text-purple-400">
                                     <i class="fas fa-spinner fa-spin text-2xl"></i>
-                                    <span class="text-lg font-medium">{{ __('Analyzing, please wait...') }}</span>
+                                    <span class="text-lg font-medium">{{ __('messages.analyzing_please_wait') }}</span>
                                 </div>
                             </div>
                         </div>
@@ -143,8 +144,9 @@
                                                     type="button"
                                                     class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-500/10 dark:text-red-300 transition"
                                                     data-compare-remove="{{ $product->id }}"
+                                                    aria-label="{{ __('messages.remove') }} {{ $product->name }} {{ __('messages.from_comparison') }}"
                                                 >
-                                                    <i class="fas fa-times mr-1"></i> {{ __('Remove') }}
+                                                    <i class="fas fa-times mr-1" aria-hidden="true"></i> {{ __('messages.remove') }}
                                                 </button>
                                             </div>
                                         </th>

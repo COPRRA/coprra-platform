@@ -47,4 +47,34 @@ return [
     'success' => 'Success',
     'warning' => 'Warning',
     'info' => 'Info',
+    
+    // Product Page
+    'back_to_products' => 'Back to products',
+    'back_to_products_list' => 'Back to products list',
+    'view_stores' => 'View Stores',
+    'view_stores_selling' => 'View stores selling',
+    'category' => 'Category',
+    'brand' => 'Brand',
+    'specifications' => 'Specifications',
+    'year' => 'Year',
+    'colors' => 'Colors',
+    'related_products' => 'Related Products',
+    'view_details_for' => 'View details for',
+    'remove' => 'Remove',
+    'from_wishlist' => 'from Wishlist',
+    'from_comparison' => 'from comparison',
+    'view_products_in_category' => 'View products in category',
+    
+    // Compare Page
+    'compare_page_title' => 'Compare Products',
+    'compare_page_description' => 'Compare up to 4 products side by side with detailed specifications',
+    'generate_ai_analysis' => 'Generate AI Analysis',
+    'generate_ai_powered_analysis_comparing_selected_products' => 'Generate AI-powered analysis comparing selected products',
+    'analyzing_please_wait' => 'Analyzing, please wait...',
+    'remove_from_comparison' => 'Remove from comparison',
+    
+    // Home Page
+    'start_comparing_prices' => 'Start Comparing Prices',
+    'find_best_deals_description' => 'Find the best deals across multiple stores and save money on your purchases.',
+    'browse_all_products' => 'Browse All Products',
 ];
