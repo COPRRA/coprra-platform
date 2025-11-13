@@ -28,19 +28,22 @@ class PriceComparisonController extends Controller
     /**
      * Show price comparison for a product.
      */
-    public function show(Request $request, Product $product): View
+    public function show(Request $request, string $product): View
     {
+        // Resolve product by slug
+        $productModel = Product::where('slug', $product)->firstOrFail();
+
         $this->analyticsService->trackPriceComparison(
-            $product->id,
+            $productModel->id,
             auth()->check() ? (int) auth()->id() : null
         );
 
         /** @var array<int, array<string, string|float|bool|* @method static \App\Models\Brand create(array<string, string|bool|null>> $prices */
-        $prices = $this->cacheService->getCachedPriceComparison($product->id);
+        $prices = $this->cacheService->getCachedPriceComparison($productModel->id);
 
         if (! $prices) {
-            $prices = $this->priceComparisonService->fetchPricesFromStores($product);
-            $this->cacheService->cachePriceComparison($product->id, $prices);
+            $prices = $this->priceComparisonService->fetchPricesFromStores($productModel);
+            $this->cacheService->cachePriceComparison($productModel->id, $prices);
         }
 
         $prices = $this->priceComparisonService->markBestDeal($prices);
@@ -52,11 +55,11 @@ class PriceComparisonController extends Controller
         $priceHistory = $showHistory ? $this->getPriceHistory() : [];
 
         $isWishlisted = auth()->check()
-            ? auth()->user()->wishlist()->where('products.id', $product->id)->exists()
+            ? auth()->user()->wishlist()->where('products.id', $productModel->id)->exists()
             : false;
 
         return view('products.price-comparison', [
-            'product' => $product,
+            'product' => $productModel,
             'prices' => $prices,
             'showHistory' => $showHistory,
             'priceHistory' => $priceHistory,
@@ -68,12 +71,15 @@ class PriceComparisonController extends Controller
     /**
      * API endpoint to refresh prices.
      */
-    public function refresh(Product $product): JsonResponse
+    public function refresh(string $product): JsonResponse
     {
-        $this->cacheService->invalidateProduct($product->id);
+        // Resolve product by slug
+        $productModel = Product::where('slug', $product)->firstOrFail();
 
-        $prices = $this->priceComparisonService->fetchPricesFromStores($product);
-        $this->cacheService->cachePriceComparison($product->id, $prices);
+        $this->cacheService->invalidateProduct($productModel->id);
+
+        $prices = $this->priceComparisonService->fetchPricesFromStores($productModel);
+        $this->cacheService->cachePriceComparison($productModel->id, $prices);
 
         return response()->json([
             'success' => true,
