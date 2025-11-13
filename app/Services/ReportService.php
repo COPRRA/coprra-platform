@@ -6,20 +6,21 @@ namespace App\Services;
 
 use App\Services\Reports\PriceAnalysisReportGenerator;
 use App\Services\Reports\ProductPerformanceReportGenerator;
-use App\Services\Reports\SalesReportGenerator;
 use App\Services\Reports\UserActivityReportGenerator;
 use Carbon\Carbon;
 
 /**
  * Main report service that coordinates different report generators.
  * Acts as a facade for various specialized report generation services.
+ * 
+ * Note: Sales reporting has been removed as the platform operates on an affiliate model
+ * where purchases are made on external stores, not directly through the platform.
  */
 final readonly class ReportService
 {
     public function __construct(
         private ProductPerformanceReportGenerator $productPerformanceGenerator,
         private UserActivityReportGenerator $userActivityGenerator,
-        private SalesReportGenerator $salesGenerator,
         private PriceAnalysisReportGenerator $priceAnalysisGenerator
     ) {}
 
@@ -69,6 +70,9 @@ final readonly class ReportService
 
     /**
      * Generate sales report.
+     * 
+     * @deprecated Sales reporting has been removed as the platform operates on an affiliate model.
+     * This method returns an empty report structure for backward compatibility.
      *
      * @return array{
      *     total_orders: int,
@@ -82,10 +86,16 @@ final readonly class ReportService
      */
     public function generateSalesReport(?Carbon $startDate = null, ?Carbon $endDate = null): array
     {
-        $startDate ??= now()->subMonth();
-        $endDate ??= now();
-
-        return $this->salesGenerator->generateReport($startDate, $endDate);
+        // Sales reporting removed - platform is affiliate-based, no direct sales
+        return [
+            'total_orders' => 0,
+            'total_revenue' => 0.0,
+            'average_order_value' => 0.0,
+            'top_selling_products' => [],
+            'sales_by_period' => [],
+            'order_status_breakdown' => [],
+            'revenue_trends' => [],
+        ];
     }
 
     /**
@@ -123,7 +133,7 @@ final readonly class ReportService
         $endDate ??= now();
 
         return [
-            'sales_summary' => $this->salesGenerator->generateReport($startDate, $endDate),
+            'sales_summary' => $this->generateSalesReport($startDate, $endDate),
             'user_activity_summary' => $this->userActivityGenerator->generateReport($startDate, $endDate),
             'price_analysis_summary' => $this->priceAnalysisGenerator->generateReport($startDate, $endDate),
             'generated_at' => now()->toDateTimeString(),
@@ -132,10 +142,17 @@ final readonly class ReportService
 
     /**
      * Get daily sales summary.
+     * 
+     * @deprecated Sales reporting has been removed as the platform operates on an affiliate model.
      */
     public function getDailySalesSummary(Carbon $date): array
     {
-        return $this->salesGenerator->getDailySalesSummary($date);
+        return [
+            'date' => $date->toDateString(),
+            'orders_count' => 0,
+            'revenue' => 0.0,
+            'average_order_value' => 0.0,
+        ];
     }
 
     /**
@@ -156,17 +173,27 @@ final readonly class ReportService
 
     /**
      * Get top selling products.
+     * 
+     * @deprecated Sales reporting has been removed as the platform operates on an affiliate model.
      */
     public function getTopSellingProducts(Carbon $startDate, Carbon $endDate, int $limit = 10): array
     {
-        return $this->salesGenerator->getTopSellingProducts($startDate, $endDate, $limit);
+        return [];
     }
 
     /**
      * Get customer analysis.
+     * 
+     * @deprecated Sales reporting has been removed as the platform operates on an affiliate model.
      */
     public function getCustomerAnalysis(Carbon $startDate, Carbon $endDate): array
     {
-        return $this->salesGenerator->getCustomerAnalysis($startDate, $endDate);
+        return [
+            'total_customers' => 0,
+            'new_customers' => 0,
+            'returning_customers' => 0,
+            'average_orders_per_customer' => 0.0,
+            'customer_lifetime_value' => 0.0,
+        ];
     }
 }

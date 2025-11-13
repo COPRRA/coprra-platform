@@ -35,7 +35,9 @@
     <link rel="stylesheet" href="{{ asset('vendor/fontawesome/css/all.min.css') }}">
 
     <!-- Critical CSS -->
-    <style>{!! file_exists(public_path('build/manifest.json')) ? \Illuminate\Support\Facades\File::get(resource_path('css/critical.css')) : \Illuminate\Support\Facades\File::get(resource_path('css/critical.css')) !!}</style>
+    @if(\Illuminate\Support\Facades\File::exists(resource_path('css/critical.css')))
+    <style>{!! \Illuminate\Support\Facades\File::get(resource_path('css/critical.css')) !!}</style>
+    @endif
 
     <!-- Brand CSS -->
     <link rel="stylesheet" href="{{ asset('css/coprra-brand.css') }}">

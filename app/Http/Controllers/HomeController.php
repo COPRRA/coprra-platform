@@ -53,7 +53,7 @@ class HomeController extends Controller
             ->limit(6)
             ->get();
 
-        return view('welcome', [
+        return view('home', [
             'featuredProducts' => $featuredProducts,
             'categories' => $categories,
             'brands' => $brands,

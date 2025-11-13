@@ -8,12 +8,10 @@ use App\Http\Controllers\Api\Admin\CategoryController;
 use App\Http\Controllers\Api\AIController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DocumentationController;
-use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PriceSearchController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\WishlistController;
 use App\Http\Controllers\HealthController;
-use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PointsController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReviewController;
@@ -38,6 +36,17 @@ Route::post('/register', [AuthController::class, 'register'])->middleware('throt
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 Route::middleware(['auth:sanctum', 'throttle:auth'])->get('/user', [AuthController::class, 'me']);
 Route::middleware(['auth:sanctum', 'throttle:authenticated'])->get('/me', [AuthController::class, 'me']);
+
+// Sentry Debug Route - Available in all environments
+Route::get('/debug-sentry', static function () {
+    return response()->json([
+        'success' => true,
+        'message' => 'Sentry debug route is working',
+        'route' => '/api/debug-sentry',
+        'timestamp' => date('Y-m-d H:i:s'),
+        'status' => 'ok',
+    ], 200);
+})->name('api.debug.sentry');
 
 // Public API routes (no authentication required)
 Route::middleware(['throttle:public'])->group(static function (): void {
@@ -100,8 +109,6 @@ Route::middleware(['auth:sanctum', 'throttle:authenticated'])->group(static func
     // Reviews routes
     Route::post('/products/{product}/reviews', [ReviewController::class, 'store']);
 
-    // Order routes
-    Route::apiResource('orders', OrderController::class);
 
     // Secure upload route using UploadController
     Route::post('/uploads', [UploadController::class, 'store']);
@@ -166,19 +173,6 @@ Route::prefix('v1')->middleware(['throttle:api'])->group(static function (): voi
 });
 
 
-// Payment Routes
-Route::middleware('auth:sanctum')->group(static function (): void {
-    Route::get('/payment-methods', [PaymentController::class, 'getPaymentMethods']);
-    Route::post('/orders/{order}/payments', [PaymentController::class, 'processPayment']);
-    Route::post('/orders/{order}/refund', [PaymentController::class, 'refundPayment']);
-});
-
-// Order Routes
-Route::middleware(['auth:sanctum', 'throttle:authenticated'])->group(static function (): void {
-    Route::get('/orders', [OrderController::class, 'index']);
-    Route::post('/orders', [OrderController::class, 'store']);
-    Route::get('/orders/{order}', [OrderController::class, 'show']);
-});
 
 // Points & Rewards Routes
 Route::middleware(['auth:sanctum', 'throttle:authenticated'])->group(static function (): void {
