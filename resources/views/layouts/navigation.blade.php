@@ -73,6 +73,12 @@
                             <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                                 <i class="fas fa-cog mr-2"></i> {{ __('Profile') }}
                             </a>
+                            <a href="{{ route('price-alerts.index') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <i class="fas fa-bell mr-2"></i> {{ __('My Price Alerts') }}
+                            </a>
+                            <a href="{{ route('account.points') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <i class="fas fa-coins mr-2"></i> {{ __('My Points') }}
+                            </a>
                             @if(Auth::user()->role === 'admin' || (method_exists(Auth::user(), 'hasRole') && Auth::user()->hasRole('admin')))
                             <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                                 <i class="fas fa-tachometer-alt mr-2"></i> {{ __('Admin Dashboard') }}
@@ -213,6 +219,12 @@
                     </div>
                     <a href="{{ route('profile.edit') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700">
                         <i class="fas fa-cog mr-2"></i> {{ __('Profile') }}
+                    </a>
+                    <a href="{{ route('price-alerts.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <i class="fas fa-bell mr-2"></i> {{ __('My Price Alerts') }}
+                    </a>
+                    <a href="{{ route('account.points') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <i class="fas fa-coins mr-2"></i> {{ __('My Points') }}
                     </a>
                     @if(Auth::user()->role === 'admin' || (method_exists(Auth::user(), 'hasRole') && Auth::user()->hasRole('admin')))
                     <a href="{{ route('admin.dashboard') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700">

@@ -14,20 +14,33 @@
                     <form action="{{ route('price-alerts.store') }}" method="POST">
                         @csrf
                         
-                        <div class="mb-3">
-                            <label for="product_id" class="form-label">Product <span class="text-danger">*</span></label>
-                            <select class="form-select @error('product_id') is-invalid @enderror" id="product_id" name="product_id" required>
-                                <option value="">Select a product</option>
-                                @foreach($products ?? [] as $product)
-                                <option value="{{ $product->id }}" {{ old('product_id') == $product->id ? 'selected' : '' }}>
-                                    {{ $product->name }} - ${{ number_format($product->price, 2) }}
-                                </option>
-                                @endforeach
-                            </select>
-                            @error('product_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
+                        @if($product)
+                            <input type="hidden" name="product_id" value="{{ $product->id }}">
+                            <div class="mb-3">
+                                <label class="form-label">Product</label>
+                                <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                                    <strong>{{ $product->name }}</strong>
+                                    @if($product->price)
+                                        <span class="text-blue-600 dark:text-blue-400"> - ${{ number_format((float)$product->price, 2) }}</span>
+                                    @endif
+                                </div>
+                            </div>
+                        @else
+                            <div class="mb-3">
+                                <label for="product_id" class="form-label">Product <span class="text-danger">*</span></label>
+                                <select class="form-select @error('product_id') is-invalid @enderror" id="product_id" name="product_id" required>
+                                    <option value="">Select a product</option>
+                                    @foreach($products ?? [] as $product)
+                                    <option value="{{ $product->id }}" {{ old('product_id') == $product->id ? 'selected' : '' }}>
+                                        {{ $product->name }} - ${{ number_format($product->price, 2) }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                                @error('product_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        @endif
 
                         <div class="mb-3">
                             <label for="target_price" class="form-label">Target Price <span class="text-danger">*</span></label>
@@ -37,15 +50,19 @@
                                        class="form-control @error('target_price') is-invalid @enderror" 
                                        id="target_price" 
                                        name="target_price" 
-                                       value="{{ old('target_price') }}" 
+                                       value="{{ old('target_price', $product ? number_format((float)$product->price * 0.9, 2, '.', '') : '') }}" 
                                        step="0.01" 
                                        min="0.01" 
+                                       @if($product && $product->price) max="{{ $product->price }}" @endif
                                        required>
                             </div>
                             @error('target_price')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                             <div class="form-text">We'll notify you when the price drops to or below this amount.</div>
+                            @if($product && $product->price)
+                                <div class="form-text text-muted">Current price: ${{ number_format((float)$product->price, 2) }}</div>
+                            @endif
                         </div>
 
                         <div class="mb-3">

@@ -79,8 +79,8 @@ class PointsService
             throw BusinessLogicException::insufficientResources('points', $availablePoints, $points);
         }
 
-        DB::transaction(function () use ($user, $points, $description): void {
-            $this->addPoints($user, -$points, 'redeemed', 'manual_redemption', null, $description);
+        DB::transaction(function () use ($user, $points, $reason): void {
+            $this->addPoints($user, -$points, 'redeemed', 'manual_redemption', null, $reason);
         });
 
         return true;
@@ -96,7 +96,10 @@ class PointsService
     public function getAvailablePoints(int $userId): int
     {
         $sum = UserPoint::where('user_id', $userId)
-            ->valid()
+            ->where(function ($query) {
+                $query->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            })
             ->sum('points')
         ;
 

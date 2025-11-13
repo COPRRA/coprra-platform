@@ -88,6 +88,11 @@ class ProductController extends Controller
                 ? auth()->user()->wishlist()->where('products.id', $product->id)->exists()
                 : false;
 
+            // Load reviews with user relationship for display
+            $reviews = $product->reviews()->with('user')->where('is_approved', true)->latest()->take(10)->get();
+            $averageRating = $product->getAverageRating();
+            $reviewsCount = $product->reviews()->where('is_approved', true)->count();
+
             $seoMeta = $this->seoService->generateMetaData($product, 'Product');
             $productSchema = $this->seoService->generateProductSchema($product);
 
@@ -95,6 +100,9 @@ class ProductController extends Controller
                 'product' => $product,
                 'relatedProducts' => $relatedProducts,
                 'isWishlisted' => $isWishlisted,
+                'reviews' => $reviews,
+                'averageRating' => $averageRating,
+                'reviewsCount' => $reviewsCount,
                 'seoMeta' => $seoMeta,
                 'productSchema' => $productSchema,
             ]);

@@ -7,7 +7,14 @@
     <h1 class="mb-4">{{ __('messages.cart') }}</h1>
 
     @if($cartItems->isEmpty())
-        <div class="text-center text-muted py-5">{{ __('messages.empty_cart') }}</div>
+        <div class="text-center text-gray-500 dark:text-gray-400 py-12">
+            <i class="fas fa-shopping-cart fa-5x mb-4 opacity-50" aria-hidden="true"></i>
+            <p class="text-xl font-semibold mb-2">{{ __('Your shopping list is empty') }}</p>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">{{ __('Add products to your shopping list to track prices and compare deals.') }}</p>
+            <a href="{{ route('products.index') }}" class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition">
+                <i class="fas fa-shopping-bag mr-2" aria-hidden="true"></i>{{ __('Browse Products') }}
+            </a>
+        </div>
     @else
         <div class="table-responsive">
             <table class="table align-middle">

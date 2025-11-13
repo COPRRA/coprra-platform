@@ -77,4 +77,47 @@ return [
     'start_comparing_prices' => 'Start Comparing Prices',
     'find_best_deals_description' => 'Find the best deals across multiple stores and save money on your purchases.',
     'browse_all_products' => 'Browse All Products',
+    
+    // Price Alerts
+    'set_price_alert' => 'Set Price Alert',
+    'my_price_alerts' => 'My Price Alerts',
+    'create_price_alert' => 'Create Price Alert',
+    'price_alert_created' => 'Price alert created successfully!',
+    'price_alert_updated' => 'Price alert updated successfully!',
+    'price_alert_deleted' => 'Price alert deleted successfully!',
+    
+    // Reviews
+    'customer_reviews' => 'Customer Reviews',
+    'no_reviews_yet' => 'No reviews yet. Be the first to review this product!',
+    'login_to_write_review' => 'Login to Write Review',
+    'write_a_review' => 'Write a Review',
+    'edit_review' => 'Edit Review',
+    'submit_review' => 'Submit Review',
+    'update_review' => 'Update Review',
+    'review_submitted' => 'Review submitted successfully!',
+    'review_updated' => 'Review updated successfully!',
+    'review_deleted' => 'Review deleted successfully!',
+    'anonymous' => 'Anonymous',
+    
+    // Points & Rewards
+    'my_points' => 'My Points',
+    'available_points' => 'Available Points',
+    'points_history' => 'Points History',
+    'available_rewards' => 'Available Rewards',
+    'redeem_points' => 'Redeem Points',
+    'redeem_reward' => 'Redeem Reward',
+    'points_redeemed' => 'Points redeemed successfully!',
+    'reward_redeemed' => 'Reward redeemed successfully!',
+    'insufficient_points' => 'Insufficient points',
+    'no_rewards_available' => 'No rewards available at the moment.',
+    'no_points_history' => 'No points history yet.',
+    
+    // Price Comparison
+    'compare_all_prices' => 'Compare All Prices',
+    'compare_prices_for' => 'Compare All Prices for',
+    
+    // Cart
+    'empty_cart' => 'Your shopping list is empty',
+    'add_products_to_track' => 'Add products to your shopping list to track prices and compare deals.',
+    'browse_products' => 'Browse Products',
 ];

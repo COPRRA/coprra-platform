@@ -85,9 +85,17 @@
 
                     <!-- Call to Action Buttons -->
                     <div class="mt-8 flex gap-4 flex-wrap">
+                        <a href="{{ route('products.price-comparison', $product->slug) }}" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition" aria-label="{{ __('messages.compare_prices_for') }} {{ $product->name }}">
+                            <i class="fas fa-dollar-sign mr-2" aria-hidden="true"></i>{{ __('messages.compare_all_prices') }}
+                        </a>
                         <a href="{{ route('stores.index') }}" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition" aria-label="{{ __('messages.view_stores_selling') }} {{ $product->name }}">
                             <i class="fas fa-shopping-cart mr-2" aria-hidden="true"></i>{{ __('messages.view_stores') }}
                         </a>
+                        @auth
+                        <a href="{{ route('price-alerts.create', ['product_id' => $product->id]) }}" class="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition" aria-label="{{ __('Set Price Alert for') }} {{ $product->name }}">
+                            <i class="fas fa-bell mr-2" aria-hidden="true"></i>{{ __('Set Price Alert') }}
+                        </a>
+                        @endauth
                         <button
                             type="button"
                             class="wishlist-toggle-btn flex-1 min-w-[10rem] inline-flex items-center justify-center gap-2 font-semibold py-3 px-6 rounded-lg transition {{ ($isWishlisted ?? false) ? 'bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-500/10 dark:text-red-200 dark:hover:bg-red-500/20' : 'bg-gray-200 hover:bg-gray-300 text-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white' }}"
@@ -130,12 +138,91 @@
             </div>
         </div>
 
-        @if(isset($relatedProducts) && $relatedProducts->count())
+        <!-- Customer Reviews Section -->
+        <div class="mt-12 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ __('messages.reviews') }}</h2>
+                @auth
+                <a href="{{ route('reviews.create', $product->id) }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition">
+                    <i class="fas fa-edit mr-2" aria-hidden="true"></i>{{ __('messages.write_review') }}
+                </a>
+                @else
+                <a href="{{ route('login') }}" class="inline-flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-semibold rounded-lg transition">
+                    <i class="fas fa-sign-in-alt mr-2" aria-hidden="true"></i>{{ __('Login to Write Review') }}
+                </a>
+                @endauth
+            </div>
+
+            <!-- Rating Summary -->
+            <div class="mb-6 pb-6 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center gap-4">
+                    <div class="text-center">
+                        <div class="text-4xl font-bold text-gray-900 dark:text-white">{{ number_format($averageRating ?? 0, 1) }}</div>
+                        <div class="flex items-center justify-center gap-1 mt-2">
+                            @for($i = 1; $i <= 5; $i++)
+                                <i class="fas fa-star {{ $i <= ($averageRating ?? 0) ? 'text-yellow-400' : 'text-gray-300' }}" aria-hidden="true"></i>
+                            @endfor
+                        </div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ $reviewsCount ?? 0 }} {{ __('messages.reviews') }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reviews List -->
+            @if(isset($reviews) && $reviews->count() > 0)
+                <div class="space-y-6">
+                    @foreach($reviews as $review)
+                        <div class="border-b border-gray-200 dark:border-gray-700 pb-6 last:border-b-0 last:pb-0">
+                            <div class="flex items-start justify-between mb-2">
+                                <div>
+                                    <div class="font-semibold text-gray-900 dark:text-white">{{ $review->user->name ?? __('Anonymous') }}</div>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <div class="flex items-center gap-1">
+                                            @for($i = 1; $i <= 5; $i++)
+                                                <i class="fas fa-star {{ $i <= $review->rating ? 'text-yellow-400' : 'text-gray-300' }} text-sm" aria-hidden="true"></i>
+                                            @endfor
+                                        </div>
+                                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ $review->created_at->diffForHumans() }}</span>
+                                    </div>
+                                </div>
+                                @auth
+                                @if(auth()->id() === $review->user_id)
+                                <div class="flex gap-2">
+                                    <a href="{{ route('reviews.edit', $review->id) }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm">
+                                        <i class="fas fa-edit" aria-hidden="true"></i>
+                                    </a>
+                                    <form method="POST" action="{{ route('reviews.destroy', $review->id) }}" class="inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-sm" onclick="return confirm('{{ __('Are you sure you want to delete this review?') }}')">
+                                            <i class="fas fa-trash" aria-hidden="true"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                                @endif
+                                @endauth
+                            </div>
+                            @if($review->title)
+                                <h3 class="font-semibold text-gray-900 dark:text-white mb-2">{{ $review->title }}</h3>
+                            @endif
+                            <p class="text-gray-700 dark:text-gray-300">{{ $review->content }}</p>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                    <i class="fas fa-comments fa-3x mb-4 opacity-50" aria-hidden="true"></i>
+                    <p>{{ __('No reviews yet. Be the first to review this product!') }}</p>
+                </div>
+            @endif
+        </div>
+
+        @if(isset($relatedProducts) && $relatedProducts->count() > 0)
             <div class="mt-12">
                 <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">{{ __('messages.related_products') }}</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     @foreach($relatedProducts as $rp)
-                        <article class="product-card bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+                        <article class="product-card bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
                             @if($rp->image ?? $rp->image_url)
                                 <img src="{{ $rp->image ?? $rp->image_url }}" alt="{{ $rp->name }}" class="w-full h-48 object-cover">
                             @else
