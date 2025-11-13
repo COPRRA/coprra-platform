@@ -6,20 +6,21 @@ namespace App\Services;
 
 use App\Services\Reports\PriceAnalysisReportGenerator;
 use App\Services\Reports\ProductPerformanceReportGenerator;
-use App\Services\Reports\SalesReportGenerator;
 use App\Services\Reports\UserActivityReportGenerator;
 use Carbon\Carbon;
 
 /**
  * Main report service that coordinates different report generators.
  * Acts as a facade for various specialized report generation services.
+ * 
+ * Note: Sales reporting has been removed as the platform operates on an affiliate model
+ * where purchases are made on external stores, not directly through the platform.
  */
 final readonly class ReportService
 {
     public function __construct(
         private ProductPerformanceReportGenerator $productPerformanceGenerator,
         private UserActivityReportGenerator $userActivityGenerator,
-        private SalesReportGenerator $salesGenerator,
         private PriceAnalysisReportGenerator $priceAnalysisGenerator
     ) {}
 
@@ -69,6 +70,9 @@ final readonly class ReportService
 
     /**
      * Generate sales report.
+     * 
+     * @deprecated Sales reporting has been removed as the platform operates on an affiliate model.
+     * This method returns an empty report structure for backward compatibility.
      *
      * @return array{
      *     total_orders: int,
@@ -82,10 +86,16 @@ final readonly class ReportService
      */
     public function generateSalesReport(?Carbon $startDate = null, ?Carbon $endDate = null): array
     {
-        $startDate ??= now()->subMonth();
-        $endDate ??= now();
-
-        return $this->salesGenerator->generateReport($startDate, $endDate);
+        // Sales reporting removed - platform is affiliate-based, no direct sales
+        return [
+            'total_orders' => 0,
+            'total_revenue' => 0.0,
+            'average_order_value' => 0.0,
+            'top_selling_products' => [],
+            'sales_by_period' => [],
+            'order_status_breakdown' => [],
+            'revenue_trends' => [],
+        ];
     }
 
     /**
