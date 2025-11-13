@@ -99,7 +99,7 @@
                             data-wishlist-icon-active="fas fa-heart-broken"
                             data-wishlist-class-default="bg-gray-200 hover:bg-gray-300 text-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
                             data-wishlist-class-active="bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-500/10 dark:text-red-200 dark:hover:bg-red-500/20"
-                            aria-label="{{ ($isWishlisted ?? false) ? __('messages.remove') }} {{ $product->name }} {{ __('messages.from_wishlist') }}"
+                            aria-label="{{ ($isWishlisted ?? false) ? __('messages.remove').' ' : '' }}{{ $product->name }} {{ __('messages.from_wishlist') }}"
                             aria-pressed="{{ ($isWishlisted ?? false) ? 'true' : 'false' }}"
                         >
                             <i class="wishlist-icon {{ ($isWishlisted ?? false) ? 'fas fa-heart-broken' : 'fas fa-heart' }} mr-2" aria-hidden="true"></i>
@@ -119,7 +119,7 @@
                             data-compare-label-added="{{ __('Added to Compare') }}"
                             data-compare-class-default="bg-indigo-600 hover:bg-indigo-700"
                             data-compare-class-added="bg-green-600 hover:bg-green-700"
-                            aria-label="{{ $alreadyCompared ? __('messages.remove') }} {{ $product->name }} {{ __('messages.from_comparison') }}"
+                            aria-label="{{ $alreadyCompared ? __('messages.remove').' ' : '' }}{{ $product->name }} {{ __('messages.from_comparison') }}"
                             aria-pressed="{{ $alreadyCompared ? 'true' : 'false' }}"
                         >
                             <i class="fas fa-balance-scale mr-2" aria-hidden="true"></i>
