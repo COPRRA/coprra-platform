@@ -22,18 +22,18 @@
             <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-6">{{ __('Featured Products') }}</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach($featuredProducts as $product)
-                    <article class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+                    <article class="product-card bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
                         @if($product->image)
                             <img src="{{ $product->image }}" alt="{{ $product->name }}" class="w-full h-48 object-cover">
                         @else
-                            <div class="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                            <div class="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center" aria-hidden="true">
                                 <i class="fas fa-image fa-3x text-gray-400"></i>
                             </div>
                         @endif
 
                         <div class="p-4">
                             <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                                <a href="{{ route('products.show', $product->slug ?? $product->id) }}" class="hover:text-blue-600 dark:hover:text-blue-400">
+                                <a href="{{ route('products.show', $product->slug ?? $product->id) }}" class="hover:text-blue-600 dark:hover:text-blue-400" aria-label="{{ __('messages.view_details_for') }} {{ $product->name }}">
                                     {{ $product->name }}
                                 </a>
                             </h3>
@@ -41,16 +41,32 @@
                                 <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ $product->brand->name }}</p>
                             @endif
                             @if(!is_null($product->price))
-                                <div class="text-xl font-bold text-blue-600 dark:text-blue-400 mb-3">
+                                <div class="text-xl font-bold text-blue-600 dark:text-blue-400 mb-3" aria-label="{{ __('messages.price') }}: ${{ number_format((float)$product->price, 2) }}">
                                     ${{ number_format((float)$product->price, 2) }}
                                 </div>
                             @endif
-                            <a href="{{ route('products.show', $product->slug ?? $product->id) }}" class="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-4 rounded transition">
+                            <a href="{{ route('products.show', $product->slug ?? $product->id) }}" class="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-4 rounded transition" aria-label="{{ __('messages.view_details_for') }} {{ $product->name }}">
                                 {{ __('View Details') }}
                             </a>
                         </div>
                     </article>
                 @endforeach
+            </div>
+        @else
+        <!-- Loading Skeletons for Featured Products -->
+        <div class="mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-6">{{ __('Featured Products') }}</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                @for($i = 0; $i < 4; $i++)
+                    <article class="skeleton-product-card skeleton bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+                        <div class="skeleton-image skeleton"></div>
+                        <div class="p-4">
+                            <div class="skeleton-text medium skeleton mb-2"></div>
+                            <div class="skeleton-text short skeleton mb-3"></div>
+                            <div class="skeleton-button skeleton"></div>
+                        </div>
+                    </article>
+                @endfor
             </div>
         </div>
         @endif
@@ -105,10 +121,10 @@
 
         <!-- Call to Action -->
         <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg shadow-lg p-8 text-center text-white">
-            <h2 class="text-3xl font-bold mb-4">{{ __('Start Comparing Prices') }}</h2>
-            <p class="text-lg mb-6">{{ __('Find the best deals across multiple stores and save money on your purchases.') }}</p>
-            <a href="{{ route('products.index') }}" class="inline-block bg-white text-blue-600 font-semibold py-3 px-8 rounded-lg hover:bg-gray-100 transition">
-                {{ __('Browse All Products') }}
+            <h2 class="text-3xl font-bold mb-4">{{ __('messages.start_comparing_prices') }}</h2>
+            <p class="text-lg mb-6">{{ __('messages.find_best_deals_description') }}</p>
+            <a href="{{ route('products.index') }}" class="inline-block bg-white text-blue-600 font-semibold py-3 px-8 rounded-lg hover:bg-gray-100 transition" aria-label="{{ __('messages.browse_all_products') }}">
+                {{ __('messages.browse_all_products') }}
             </a>
         </div>
     </div>

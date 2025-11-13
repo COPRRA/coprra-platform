@@ -11,8 +11,8 @@
 @section('content')
 <div class="py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <a href="{{ route('products.index') }}" class="inline-flex items-center text-blue-600 dark:text-blue-400 hover:underline mb-6">
-            <i class="fas fa-arrow-left mr-2"></i> Back to products
+        <a href="{{ route('products.index') }}" class="inline-flex items-center text-blue-600 dark:text-blue-400 hover:underline mb-6" aria-label="{{ __('messages.back_to_products_list') }}">
+            <i class="fas fa-arrow-left mr-2" aria-hidden="true"></i> {{ __('messages.back_to_products') }}
         </a>
 
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
@@ -46,9 +46,10 @@
 
                     @if($product->category)
                         <div class="mb-4">
-                            <span class="text-sm text-gray-500 dark:text-gray-400">Category:</span>
+                            <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('messages.category') }}:</span>
                             <a href="{{ route('categories.show', $product->category->slug) }}"
-                               class="ml-2 text-blue-600 dark:text-blue-400 hover:underline">
+                               class="ml-2 text-blue-600 dark:text-blue-400 hover:underline"
+                               aria-label="{{ __('messages.view_products_in_category') }} {{ $product->category->name }}">
                                 {{ $product->category->name }}
                             </a>
                         </div>
@@ -56,7 +57,7 @@
 
                     @if($product->brand)
                         <div class="mb-4">
-                            <span class="text-sm text-gray-500 dark:text-gray-400">Brand:</span>
+                            <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('messages.brand') }}:</span>
                             <span class="ml-2 text-gray-900 dark:text-white font-medium">{{ $product->brand->name }}</span>
                         </div>
                     @endif
@@ -64,18 +65,18 @@
                     <!-- Product Specifications -->
                     @if($product->year_of_manufacture || $product->available_colors)
                         <div class="mt-6 bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Specifications</h3>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">{{ __('messages.specifications') }}</h3>
 
                             @if($product->year_of_manufacture)
                                 <div class="flex justify-between py-2 border-b border-gray-200 dark:border-gray-600">
-                                    <span class="text-gray-600 dark:text-gray-400">Year:</span>
+                                    <span class="text-gray-600 dark:text-gray-400">{{ __('messages.year') }}:</span>
                                     <span class="font-semibold text-gray-900 dark:text-white">{{ $product->year_of_manufacture }}</span>
                                 </div>
                             @endif
 
                             @if($product->available_colors && is_array($product->available_colors) && count($product->available_colors) > 0)
                                 <div class="flex justify-between py-2">
-                                    <span class="text-gray-600 dark:text-gray-400">Colors:</span>
+                                    <span class="text-gray-600 dark:text-gray-400">{{ __('messages.colors') }}:</span>
                                     <span class="font-semibold text-gray-900 dark:text-white">{{ $product->color_list }}</span>
                                 </div>
                             @endif
@@ -84,8 +85,8 @@
 
                     <!-- Call to Action Buttons -->
                     <div class="mt-8 flex gap-4 flex-wrap">
-                        <a href="#" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition">
-                            <i class="fas fa-shopping-cart mr-2"></i>View Stores
+                        <a href="#" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition" aria-label="{{ __('messages.view_stores_selling') }} {{ $product->name }}">
+                            <i class="fas fa-shopping-cart mr-2" aria-hidden="true"></i>{{ __('messages.view_stores') }}
                         </a>
                         <button
                             type="button"
@@ -98,8 +99,10 @@
                             data-wishlist-icon-active="fas fa-heart-broken"
                             data-wishlist-class-default="bg-gray-200 hover:bg-gray-300 text-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
                             data-wishlist-class-active="bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-500/10 dark:text-red-200 dark:hover:bg-red-500/20"
+                            aria-label="{{ ($isWishlisted ?? false) ? __('messages.remove') }} {{ $product->name }} {{ __('messages.from_wishlist') }}"
+                            aria-pressed="{{ ($isWishlisted ?? false) ? 'true' : 'false' }}"
                         >
-                            <i class="wishlist-icon {{ ($isWishlisted ?? false) ? 'fas fa-heart-broken' : 'fas fa-heart' }} mr-2"></i>
+                            <i class="wishlist-icon {{ ($isWishlisted ?? false) ? 'fas fa-heart-broken' : 'fas fa-heart' }} mr-2" aria-hidden="true"></i>
                             <span class="wishlist-label">
                                 {{ ($isWishlisted ?? false) ? __('Remove from Wishlist') : __('Add to Wishlist') }}
                             </span>
@@ -116,9 +119,10 @@
                             data-compare-label-added="{{ __('Added to Compare') }}"
                             data-compare-class-default="bg-indigo-600 hover:bg-indigo-700"
                             data-compare-class-added="bg-green-600 hover:bg-green-700"
+                            aria-label="{{ $alreadyCompared ? __('messages.remove') }} {{ $product->name }} {{ __('messages.from_comparison') }}"
                             aria-pressed="{{ $alreadyCompared ? 'true' : 'false' }}"
                         >
-                            <i class="fas fa-balance-scale mr-2"></i>
+                            <i class="fas fa-balance-scale mr-2" aria-hidden="true"></i>
                             {{ $alreadyCompared ? __('Added to Compare') : __('Add to Compare') }}
                         </button>
                     </div>
@@ -128,26 +132,26 @@
 
         @if(isset($relatedProducts) && $relatedProducts->count())
             <div class="mt-12">
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Related Products</h2>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">{{ __('messages.related_products') }}</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     @foreach($relatedProducts as $rp)
-                        <article class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+                        <article class="product-card bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
                             @if($rp->image ?? $rp->image_url)
                                 <img src="{{ $rp->image ?? $rp->image_url }}" alt="{{ $rp->name }}" class="w-full h-48 object-cover">
                             @else
-                                <div class="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                <div class="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center" aria-hidden="true">
                                     <i class="fas fa-image fa-3x text-gray-400"></i>
                                 </div>
                             @endif
 
                             <div class="p-4">
                                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                                    <a href="{{ route('products.show', $rp->slug) }}" class="hover:text-blue-600 dark:hover:text-blue-400">
+                                    <a href="{{ route('products.show', $rp->slug) }}" class="hover:text-blue-600 dark:hover:text-blue-400" aria-label="{{ __('messages.view_details_for') }} {{ $rp->name }}">
                                         {{ $rp->name }}
                                     </a>
                                 </h3>
                                 @if(!is_null($rp->price))
-                                    <div class="text-xl font-bold text-blue-600 dark:text-blue-400">
+                                    <div class="text-xl font-bold text-blue-600 dark:text-blue-400" aria-label="{{ __('messages.price') }}: ${{ number_format((float)$rp->price, 2) }}">
                                         ${{ number_format((float)$rp->price, 2) }}
                                     </div>
                                 @endif
