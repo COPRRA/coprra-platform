@@ -25,6 +25,7 @@ use App\Http\Controllers\HealthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PriceAlertController;
+use App\Http\Controllers\PriceComparisonController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
@@ -147,6 +148,8 @@ Route::post('/email/verification-notification', [EmailVerificationController::cl
 Route::get('products', [ProductController::class, 'index'])->name('products.index');
 Route::get('products/search', [ProductController::class, 'search'])->name('products.search');
 Route::get('products/{slug}', [ProductController::class, 'show'])->name('products.show');
+Route::get('products/{product}/price-comparison', [PriceComparisonController::class, 'show'])->name('products.price-comparison');
+Route::post('products/{product}/price-comparison/refresh', [PriceComparisonController::class, 'refresh'])->name('products.price-comparison.refresh');
 
 // Compare Routes (public, session-based)
 Route::get('compare', [CompareController::class, 'index'])->name('compare.index');
