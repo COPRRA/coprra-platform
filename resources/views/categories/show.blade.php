@@ -1,7 +1,12 @@
 @extends('layouts.app')
 
-@section('title', ($category->name ?? 'Category') . ' - ' . config('app.name'))
-@section('description', $category->description ?? 'Browse products in this category')
+@if(isset($seoMeta))
+    @section('title', $seoMeta['title'] ?? 'Category - ' . config('app.name'))
+    @section('description', $seoMeta['description'] ?? 'Browse category products')
+@else
+    @section('title', ($category->name ?? 'Category') . ' - ' . config('app.name'))
+    @section('description', $category->description ?? 'Browse products in this category')
+@endif
 
 @section('content')
 <div class="py-8">

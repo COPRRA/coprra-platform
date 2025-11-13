@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Services\ProductService;
+use App\Services\SEOService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -14,7 +15,8 @@ use Illuminate\View\View;
 class ProductController extends Controller
 {
     public function __construct(
-        private readonly ProductService $productService
+        private readonly ProductService $productService,
+        private readonly SEOService $seoService
     ) {}
 
     /**
@@ -86,10 +88,15 @@ class ProductController extends Controller
                 ? auth()->user()->wishlist()->where('products.id', $product->id)->exists()
                 : false;
 
+            $seoMeta = $this->seoService->generateMetaData($product, 'Product');
+            $productSchema = $this->seoService->generateProductSchema($product);
+
             return view('products.show', [
                 'product' => $product,
                 'relatedProducts' => $relatedProducts,
                 'isWishlisted' => $isWishlisted,
+                'seoMeta' => $seoMeta,
+                'productSchema' => $productSchema,
             ]);
         } catch (\Throwable $e) {
             Log::error('Product show failure', [

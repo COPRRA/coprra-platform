@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Brand;
+use App\Services\SEOService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -12,6 +13,9 @@ use Illuminate\View\View;
 
 class BrandController extends Controller
 {
+    public function __construct(
+        private readonly SEOService $seoService
+    ) {}
     /**
      * Display a listing of brands.
      */
@@ -35,6 +39,36 @@ class BrandController extends Controller
             abort(500);
         }
     }
+    /**
+     * Display the specified brand.
+     */
+    public function show(string $slug): View
+    {
+        try {
+            $brand = Brand::query()->active()->where('slug', $slug)->firstOrFail();
+            
+            $products = $brand->products()
+                ->where('is_active', true)
+                ->with(['category', 'brand'])
+                ->paginate(12);
+
+            $seoMeta = $this->seoService->generateMetaData($brand, 'Brand');
+
+            return view('brands.show', [
+                'brand' => $brand,
+                'products' => $products,
+                'seoMeta' => $seoMeta,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Brand show failure', [
+                'exception' => $e->getMessage(),
+                'slug' => $slug,
+                'trace' => $e->getTraceAsString(),
+            ]);
+            abort(404);
+        }
+    }
+
     /**
      * Show the form for creating a new brand.
      */

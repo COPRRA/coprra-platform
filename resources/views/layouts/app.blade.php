@@ -5,8 +5,37 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="description" content="@yield('description', __('messages.coprra_description'))">
-    <meta name="keywords" content="@yield('keywords', 'price comparison, shopping, deals, discounts, COPRRA')">
+    @if(isset($seoMeta))
+        <meta name="description" content="{{ $seoMeta['description'] ?? @yield('description', __('messages.coprra_description')) }}">
+        <meta name="keywords" content="{{ $seoMeta['keywords'] ?? @yield('keywords', 'price comparison, shopping, deals, discounts, COPRRA') }}">
+        <meta name="robots" content="{{ $seoMeta['robots'] ?? 'index, follow' }}">
+        <link rel="canonical" href="{{ $seoMeta['canonical'] ?? url()->current() }}">
+        
+        <!-- Open Graph -->
+        <meta property="og:title" content="{{ $seoMeta['og_title'] ?? @yield('og_title', View::getSection('title') ?? config('app.name', 'COPRRA')) }}">
+        <meta property="og:description" content="{{ $seoMeta['og_description'] ?? @yield('og_description', __('messages.coprra_description')) }}">
+        <meta property="og:type" content="{{ $seoMeta['og_type'] ?? 'website' }}">
+        <meta property="og:url" content="{{ $seoMeta['og_url'] ?? url()->current() }}">
+        <meta property="og:image" content="{{ $seoMeta['og_image'] ?? @yield('og_image', asset('images/logo/coprra-logo.svg')) }}">
+        
+        <title>{{ $seoMeta['title'] ?? @yield('title', config('app.name', 'COPRRA')) }}</title>
+    @else
+        <meta name="description" content="@yield('description', __('messages.coprra_description'))">
+        <meta name="keywords" content="@yield('keywords', 'price comparison, shopping, deals, discounts, COPRRA')">
+        <meta name="author" content="{{ config('app.name', 'COPRRA') }}">
+        <meta name="theme-color" content="#0A1E40">
+        <meta name="color-scheme" content="light dark">
+
+        <!-- Open Graph -->
+        <meta property="og:title" content="@yield('og_title', View::getSection('title') ?? config('app.name', 'COPRRA'))">
+        <meta property="og:description" content="@yield('og_description', __('messages.coprra_description'))">
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="{{ url()->current() }}">
+        <meta property="og:image" content="@yield('og_image', asset('images/logo/coprra-logo.svg'))">
+
+        <title>@yield('title', config('app.name', 'COPRRA'))</title>
+    @endif
+    
     <meta name="author" content="{{ config('app.name', 'COPRRA') }}">
     <meta name="theme-color" content="#0A1E40">
     <meta name="color-scheme" content="light dark">
@@ -14,15 +43,13 @@
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="{{ asset('images/logo/coprra-icon.svg') }}">
     <link rel="alternate icon" type="image/png" href="{{ asset('favicon.png') }}">
-
-    <!-- Open Graph -->
-    <meta property="og:title" content="@yield('og_title', View::getSection('title') ?? config('app.name', 'COPRRA'))">
-    <meta property="og:description" content="@yield('og_description', __('messages.coprra_description'))">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:image" content="@yield('og_image', asset('images/logo/coprra-logo.svg'))">
-
-    <title>@yield('title', config('app.name', 'COPRRA'))</title>
+    
+    @if(isset($productSchema))
+    <!-- Product Schema (JSON-LD) -->
+    <script type="application/ld+json">
+    {!! json_encode($productSchema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+    </script>
+    @endif
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">

@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Product;
 use App\Services\Contracts\CacheServiceContract;
+use App\Services\SEOService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -13,7 +14,8 @@ use Illuminate\View\View;
 class CategoryController extends Controller
 {
     public function __construct(
-        private readonly CacheServiceContract $cache
+        private readonly CacheServiceContract $cache,
+        private readonly SEOService $seoService
     ) {}
 
     /**
@@ -87,10 +89,13 @@ class CategoryController extends Controller
                 ? auth()->user()->wishlist()->pluck('products.id')->all()
                 : [];
 
+            $seoMeta = $this->seoService->generateMetaData($category, 'Category');
+
             return view('categories.show', [
                 'category' => $category,
                 'products' => $products,
                 'wishlistProductIds' => $wishlistProductIds,
+                'seoMeta' => $seoMeta,
             ]);
         } catch (\Throwable $e) {
             Log::error('Category show failure', [
