@@ -34,20 +34,18 @@ return [
         Illuminate\Validation\ValidationException::class,
     ],
 
-    // Before send callback
-    'before_send' => function (\Sentry\Event $event): ?\Sentry\Event {
-        // Don't send events in local environment
-        if (app()->environment('local')) {
-            return null;
-        }
-
-        // Add custom context
-        $event->setContext('app', [
-            'version' => config('app.version', '1.0.0'),
-            'environment' => config('app.env'),
-        ]);
-
-        return $event;
-    },
+    // Before send callback - Commented out to allow config caching
+    // Note: Closures cannot be serialized for config cache
+    // If needed, implement as a class method instead
+    // 'before_send' => function (\Sentry\Event $event): ?\Sentry\Event {
+    //     if (app()->environment('local')) {
+    //         return null;
+    //     }
+    //     $event->setContext('app', [
+    //         'version' => config('app.version', '1.0.0'),
+    //         'environment' => config('app.env'),
+    //     ]);
+    //     return $event;
+    // },
 ];
 
