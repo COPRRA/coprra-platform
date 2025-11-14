@@ -8,10 +8,22 @@ RewriteEngine On
     Options -MultiViews
 </IfModule>
 
+# Serve static files directly (CSS, JS, images, fonts, etc.) BEFORE Laravel routing
+# If file exists in document root, serve it directly
+RewriteCond %{REQUEST_URI} \.(css|js|png|jpg|jpeg|gif|ico|svg|webp|woff|woff2|ttf|eot|json|xml|txt|map)$ [NC]
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule . - [L]
+
+# If file doesn't exist in root but exists in public directory, serve from public
+RewriteCond %{REQUEST_URI} \.(css|js|png|jpg|jpeg|gif|ico|svg|webp|woff|woff2|ttf|eot|json|xml|txt|map)$ [NC]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond public%{REQUEST_URI} -f
+RewriteRule . /public%{REQUEST_URI} [L]
+
 # Handle all dynamic routes through Laravel's front controller
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ index.php [QSA,L]
+RewriteRule ^(.*)$ public/index.php [QSA,L]
 
 # Security Headers
 <IfModule mod_headers.c>
@@ -33,6 +45,17 @@ RewriteRule ^(.*)$ index.php [QSA,L]
     AddOutputFilterByType DEFLATE application/rss+xml
     AddOutputFilterByType DEFLATE application/javascript
     AddOutputFilterByType DEFLATE application/x-javascript
+</IfModule>
+
+# MIME Types (ensure proper content types for static files)
+<IfModule mod_mime.c>
+    AddType text/css .css
+    AddType application/javascript .js
+    AddType image/svg+xml .svg .svgz
+    AddType image/webp .webp
+    AddType font/woff .woff
+    AddType font/woff2 .woff2
+    AddType application/json .json
 </IfModule>
 
 # Cache Control

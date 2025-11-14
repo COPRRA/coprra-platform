@@ -2,7 +2,7 @@
 
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
-        Options -MultiViews -Indexes
+        Options -MultiViews -Indexes +FollowSymLinks
     </IfModule>
 
     RewriteEngine On
@@ -26,9 +26,14 @@
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
 
-    # Serve static files directly (images, CSS, JS, fonts, etc.)
+    # Serve robots.txt and sitemap.xml directly
+    RewriteCond %{REQUEST_URI} ^/(robots\.txt|sitemap\.xml)$ [NC]
+    RewriteRule . - [L]
+
+    # Serve static files directly (images, CSS, JS, fonts, etc.) BEFORE Laravel routing
+    # Check URI pattern first, then verify file exists
+    RewriteCond %{REQUEST_URI} \.(css|js|png|jpg|jpeg|gif|ico|svg|webp|woff|woff2|ttf|eot|json|xml|txt|map)$ [NC]
     RewriteCond %{REQUEST_FILENAME} -f
-    RewriteCond %{REQUEST_URI} \.(css|js|png|jpg|jpeg|gif|ico|svg|webp|woff|woff2|ttf|eot|json|xml|txt)$ [NC]
     RewriteRule . - [L]
 
     # Send Requests To Front Controller...

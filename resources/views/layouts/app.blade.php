@@ -141,6 +141,9 @@
         @include('layouts.footer')
     </div>
 
+    <!-- Cookie Consent Banner -->
+    @include('components.cookie-consent')
+
     <!-- Livewire (excluded on home) -->
     @unless (request()->routeIs('home'))
     @livewireScripts
