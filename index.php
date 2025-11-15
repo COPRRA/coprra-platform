@@ -1,85 +1,71 @@
 <?php
-// 🔥 COPRRA - Advanced Index File
+/**
+ * COPRRA - Smart Root Router
+ * This file sits at the web root and intelligently routes requests
+ */
 
-// Error reporting for debugging
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+$requestUri = $_SERVER['REQUEST_URI'] ?? '';
+$requestPath = parse_url($requestUri, PHP_URL_PATH);
 
-// Check if Laravel exists
-if (file_exists(__DIR__.'/public/index.php')) {
-    // Laravel application exists, redirect to public
-    require_once __DIR__.'/public/index.php';
-} else {
-    // Show COPRRA welcome page
-    ?>
-    <!DOCTYPE html>
-    <html lang="ar" dir="rtl">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>🔥 COPRRA - مرحباً بك</title>
-        <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { 
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white; min-height: 100vh; display: flex;
-                align-items: center; justify-content: center;
-            }
-            .container { 
-                text-align: center; background: rgba(255,255,255,0.1);
-                padding: 50px; border-radius: 20px; backdrop-filter: blur(10px);
-                box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
-            }
-            h1 { font-size: 3em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
-            p { font-size: 1.2em; margin: 15px 0; }
-            .status { background: rgba(0,255,0,0.2); padding: 15px; border-radius: 10px; margin: 20px 0; }
-            .button { 
-                display: inline-block; background: #FFD700; color: #333;
-                padding: 15px 30px; border-radius: 10px; text-decoration: none;
-                margin: 10px; font-weight: bold; transition: all 0.3s;
-            }
-            .button:hover { background: #FFA500; transform: translateY(-2px); }
-            .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 30px 0; }
-            .feature { background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <h1>🔥 COPRRA</h1>
-            <div class="status">
-                <h2>✅ الموقع يعمل بنجاح!</h2>
-                <p>تم تثبيت وتكوين COPRRA بنجاح</p>
-            </div>
-            
-            <div class="features">
-                <div class="feature">
-                    <h3>🚀 سرعة عالية</h3>
-                    <p>أداء محسن ومتقدم</p>
-                </div>
-                <div class="feature">
-                    <h3>🔒 أمان متقدم</h3>
-                    <p>حماية شاملة للبيانات</p>
-                </div>
-                <div class="feature">
-                    <h3>📱 تصميم متجاوب</h3>
-                    <p>يعمل على جميع الأجهزة</p>
-                </div>
-                <div class="feature">
-                    <h3>🌐 متعدد اللغات</h3>
-                    <p>دعم العربية والإنجليزية</p>
-                </div>
-            </div>
-            
-            <p>🎉 تم النشر بنجاح في: <?php echo date('Y-m-d H:i:s'); ?></p>
-            
-            <div>
-                <a href="/advanced_database_setup.php" class="button">🗄️ إعداد قاعدة البيانات</a>
-                <a href="/phpinfo.php" class="button">🔧 معلومات الخادم</a>
-            </div>
-        </div>
-    </body>
-    </html>
-    <?php
+// Remove query string and normalize
+$requestPath = strtok($requestPath, '?');
+
+// Define public directory path
+$publicDir = __DIR__ . '/public';
+
+// Check if this is a request for a static file
+$staticExtensions = ['css', 'js', 'png', 'jpg', 'jpeg', 'gif', 'ico', 'svg', 'webp', 'woff', 'woff2', 'ttf', 'eot', 'json', 'map', 'txt', 'xml', 'pdf'];
+$pathInfo = pathinfo($requestPath);
+$extension = strtolower($pathInfo['extension'] ?? '');
+
+if (in_array($extension, $staticExtensions)) {
+    // Build file path in public directory
+    $filePath = $publicDir . $requestPath;
+    
+    if (file_exists($filePath) && is_file($filePath) && is_readable($filePath)) {
+        // Determine MIME type
+        $mimeTypes = [
+            'css' => 'text/css',
+            'js' => 'application/javascript',
+            'json' => 'application/json',
+            'png' => 'image/png',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'gif' => 'image/gif',
+            'ico' => 'image/x-icon',
+            'svg' => 'image/svg+xml',
+            'webp' => 'image/webp',
+            'woff' => 'font/woff',
+            'woff2' => 'font/woff2',
+            'ttf' => 'font/ttf',
+            'eot' => 'application/vnd.ms-fontobject',
+            'map' => 'application/json',
+            'txt' => 'text/plain',
+            'xml' => 'application/xml',
+            'pdf' => 'application/pdf',
+        ];
+        
+        $mimeType = $mimeTypes[$extension] ?? 'application/octet-stream';
+        
+        // Clear any output buffers
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        
+        // Send headers
+        http_response_code(200);
+        header('Content-Type: ' . $mimeType);
+        header('Content-Length: ' . filesize($filePath));
+        header('Cache-Control: public, max-age=31536000');
+        header('Access-Control-Allow-Origin: *');
+        
+        // Send file
+        readfile($filePath);
+        exit(0);
+    }
 }
-?>
+
+// Not a static file or file doesn't exist - pass to Laravel
+// Change to public directory and include Laravel's index.php
+chdir($publicDir);
+require $publicDir . '/index.php';

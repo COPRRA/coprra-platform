@@ -1,85 +1,23 @@
-# 🔥 COPRRA - Advanced .htaccess Configuration
-
-# Enable Rewrite Engine (root dispatcher)
+# COPRRA - Ultimate .htaccess Fix for Document Root Issue
 RewriteEngine On
 
-# Ensure Apache does not use MultiViews content negotiation (prevents false 404s on routes like /products)
-<IfModule mod_negotiation.c>
-    Options -MultiViews
-</IfModule>
+# ============================================
+# PRIORITY 1: Serve static files from public/ FIRST
+# ============================================
+# For any request to static files, rewrite to public/ directory
+RewriteCond %{REQUEST_URI} ^/build/ [NC]
+RewriteCond %{DOCUMENT_ROOT}/public%{REQUEST_URI} -f
+RewriteRule ^(.*)$ public/$1 [L]
 
-# Serve static files directly (CSS, JS, images, fonts, etc.) BEFORE Laravel routing
-# If file exists in document root, serve it directly
-RewriteCond %{REQUEST_URI} \.(css|js|png|jpg|jpeg|gif|ico|svg|webp|woff|woff2|ttf|eot|json|xml|txt|map)$ [NC]
-RewriteCond %{REQUEST_FILENAME} -f
-RewriteRule . - [L]
+# ============================================
+# PRIORITY 2: Serve other static assets
+# ============================================
+RewriteCond %{REQUEST_URI} \.(css|js|png|jpg|jpeg|gif|ico|svg|webp|woff|woff2|ttf|eot|json|map|txt|xml|pdf)$ [NC]
+RewriteCond %{DOCUMENT_ROOT}/public%{REQUEST_URI} -f
+RewriteRule ^(.*)$ public/$1 [L]
 
-# If file doesn't exist in root but exists in public directory, serve from public
-RewriteCond %{REQUEST_URI} \.(css|js|png|jpg|jpeg|gif|ico|svg|webp|woff|woff2|ttf|eot|json|xml|txt|map)$ [NC]
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond public%{REQUEST_URI} -f
-RewriteRule . /public%{REQUEST_URI} [L]
-
-# Handle all dynamic routes through Laravel's front controller
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ public/index.php [QSA,L]
-
-# Security Headers
-<IfModule mod_headers.c>
-    Header always set X-Content-Type-Options nosniff
-    Header always set X-Frame-Options DENY
-    Header always set X-XSS-Protection "1; mode=block"
-    Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
-    Header always set Referrer-Policy "strict-origin-when-cross-origin"
-</IfModule>
-
-# Compression
-<IfModule mod_deflate.c>
-    AddOutputFilterByType DEFLATE text/plain
-    AddOutputFilterByType DEFLATE text/html
-    AddOutputFilterByType DEFLATE text/xml
-    AddOutputFilterByType DEFLATE text/css
-    AddOutputFilterByType DEFLATE application/xml
-    AddOutputFilterByType DEFLATE application/xhtml+xml
-    AddOutputFilterByType DEFLATE application/rss+xml
-    AddOutputFilterByType DEFLATE application/javascript
-    AddOutputFilterByType DEFLATE application/x-javascript
-</IfModule>
-
-# MIME Types (ensure proper content types for static files)
-<IfModule mod_mime.c>
-    AddType text/css .css
-    AddType application/javascript .js
-    AddType image/svg+xml .svg .svgz
-    AddType image/webp .webp
-    AddType font/woff .woff
-    AddType font/woff2 .woff2
-    AddType application/json .json
-</IfModule>
-
-# Cache Control
-<IfModule mod_expires.c>
-    ExpiresActive on
-    ExpiresByType text/css "access plus 1 year"
-    ExpiresByType application/javascript "access plus 1 year"
-    ExpiresByType image/png "access plus 1 year"
-    ExpiresByType image/jpg "access plus 1 year"
-    ExpiresByType image/jpeg "access plus 1 year"
-    ExpiresByType image/gif "access plus 1 year"
-    ExpiresByType image/svg+xml "access plus 1 year"
-</IfModule>
-
-# PHP Settings
-<IfModule mod_php.c>
-    php_value upload_max_filesize 64M
-    php_value post_max_size 64M
-    php_value memory_limit 256M
-    php_value max_execution_time 300
-    php_value max_input_vars 3000
-</IfModule>
-
-# Error Pages
-ErrorDocument 404 /index.php
-ErrorDocument 403 /index.php
-ErrorDocument 500 /index.php
+# ============================================
+# PRIORITY 3: Route everything else to public/index.php
+# ============================================
+RewriteCond %{REQUEST_URI} !^/public/
+RewriteRule ^(.*)$ public/$1 [L]
