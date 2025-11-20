@@ -126,6 +126,14 @@ Route::get('/dashboard', static function () {
     return redirect()->route('home');
 })->middleware('auth')->name('dashboard');
 
+Route::get('/debug/session-driver', static function () {
+    return response()->json([
+        'driver' => config('session.driver'),
+        'store' => config('session.store'),
+        'cache_default' => config('cache.default'),
+    ]);
+});
+
 // Authentication routes - Using Controllers with Form Requests and Rate Limiting
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1')->name('login.post');
@@ -345,4 +353,3 @@ if (config('app.env') !== 'production') {
         throw new Exception('Sentry test exception');
     });
 }
-
