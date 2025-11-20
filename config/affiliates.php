@@ -15,7 +15,7 @@ return [
     'stores' => [
         'amazon' => [
             'name' => 'Amazon',
-            'logo' => asset('images/stores/amazon.png'),
+            'logo' => 'images/stores/amazon.png',
             'base_url' => 'https://www.amazon.com',
             'affiliate_tag' => env('AMAZON_AFFILIATE_TAG', 'coprra-20'),
             'tag_parameter' => 'tag',
@@ -23,7 +23,7 @@ return [
         ],
         'ebay' => [
             'name' => 'eBay',
-            'logo' => asset('images/stores/ebay.png'),
+            'logo' => 'images/stores/ebay.png',
             'base_url' => 'https://www.ebay.com',
             'affiliate_tag' => env('EBAY_AFFILIATE_TAG', 'coprra'),
             'tag_parameter' => 'ref',
@@ -31,7 +31,7 @@ return [
         ],
         'noon' => [
             'name' => 'Noon',
-            'logo' => asset('images/stores/noon.png'),
+            'logo' => 'images/stores/noon.png',
             'base_url' => 'https://www.noon.com',
             'affiliate_tag' => env('NOON_AFFILIATE_TAG', 'coprra'),
             'tag_parameter' => 'ref',
@@ -39,7 +39,7 @@ return [
         ],
         'jumia' => [
             'name' => 'Jumia',
-            'logo' => asset('images/stores/jumia.png'),
+            'logo' => 'images/stores/jumia.png',
             'base_url' => 'https://www.jumia.com',
             'affiliate_tag' => env('JUMIA_AFFILIATE_TAG', 'coprra'),
             'tag_parameter' => 'ref',
