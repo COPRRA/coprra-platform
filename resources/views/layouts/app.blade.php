@@ -150,6 +150,9 @@
     @livewireScripts
     @endunless
 
+    <!-- Theme Switcher Script -->
+    <script src="{{ asset('js/theme-switcher.js') }}" defer></script>
+
     <!-- Additional JS -->
     @stack('scripts')
 </body>

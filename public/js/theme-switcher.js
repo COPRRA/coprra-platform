@@ -108,21 +108,30 @@
             }
 
             // Handle theme option buttons (new dropdown style)
-            document.querySelectorAll('[data-theme-option]').forEach(button => {
-                button.addEventListener('click', (e) => {
+            // Use event delegation to handle dynamically created elements
+            document.addEventListener('click', (e) => {
+                const button = e.target.closest('[data-theme-option]');
+                if (button) {
+                    e.preventDefault();
                     e.stopPropagation();
-                    const selectedTheme = e.currentTarget.getAttribute('data-theme-option');
-                    this.saveTheme(selectedTheme);
-                    this.applyTheme(selectedTheme);
-                    this.updateToggleUI(selectedTheme);
-                    // Close dropdown
+                    const selectedTheme = button.getAttribute('data-theme-option');
+                    ThemeSwitcher.saveTheme(selectedTheme);
+                    ThemeSwitcher.applyTheme(selectedTheme);
+                    ThemeSwitcher.updateToggleUI(selectedTheme);
+                    // Close dropdown (handle both Alpine.js and vanilla JS)
                     const dropdown = themeToggle?.closest('.relative');
-                    const menu = dropdown?.querySelector('[x-show]') || dropdown?.querySelector('.absolute');
-                    if (menu) {
-                        menu.style.display = 'none';
-                        menu.setAttribute('hidden', '');
+                    if (dropdown) {
+                        const menu = dropdown.querySelector('[x-show]') || dropdown.querySelector('.absolute');
+                        if (menu) {
+                            menu.style.display = 'none';
+                            menu.setAttribute('hidden', '');
+                            // Also close Alpine.js dropdown if present
+                            if (window.Alpine && dropdown.__x) {
+                                dropdown.__x.$data.themeOpen = false;
+                            }
+                        }
                     }
-                });
+                }
             });
 
             // Handle select dropdown (desktop)
