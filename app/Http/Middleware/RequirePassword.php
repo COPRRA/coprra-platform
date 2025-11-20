@@ -1,0 +1,54 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Middleware;
+
+use App\Models\User;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+class RequirePassword
+{
+    public function handle(Request $request, \Closure $next): Response
+    {
+        if ($this->isPasswordConfirmed($request)) {
+            return $next($request);
+        }
+
+        return $this->responseForMissingPasswordConfirmation($request);
+    }
+
+    private function isPasswordConfirmed(Request $request): bool
+    {
+        $user = $request->user();
+
+        if (! $this->hasConfirmedPassword($user)) {
+            return false;
+        }
+
+        $lastConfirmation = \is_string($user->password_confirmed_at)
+            ? strtotime($user->password_confirmed_at)
+            : $user->password_confirmed_at->timestamp;
+
+        $timeout = config('auth.password_timeout', 10800);
+
+        return time() - $lastConfirmation <= $timeout;
+    }
+
+    private function hasConfirmedPassword(?User $user): bool
+    {
+        return $user && isset($user->password_confirmed_at) && $user->password_confirmed_at;
+    }
+
+    private function responseForMissingPasswordConfirmation(Request $request): JsonResponse|RedirectResponse
+    {
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Password confirmation required'], 423);
+        }
+
+        return redirect('/password/confirm');
+    }
+}

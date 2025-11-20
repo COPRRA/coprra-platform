@@ -1,0 +1,222 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers;
+
+use App\Services\Backup\BackupFileService;
+use App\Services\Backup\BackupListService;
+use App\Services\Backup\BackupValidator;
+use App\Services\Backup\RestoreService;
+use App\Services\BackupService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+
+class BackupController extends Controller
+{
+    private readonly BackupService $backupService;
+
+    private readonly BackupValidator $backupValidator;
+
+    private readonly BackupListService $backupListService;
+
+    private readonly BackupFileService $backupFileService;
+
+    private readonly RestoreService $restoreService;
+
+    private readonly string $backupPath;
+
+    public function __construct()
+    {
+        $this->backupPath = storage_path('app/backups');
+        $this->backupService = app(BackupService::class);
+        $this->backupValidator = new BackupValidator();
+        $this->backupListService = new BackupListService($this->backupPath);
+        $this->backupFileService = new BackupFileService($this->backupPath);
+        $this->restoreService = new RestoreService($this->backupPath);
+    }
+
+    /**
+     * Get all backups.
+     */
+    public function index(): JsonResponse
+    {
+        $this->authorize('viewAny', 'App\Models\User');
+
+        try {
+            $backups = $this->backupListService->getBackupsList();
+
+            return $this->createSuccessResponse($backups, 'Backups retrieved successfully');
+        } catch (\Exception $e) {
+            return $this->handleError($e, 'getting backups');
+        }
+    }
+
+    /**
+     * Create a new backup.
+     */
+    public function create(Request $request): JsonResponse
+    {
+        $this->authorize('create', 'App\Models\User');
+
+        try {
+            $backupConfig = $this->backupValidator->validateBackupRequest($request);
+            $type = $backupConfig['type'] ?? 'full';
+
+            if ('database' === $type) {
+                $backup = $this->backupService->createDatabaseBackup();
+            } elseif ('files' === $type) {
+                $backup = $this->backupService->createFilesBackup();
+            } else {
+                $backup = $this->backupService->createFullBackup();
+            }
+
+            return $this->createSuccessResponse($backup, 'Backup created successfully');
+        } catch (\Exception $e) {
+            return $this->handleError($e, 'creating backup');
+        }
+    }
+
+    /**
+     * Download a backup.
+     */
+    public function download(string $id): JsonResponse
+    {
+        $this->authorize('download', 'App\Models\User');
+
+        try {
+            $backup = $this->backupListService->getBackupById($id);
+
+            if (! $backup) {
+                return $this->createNotFoundResponse('Backup not found');
+            }
+
+            if (! $this->backupFileService->backupFileExists($backup)) {
+                return $this->createNotFoundResponse('Backup file not found');
+            }
+
+            return $this->createDownloadResponse($backup);
+        } catch (\Exception $e) {
+            return $this->handleError($e, 'downloading backup');
+        }
+    }
+
+    /**
+     * Delete a backup.
+     */
+    public function destroy(string $id): JsonResponse
+    {
+        $this->authorize('delete', 'App\Models\User');
+
+        try {
+            $backup = $this->backupListService->getBackupById($id);
+
+            if (! $backup) {
+                return $this->createNotFoundResponse('Backup not found');
+            }
+
+            $this->backupFileService->deleteBackupFile($backup, $id);
+
+            return $this->createSuccessResponse([], 'Backup deleted successfully');
+        } catch (\Exception $e) {
+            return $this->handleError($e, 'deleting backup');
+        }
+    }
+
+    /**
+     * Restore from backup.
+     */
+    public function restore(string $id): JsonResponse
+    {
+        $this->authorize('restore', 'App\Models\User');
+
+        try {
+            $backup = $this->backupListService->getBackupById($id);
+
+            if (! $backup) {
+                return $this->createNotFoundResponse('Backup not found');
+            }
+
+            $result = $this->restoreService->restoreFromBackup($backup);
+
+            return $result['success']
+                ? $this->success($result, $result['message'])
+                : $this->error($result['message']);
+        } catch (\Exception $e) {
+            return $this->handleError($e, 'restoring backup');
+        }
+    }
+
+    /**
+     * Get backup statistics.
+     */
+    public function statistics(): JsonResponse
+    {
+        try {
+            $stats = $this->backupListService->calculateBackupStatistics();
+
+            return $this->createSuccessResponse($stats, 'Backup statistics retrieved successfully');
+        } catch (\Exception $e) {
+            return $this->handleError($e, 'getting backup statistics');
+        }
+    }
+
+    /**
+     * Create success response.
+     *
+     * @param array<string, mixed> $data
+     */
+    private function createSuccessResponse(array $data, string $message): JsonResponse
+    {
+        return $this->success($data, $message);
+    }
+
+    /**
+     * Create not found response.
+     */
+    private function createNotFoundResponse(string $message): JsonResponse
+    {
+        return $this->notFound($message);
+    }
+
+    /**
+     * Create download response for backup.
+     *
+     * @param  array<string, string|int|* @method static \App\Models\Brand create(array<string, string|bool|null>  $backup
+     */
+    private function createDownloadResponse(array $backup): JsonResponse
+    {
+        return $this->success([
+            'filename' => $backup['filename'],
+            'download_url' => $this->buildDownloadUrl($backup),
+            'size' => $this->backupFileService->getBackupFileSize($backup),
+            'expires_at' => now()->addHours(24)->toISOString(),
+        ], 'Backup ready for download');
+    }
+
+    /**
+     * Build download URL for backup.
+     *
+     * @param  array<string, string|int|* @method static \App\Models\Brand create(array<string, string|bool|null>  $backup
+     */
+    private function buildDownloadUrl(array $backup): string
+    {
+        $filename = \is_string($backup['filename'] ?? '') ? $backup['filename'] ?? '' : '';
+
+        return url('storage/backups/'.$filename);
+    }
+
+    /**
+     * Handle errors and return error response.
+     */
+    private function handleError(\Exception $e, string $operation): JsonResponse
+    {
+        Log::error("Error {$operation}: ".$e->getMessage());
+
+        return $this->serverError(
+            "Failed to {$operation}",
+            ['error' => $e->getMessage()]
+        );
+    }
+}

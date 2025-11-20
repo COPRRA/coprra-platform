@@ -1,0 +1,16 @@
+// Simple global store with get/set helpers
+export const Store = {
+  state: {},
+  set(key, value) {
+    this.state[key] = value;
+  },
+  get(key) {
+    return this.state[key];
+  },
+  has(key) {
+    return Object.prototype.hasOwnProperty.call(this.state, key);
+  },
+  remove(key) {
+    delete this.state[key];
+  },
+};

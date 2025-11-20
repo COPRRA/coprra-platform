@@ -1,0 +1,317 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Services\StoreAdapters;
+
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
+use Illuminate\Http\Client\Factory as HttpFactory;
+use Psr\Log\LoggerInterface;
+
+/**
+ * Amazon store adapter.
+ *
+ * Note: This is a basic implementation. Fofinal r production use,
+ * you should use Amazon Product Advertising API.
+ */
+final class AmazonAdapter extends StoreAdapter
+{
+    private readonly string $apiKey;
+
+    private readonly string $apiSecret;
+
+    private readonly string $region;
+
+    public function __construct(HttpFactory $http, CacheRepository $cache, LoggerInterface $logger)
+    {
+        parent::__construct($http, $cache, $logger);
+        $apiKey = config('services.amazon.api_key', '');
+        $this->apiKey = \is_string($apiKey) ? $apiKey : '';
+
+        $apiSecret = config('services.amazon.api_secret', '');
+        $this->apiSecret = \is_string($apiSecret) ? $apiSecret : '';
+
+        $region = config('services.amazon.region', 'us-east-1');
+        $this->region = \is_string($region) ? $region : 'us-east-1';
+    }
+
+    /**
+     * @psalm-return 'Amazon'
+     */
+    public function getStoreName(): string
+    {
+        return 'Amazon';
+    }
+
+    /**
+     * @psalm-return 'amazon'
+     */
+    #[\Override]
+    public function getStoreIdentifier(): string
+    {
+        return 'amazon';
+    }
+
+    #[\Override]
+    public function isAvailable(): bool
+    {
+        // Always return true for dummy data mode
+        return true;
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    #[\Override]
+    public function fetchProduct(string $productIdentifier): ?array
+    {
+        // Check cache first
+        /** @var array<string, mixed>|null $cached */
+        $cached = $this->getCachedProduct($productIdentifier);
+        if ($cached) {
+            return $cached;
+        }
+
+        // Return dummy data for demonstration
+        $dummyData = $this->generateDummyData($productIdentifier);
+        if ($dummyData) {
+            $normalized = $this->normalizeAmazonData($dummyData);
+            $this->cacheProduct($productIdentifier, $normalized, 3600);
+
+            return $normalized;
+        }
+
+        return null;
+    }
+
+    #[\Override]
+    public function searchProducts(string $query, array $options = []): array
+    {
+        $limit = $options['limit'] ?? 10;
+
+        return $this->search($query, $limit);
+    }
+
+    public function search(string $query, int $limit = 10): array
+    {
+        if (! $this->isAvailable()) {
+            return [];
+        }
+
+        // Amazon Product Advertising API search implementation
+        // Note: This requires proper API credentials and signing
+        try {
+            $searchParams = [
+                'Keywords' => $query,
+                'SearchIndex' => 'All',
+                'ItemCount' => min($limit, 10), // Amazon API limit
+                'ResponseGroup' => 'ItemAttributes,Images,Offers',
+            ];
+
+            // In production, this would make actual API calls
+            // For now, return empty array as API integration requires credentials
+            $this->logger->info('Amazon search requested', [
+                'query' => $query,
+                'limit' => $limit,
+                'status' => 'not_implemented_requires_credentials',
+            ]);
+
+            return [];
+        } catch (\Exception $e) {
+            $this->logger->error('Amazon search failed', [
+                'query' => $query,
+                'error' => $e->getMessage(),
+            ]);
+
+            return [];
+        }
+    }
+
+    public function validateIdentifier(string $identifier): bool
+    {
+        // Amazon ASIN is 10 characters (alphanumeric)
+        return 1 === preg_match('/^[A-Z0-9]{10}$/', $identifier);
+    }
+
+    #[\Override]
+    public function getProductUrl(string $identifier): string
+    {
+        $domain = $this->getAmazonDomain();
+
+        return "https://www.{$domain}/dp/{$identifier}";
+    }
+
+    public function getRateLimits(): array
+    {
+        return [
+            'requests_per_minute' => 10,
+            'requests_per_hour' => 500,
+            'requests_per_day' => 8640,
+        ];
+    }
+
+    /**
+     * Fetch product from Amazon API.
+     *
+     * @return array<array<array<array<array<float|string>|string>|float|string>|int>|string>|null
+     *
+     * @psalm-return array{ASIN: 'B07VGRJDFY', DetailPageURL: 'https://www.amazon.com/dp/B07VGRJDFY', ItemInfo: array{Title: array{DisplayValues: list{'Echo Dot (4th Gen) | Smart speaker with Alexa'}}, Features: array{DisplayValues: list{'Meet Echo Dot - Our most popular smart speaker with a fabric design. It is our most compact smart speaker that fits perfectly into small spaces.'}}}, Images: array{Primary: array{Large: array{URL: 'https://m.media-amazon.com/images/I/6182S7MYC2L._AC_SL1000_.jpg'}}}, ByLineInfo: array{Brand: array{DisplayValue: 'Amazon'}}, Offers: array{Listings: list{array{Price: array{Amount: float, Currency: 'USD'}, Availability: array{Type: 'InStock'}}}}, CustomerReviews: array{StarRating: array{Value: float}, Count: 1054231}, BrowseNodeInfo: array{BrowseNodes: list{array{DisplayName: 'Electronics'}}}, ParentASIN: 'B07VGRJDFY'}|null
+     */
+    private function fetchFromAmazonAPI(string $asin): ?array
+    {
+        // Amazon Product Advertising API implementation
+        // This requires signing requests with AWS Signature Version 4
+        try {
+            // In production, this would implement proper AWS signature and API call
+            $this->logger->info('Amazon API fetch requested', [
+                'asin' => $asin,
+                'status' => 'mock_response_for_development',
+            ]);
+        } catch (\Exception $e) {
+            $this->logger->error('Amazon API fetch failed', [
+                'asin' => $asin,
+                'error' => $e->getMessage(),
+            ]);
+
+            return null;
+        }
+        if ('B07VGRJDFY' === $asin) {
+            return [
+                'ASIN' => 'B07VGRJDFY',
+                'DetailPageURL' => 'https://www.amazon.com/dp/B07VGRJDFY',
+                'ItemInfo' => [
+                    'Title' => ['DisplayValues' => ['Echo Dot (4th Gen) | Smart speaker with Alexa']],
+                    'Features' => ['DisplayValues' => [
+                        'Meet Echo Dot - Our most popular smart speaker with a fabric design. It is our most compact smart speaker that fits perfectly into small spaces.',
+                    ],
+                    ],
+                ],
+                'Images' => [
+                    'Primary' => [
+                        'Large' => ['URL' => 'https://m.media-amazon.com/images/I/6182S7MYC2L._AC_SL1000_.jpg'],
+                    ],
+                ],
+                'ByLineInfo' => ['Brand' => ['DisplayValue' => 'Amazon']],
+                'Offers' => [
+                    'Listings' => [
+                        [
+                            'Price' => ['Amount' => 39.99, 'Currency' => 'USD'],
+                            'Availability' => ['Type' => 'InStock'],
+                        ],
+                    ],
+                ],
+                'CustomerReviews' => [
+                    'StarRating' => ['Value' => 4.7],
+                    'Count' => 1054231,
+                ],
+                'BrowseNodeInfo' => [
+                    'BrowseNodes' => [['DisplayName' => 'Electronics']],
+                ],
+                'ParentASIN' => 'B07VGRJDFY',
+            ];
+        }
+
+        $this->lastError = 'Amazon Product Advertising API requires credentials and approval.';
+
+        throw new \RuntimeException(
+            'Amazon Product Advertising API integration requires:'.\PHP_EOL
+            .'1. Amazon Associates account approval'.\PHP_EOL
+            .'2. Product Advertising API credentials (Access Key & Secret)'.\PHP_EOL
+            .'3. Compliance with Amazon API License Agreement'.\PHP_EOL
+            .'4. Associate Tag assignment'.\PHP_EOL.\PHP_EOL
+            .'Status: NOT IMPLEMENTED - Apply at https://affiliate-program.amazon.com'.\PHP_EOL
+            .'Note: Amazon has strict approval requirements and usage limits.'
+        );
+    }
+
+    /**
+     * Normalize Amazon product data.
+     *
+     * @param array<string, mixed> $amazonData
+     *
+     * @return array<array|scalar|* @method static \App\Models\Brand create(array<string, string|bool|null>
+     *
+     * @psalm-return array{name: array|scalar, price: float, currency: array|scalar, url: array|scalar, image_url: array|scalar|null, availability: array|scalar, rating: float|null, reviews_count: int|null, description: array|scalar|null, brand: array|scalar|null, category: array|scalar|null, metadata: array|scalar}
+     */
+    private function normalizeAmazonData(array $amazonData): array
+    {
+        return $this->normalizeProductData([
+            'name' => data_get($amazonData, 'ItemInfo.Title.DisplayValue', ''),
+            'price' => data_get($amazonData, 'Offers.Listings.0.Price.Amount', 0),
+            'currency' => data_get($amazonData, 'Offers.Listings.0.Price.Currency', 'USD'),
+            'url' => data_get($amazonData, 'DetailPageURL', ''),
+            'image_url' => data_get($amazonData, 'Images.Primary.Large.URL'),
+            'availability' => data_get($amazonData, 'Offers.Listings.0.Availability.Type', 'unknown'),
+            'rating' => data_get($amazonData, 'CustomerReviews.StarRating.Value'),
+            'reviews_count' => data_get($amazonData, 'CustomerReviews.Count'),
+            'description' => data_get($amazonData, 'ItemInfo.Features.DisplayValues.0'),
+            'brand' => data_get($amazonData, 'ItemInfo.ByLineInfo.Brand.DisplayValue'),
+            'category' => data_get($amazonData, 'BrowseNodeInfo.BrowseNodes.0.DisplayName'),
+            'metadata' => [
+                'asin' => data_get($amazonData, 'ASIN', ''),
+                'parent_asin' => data_get($amazonData, 'ParentASIN'),
+            ],
+        ]);
+    }
+
+    /**
+     * Get Amazon domain based on region.
+     */
+    private function getAmazonDomain(): string
+    {
+        return match ($this->region) {
+            'us-east-1' => 'amazon.com',
+            'eu-west-1' => 'amazon.co.uk',
+            'eu-central-1' => 'amazon.de',
+            'ap-northeast-1' => 'amazon.co.jp',
+            default => 'amazon.com',
+        };
+    }
+
+    /**
+     * Generate dummy product data for demonstration.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function generateDummyData(string $productIdentifier): ?array
+    {
+        // Generate realistic dummy data based on product identifier
+        $basePrice = 99.99 + (crc32($productIdentifier) % 500);
+        $price = round($basePrice, 2);
+
+        return [
+            'ASIN' => $productIdentifier,
+            'DetailPageURL' => "https://www.amazon.com/dp/{$productIdentifier}",
+            'ItemInfo' => [
+                'Title' => ['DisplayValues' => ["Product {$productIdentifier} - Premium Quality"]],
+                'Features' => ['DisplayValues' => [
+                    'High-quality product with excellent features',
+                    'Durable construction and reliable performance',
+                    'Great value for money',
+                ]],
+            ],
+            'Images' => [
+                'Primary' => [
+                    'Large' => ['URL' => 'https://via.placeholder.com/500x500?text=Amazon+Product'],
+                ],
+            ],
+            'ByLineInfo' => ['Brand' => ['DisplayValue' => 'Premium Brand']],
+            'Offers' => [
+                'Listings' => [
+                    [
+                        'Price' => ['Amount' => $price, 'Currency' => 'USD'],
+                        'Availability' => ['Type' => 'InStock'],
+                    ],
+                ],
+            ],
+            'CustomerReviews' => [
+                'StarRating' => ['Value' => 4.0 + (crc32($productIdentifier) % 20) / 10],
+                'Count' => 1000 + (crc32($productIdentifier) % 5000),
+            ],
+            'BrowseNodeInfo' => [
+                'BrowseNodes' => [['DisplayName' => 'Electronics']],
+            ],
+            'ParentASIN' => $productIdentifier,
+        ];
+    }
+}

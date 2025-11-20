@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="200" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Cobra Graphic with Gradient -->
+  <defs>
+    <linearGradient id="cobraGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#60A5FA;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1E40AF;stop-opacity:1" />
+    </linearGradient>
+
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#60A5FA;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1E40AF;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Cobra Snake -->
+  <g id="cobra">
+    <!-- Hood (spread) -->
+    <path d="M 180 30 Q 160 35, 150 45 Q 145 50, 150 55 L 165 50 Z" fill="url(#cobraGradient)" opacity="0.7"/>
+    <path d="M 220 30 Q 240 35, 250 45 Q 255 50, 250 55 L 235 50 Z" fill="url(#cobraGradient)" opacity="0.7"/>
+
+    <!-- Head -->
+    <ellipse cx="200" cy="45" rx="25" ry="18" fill="url(#cobraGradient)"/>
+
+    <!-- Eye -->
+    <circle cx="195" cy="42" r="3" fill="#60A5FA"/>
+
+    <!-- Mouth/Fangs -->
+    <path d="M 193 50 L 191 54 M 207 50 L 209 54" stroke="#60A5FA" stroke-width="2"/>
+
+    <!-- Body (S-shape coil) -->
+    <path d="M 200 60 Q 220 80, 210 100 Q 200 120, 190 105 Q 180 90, 195 75 L 200 60"
+          fill="url(#cobraGradient)" stroke="#1E40AF" stroke-width="2"/>
+
+    <!-- Texture lines on body -->
+    <line x1="195" y1="70" x2="205" y2="70" stroke="#0A1E40" stroke-width="1" opacity="0.3"/>
+    <line x1="197" y1="85" x2="207" y2="85" stroke="#0A1E40" stroke-width="1" opacity="0.3"/>
+    <line x1="193" y1="95" x2="203" y2="95" stroke="#0A1E40" stroke-width="1" opacity="0.3"/>
+  </g>
+
+  <!-- COPRRA Text -->
+  <text x="200" y="145" font-family="Poppins, Arial" font-size="48" font-weight="700"
+        fill="url(#textGradient)" text-anchor="middle" letter-spacing="2">
+    COPRRA
+  </text>
+
+  <!-- Diamond in O -->
+  <g transform="translate(162, 120) rotate(45)">
+    <rect x="0" y="0" width="8" height="8" fill="#60A5FA"/>
+  </g>
+
+  <!-- COMPARE PRICE RANGES text -->
+  <text x="200" y="175" font-family="Poppins, Arial" font-size="12" font-weight="400"
+        fill="#9CA3AF" text-anchor="middle" letter-spacing="3">
+    COMPARE PRICE RANGES
+  </text>
+
+  <!-- Arabic Tagline -->
+  <text x="200" y="192" font-family="Cairo, Arial" font-size="14" font-weight="400"
+        fill="#6B7280" text-anchor="middle">
+    قارن. اختر. وفر.
+  </text>
+</svg>

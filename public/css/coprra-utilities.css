@@ -1,0 +1,142 @@
+/* ─────────────────────────────────────────────────────────────
+   COPRRA Utilities
+   Shared layout and component helpers (framework-agnostic)
+   ───────────────────────────────────────────────────────────── */
+
+/* Layout Container */
+.page-wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: var(--space-6);
+  padding-right: var(--space-6);
+}
+
+/* Section Card Wrapper */
+.section-card {
+  background: var(--coprra-white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  box-shadow: var(--shadow-md);
+}
+
+/* Responsive Grid */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-6);
+}
+
+/* Section Titles */
+.section-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+  font-family: var(--font-primary);
+  color: var(--coprra-navy);
+}
+.section-title-accent {
+  color: var(--coprra-sky-blue);
+  font-weight: 600;
+}
+
+/* Generic Card (Bootstrap-like) */
+.card {
+  background: var(--coprra-white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+}
+.card:hover {
+  border-color: var(--coprra-sky-blue);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
+}
+.card-title {
+  font-family: var(--font-primary);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--coprra-navy);
+}
+.card-text {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--gray-600);
+}
+
+/* Buttons (Bootstrap-like) */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 10px 18px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-primary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition-base);
+}
+.btn i { margin-inline-end: var(--space-2); }
+
+.btn-primary {
+  background: var(--gradient-primary);
+  color: var(--coprra-white);
+  box-shadow: var(--shadow-md);
+}
+.btn-primary:hover { background: var(--gradient-hover); box-shadow: var(--shadow-lg); }
+
+.btn-secondary {
+  background: transparent;
+  color: var(--coprra-navy);
+  border: 2px solid var(--coprra-sky-blue);
+}
+.btn-secondary:hover { background: var(--coprra-sky-blue); color: var(--coprra-navy); }
+
+.btn-outline-primary {
+  background: transparent;
+  color: var(--coprra-navy);
+  border: 2px solid var(--coprra-navy);
+}
+.btn-outline-primary:hover { background: var(--coprra-navy); color: var(--coprra-white); }
+
+.btn-light {
+  background: var(--coprra-white);
+  color: var(--coprra-navy);
+  border: 1px solid var(--gray-200);
+}
+.btn-light:hover { box-shadow: var(--shadow-md); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--coprra-navy);
+}
+.btn-ghost:hover { background: rgba(166, 200, 255, 0.1); }
+
+/* Badges (minimal) */
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+.badge-primary { background: var(--coprra-sky-blue); color: var(--coprra-navy); }
+.badge-success { background: var(--color-success); color: var(--coprra-white); }
+.badge-warning { background: var(--color-warning); color: var(--coprra-white); }
+.badge-info { background: var(--color-info); color: var(--coprra-white); }
+
+/* Responsive tweaks */
+@media (max-width: 640px) {
+  .page-wrap { padding-left: var(--space-4); padding-right: var(--space-4); }
+  .section-card { padding: var(--space-6); }
+}
+

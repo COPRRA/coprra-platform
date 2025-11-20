@@ -1,0 +1,310 @@
+/**
+ * RTL (Right-to-Left) Stylesheet
+ * For Arabic, Hebrew, Urdu, and Farsi languages
+ */
+
+[dir="rtl"] {
+    direction: rtl;
+    text-align: right;
+}
+
+/* Layout Mirroring */
+[dir="rtl"] .flex-row-reverse {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .space-x-reverse > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 1;
+}
+
+/* Navigation */
+[dir="rtl"] nav {
+    direction: rtl;
+}
+
+[dir="rtl"] .navbar-brand {
+    margin-right: 0;
+    margin-left: auto;
+}
+
+/* Forms */
+[dir="rtl"] input,
+[dir="rtl"] select,
+[dir="rtl"] textarea {
+    text-align: right;
+}
+
+[dir="rtl"] .form-control {
+    padding-right: 0.75rem;
+    padding-left: 2.5rem;
+}
+
+/* Icons */
+[dir="rtl"] .fa-chevron-left::before {
+    content: "\f054"; /* chevron-right */
+}
+
+[dir="rtl"] .fa-chevron-right::before {
+    content: "\f053"; /* chevron-left */
+}
+
+[dir="rtl"] .fa-angle-left::before {
+    content: "\f105"; /* angle-right */
+}
+
+[dir="rtl"] .fa-angle-right::before {
+    content: "\f104"; /* angle-left */
+}
+
+/* Margins and Paddings - Mirror */
+[dir="rtl"] .ml-auto {
+    margin-left: 0 !important;
+    margin-right: auto !important;
+}
+
+[dir="rtl"] .mr-auto {
+    margin-right: 0 !important;
+    margin-left: auto !important;
+}
+
+[dir="rtl"] .pl-3 {
+    padding-left: 0 !important;
+    padding-right: 0.75rem !important;
+}
+
+[dir="rtl"] .pr-3 {
+    padding-right: 0 !important;
+    padding-left: 0.75rem !important;
+}
+
+[dir="rtl"] .ml-2 {
+    margin-left: 0 !important;
+    margin-right: 0.5rem !important;
+}
+
+[dir="rtl"] .mr-2 {
+    margin-right: 0 !important;
+    margin-left: 0.5rem !important;
+}
+
+/* Text Alignment */
+[dir="rtl"] .text-left {
+    text-align: right !important;
+}
+
+[dir="rtl"] .text-right {
+    text-align: left !important;
+}
+
+/* Float */
+[dir="rtl"] .float-left {
+    float: right !important;
+}
+
+[dir="rtl"] .float-right {
+    float: left !important;
+}
+
+/* Dropdowns */
+[dir="rtl"] .dropdown-menu {
+    right: auto;
+    left: 0;
+    text-align: right;
+}
+
+[dir="rtl"] .dropdown-menu-end {
+    right: auto;
+    left: 0;
+}
+
+/* Borders */
+[dir="rtl"] .border-l {
+    border-left: 0 !important;
+    border-right: 1px solid;
+}
+
+[dir="rtl"] .border-r {
+    border-right: 0 !important;
+    border-left: 1px solid;
+}
+
+/* Tailwind Utilities - RTL Support */
+[dir="rtl"] .ltr\:text-left {
+    text-align: right;
+}
+
+[dir="rtl"] .ltr\:text-right {
+    text-align: left;
+}
+
+/* Search Bar */
+[dir="rtl"] .search-icon {
+    left: auto;
+    right: 0.75rem;
+}
+
+[dir="rtl"] input[type="search"] {
+    padding-left: 1rem;
+    padding-right: 2.5rem;
+}
+
+/* Cards */
+[dir="rtl"] .card {
+    text-align: right;
+}
+
+[dir="rtl"] .card-title,
+[dir="rtl"] .card-text {
+    text-align: right;
+}
+
+/* Lists */
+[dir="rtl"] ul,
+[dir="rtl"] ol {
+    padding-right: 2rem;
+    padding-left: 0;
+}
+
+/* Tables */
+[dir="rtl"] table {
+    direction: rtl;
+}
+
+[dir="rtl"] th,
+[dir="rtl"] td {
+    text-align: right;
+}
+
+/* Breadcrumbs */
+[dir="rtl"] .breadcrumb-item + .breadcrumb-item::before {
+    padding-right: 0;
+    padding-left: 0.5rem;
+    content: "/";
+}
+
+/* Alerts */
+[dir="rtl"] .alert {
+    text-align: right;
+}
+
+/* Modals */
+[dir="rtl"] .modal-header .close {
+    margin: -1rem auto -1rem -1rem;
+}
+
+/* Tooltips */
+[dir="rtl"] .tooltip {
+    text-align: right;
+}
+
+/* Progress Bars */
+[dir="rtl"] .progress-bar {
+    right: 0;
+    left: auto;
+}
+
+/* Custom Components */
+[dir="rtl"] .product-card {
+    text-align: right;
+}
+
+[dir="rtl"] .category-card {
+    text-align: right;
+}
+
+/* Navigation Specific */
+[dir="rtl"] .nav-link {
+    margin-right: 0;
+    margin-left: 1rem;
+}
+
+[dir="rtl"] .navbar-nav {
+    padding-right: 0;
+}
+
+/* Flex Utilities */
+[dir="rtl"] .justify-end {
+    justify-content: flex-start !important;
+}
+
+[dir="rtl"] .justify-start {
+    justify-content: flex-end !important;
+}
+
+/* Transform */
+[dir="rtl"] .transform-none {
+    transform: none !important;
+}
+
+/* Positioning */
+[dir="rtl"] .left-0 {
+    left: auto;
+    right: 0;
+}
+
+[dir="rtl"] .right-0 {
+    right: auto;
+    left: 0;
+}
+
+[dir="rtl"] .left-1\/2 {
+    left: auto;
+    right: 50%;
+}
+
+[dir="rtl"] .-translate-x-1\/2 {
+    --tw-translate-x: 50%;
+}
+
+/* Specific Component Fixes */
+[dir="rtl"] .i18n-dropdown {
+    margin-left: 0;
+    margin-right: 0.5rem;
+}
+
+[dir="rtl"] .user-dropdown {
+    right: auto;
+    left: 0;
+}
+
+[dir="rtl"] .mobile-menu {
+    right: auto;
+    left: 0;
+}
+
+/* Price Display */
+[dir="rtl"] .price::before {
+    content: "";
+    margin-left: 0.25rem;
+}
+
+[dir="rtl"] .price::after {
+    content: attr(data-currency);
+    margin-right: 0.25rem;
+}
+
+/* Animations */
+[dir="rtl"] @keyframes slideInRight {
+    from {
+        transform: translateX(-100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+[dir="rtl"] @keyframes slideInLeft {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+/* Print */
+@media print {
+    [dir="rtl"] body {
+        direction: rtl;
+    }
+}

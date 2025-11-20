@@ -1,0 +1,41 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Providers;
+
+use App\Services\Security\Headers\SecurityHeaderStrategyFactory;
+use App\Services\Security\SecurityHeaderConfiguration;
+use App\Services\Security\SecurityHeadersService;
+use Illuminate\Support\ServiceProvider;
+
+class SecurityHeadersServiceProvider extends ServiceProvider
+{
+    /**
+     * Register services.
+     */
+    #[\Override]
+    public function register(): void
+    {
+        // Register SecurityHeaderStrategyFactory as singleton
+        $this->app->singleton(SecurityHeaderStrategyFactory::class, static function (): SecurityHeaderStrategyFactory {
+            return new SecurityHeaderStrategyFactory();
+        });
+
+        // Register SecurityHeaderConfiguration as singleton
+        $this->app->singleton(SecurityHeaderConfiguration::class, static function (): SecurityHeaderConfiguration {
+            $configuration = new SecurityHeaderConfiguration();
+            $configuration->loadFromConfig();
+
+            return $configuration;
+        });
+
+        // Register SecurityHeadersService as singleton
+        $this->app->singleton(SecurityHeadersService::class, static function ($app): SecurityHeadersService {
+            return new SecurityHeadersService(
+                $app->make(SecurityHeaderConfiguration::class),
+                $app->make(SecurityHeaderStrategyFactory::class)
+            );
+        });
+    }
+}

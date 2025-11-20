@@ -1,0 +1,26 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Http\Middleware\EncryptCookies;
+use App\Http\Middleware\VerifyCsrfToken;
+use Laravel\Sanctum\Sanctum;
+
+return [
+    'stateful' => explode(',', (string) env('SANCTUM_STATEFUL_DOMAINS', sprintf(
+        '%s,%s',
+        'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1',
+        Sanctum::currentApplicationUrlWithPort()
+    ))),
+
+    // Sanctum should fall back to the session-based 'web' guard to resolve users
+    // Avoid using 'sanctum' here as it causes recursive guard resolution
+    'guard' => ['web'],
+
+    'expiration' => null,
+
+    'middleware' => [
+        'verify_csrf_token' => VerifyCsrfToken::class,
+        'encrypt_cookies' => EncryptCookies::class,
+    ],
+];
