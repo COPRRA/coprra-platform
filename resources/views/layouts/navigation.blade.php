@@ -5,16 +5,10 @@
 <nav class="sticky top-0 z-50 bg-white dark:bg-gray-800 shadow" style="position: sticky !important; top: 0 !important; z-index: 50 !important;" x-data="{ mobileMenuOpen: false, searchOpen: false }">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
-            <!-- Logo -->
-            <div class="shrink-0 flex items-center">
-                <a href="{{ route('home') }}" class="flex items-center space-x-2" aria-label="{{ config('app.name', 'COPRRA') }} - {{ __('Home') }}">
-                    <img src="{{ asset('images/logo/coprra-logo.svg') }}" alt="{{ config('app.name', 'COPRRA') }}" class="h-10 w-auto" style="max-width: 150px; height: auto; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
-                    <span class="text-2xl font-bold text-blue-600 dark:text-blue-400" style="display: none;">{{ config('app.name', 'COPRRA') }}</span>
-                </a>
-            </div>
+            <!-- Logo - Removed -->
 
             <!-- Centered Navigation Links (Desktop) -->
-            <div class="hidden md:flex flex-1 justify-center space-x-8">
+            <div class="hidden md:flex flex-1 justify-center space-x-8 rtl:space-x-reverse">
                 <a href="{{ route('home') }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition duration-150 ease-in-out {{ request()->routeIs('home') ? 'text-blue-600 dark:text-blue-400 font-semibold' : '' }}">
                     <i class="fas fa-home mr-2"></i> {{ __('Home') }}
                 </a>
@@ -51,10 +45,10 @@
             </div>
 
             <!-- Right Side Of Navbar (Desktop) -->
-            <div class="hidden md:flex items-center space-x-4">
+            <div class="hidden md:flex items-center space-x-4 rtl:space-x-reverse">
                 <!-- Dual Search -->
                 @include('layouts.navigation-dual-search')
-                
+
                 <!-- Triple Dropdown: Language, Country, Currency -->
                 @include('layouts.navigation-triple-dropdown')
 
@@ -97,7 +91,7 @@
             </div>
 
             <!-- Mobile menu button -->
-            <div class="md:hidden flex items-center space-x-2">
+            <div class="md:hidden flex items-center space-x-2 rtl:space-x-reverse">
                 <button @click="searchOpen = !searchOpen" class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
                     <i class="fas fa-search"></i>
                 </button>
@@ -159,6 +153,17 @@
 
         <!-- Mobile i18n Options -->
         <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-3 space-y-3">
+            <!-- Theme Switcher (Mobile) -->
+            <div>
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{ __('Theme') }}</label>
+                <select
+                    id="theme-select-mobile"
+                    class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="light">{{ __('Light') }}</option>
+                    <option value="dark">{{ __('Dark') }}</option>
+                    <option value="auto" selected>{{ __('Auto') }}</option>
+                </select>
+            </div>
             <div>
                 <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{ __('Language') }}</label>
                 <form method="POST" action="{{ route('locale.language') }}">

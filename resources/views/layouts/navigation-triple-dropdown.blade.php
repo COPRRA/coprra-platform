@@ -1,5 +1,5 @@
 {{-- Triple Dropdown Component: Language, Country, Currency --}}
-<div class="flex items-center space-x-2">
+<div class="flex items-center space-x-2 rtl:space-x-reverse">
     {{-- Language Dropdown --}}
     <div x-data="{ languageOpen: {{ request()->get('open') === 'language' ? 'true' : 'false' }} }" class="relative">
         <button
@@ -106,6 +106,53 @@
                     </label>
                 @endforeach
             </form>
+        </div>
+    </div>
+
+    {{-- Theme Switcher Button - Visible and Prominent --}}
+    <div x-data="{ themeOpen: false }" class="relative">
+        <button
+            id="theme-toggle"
+            @click="themeOpen = !themeOpen"
+            @click.away="themeOpen = false"
+            class="inline-flex items-center justify-center px-4 py-2 text-base font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 dark:from-gray-700 dark:to-gray-800 dark:hover:from-gray-600 dark:hover:to-gray-700 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 ease-in-out transform hover:scale-105"
+            aria-label="{{ __('Theme') }}"
+            title="{{ __('Toggle theme') }}"
+            style="min-width: 50px; min-height: 40px;">
+            <i id="theme-icon" class="fas fa-adjust text-lg"></i>
+            <span id="theme-text" class="ml-2 hidden sm:inline-block font-medium"></span>
+        </button>
+        <div
+            x-show="themeOpen"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 scale-95"
+            x-transition:enter-end="opacity-100 scale-100"
+            x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100 scale-100"
+            x-transition:leave-end="opacity-0 scale-95"
+            class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl py-2 z-50 border-2 border-blue-500 dark:border-gray-600"
+            style="display: none;">
+            <button
+                type="button"
+                data-theme-option="light"
+                class="w-full px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 flex items-center transition-colors">
+                <i class="fas fa-sun mr-3 text-yellow-500"></i>
+                <span>{{ __('Light') }}</span>
+            </button>
+            <button
+                type="button"
+                data-theme-option="dark"
+                class="w-full px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 flex items-center transition-colors">
+                <i class="fas fa-moon mr-3 text-indigo-500"></i>
+                <span>{{ __('Dark') }}</span>
+            </button>
+            <button
+                type="button"
+                data-theme-option="auto"
+                class="w-full px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 flex items-center transition-colors">
+                <i class="fas fa-adjust mr-3 text-gray-500"></i>
+                <span>{{ __('Auto') }}</span>
+            </button>
         </div>
     </div>
 </div>

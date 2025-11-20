@@ -1,5 +1,5 @@
 {{-- Dual Search Component: Internal Search and External Search --}}
-<div x-data="{ searchMode: 'internal', internalSearchOpen: false, externalSearchOpen: false, isLoading: false }" class="flex items-center space-x-2">
+<div x-data="{ searchMode: 'internal', internalSearchOpen: false, externalSearchOpen: false, isLoading: false }" class="flex items-center space-x-2 rtl:space-x-reverse">
     {{-- Search Mode Toggle --}}
     <div class="relative">
         <button

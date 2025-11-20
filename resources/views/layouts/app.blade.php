@@ -86,8 +86,13 @@
     <!-- Additional CSS -->
     @stack('styles')
 
-    <!-- Alpine.js (local) - loaded globally for navigation component -->
-    {{-- Only load Alpine.js on home page or pages without Livewire to avoid multiple instances --}}
+    <!-- Alpine.js - loaded globally for navigation component -->
+    @if (file_exists(public_path('js/alpine.js')))
+        <script defer src="{{ asset('js/alpine.js') }}"></script>
+    @else
+        <!-- Fallback to CDN if local file not found -->
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+    @endif
 
 
     <!-- Scripts -->
