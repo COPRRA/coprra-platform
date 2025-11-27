@@ -27,6 +27,9 @@ jobs:
       - name: Generate application key
         run: php artisan key:generate
 
+      - name: Run database migrations
+        run: php artisan migrate --force
+
       - name: Run Unit & Feature Tests
         run: php artisan test
 
